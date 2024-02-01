@@ -1,5 +1,5 @@
-#ifndef _BASIC_CUH_
-#define _BASIC_CUH_
+#ifndef _BASIC_HH_
+#define _BASIC_HH_
 
 #include <stdio.h>
 #include <iostream>

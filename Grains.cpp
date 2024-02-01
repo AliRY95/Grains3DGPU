@@ -4,11 +4,7 @@
 /* ========================================================================== */
 #include <cuda.h>
 #include <cuda_runtime.h>
-
-#include "Basic.cuh"
-#include "Vector3.cu"
-#include "Convex.cu"
-#include "Kernels.cu"
+#include "Kernels.cpp"
 
 using namespace std;
 
@@ -79,13 +75,13 @@ int main(int argc, char* argv[])
                               sizeof( Vector3<userDefType> ), 
                               cudaMemcpyHostToDevice ) );
 
-    Convex<userDefType> *h_convex = new Convex<userDefType>( r1, r2, r3 );
+    Convex *h_convex = new Convex( r1, r2, r3 );
 
     // Copying the array from host to device
-    Convex<userDefType> *d_convex;
+    Convex *d_convex;
     cudaErrCheck( cudaMalloc( (void**)&d_convex,
-                              sizeof( Convex<userDefType> ) ) );
-    setupConvex<<< 1, 1 >>>( r1, r2, r3, d_convex );
+                              sizeof( Convex ) ) );
+    // setupConvex<<< 1, 1 >>>( r1, r2, r3, d_convex );
 
     /* ====================================================================== */
     /* Collision detection                                                    */

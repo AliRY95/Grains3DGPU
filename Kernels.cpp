@@ -1,17 +1,16 @@
-#ifndef _KERNELS_CUH_
-#define _KERNELS_CUH_
+#ifndef _KERNELS_CU_
+#define _KERNELS_CU_
 
-#include "Vector3.cu"
-#include "Convex.cu"
+#include "Vector3.hh"
+#include "Convex.hh"
 
 
 // -----------------------------------------------------------------------------
 namespace GrainsCPU
 {
 // ...
-template <typename T>
-void collisionDetectionGJKwithAABB( Convex<T> const* a,
-                                    Vector3<T> const* cen,
+void collisionDetectionGJKwithAABB( Convex const* a,
+                                    Vec3d const* cen,
                                     bool* result,
                                     int const N )
 {
@@ -28,9 +27,8 @@ void collisionDetectionGJKwithAABB( Convex<T> const* a,
 
 // -----------------------------------------------------------------------------
 // ...
-template <typename T>
-void collisionDetectionGJK( Convex<T> const* a,
-                            Vector3<T> const* cen,
+void collisionDetectionGJK( Convex const* a,
+                            Vec3d const* cen,
                             bool* result,
                             int const N )
 {
@@ -97,9 +95,8 @@ void collisionDetectionAABB( Vector3<T> const* box,
 namespace GrainsGPU
 {
 // ...
-template <typename T>
-__global__ void collisionDetectionGJKwithAABB( Convex<T> const* __restrict__ a,
-                                               Vector3<T> const* __restrict__ cen,
+__global__ void collisionDetectionGJKwithAABB( Convex const* __restrict__ a,
+                                               Vec3d const* __restrict__ cen,
                                                bool* result,
                                                int const N )
 {
@@ -108,8 +105,8 @@ __global__ void collisionDetectionGJKwithAABB( Convex<T> const* __restrict__ a,
               blockIdx.x;
     int tid = bid * blockDim.x + threadIdx.x;
     
-    Vector3<T> primaryParticleCen = cen[tid];
-    Vector3<T> secondaryParticleCen;
+    Vec3d primaryParticleCen = cen[tid];
+    Vec3d secondaryParticleCen;
     for ( int j = 0; j < N; j++ )
     // for ( int j = tid - 32; j < tid + 32 && j > 0 && j < N; j++ )
     {
@@ -124,9 +121,8 @@ __global__ void collisionDetectionGJKwithAABB( Convex<T> const* __restrict__ a,
 
 // -----------------------------------------------------------------------------
 // ...
-template <typename T>
-__global__ void collisionDetectionGJK( Convex<T> const* a,
-                                       Vector3<T> const* cen,
+__global__ void collisionDetectionGJK( Convex const* a,
+                                       Vec3d const* cen,
                                        bool* result,
                                        int const N )
 {
@@ -199,13 +195,11 @@ __global__ void collisionDetectionAABB( Vector3<T> const* box,
 
 
 // -----------------------------------------------------------------------------
-template <typename T>
-__global__ void setupConvex( T x, T y, T z, Convex<T>* convex )
+__global__ void setupConvex( double x, double y, double z, Convex* convex )
 {
     // convex->setExtent( x, y, z );
     *convex = *(new Convex( x, y, z ));
     // convex( x, y, z);
 };
-
 
 #endif

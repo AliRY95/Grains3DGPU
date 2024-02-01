@@ -1,114 +1,9 @@
-#ifndef _CONVEX_CUH_
-#define _CONVEX_CUH_
-
-#include "Basic.cuh"
-#include "Vector3.cu"
-
-
-// =============================================================================
-/** @brief The class Convex.
-
-    Convex bodies.
-
-    @author A.Yazdani - 2023 - Construction */
-// =============================================================================
-template <typename T>
-class Convex
-{
-  protected:
-    /**@name Parameters */
-    //@{
-    Vector3<T> m_extent; /**< vector containing the half-legnth of the edges */
-    //@}
-
-  public:
-    /** @name Constructors */
-    //@{
-    /** @brief Default constructor */
-    __host__ __device__ Convex();
-
-    /** @brief Constructor with 3 components as inputs
-    @param x 1st component
-    @param y 2nd component
-    @param z 3rd component */
-    __host__ __device__ Convex( T x, T y, T z );
-
-    /** @brief Constructor with a vector containing the edge half-lengths
-    @param extent_ vector of half-lengths */
-    __host__ __device__ Convex( Vector3<T> const& extent_ );
-
-    /** @brief Destructor */
-    __host__ __device__ ~Convex();
-    //@}
-
-
-    /** @name Methods */
-    //@{
-    /** @brief Sets values of the edge length
-    @param x 1st component
-    @param y 2nd component
-    @param z 3rd component */
-    __host__ __device__ void setExtent( T x, T y, T z );
-
-    /** @brief Gets values of the edge length
-    @param x 1st component
-    @param y 2nd component
-    @param z 3rd component */
-    __host__ __device__ Vector3<T> const getExtent() const;
-
-    /** @brief Box support function, returns the support point P, i.e. the
-    point on the surface of the box that satisfies max(P.v)
-    @param v direction */
-    __host__ __device__ Vector3<T> support( Vector3<T> const& v ) const;
-    //@}
-};
-
-
-/** @name Convex : External methods for the GJK algorithm */
-//@{
-/** @brief Returns whether 2 convex shapes intersect
- @param a convex shape A
- @param b convex shape B
- @param a2w geometric tramsformation describing convex A in the world reference
- frame
- @param b2w geometric tramsformation describing convex B in the world reference
- frame */
-template <typename T>
-__host__ __device__ bool intersectGJK( Convex<T> const* a, 
-                                       Convex<T> const* b,
-                                       Vector3<T> const& a2w,
-	                                   Vector3<T> const& b2w );
-
-/** @brief Returns whether the bounding boxex are in contact or not
- @param a bounding box of A
- @param b bounding box of B
- @param a2w geometric tramsformation describing convex A in the world reference
- frame
- @param b2w geometric tramsformation describing convex B in the world reference
- frame */
-template <typename T>
-__host__ __device__ bool intersectAABB( Convex<T> const* a, 
-                                        Convex<T> const* b,
-                                        Vector3<T> const& a2w,
-	                                    Vector3<T> const& b2w );
-
-
-//@}
-
-/* ========================================================================== */
-/*                                                                            */
-/*                                                                            */
-/*                                                                            */
-/*                                                                            */
-/*                                                                            */
-/*                                                                            */
-/* ========================================================================== */
-
+#include "Convex.hh"
+#include "Vector3.hh"
 
 // -----------------------------------------------------------------------------
 // Default constructor
-template <typename T>
-__host__ __device__ Convex<T>::Convex()
+__host__ __device__ Convex::Convex()
 {}
 
 
@@ -116,8 +11,7 @@ __host__ __device__ Convex<T>::Convex()
 
 // -----------------------------------------------------------------------------
 // Constructor with a vector containing the edge half-lengths
-template <typename T>
-__host__ __device__ Convex<T>::Convex( Vector3<T> const& extent_ )
+__host__ __device__ Convex::Convex( Vec3d const& extent_ )
 : m_extent( extent_ )
 {}
 
@@ -126,9 +20,8 @@ __host__ __device__ Convex<T>::Convex( Vector3<T> const& extent_ )
 
 // -----------------------------------------------------------------------------
 // Constructor with half edge length as input parameters
-template <typename T>
-__host__ __device__ Convex<T>::Convex( T x, T y, T z )
-: m_extent( Vector3<T>( x, y, z ) )
+__host__ __device__ Convex::Convex( double x, double y, double z )
+: m_extent( Vec3d( x, y, z ) )
 {}
 
 
@@ -136,8 +29,7 @@ __host__ __device__ Convex<T>::Convex( T x, T y, T z )
 
 // -----------------------------------------------------------------------------
 // Destructor
-template <typename T>
-__host__ __device__ Convex<T>::~Convex()
+__host__ __device__ Convex::~Convex()
 {}
 
 
@@ -145,12 +37,9 @@ __host__ __device__ Convex<T>::~Convex()
 
 // -----------------------------------------------------------------------------
 // Sets values of the edge length
-template <typename T>
-__host__ __device__ void Convex<T>::setExtent( T x, T y, T z )
+__host__ __device__ void Convex::setExtent( double x, double y, double z )
 {
-    m_extent[X] = x;
-    m_extent[Y] = y;
-    m_extent[Z] = z;
+    m_extent = Vec3d( x, y, z );
 }
 
 
@@ -158,8 +47,7 @@ __host__ __device__ void Convex<T>::setExtent( T x, T y, T z )
 
 // -----------------------------------------------------------------------------
 // Gets values of the edge length
-template <typename T>
-__host__ __device__ Vector3<T> const Convex<T>::getExtent() const
+__host__ __device__ Vec3d const Convex::getExtent() const
 {
     return( m_extent );
 }
@@ -170,16 +58,15 @@ __host__ __device__ Vector3<T> const Convex<T>::getExtent() const
 // -----------------------------------------------------------------------------
 // Box support function, returns the support point P, i.e. the point on the
 // surface of the box that satisfies max(P.v)
-template <typename T>
-__host__ __device__ Vector3<T> Convex<T>::support( Vector3<T> const& v ) const
+__host__ __device__ Vec3d Convex::support( Vec3d const& v ) const
 {
-    T norm = Norm( v );
+    double norm = v.Norm();
     if ( norm < EPSILON1 )
-        return ( Vector3<T>() );
+        return ( Vec3d() );
     else
-        return ( Vector3<T>( v[X] < 0. ? -m_extent[X] : m_extent[X],
-                             v[Y] < 0. ? -m_extent[Y] : m_extent[Y],
-                             v[Z] < 0. ? -m_extent[Z] : m_extent[Z] ) );
+        return ( Vec3d( v[X] < 0. ? -m_extent[X] : m_extent[X],
+                        v[Y] < 0. ? -m_extent[Y] : m_extent[Y],
+                        v[Z] < 0. ? -m_extent[Z] : m_extent[Z] ) );
 }
 
 
@@ -188,26 +75,23 @@ __host__ __device__ Vector3<T> Convex<T>::support( Vector3<T> const& v ) const
 /* ========================================================================== */
 /*                              External Methods                              */
 /* ========================================================================== */
-
-
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
-template <typename T>
 __host__ __device__ void computeDet( int const bits,
                                      int const last,
                                      int const last_bit,
                                      int const all_bits,
-                                     Vector3<T> const y[4],
-                                     T dp[4][4],
-                                     T det[16][4] )
+                                     Vec3d const y[4],
+                                     double dp[4][4],
+                                     double det[16][4] )
 {
     for( int i = 0, bit = 1; i < 4; ++i, bit <<=1 )
         if (bits & bit) 
             dp[i][last] = dp[last][i] = y[i] * y[last];
     dp[last][last] = y[last] * y[last];
 
-    det[last_bit][last] = T( 1 );
+    det[last_bit][last] = 1.;
     for( int j = 0, sj = 1; j < 4; ++j, sj <<= 1 )
     {
         if( bits & sj )
@@ -252,10 +136,9 @@ __host__ __device__ void computeDet( int const bits,
 
 
 // -----------------------------------------------------------------------------
-template <typename T>
 __host__ __device__  inline bool valid( int const s,
                                         int const all_bits,
-                                        T const det[16][4] )
+                                        double const det[16][4] )
 {
     for ( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     {
@@ -266,7 +149,7 @@ __host__ __device__  inline bool valid( int const s,
                 if ( det[s][i] <= EPSILON1 )
                     return ( false );
             }
-            else if ( det[s|bit][i] > T( 0 ) )
+            else if ( det[s|bit][i] > 0. )
                 return ( false );
         }
     }
@@ -277,14 +160,13 @@ __host__ __device__  inline bool valid( int const s,
 
 
 // -----------------------------------------------------------------------------
-template <typename T>
 __host__ __device__ inline void computeVec( int const bits_,
-                                            Vector3<T> const y[4],
-                                            T const det[16][4],
-                                            Vector3<T>& v )
+                                            Vec3d const y[4],
+                                            double const det[16][4],
+                                            Vec3d& v )
 {
-    T sum = T( 0 );
-    v.setValue( T( 0 ), T( 0 ), T( 0 ) );
+    double sum = 0.;
+    v.setValue( 0., 0., 0. );
     for ( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     {
         if ( bits_ & bit )
@@ -293,16 +175,15 @@ __host__ __device__ inline void computeVec( int const bits_,
             v += y[i] * det[bits_][i];
         }
     }
-    v *= T( 1 ) / sum;
+    v *= 1. / sum;
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-template <typename T>
 __host__ __device__ inline bool proper( int const s,
-                                        T const det[16][4] )
+                                        double const det[16][4] )
 {
     for( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
         if( ( s & bit ) && det[s][i] <= EPSILON3 )
@@ -314,15 +195,14 @@ __host__ __device__ inline bool proper( int const s,
 
 
 // -----------------------------------------------------------------------------
-template <typename T>
 __host__ __device__ inline bool closest( int& bits,
                                          int const last,
                                          int const last_bit,
                                          int const all_bits,
-                                         Vector3<T> const y[4],
-                                         T dp[4][4],
-                                         T det[16][4],
-                                         Vector3<T>& v )
+                                         Vec3d const y[4],
+                                         double dp[4][4],
+                                         double det[16][4],
+                                         Vec3d& v )
 {
     int s;
     computeDet( bits, last, last_bit, all_bits, y, dp, det );
@@ -345,16 +225,16 @@ __host__ __device__ inline bool closest( int& bits,
         return( true );
     }
     // Original GJK calls the backup procedure at this point.
-    T min_dist2 = INFINITY;
+    double min_dist2 = INFINITY;
     for ( s = all_bits; s; --s )
     {
         if ( ( s & all_bits ) == s )
         {
             if ( proper( s, det ) )
             {
-                Vector3<T> u;
+                Vec3d u;
                 computeVec( s, y, det, u );
-                T dist2 = Norm2( u );
+                double dist2 = u.Norm2();
                 if ( dist2 < min_dist2 )
                 {
                     min_dist2 = dist2;
@@ -373,10 +253,9 @@ __host__ __device__ inline bool closest( int& bits,
 // ----------------------------------------------------------------------------
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
-template <typename T>
 __host__ __device__ inline bool degenerate( int const all_bits,
-                                            Vector3<T> const y[4],
-                                            Vector3<T> const& w )
+                                            Vec3d const y[4],
+                                            Vec3d const& w )
 {
   for ( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     if ( (all_bits & bit) && y[i] == w )
@@ -391,22 +270,21 @@ __host__ __device__ inline bool degenerate( int const all_bits,
 /*                            High-Level Methods                              */
 /* ========================================================================== */
 // Returns whether 2 convex shapes intersect
-template <typename T>
-__host__ __device__  bool intersectGJK( Convex<T> const* a,
-                                        Convex<T> const* b,
-                                        Vector3<T> const& a2w,
-                                        Vector3<T> const& b2w )
+__host__ __device__  bool intersectGJK( Convex const* a,
+                                        Convex const* b,
+                                        Vec3d const& a2w,
+                                        Vec3d const& b2w )
 {
     int bits = 0;           // identifies current simplex
     int last = 0;           // identifies last found support point
     int last_bit = 0;       // last_bit = 1<<last
     int all_bits = 0;       // all_bits = bits|last_bit
-    Vector3<T> y[4];        // support points of A - B in world coordinates
-    T det[16][4] = {T( 0 )};// cached sub-determinants
-    T dp[4][4] = {T( 0 )};
+    Vec3d y[4];        // support points of A - B in world coordinates
+    double det[16][4] = { 0. };// cached sub-determinants
+    double dp[4][4] = { 0. };
 
-    Vector3<T> v( T( 1 ), T( 1 ), T( 1 )), w;
-    T prod;
+    Vec3d v( 1., 1., 1. ), w;
+    double prod;
     
     do {        
         last = 0;
@@ -421,7 +299,7 @@ __host__ __device__  bool intersectGJK( Convex<T> const* a,
         // printf("[%f %f %f], [%f %f %f] \n", v[X], v[Y] , v[Z],
         //                                     w[X], w[Y] , w[Z] );
         prod = v * w;
-        if( prod > T( 0 ) || fabs( prod ) < EPSILON2 )
+        if( prod > 0. || fabs( prod ) < EPSILON2 )
             return ( false );
         if ( degenerate( all_bits, y, w ) )
             return ( false );      
@@ -429,7 +307,7 @@ __host__ __device__  bool intersectGJK( Convex<T> const* a,
         all_bits = bits | last_bit;
         if ( !closest( bits, last, last_bit, all_bits, y, dp, det, v ) )
             return ( false );
-    } while ( bits < 15 && !approxZero( v ) );
+    } while ( bits < 15 && !v.isApproxZero() );
     return ( true );
 }
 
@@ -438,14 +316,13 @@ __host__ __device__  bool intersectGJK( Convex<T> const* a,
 
 // ----------------------------------------------------------------------------
 // Returns whether the bounding boxes of 2 convex shapes intersect
-template <typename T>
-__host__ __device__  bool intersectAABB( Convex<T> const* a,
-                                         Convex<T> const* b,
-                                         Vector3<T> const& a2w,
-                                         Vector3<T> const& b2w )
+__host__ __device__  bool intersectAABB( Convex const* a,
+                                         Convex const* b,
+                                         Vec3d const& a2w,
+                                         Vec3d const& b2w )
 {
-    Vector3<T> const AABB1 = a->getExtent();
-    Vector3<T> const AABB2 = b->getExtent();
+    Vec3d const AABB1 = a->getExtent();
+    Vec3d const AABB2 = b->getExtent();
     if ( fabs( a2w[X] - b2w[X] ) > ( AABB1[X] + AABB2[X] ) )
         return ( false );
     else if ( fabs( a2w[Y] - b2w[Y] ) > ( AABB1[Y] + AABB2[Y] ) )
@@ -455,5 +332,3 @@ __host__ __device__  bool intersectAABB( Convex<T> const* a,
     else // We have an overlap
         return ( true );
 }
-
-#endif
