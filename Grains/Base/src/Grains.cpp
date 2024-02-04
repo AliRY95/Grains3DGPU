@@ -4,7 +4,7 @@
 /* ========================================================================== */
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "Kernels.cpp"
+#include "Kernels.cu"
 
 using namespace std;
 

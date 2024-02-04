@@ -34,7 +34,7 @@ class Vector3
     __host__ __device__ Vector3( T x, T y, T z );
 
     /** @brief Copy constructor
-    @param g copied Vector3 object */
+    @param vec copied Vector3 object */
     __host__ __device__ Vector3( Vector3<T> const& vec );
 
     /** @brief Destructor */
@@ -62,7 +62,6 @@ class Vector3
     /** @brief Returns whether the vector norm is less than EPSILON2
     where EPSILON2 is defined in Basic.hh */
     __host__ __device__ bool isApproxZero() const;
-
     //@}
 
 
@@ -112,12 +111,11 @@ class Vector3
     @param i component index */
     __host__ __device__ T operator [] ( size_t i ) const;
 
-    /** @brief Equal operator to another Vector3 object
-    @param vec the other Vector3 object */
+    /** @brief Assign operator to another Vector3 object
+    @param vec rhs Vector3 object */
     __host__ __device__ Vector3<T>& operator = ( Vector3<T> const& vec );    
 
-    /** @brief Unitary operator -. Returns an object with negative
-    components */
+    /** @brief Unitary operator -. Returns an object with negative components */
     __host__ __device__ Vector3<T> operator - () const;
 
     /** @brief Comparaison operator
@@ -130,10 +128,8 @@ class Vector3
     //@}
 };
 
-
 // static Vector3 Vector3Nul; /**< Vector3 nul (0.,0.,0.)  */
 typedef Vector3<float> Vec3f;
 typedef Vector3<double> Vec3d;
-
 
 #endif

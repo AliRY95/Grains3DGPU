@@ -1,6 +1,7 @@
 #include "Basic.hh"
 #include "Vector3.hh"
 
+
 // -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
@@ -95,6 +96,19 @@ __host__ __device__ T Vector3<T>::Norm() const
 
 
 // -----------------------------------------------------------------------------
+//Returns the norm of the vector - specialized for floats
+template <>
+__host__ __device__ float Vector3<float>::Norm() const
+{
+  return ( sqrtf( m_comp[X] * m_comp[X] + 
+                  m_comp[Y] * m_comp[Y] + 
+                  m_comp[Z] * m_comp[Z] ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Returns the squared norm of the vector
 template <typename T>
 __host__ __device__ T Vector3<T>::Norm2() const
@@ -115,6 +129,19 @@ __host__ __device__ bool Vector3<T>::isApproxZero() const
     return ( fabs( m_comp[X] ) < EPSILON2 && 
              fabs( m_comp[Y] ) < EPSILON2 &&
              fabs( m_comp[Z] ) < EPSILON2 );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Determines if the vector is approximately zero - specialized for floats
+template <>
+__host__ __device__ bool Vector3<float>::isApproxZero() const
+{
+    return ( fabsf( m_comp[X] ) < EPSILON2 && 
+             fabsf( m_comp[Y] ) < EPSILON2 &&
+             fabsf( m_comp[Z] ) < EPSILON2 );
 }
 
 
