@@ -20,6 +20,7 @@ class Vector3
     T m_comp[3]; /**< array of 3 components */
     //@}
 
+
   public:
     /**@name Constructors */
     //@{
@@ -54,10 +55,10 @@ class Vector3
     __host__ __device__ Vector3<T> normalized() const;
 
     /** @brief Returns the norm of the vector */
-    __host__ __device__ T Norm() const;
+    __host__ __device__ T norm() const;
 
     /** @brief Returns the norm square of the vector */
-    __host__ __device__ T Norm2() const;
+    __host__ __device__ T norm2() const;
 
     /** @brief Returns whether the vector norm is less than EPSILON2
     where EPSILON2 is defined in Basic.hh */

@@ -86,7 +86,7 @@ __host__ __device__ Vector3<T> Vector3<T>::normalized() const
 // -----------------------------------------------------------------------------
 //Returns the norm of the vector
 template <typename T>
-__host__ __device__ T Vector3<T>::Norm() const
+__host__ __device__ T Vector3<T>::norm() const
 {
   return ( sqrt( m_comp[X] * m_comp[X] + 
                  m_comp[Y] * m_comp[Y] + 
@@ -98,7 +98,7 @@ __host__ __device__ T Vector3<T>::Norm() const
 // -----------------------------------------------------------------------------
 //Returns the norm of the vector - specialized for floats
 template <>
-__host__ __device__ float Vector3<float>::Norm() const
+__host__ __device__ float Vector3<float>::norm() const
 {
   return ( sqrtf( m_comp[X] * m_comp[X] + 
                   m_comp[Y] * m_comp[Y] + 
@@ -111,7 +111,7 @@ __host__ __device__ float Vector3<float>::Norm() const
 // -----------------------------------------------------------------------------
 // Returns the squared norm of the vector
 template <typename T>
-__host__ __device__ T Vector3<T>::Norm2() const
+__host__ __device__ T Vector3<T>::norm2() const
 {
   return ( m_comp[X] * m_comp[X] + 
            m_comp[Y] * m_comp[Y] + 

@@ -5,60 +5,71 @@
 #include "Vector3.hh"
 
 
+// Convex types
+enum ConvexType {
+  SPHERE,
+  BOX,
+  CYLINDER,
+  CONE,
+  SUPERQUADRIC,
+  POLYHEDRON,
+  RECTANGLE2D
+};
+
+
 // =============================================================================
 /** @brief The class Convex.
 
-    Convex bodies.
+    Convex bodies in double precision.
 
-    @author A.Yazdani - 2023 - Construction */
+    @author A.Yazdani - 2023 - Construction 
+    @author A.Yazdani - 2024 - Modificiation */
 // =============================================================================
 class Convex
 {
   protected:
-    /**@name Parameters */
+    /**@name Contructors */
     //@{
-    Vec3d m_extent; /**< vector containing the half-legnth of the edges */
+    /** @brief Default constructor (forbidden except in derived classes) */
+    __host__ __device__ Convex();
     //@}
+
 
   public:
     /** @name Constructors */
     //@{
-    /** @brief Default constructor */
-    __host__ __device__ Convex();
-
-    /** @brief Constructor with 3 components as inputs
-    @param x 1st component
-    @param y 2nd component
-    @param z 3rd component */
-    __host__ __device__ Convex( double x, double y, double z );
-
-    /** @brief Constructor with a vector containing the edge half-lengths
-    @param extent_ vector of half-lengths */
-    __host__ __device__ Convex( Vec3d const& extent_ );
-
     /** @brief Destructor */
-    __host__ __device__ ~Convex();
+    __host__ __device__ virtual ~Convex();
     //@}
 
 
     /** @name Methods */
     //@{
-    /** @brief Sets values of the edge length
-    @param x 1st component
-    @param y 2nd component
-    @param z 3rd component */
-    __host__ __device__ void setExtent( double x, double y, double z );
+    /** @brief Returns the convex type */
+    __host__ __device__  virtual ConvexType getConvexType() const = 0;
 
-    /** @brief Gets values of the edge length
-    @param x 1st component
-    @param y 2nd component
-    @param z 3rd component */
-    __host__ __device__ Vec3d const getExtent() const;
+    /** @brief Computes and returns the circumscribed radius of the reference
+    convex shape */
+    __host__ __device__ virtual double computeCircumscribedRadius() const = 0;
 
-    /** @brief Box support function, returns the support point P, i.e. the
-    point on the surface of the box that satisfies max(P.v)
-    @param v direction */
-    __host__ __device__ Vec3d support( Vec3d const& v ) const;
+    /** @brief Returns the volume of the convex shape */
+    __host__ __device__ virtual double computeVolume() const = 0;
+
+    /** @brief Computes the inertia tensor and the inverse of the inertia tensor
+    @param inertia inertia tensor
+    @param inertia_1 inverse of the inertia tensor */
+    __host__ __device__ virtual bool buildInertia( double* inertia, 
+                                                   double* inertia_1 ) const = 0;
+
+    // /** @brief Returns the convex shape bounding volume
+    // @param type 1 = OBB, 2 = OBC */
+    // __host__ __device__ virtual BVolume const* computeBoundingVolume( 
+    //                                                   unsigned int type ) const;
+
+    /** @brief Convex support function, returns the support point P, i.e. the
+    point on the surface of the convex shape that satisfies max(P.v)
+    @param v direction vector */
+    __host__ __device__  virtual Vec3d support( Vec3d const& v ) const = 0;
     //@}
 };
 

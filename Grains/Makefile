@@ -56,7 +56,7 @@ DEBUG  := -g
 
 # Compiler flags
 INCFLAGS  := $(INCDIR:%=-I%)
-COMPFLAGS := $(DEBUG) -x cu -arch=sm_75 $(INCFLAGS)
+COMPFLAGS := $(DEBUG) -x cu -O3 -arch=sm_75 $(INCFLAGS)
 
 
 #------------------------------------------------------------------------------

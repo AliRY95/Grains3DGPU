@@ -10,24 +10,6 @@ __host__ __device__ Convex::Convex()
 
 
 // -----------------------------------------------------------------------------
-// Constructor with a vector containing the edge half-lengths
-__host__ __device__ Convex::Convex( Vec3d const& extent_ )
-: m_extent( extent_ )
-{}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Constructor with half edge length as input parameters
-__host__ __device__ Convex::Convex( double x, double y, double z )
-: m_extent( Vec3d( x, y, z ) )
-{}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Destructor
 __host__ __device__ Convex::~Convex()
 {}
@@ -35,39 +17,17 @@ __host__ __device__ Convex::~Convex()
 
 
 
-// -----------------------------------------------------------------------------
-// Sets values of the edge length
-__host__ __device__ void Convex::setExtent( double x, double y, double z )
-{
-    m_extent = Vec3d( x, y, z );
-}
+// // -----------------------------------------------------------------------------
+// // Returns the convex shape bounding volume
+// __host__ __device__ BVolume const* Convex::computeBVolume( unsigned int type ) 
+//                                                                            const
+// {
+//   cout << "Warning for this Convex the method Convex::computeBVolume() "
+//        << "is not yet implemented !\n";
+//   return( nullptr );
+// }
 
 
-
-
-// -----------------------------------------------------------------------------
-// Gets values of the edge length
-__host__ __device__ Vec3d const Convex::getExtent() const
-{
-    return( m_extent );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Box support function, returns the support point P, i.e. the point on the
-// surface of the box that satisfies max(P.v)
-__host__ __device__ Vec3d Convex::support( Vec3d const& v ) const
-{
-    double norm = v.Norm();
-    if ( norm < EPSILON1 )
-        return ( Vec3d() );
-    else
-        return ( Vec3d( v[X] < 0. ? -m_extent[X] : m_extent[X],
-                        v[Y] < 0. ? -m_extent[Y] : m_extent[Y],
-                        v[Z] < 0. ? -m_extent[Z] : m_extent[Z] ) );
-}
 
 
 
