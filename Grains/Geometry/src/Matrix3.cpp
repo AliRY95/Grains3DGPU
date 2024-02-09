@@ -1,5 +1,3 @@
-#include "Basic.hh"
-#include "Vector3.hh"
 #include "Matrix3.hh"
 
 
@@ -289,9 +287,9 @@ __host__ __device__ Matrix3<T> operator + ( Matrix3<T> const& m1,
                                             Matrix3<T> const& m2 )
 {
   return (
-    Matrix( m1[X][X] + m2[X][X], m1[X][Y] + m2[X][Y], m1[X][Z] + m2[X][Z],
-            m1[Y][X] + m2[Y][X], m1[Y][Y] + m2[Y][Y], m1[Y][Z] + m2[Y][Z],
-            m1[Z][X] + m2[Z][X], m1[Z][Y] + m2[Z][Y], m1[Z][Z] + m2[Z][Z] ) );
+    Matrix3<T>( m1[X][X] + m2[X][X], m1[X][Y] + m2[X][Y], m1[X][Z] + m2[X][Z],
+                m1[Y][X] + m2[Y][X], m1[Y][Y] + m2[Y][Y], m1[Y][Z] + m2[Y][Z],
+                m1[Z][X] + m2[Z][X], m1[Z][Y] + m2[Z][Y], m1[Z][Z] + m2[Z][Z] ) );
 }
 
 
@@ -341,7 +339,7 @@ template <typename T>
 __host__ __device__ Matrix3<T> operator * ( Matrix3<T> const& m1, 
                                             Matrix3<T> const& m2 )
 {
-  return Matrix(
+  return Matrix3<T>(
     m1[X][X] * m2[X][X] + m1[X][Y] * m2[Y][X] + m1[X][Z] * m2[Z][X],
     m1[X][X] * m2[X][Y] + m1[X][Y] * m2[Y][Y] + m1[X][Z] * m2[Z][Y],
     m1[X][X] * m2[X][Z] + m1[X][Y] * m2[Y][Z] + m1[X][Z] * m2[Z][Z],
@@ -402,6 +400,16 @@ __host__ __device__ Matrix3<T> operator * ( Matrix3<T> const& m1,
 // Explicit instantiation
 template class Matrix3<float>;
 template class Matrix3<double>;
+
+#define X( T ) \
+template Matrix3<T> operator +<T>( Matrix3<T> const& m1, Matrix3<T> const& m2 );\
+template Matrix3<T> operator *<T>( T c, Matrix3<T> const& m );\
+template Vector3<T> operator *<T>( Matrix3<T> const& m, Vector3<T> const& v );\
+template Vector3<T> operator *<T>( Vector3<T> const& v, Matrix3<T> const& m );\
+template Matrix3<T> operator *<T>( Matrix3<T> const& m1, Matrix3<T> const& m2 );
+X( float )
+X( double )
+#undef X
 
 
 

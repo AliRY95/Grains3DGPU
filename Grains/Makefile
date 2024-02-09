@@ -4,17 +4,17 @@ INCDIROUT := include
 ALLINC = 
 
 SRCDIRBASE := Base/src
-INCDIRBASE := Base/inc
+INCDIRBASE := Base/include
 INCDIR += $(INCDIRBASE)
 ALLINC += $(wildcard $(INCDIRBASE)/*.hh)
 
 SRCDIRCOMPO := Component/src
-INCDIRCOMPO := Component/inc
+INCDIRCOMPO := Component/include
 INCDIR += $(INCDIRCOMPO)
 ALLINC += $(wildcard $(INCDIRCOMPO)/*.hh)
 
 SRCDIRGEOM := Geometry/src
-INCDIRGEOM := Geometry/inc
+INCDIRGEOM := Geometry/include
 INCDIR += $(INCDIRGEOM)
 ALLINC += $(wildcard $(INCDIRGEOM)/*.hh)
 
@@ -51,12 +51,15 @@ VPATH := $(SRCDIRBASE):$(SRCDIRCOMPO):$(SRCDIRGEOM)
 # Compiler
 COMP  := nvcc
 LINK  := nvcc
-DEBUG  := -g
+#DEBUG  := -G -g -Xcompiler -rdynamic
+DEBUG  := -g -Xcompiler -rdynamic
 
 
 # Compiler flags
 INCFLAGS  := $(INCDIR:%=-I%)
-COMPFLAGS := $(DEBUG) -x cu -O3 -arch=sm_75 $(INCFLAGS)
+#COMPFLAGS := $(DEBUG) -x cu -O3 -arch=sm_75 $(INCFLAGS) -dlto
+COMPFLAGS := $(DEBUG) -arch=sm_75 -O3 -dlto -rdc=true -x cu $(INCFLAGS)
+LINKFLAGS := -arch=sm_75 -O3 -dlto -rdc=true -lcudart $(INCFLAGS)
 
 
 #------------------------------------------------------------------------------
@@ -66,7 +69,7 @@ COMPFLAGS := $(DEBUG) -x cu -O3 -arch=sm_75 $(INCFLAGS)
 all : grains
 
 grains : MESS CPINC BASE COMPO GEOM
-	$(LINK) -arch=sm_75 $(OBJS_GEOM) $(OBJS_COMPO) $(OBJS_BASE) -lcudart -o grains
+	$(LINK) $(LINKFLAGS) $(OBJS_GEOM) $(OBJS_COMPO) $(OBJS_BASE) -o grains
 	@echo 'Compilation is complete'
 
 MESS   :

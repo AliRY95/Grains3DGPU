@@ -130,6 +130,12 @@ template <typename T>
 __host__ __device__ Matrix3<T> operator + ( Matrix3<T> const& m1, 
                                             Matrix3<T> const& m2 );
 
+/** @brief Scalar-matrix product
+@param c the scalar
+@param m the matrix */
+template <typename T>
+__host__ __device__ Matrix3<T> operator * ( T c, Matrix3<T> const& m );
+
 /** @brief Matrix-vector product
 @param m the matrix
 @param v the vector */
@@ -150,12 +156,6 @@ __host__ __device__ Vector3<T> operator * ( Vector3<T> const& v,
 template <typename T>
 __host__ __device__ Matrix3<T> operator * ( Matrix3<T> const& m1, 
                                             Matrix3<T> const& m2 );
-
-/** @brief Scalar-matrix product
-@param c the scalar
-@param m the matrix */
-template <typename T>
-__host__ __device__ Matrix3<T> operator * ( T c, Matrix3<T> const& m );
 
 // /** @brief Returns the matrix that rotates vector src to vector dest,
 // i.e. dest = mat * src

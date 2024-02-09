@@ -1,9 +1,12 @@
-#include "Convex.hh"
 #include "Vector3.hh"
+#include "Convex.hh"
+#include "Box.hh"
+
 
 // -----------------------------------------------------------------------------
-// Default constructor
-__host__ __device__ Box::Box()
+// Constructor with half edge length as input parameters
+__host__ __device__ Box::Box( double x, double y, double z )
+: m_extent( Vec3d( x, y, z ) )
 {}
 
 
@@ -13,15 +16,6 @@ __host__ __device__ Box::Box()
 // Constructor with a vector containing the edge half-lengths
 __host__ __device__ Box::Box( Vec3d const& extent_ )
 : m_extent( extent_ )
-{}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Constructor with half edge length as input parameters
-__host__ __device__ Box::Box( double x, double y, double z )
-: m_extent( Vec3d( x, y, z ) )
 {}
 
 
@@ -66,16 +60,6 @@ __host__ __device__ ConvexType Box::getConvexType() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the circumscribed radius of the box
-__host__ __device__ double Box::computeCircumscribedRadius() const
-{
-    return ( m_extent.norm() );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Returns the volume of the box
 __host__ __device__ double Box::computeVolume() const
 {
@@ -109,28 +93,24 @@ __host__ __device__ bool Box::buildInertia( double* inertia,
 
 
 
-// // -----------------------------------------------------------------------------
-// // Returns the bounding volume to box
-// __host__ __device__ BVolume const* Box::computeBVolume( unsigned int type ) const
-// {
-//     BVolume* bvol = NULL;
-//     if ( type == 1 ) // OBB
-//         bvol = new OBB( m_extent, Matrix() );
-//     else if ( type == 2 ) // OBC
-//     {
-//         double a[2];
-//         int axis = ( a[X] = fabs( m_extent[X] ) ) < ( a[Y] = fabs( m_extent[Y] ) )
-//             ? Y : X;
-//         int i = a[axis] < fabs( m_extent[Z] ) ? Z : axis;
-//         Vector3 e( 0., 0., 0. );
-//         e[i] = 1.;
-//         double h = 2. * m_extent[i];
-//         double r = sqrt( norm2(m_extent) - m_extent[i]*m_extent[i]);
-//         bvol = new OBC( r, h, e );
-//     }
+// -----------------------------------------------------------------------------
+// Returns the circumscribed radius of the box
+__host__ __device__ double Box::computeCircumscribedRadius() const
+{
+    return ( m_extent.norm() );
+}
 
-//     return ( bvol );
-// }
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the bounding volume to box
+__host__ __device__ Vec3f Box::computeAABB() const
+{
+    return ( Vec3f( (float) m_extent[X], 
+                    (float) m_extent[Y], 
+                    (float) m_extent[Z] ) );
+}
 
 
 

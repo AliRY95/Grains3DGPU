@@ -3,6 +3,7 @@
 
 #include "Basic.hh"
 #include "Vector3.hh"
+#include "AABB.hh"
 
 
 // Convex types
@@ -48,10 +49,6 @@ class Convex
     /** @brief Returns the convex type */
     __host__ __device__  virtual ConvexType getConvexType() const = 0;
 
-    /** @brief Computes and returns the circumscribed radius of the reference
-    convex shape */
-    __host__ __device__ virtual double computeCircumscribedRadius() const = 0;
-
     /** @brief Returns the volume of the convex shape */
     __host__ __device__ virtual double computeVolume() const = 0;
 
@@ -61,10 +58,12 @@ class Convex
     __host__ __device__ virtual bool buildInertia( double* inertia, 
                                                    double* inertia_1 ) const = 0;
 
-    // /** @brief Returns the convex shape bounding volume
-    // @param type 1 = OBB, 2 = OBC */
-    // __host__ __device__ virtual BVolume const* computeBoundingVolume( 
-    //                                                   unsigned int type ) const;
+    /** @brief Computes and returns the circumscribed radius of the reference
+    convex shape */
+    __host__ __device__ virtual double computeCircumscribedRadius() const = 0;
+
+    /** @brief Returns the half-length of the AABB fitted to the convex */
+    __host__ __device__ virtual Vec3f computeAABB() const = 0;
 
     /** @brief Convex support function, returns the support point P, i.e. the
     point on the surface of the convex shape that satisfies max(P.v)
@@ -95,8 +94,8 @@ __host__ __device__ bool intersectGJK( Convex const* a,
  frame
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
-__host__ __device__ bool intersectAABB( Convex const* a, 
-                                        Convex const* b,
+__host__ __device__ bool intersectAABB( Convex const& a, 
+                                        Convex const& b,
                                         Vec3d const& a2w,
 	                                      Vec3d const& b2w );
 

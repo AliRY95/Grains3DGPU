@@ -1,5 +1,6 @@
-#include "Convex.hh"
 #include "Vector3.hh"
+#include "Convex.hh"
+
 
 // -----------------------------------------------------------------------------
 // Default constructor
@@ -17,19 +18,6 @@ __host__ __device__ Convex::~Convex()
 
 
 
-// // -----------------------------------------------------------------------------
-// // Returns the convex shape bounding volume
-// __host__ __device__ BVolume const* Convex::computeBVolume( unsigned int type ) 
-//                                                                            const
-// {
-//   cout << "Warning for this Convex the method Convex::computeBVolume() "
-//        << "is not yet implemented !\n";
-//   return( nullptr );
-// }
-
-
-
-
 
 
 /* ========================================================================== */
@@ -38,13 +26,13 @@ __host__ __device__ Convex::~Convex()
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
-__host__ __device__ void computeDet( int const bits,
-                                     int const last,
-                                     int const last_bit,
-                                     int const all_bits,
-                                     Vec3d const y[4],
-                                     double dp[4][4],
-                                     double det[16][4] )
+__host__ __device__ inline void computeDet( int const bits,
+                                            int const last,
+                                            int const last_bit,
+                                            int const all_bits,
+                                            Vec3d const y[4],
+                                            double dp[4][4],
+                                            double det[16][4] )
 {
     for( int i = 0, bit = 1; i < 4; ++i, bit <<=1 )
         if (bits & bit) 
@@ -194,7 +182,7 @@ __host__ __device__ inline bool closest( int& bits,
             {
                 Vec3d u;
                 computeVec( s, y, det, u );
-                double dist2 = u.Norm2();
+                double dist2 = u.norm2();
                 if ( dist2 < min_dist2 )
                 {
                     min_dist2 = dist2;
@@ -274,21 +262,21 @@ __host__ __device__  bool intersectGJK( Convex const* a,
 
 
 
-// ----------------------------------------------------------------------------
-// Returns whether the bounding boxes of 2 convex shapes intersect
-__host__ __device__  bool intersectAABB( Convex const* a,
-                                         Convex const* b,
-                                         Vec3d const& a2w,
-                                         Vec3d const& b2w )
-{
-    Vec3d const AABB1 = a->getExtent();
-    Vec3d const AABB2 = b->getExtent();
-    if ( fabs( a2w[X] - b2w[X] ) > ( AABB1[X] + AABB2[X] ) )
-        return ( false );
-    else if ( fabs( a2w[Y] - b2w[Y] ) > ( AABB1[Y] + AABB2[Y] ) )
-        return ( false );
-    else if ( fabs( a2w[Z] - b2w[Z] ) > ( AABB1[Z] + AABB2[Z] ) )
-        return ( false );
-    else // We have an overlap
-        return ( true );
-}
+// // ----------------------------------------------------------------------------
+// // Returns whether the bounding boxes of 2 convex shapes intersect
+// __host__ __device__  bool intersectAABB( Convex const& a,
+//                                          Convex const& b,
+//                                          Vec3d const& a2w,
+//                                          Vec3d const& b2w )
+// {
+//     Vec3d const AABB1 = a->getExtent();
+//     Vec3d const AABB2 = b->getExtent();
+//     if ( fabs( a2w[X] - b2w[X] ) > ( AABB1[X] + AABB2[X] ) )
+//         return ( false );
+//     else if ( fabs( a2w[Y] - b2w[Y] ) > ( AABB1[Y] + AABB2[Y] ) )
+//         return ( false );
+//     else if ( fabs( a2w[Z] - b2w[Z] ) > ( AABB1[Z] + AABB2[Z] ) )
+//         return ( false );
+//     else // We have an overlap
+//         return ( true );
+// }

@@ -66,7 +66,7 @@ __host__ __device__ void Vector3<T>::setValue( T x, T y, T z )
 template <typename T>
 __host__ __device__ void Vector3<T>::normalize()
 {
-  *this /= this->Norm();
+  *this /= this->norm();
 }
 
 
@@ -77,7 +77,7 @@ __host__ __device__ void Vector3<T>::normalize()
 template <typename T>
 __host__ __device__ Vector3<T> Vector3<T>::normalized() const
 {
-  return ( *this / this->Norm() );
+  return ( *this / this->norm() );
 }
 
 
