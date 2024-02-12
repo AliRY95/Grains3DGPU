@@ -1,7 +1,7 @@
 #ifndef _KERNELS_CU_
 #define _KERNELS_CU_
 
-#include "Vector3.hh"
+#include "Transform3.hh"
 #include "Convex.hh"
 #include "Box.hh"
 
@@ -10,13 +10,13 @@ namespace GrainsCPU
 {
 // ...
 void collisionDetectionGJK( Convex const* a,
-                            Vec3d const* cen,
+                            Transform3d const* tr3d,
                             bool* result,
                             int const N )
 {
     for ( int i = 0; i < N; i++ )
         for ( int j = 0; j < N; j++ ) // or start from j = i?
-            result[i] = intersectGJK( *a, *a, cen[i], cen[j] );
+            result[i] = intersectGJK( *a, *a, tr3d[i], tr3d[j] );
 };
 } // GrainsCPU namespace end
 
@@ -28,7 +28,7 @@ void collisionDetectionGJK( Convex const* a,
 namespace GrainsGPU
 {
 __global__ void collisionDetectionGJK( Convex** a,
-                                       Vec3d const* cen,
+                                       Transform3d const* tr3d,
                                        bool* result,
                                        int const N )
 {
@@ -37,14 +37,14 @@ __global__ void collisionDetectionGJK( Convex** a,
               blockIdx.x;
     int tid = bid * blockDim.x + threadIdx.x;
 
-    extern __shared__ Convex const& AA = **a;
-    extern __shared__ Vec3d const& primaryParticleCen = cen[tid];
+    Convex const& AA = **a;
+    Transform3d const& primaryParticleTr = tr3d[tid];
     // extern __shared__ Vec3d secondaryParticleCen[32];
     // for ( int j = 0; j < 32; j++ )
     //     secondaryParticleCen = cen[tid];
     __syncthreads();
     for ( int j = 0; j < N; j++ )
-        result[tid] = intersectGJK( AA, AA, primaryParticleCen, cen[j] );
+        result[tid] = intersectGJK( AA, AA, primaryParticleTr, tr3d[j] );
 };
 } // GrainsGPU namespace end
 

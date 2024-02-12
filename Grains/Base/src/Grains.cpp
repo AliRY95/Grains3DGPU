@@ -18,36 +18,54 @@ int main(int argc, char* argv[])
 {
     double userN = stod( argv[1] );
     int const N = round( userN * 24 * 256 ); // No. pair particles
-    double r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
+    double r1 = 0.1, r2 = 0.1, r3 = 0.1; // Radii for now!
+
     /* ====================================================================== */
-    /* Creating two random Vector3 arrays for centers of pair-particles       */
+    /* Creating two random Transform3 for each particles                      */
     /* ====================================================================== */
+
     default_random_engine generator;
-    uniform_real_distribution<double> distribution( 0.0, 1.0 );
+    uniform_real_distribution<double> location( 0.0, 1.0 );
+    uniform_real_distribution<double> angle( 0.0, 2. * M_PI );
 
     // Allocating memory on host and device
-    Vec3d *h_centers = new Vec3d[N];
-    Vec3d *d_centers; // Device array
-    cudaErrCheck( cudaMalloc( (void**)&d_centers,
-                              N * sizeof( Vec3d ) ) );
+    Transform3d *h_tr3d = new Transform3d[N];
+    Transform3d *d_tr3d; // Device array
+    cudaErrCheck( cudaMalloc( (void**)&d_tr3d,
+                              N * sizeof( Transform3d ) ) );
                              
     // Randomize array on host
     for( int i = 0; i < N; i++ )
     {
-        h_centers[i].setValue( distribution( generator ),
-                               distribution( generator ),
-                               distribution( generator ) );
+        // Random orientation
+        double aX = angle( generator );
+        double aY = angle( generator );
+        double aZ = angle( generator );
+        h_tr3d[i].setBasis( 
+            Mat3d( cos(aZ)*cos(aY),
+                   cos(aZ)*sin(aY)*sin(aX) - sin(aZ)*cos(aX),
+                   cos(aZ)*sin(aY)*cos(aX) + sin(aZ)*sin(aX),
+                   sin(aZ)*cos(aY),
+                   sin(aZ)*sin(aY)*sin(aX) + cos(aZ)*cos(aX),
+                   sin(aZ)*sin(aY)*cos(aX) - cos(aZ)*sin(aX),
+                   -sin(aY),
+                   cos(aY)*sin(aX),
+                   cos(aY)*cos(aX) ) );
+        h_tr3d[i].setOrigin( Vec3d( location( generator ),
+                                    location( generator ),
+                                    location( generator ) ) );
     }
 
     // Copying the arrays from host to device
-    cudaErrCheck( cudaMemcpy( d_centers,
-                              h_centers,
-                              N * sizeof( Vec3d ), 
+    cudaErrCheck( cudaMemcpy( d_tr3d,
+                              h_tr3d,
+                              N * sizeof( Transform3d ), 
                               cudaMemcpyHostToDevice ) );
 
     /* ====================================================================== */
     /* Creating convex bodies                                                 */
     /* ====================================================================== */
+
     Convex* h_convex = new Box( r1, r2, r3 );
 
     // Copying the array from host to device
@@ -59,6 +77,7 @@ int main(int argc, char* argv[])
     /* ====================================================================== */
     /* Collision detection                                                    */
     /* ====================================================================== */
+
     bool *h_collision = new bool[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )
@@ -76,7 +95,7 @@ int main(int argc, char* argv[])
     // Collision detection on host
     auto h_start = chrono::high_resolution_clock::now();
     GrainsCPU::collisionDetectionGJK( h_convex,
-                                      h_centers,
+                                      h_tr3d,
                                       h_collision,
                                       N );
     auto h_end = chrono::high_resolution_clock::now();
@@ -86,7 +105,7 @@ int main(int argc, char* argv[])
     dim3 dimGrid( N / 256, 1, 1 );
     auto d_start = chrono::high_resolution_clock::now();
     GrainsGPU::collisionDetectionGJK<<< dimGrid, dimBlock >>> ( d_convex, 
-                                                                d_centers,
+                                                                d_tr3d,
                                                                 d_collision,
                                                                 N );
     cudaErrCheck( cudaDeviceSynchronize() );
@@ -124,9 +143,9 @@ int main(int argc, char* argv[])
          << trueDeviceCount << " Collision on device, "
          << diffCount << " Different results." << endl;
 
-    delete[] h_centers;
+    delete[] h_tr3d;
     delete[] h_collision;
-    cudaFree( d_centers );
+    cudaFree( d_tr3d );
     cudaFree( d_collision );
     
   return 0;

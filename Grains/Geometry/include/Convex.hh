@@ -1,8 +1,7 @@
 #ifndef _CONVEX_HH_
 #define _CONVEX_HH_
 
-#include "Basic.hh"
-#include "Vector3.hh"
+#include "Transform3.hh"
 #include "AABB.hh"
 
 
@@ -84,8 +83,8 @@ class Convex
  frame */
 __host__ __device__ bool intersectGJK( Convex const& a, 
                                        Convex const& b,
-                                       Vec3d const& a2w,
-	                                     Vec3d const& b2w );
+                                       Transform3d const& a2w,
+	                                     Transform3d const& b2w );
 
 /** @brief Returns whether the bounding boxex are in contact or not
  @param a bounding box of A

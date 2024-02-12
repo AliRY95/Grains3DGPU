@@ -2,8 +2,6 @@
 #define _TRANSFORM3_HH_
 
 
-#include "Basic.hh"
-#include "Vector3.hh"
 #include "Matrix3.hh"
 
 

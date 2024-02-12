@@ -1,7 +1,7 @@
 #ifndef _MATRIX3_HH_
 #define _MATRIX3_HH_
 
-#include "Basic.hh"
+
 #include "Vector3.hh"
 
 

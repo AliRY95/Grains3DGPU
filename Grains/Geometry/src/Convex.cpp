@@ -1,4 +1,3 @@
-#include "Vector3.hh"
 #include "Transform3.hh"
 #include "Convex.hh"
 
@@ -221,8 +220,8 @@ __host__ __device__ inline bool degenerate( int const all_bits,
 // Returns whether 2 convex shapes intersect
 __host__ __device__  bool intersectGJK( Convex const& a,
                                         Convex const& b,
-                                        Vec3d const& a2w,
-                                        Vec3d const& b2w )
+                                        Transform3d const& a2w,
+                                        Transform3d const& b2w )
 {
     int bits = 0;           // identifies current simplex
     int last = 0;           // identifies last found support point
@@ -243,7 +242,8 @@ __host__ __device__  bool intersectGJK( Convex const& a,
             ++last;
             last_bit <<= 1;
         }
-        w = ( a2w + a.support( -v ) ) - ( b2w + b.support( v ) ); // Change!
+        w = a2w( a.support( ( -v ) * a2w.getBasis() ) ) -
+            b2w( b.support(    v   * b2w.getBasis() ) );
         prod = v * w;
         if( prod > 0. || fabs( prod ) < EPSILON2 )
             return ( false );
