@@ -82,8 +82,8 @@ class Convex
  frame
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
-__host__ __device__ bool intersectGJK( Convex const* a, 
-                                       Convex const* b,
+__host__ __device__ bool intersectGJK( Convex const& a, 
+                                       Convex const& b,
                                        Vec3d const& a2w,
 	                                     Vec3d const& b2w );
 

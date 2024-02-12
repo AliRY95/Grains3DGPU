@@ -16,8 +16,8 @@ using namespace std;
 /* Main Function */
 int main(int argc, char* argv[])
 {
-    int userN = stoi( argv[1] );
-    int const N = userN * 24 * 256; // No. pair particles
+    double userN = stod( argv[1] );
+    int const N = round( userN * 24 * 256 ); // No. pair particles
     double r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
     /* ====================================================================== */
     /* Creating two random Vector3 arrays for centers of pair-particles       */

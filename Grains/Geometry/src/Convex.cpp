@@ -1,4 +1,5 @@
 #include "Vector3.hh"
+#include "Transform3.hh"
 #include "Convex.hh"
 
 
@@ -218,8 +219,8 @@ __host__ __device__ inline bool degenerate( int const all_bits,
 /*                            High-Level Methods                              */
 /* ========================================================================== */
 // Returns whether 2 convex shapes intersect
-__host__ __device__  bool intersectGJK( Convex const* a,
-                                        Convex const* b,
+__host__ __device__  bool intersectGJK( Convex const& a,
+                                        Convex const& b,
                                         Vec3d const& a2w,
                                         Vec3d const& b2w )
 {
@@ -242,10 +243,7 @@ __host__ __device__  bool intersectGJK( Convex const* a,
             ++last;
             last_bit <<= 1;
         }
-        w = ( a2w + a->support( -v ) ) - ( b2w + b->support( v ) ); // Change!
-        // w = a->support( -v ) - b->support( v ); // Change!
-        // printf("[%f %f %f], [%f %f %f] \n", v[X], v[Y] , v[Z],
-        //                                     w[X], w[Y] , w[Z] );
+        w = ( a2w + a.support( -v ) ) - ( b2w + b.support( v ) ); // Change!
         prod = v * w;
         if( prod > 0. || fabs( prod ) < EPSILON2 )
             return ( false );

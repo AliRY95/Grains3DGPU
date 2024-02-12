@@ -17,7 +17,7 @@ class Vector3
   protected:
     /**@name Parameters */
     //@{
-    T m_comp[3]; /**< array of 3 components */
+    T m_comp[3]; /**< Array of 3 components */
     //@}
 
 
