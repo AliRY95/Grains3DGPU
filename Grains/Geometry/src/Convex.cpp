@@ -26,25 +26,25 @@ __host__ __device__ Convex::~Convex()
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
-__host__ __device__ inline void computeDet( int const bits,
-                                            int const last,
-                                            int const last_bit,
-                                            int const all_bits,
+__host__ __device__ inline void computeDet( unsigned int const bits,
+                                            unsigned int const last,
+                                            unsigned int const last_bit,
+                                            unsigned int const all_bits,
                                             Vec3d const y[4],
                                             double dp[4][4],
                                             double det[16][4] )
 {
-    for( int i = 0, bit = 1; i < 4; ++i, bit <<=1 )
+    for( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<=1 )
         if (bits & bit) 
             dp[i][last] = dp[last][i] = y[i] * y[last];
     dp[last][last] = y[last] * y[last];
 
     det[last_bit][last] = 1.;
-    for( int j = 0, sj = 1; j < 4; ++j, sj <<= 1 )
+    for( unsigned int j = 0, sj = 1; j < 4; ++j, sj <<= 1 )
     {
         if( bits & sj )
         {
-            int s2 = sj | last_bit;
+            unsigned int s2 = sj | last_bit;
             det[s2][j] = dp[last][last] - dp[last][j];
             det[s2][last] = dp[j][j] - dp[j][last];
             for( int k = 0, sk = 1; k < j; ++k, sk <<= 1 )
@@ -84,11 +84,11 @@ __host__ __device__ inline void computeDet( int const bits,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__  inline bool valid( int const s,
-                                        int const all_bits,
+__host__ __device__  inline bool valid( unsigned int const s,
+                                        unsigned int const all_bits,
                                         double const det[16][4] )
 {
-    for ( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
+    for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     {
         if ( all_bits & bit )
         {
@@ -108,14 +108,14 @@ __host__ __device__  inline bool valid( int const s,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__ inline void computeVec( int const bits_,
+__host__ __device__ inline void computeVec( unsigned int const bits_,
                                             Vec3d const y[4],
                                             double const det[16][4],
                                             Vec3d& v )
 {
     double sum = 0.;
     v.setValue( 0., 0., 0. );
-    for ( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
+    for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     {
         if ( bits_ & bit )
         {
@@ -130,10 +130,10 @@ __host__ __device__ inline void computeVec( int const bits_,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__ inline bool proper( int const s,
+__host__ __device__ inline bool proper( unsigned int const s,
                                         double const det[16][4] )
 {
-    for( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
+    for( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
         if( ( s & bit ) && det[s][i] <= EPSILON3 )
             return ( false );
     return ( true );
@@ -143,16 +143,16 @@ __host__ __device__ inline bool proper( int const s,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__ inline bool closest( int& bits,
-                                         int const last,
-                                         int const last_bit,
-                                         int const all_bits,
+__host__ __device__ inline bool closest( unsigned int& bits,
+                                         unsigned int const last,
+                                         unsigned int const last_bit,
+                                         unsigned int const all_bits,
                                          Vec3d const y[4],
                                          double dp[4][4],
                                          double det[16][4],
                                          Vec3d& v )
 {
-    int s;
+    unsigned int s;
     computeDet( bits, last, last_bit, all_bits, y, dp, det );
     for ( s = bits; s; --s )
     {
@@ -201,11 +201,11 @@ __host__ __device__ inline bool closest( int& bits,
 // ----------------------------------------------------------------------------
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
-__host__ __device__ inline bool degenerate( int const all_bits,
+__host__ __device__ inline bool degenerate( unsigned int const all_bits,
                                             Vec3d const y[4],
                                             Vec3d const& w )
 {
-  for ( int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
+  for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     if ( (all_bits & bit) && y[i] == w )
         return ( true );
   return ( false );
@@ -223,12 +223,12 @@ __host__ __device__  bool intersectGJK( Convex const& a,
                                         Transform3d const& a2w,
                                         Transform3d const& b2w )
 {
-    int bits = 0;           // identifies current simplex
-    int last = 0;           // identifies last found support point
-    int last_bit = 0;       // last_bit = 1<<last
-    int all_bits = 0;       // all_bits = bits|last_bit
-    Vec3d y[4];        // support points of A - B in world coordinates
-    double det[16][4] = { 0. };// cached sub-determinants
+    unsigned int bits = 0;           // identifies current simplex
+    unsigned int last = 0;           // identifies last found support point
+    unsigned int last_bit = 0;       // last_bit = 1<<last
+    unsigned int all_bits = 0;       // all_bits = bits|last_bit
+    Vec3d y[4];                      // support points of A-B in world coordinates
+    double det[16][4] = { 0. };      // cached sub-determinants
     double dp[4][4] = { 0. };
 
     Vec3d v( 1., 1., 1. ), w;

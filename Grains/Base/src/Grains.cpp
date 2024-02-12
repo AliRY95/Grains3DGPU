@@ -41,16 +41,7 @@ int main(int argc, char* argv[])
         double aX = angle( generator );
         double aY = angle( generator );
         double aZ = angle( generator );
-        h_tr3d[i].setBasis( 
-            Mat3d( cos(aZ)*cos(aY),
-                   cos(aZ)*sin(aY)*sin(aX) - sin(aZ)*cos(aX),
-                   cos(aZ)*sin(aY)*cos(aX) + sin(aZ)*sin(aX),
-                   sin(aZ)*cos(aY),
-                   sin(aZ)*sin(aY)*sin(aX) + cos(aZ)*cos(aX),
-                   sin(aZ)*sin(aY)*cos(aX) - cos(aZ)*sin(aX),
-                   -sin(aY),
-                   cos(aY)*sin(aX),
-                   cos(aY)*cos(aX) ) );
+        h_tr3d[i].setBasis( aX, aY, aZ );
         h_tr3d[i].setOrigin( Vec3d( location( generator ),
                                     location( generator ),
                                     location( generator ) ) );
@@ -66,8 +57,9 @@ int main(int argc, char* argv[])
     /* Creating convex bodies                                                 */
     /* ====================================================================== */
 
-    Convex* h_convex = new Box( r1, r2, r3 );
-
+    // Convex* h_convex = new Box( r1, r2, r3 );
+    Convex* h_convex = new Superquadric( r1, r2, r3, 3., 2. );
+    cout << sizeof( h_convex ) << ", " << sizeof( *h_convex ) << endl;
     // Copying the array from host to device
     Convex** d_convex;
     cudaErrCheck( cudaMalloc( (void**)&d_convex,

@@ -102,6 +102,48 @@ __host__ __device__ void Transform3<T>::setBasis( Matrix3<T> const& m )
 
 
 // -----------------------------------------------------------------------------
+// Sets the matrix part of the transformation with specified rotations around 
+// each principal axis
+template <typename T>
+__host__ __device__ void Transform3<T>::setBasis( T aX, T aY, T aZ )
+{
+  m_basis = Matrix3<T>( cos(aZ)*cos(aY),
+                        cos(aZ)*sin(aY)*sin(aX) - sin(aZ)*cos(aX),
+                        cos(aZ)*sin(aY)*cos(aX) + sin(aZ)*sin(aX),
+                        sin(aZ)*cos(aY),
+                        sin(aZ)*sin(aY)*sin(aX) + cos(aZ)*cos(aX),
+                        sin(aZ)*sin(aY)*cos(aX) - cos(aZ)*sin(aX),
+                        -sin(aY),
+                        cos(aY)*sin(aX),
+                        cos(aY)*cos(aX) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets the matrix part of the transformation with specified rotations around 
+// each principal axis - single precision
+template<>
+__host__ __device__ void Transform3<float>::setBasis( float aX, 
+                                                      float aY,
+                                                      float aZ )
+{
+  m_basis = Mat3f( cosf(aZ)*cosf(aY),
+                   cosf(aZ)*sinf(aY)*sinf(aX) - sinf(aZ)*cosf(aX),
+                   cosf(aZ)*sinf(aY)*cosf(aX) + sinf(aZ)*sinf(aX),
+                   sinf(aZ)*cosf(aY),
+                   sinf(aZ)*sinf(aY)*sinf(aX) + cosf(aZ)*cosf(aX),
+                   sinf(aZ)*sinf(aY)*cosf(aX) - cosf(aZ)*sinf(aX),
+                   -sinf(aY),
+                   cosf(aY)*sinf(aX),
+                   cosf(aY)*cosf(aX) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Sets the origin of the transformation
 template <typename T>
 __host__ __device__ void Transform3<T>::setOrigin( Vector3<T> const& v ) 

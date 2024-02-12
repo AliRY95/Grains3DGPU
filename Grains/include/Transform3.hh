@@ -68,6 +68,13 @@ class Transform3
     @param m matrix part of the transformation */
     __host__ __device__ void setBasis( Matrix3<T> const& m );
 
+    /** @brief Sets the matrix part of the transformation with specified
+    rotations around each principal axis
+    @param aX rotation around the x-axis
+    @param aY rotation around the y-axis
+    @param aZ rotation around the z-axis */
+    __host__ __device__ void setBasis( T aX, T aY, T aZ );
+
     /** @brief Sets the origin of the transformation
     @param v origin of the transformation */
     __host__ __device__ void setOrigin( Vector3<T> const& v );

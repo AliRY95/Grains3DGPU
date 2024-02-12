@@ -4,6 +4,7 @@
 #include "Transform3.hh"
 #include "Convex.hh"
 #include "Box.hh"
+#include "Superquadric.hh"
 
 // -----------------------------------------------------------------------------
 namespace GrainsCPU
@@ -56,6 +57,7 @@ __global__ void setupConvex( double x, double y, double z, Convex** d_convex )
 {
     // convex->setExtent( x, y, z );
     (*d_convex) = (new Box( x, y, z ));
+    (*d_convex) = (new Superquadric( x, y, z, 3., 2. ));
     // convex( x, y, z);
 };
 
