@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 {
     double userN = stod( argv[1] );
     int const N = round( userN * 24 * 256 ); // No. pair particles
-    double r1 = 0.1, r2 = 0.1, r3 = 0.1; // Radii for now!
+    double r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
 
     /* ====================================================================== */
     /* Creating two random Transform3 for each particles                      */
@@ -57,14 +57,18 @@ int main(int argc, char* argv[])
     /* Creating convex bodies                                                 */
     /* ====================================================================== */
 
-    // Convex* h_convex = new Box( r1, r2, r3 );
-    Convex* h_convex = new Superquadric( r1, r2, r3, 3., 2. );
-    cout << sizeof( h_convex ) << ", " << sizeof( *h_convex ) << endl;
+    RigidBody** h_rb;
+    h_rb = ( RigidBody** ) malloc( sizeof( RigidBody* ) );
+    // GrainsCPU::setupRigidBody( BOX, r1, r2, r3, 1.e-3, h_rb );
+    GrainsCPU::setupRigidBody( SUPERQUADRIC, r1, r2, r3, 1.e-3, h_rb );
+
     // Copying the array from host to device
-    Convex** d_convex;
-    cudaErrCheck( cudaMalloc( (void**)&d_convex,
-                              sizeof( Convex** ) ) );
-    setupConvex<<< 1, 1 >>>( r1, r2, r3, d_convex );
+    // __constant__ RigidBody d_rb[1];
+    RigidBody** d_rb;
+    cudaErrCheck( cudaMalloc( (void**)&d_rb,
+                              sizeof( RigidBody* ) ) );
+    // GrainsGPU::setupRigidBody<<<1, 1>>>( BOX, r1, r2, r3, 1.e-3, d_rb );
+    GrainsGPU::setupRigidBody<<<1, 1>>>( SUPERQUADRIC, r1, r2, r3, 1.e-3, d_rb );
 
     /* ====================================================================== */
     /* Collision detection                                                    */
@@ -86,7 +90,7 @@ int main(int argc, char* argv[])
 
     // Collision detection on host
     auto h_start = chrono::high_resolution_clock::now();
-    GrainsCPU::collisionDetectionGJK( h_convex,
+    GrainsCPU::collisionDetectionGJK( h_rb,
                                       h_tr3d,
                                       h_collision,
                                       N );
@@ -96,7 +100,7 @@ int main(int argc, char* argv[])
     dim3 dimBlock( 256, 1, 1 );
     dim3 dimGrid( N / 256, 1, 1 );
     auto d_start = chrono::high_resolution_clock::now();
-    GrainsGPU::collisionDetectionGJK<<< dimGrid, dimBlock >>> ( d_convex, 
+    GrainsGPU::collisionDetectionGJK<<< dimGrid, dimBlock >>> ( d_rb, 
                                                                 d_tr3d,
                                                                 d_collision,
                                                                 N );

@@ -70,8 +70,8 @@ __host__ __device__ double Box::computeVolume() const
 
 // -----------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
-__host__ __device__ bool Box::buildInertia( double* inertia, 
-                                            double* inertia_1 ) const
+__host__ __device__ bool Box::computeInertia( double* inertia, 
+                                              double* inertia_1 ) const
 {
     inertia[1] = inertia[2] = inertia[4] = 0.0;
     inertia[0] = 8.0 * m_extent[X] * m_extent[Y] * m_extent[Z]

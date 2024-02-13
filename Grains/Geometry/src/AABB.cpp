@@ -1,5 +1,3 @@
-#include "Vector3.hh"
-// #include "Convex.hh"
 #include "AABB.hh"
 
 

@@ -1,5 +1,6 @@
 #define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
 #include <bits/stdc++.h>
+#include "Convex.hh"
 #include "Superquadric.hh"
 
 
@@ -10,7 +11,11 @@ __host__ __device__ Superquadric::Superquadric( double a,
                                                 double c, 
                                                 double n1, 
                                                 double n2 )
-: m_a( a ), m_b( b ), m_c( c ), m_n1( n1 ), m_n2( n2 )
+: m_a( a )
+, m_b( b )
+, m_c( c )
+, m_n1( n1 )
+, m_n2( n2 )
 {}
 
 
@@ -55,7 +60,7 @@ __host__ __device__ double Superquadric::computeVolume() const
 
 // -----------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
-__host__ __device__ bool Superquadric::buildInertia( double* inertia, 
+__host__ __device__ bool Superquadric::computeInertia( double* inertia, 
                                                      double* inertia_1 ) const
 {
 #ifdef __CUDA_ARCH__
