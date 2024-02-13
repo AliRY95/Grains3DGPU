@@ -124,10 +124,14 @@ __host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
     Convex const* convexB = rbB.getConvex();
 
     // In case the 2 rigid bodies are spheres
-    // if ( cvxA->getConvexType() == SPHERE && cvxB->getConvexType() == SPHERE )
-    // {
-        
-    // }
+    if ( convexA->getConvexType() == SPHERE && 
+         convexB->getConvexType() == SPHERE )
+    {
+        double radiiSum = (double) rbA.getCircumscribedRadius() + 
+                                   rbB.getCircumscribedRadius();
+        double dist2 = ( a2w.getOrigin() - b2w.getOrigin() ).norm2();
+        return ( dist2 < radiiSum * radiiSum );
+    }
 
     // General case
     Vec3d temp = a2w.getOrigin();
@@ -140,5 +144,5 @@ __host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
         if( intersectAABB( *( rbA.getAABB() ), *( rbB.getAABB() ), cenA, cenB ) )
             return( intersectGJK( *convexA, *convexB, a2w, b2w ) );
     }
-    return( false );
+    return ( false );
 }

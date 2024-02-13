@@ -1,7 +1,7 @@
 #ifndef _KERNELS_CU_
 #define _KERNELS_CU_
 
-
+#include "Sphere.hh"
 #include "Box.hh"
 #include "Superquadric.hh"
 #include "Convex.hh"
@@ -40,7 +40,12 @@ void setupRigidBody( ConvexType cType,
     // m_boundingVolume = m_convex->computeAABB();
     // m_circumscribedRadius = m_convex->computeCircumscribedRadius();
     Convex* cvx;
-    if ( cType == BOX )
+    if ( cType == SPHERE )
+    {
+        cvx = new Sphere( a );
+        *rb = new RigidBody( cvx, ct );
+    }
+    else if ( cType == BOX )
     {
         cvx = new Box( a, b, c );
         *rb = new RigidBody( cvx, ct );
@@ -105,7 +110,12 @@ __global__ void setupRigidBody( ConvexType cType,
                                 RigidBody** rb )
 {
     Convex* cvx;
-    if ( cType == BOX )
+    if ( cType == SPHERE )
+    {
+        cvx = new Sphere( a );
+        *rb = new RigidBody( cvx, ct );
+    }
+    else if ( cType == BOX )
     {
         cvx = new Box( a, b, c );
         *rb = new RigidBody( cvx, ct );
