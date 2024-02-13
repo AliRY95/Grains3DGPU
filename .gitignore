@@ -48,6 +48,7 @@
 
 
 ### MISC ###
+*.vscode
 *.ncu-rep
 Grains/Bash
 grains

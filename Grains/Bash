@@ -1,8 +1,0 @@
-#!/bin/bash
-
-N_array=(1 2 4 8)
-for N in "${N_array[@]}";
-do
-  ./Grains $N;
-  sleep 2.;
-done
