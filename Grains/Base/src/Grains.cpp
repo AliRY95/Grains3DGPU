@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
 
     RigidBody** h_rb;
     h_rb = ( RigidBody** ) malloc( sizeof( RigidBody* ) );
-    GrainsCPU::setupRigidBody( SPHERE, r1, r2, r3, 1.e-3, h_rb );
-    // GrainsCPU::setupRigidBody( BOX, r1, r2, r3, 1.e-3, h_rb );
+    // GrainsCPU::setupRigidBody( SPHERE, r1, r2, r3, 1.e-3, h_rb );
+    GrainsCPU::setupRigidBody( BOX, r1, r2, r3, 1.e-3, h_rb );
     // GrainsCPU::setupRigidBody( SUPERQUADRIC, r1, r2, r3, 1.e-3, h_rb );
 
     // Copying the array from host to device
@@ -68,8 +68,8 @@ int main(int argc, char* argv[])
     RigidBody** d_rb;
     cudaErrCheck( cudaMalloc( (void**)&d_rb,
                               sizeof( RigidBody* ) ) );
-    GrainsGPU::setupRigidBody<<<1, 1>>>( SPHERE, r1, r2, r3, 1.e-3, d_rb );
-    // GrainsGPU::setupRigidBody<<<1, 1>>>( BOX, r1, r2, r3, 1.e-3, d_rb );
+    // GrainsGPU::setupRigidBody<<<1, 1>>>( SPHERE, r1, r2, r3, 1.e-3, d_rb );
+    GrainsGPU::setupRigidBody<<<1, 1>>>( BOX, r1, r2, r3, 1.e-3, d_rb );
     // GrainsGPU::setupRigidBody<<<1, 1>>>( SUPERQUADRIC, r1, r2, r3, 1.e-3, d_rb );
 
     /* ====================================================================== */
