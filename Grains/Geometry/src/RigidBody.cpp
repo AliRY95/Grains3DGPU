@@ -141,8 +141,42 @@ __host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
     float dist = ( cenB - cenA ).norm();
     if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
     {
-        if( intersectAABB( *( rbA.getAABB() ), *( rbB.getAABB() ), cenA, cenB ) )
+        // if( intersectAABB( *( rbA.getAABB() ), *( rbB.getAABB() ), cenA, cenB ) )
             return( intersectGJK( *convexA, *convexB, a2w, b2w ) );
+    }
+    return ( false );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns whether 2 rigid bodies intersect
+__host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
+                                               RigidBody const& rbB,
+                                               Transform3d const& b2a )
+{
+    Convex const* convexA = rbA.getConvex();
+    Convex const* convexB = rbB.getConvex();
+
+    // In case the 2 rigid bodies are spheres
+    if ( convexA->getConvexType() == SPHERE && 
+         convexB->getConvexType() == SPHERE )
+    {
+        double radiiSum = (double) rbA.getCircumscribedRadius() + 
+                                   rbB.getCircumscribedRadius();
+        double dist2 = ( b2a.getOrigin() ).norm2();
+        return ( dist2 < radiiSum * radiiSum );
+    }
+
+    // General case
+    Vec3d temp = b2a.getOrigin();
+    Vec3f posB2A( ( float ) temp[X], ( float ) temp[Y], ( float ) temp[Z] );
+    float dist = posB2A.norm();
+    if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
+    {
+        // if( intersectAABB( *( rbA.getAABB() ), *( rbB.getAABB() ), posB2A ) )
+            return( intersectGJK( *convexA, *convexB, b2a ) );
     }
     return ( false );
 }

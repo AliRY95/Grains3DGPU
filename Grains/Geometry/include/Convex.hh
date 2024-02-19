@@ -87,6 +87,15 @@ __host__ __device__ bool intersectGJK( Convex const& a,
                                        Convex const& b,
                                        Transform3d const& a2w,
 	                                   Transform3d const& b2w );
+
+/** @brief Returns whether 2 convex shapes intersect
+ @param a convex shape A
+ @param b convex shape B
+ @param b2a geometric tramsformation describing convex B in the A's reference
+ frame */
+__host__ __device__ bool intersectGJK( Convex const& a, 
+                                       Convex const& b,
+                                       Transform3d const& b2a );
 //@}
 
 #endif

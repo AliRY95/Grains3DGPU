@@ -15,7 +15,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class Transform3
+class __align__(16) Transform3
 {
   private:
     /**@name Parameters */
@@ -122,6 +122,11 @@ class Transform3
     this = this o t (t first followed by this)
     @param t the other affine transformation */
     __host__ __device__ void composeRightByTransform( Transform3<T> const& t );
+
+    /** @brief Composition in a way that it is now the relative transformation
+    with respect to t
+    @param t the other affine transformation */
+    __host__ __device__ void relativeToTransform( Transform3<T> const& t );
     //@}
 
 

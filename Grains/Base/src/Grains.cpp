@@ -20,6 +20,22 @@ int main(int argc, char* argv[])
     int const N = round( userN * 24 * 256 ); // No. pair particles
     double r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
 
+    ConvexType particleType;
+    switch ( stoi( argv[2] ) )
+    {
+    case ( 1 ):
+        particleType = SPHERE;
+        break;
+    case ( 2 ):
+        particleType = BOX;
+        break;
+    case ( 3 ):
+        particleType = SUPERQUADRIC;
+        break;
+    default:
+        particleType = BOX;
+        break;
+    }
     /* ====================================================================== */
     /* Creating two random Transform3 for each particles                      */
     /* ====================================================================== */
@@ -59,18 +75,14 @@ int main(int argc, char* argv[])
 
     RigidBody** h_rb;
     h_rb = ( RigidBody** ) malloc( sizeof( RigidBody* ) );
-    // GrainsCPU::setupRigidBody( SPHERE, r1, r2, r3, 1.e-3, h_rb );
-    GrainsCPU::setupRigidBody( BOX, r1, r2, r3, 1.e-3, h_rb );
-    // GrainsCPU::setupRigidBody( SUPERQUADRIC, r1, r2, r3, 1.e-3, h_rb );
+    GrainsCPU::setupRigidBody( particleType, r1, r2, r3, 1.e-3, h_rb );
 
     // Copying the array from host to device
     // __constant__ RigidBody d_rb[1];
     RigidBody** d_rb;
     cudaErrCheck( cudaMalloc( (void**)&d_rb,
                               sizeof( RigidBody* ) ) );
-    // GrainsGPU::setupRigidBody<<<1, 1>>>( SPHERE, r1, r2, r3, 1.e-3, d_rb );
-    GrainsGPU::setupRigidBody<<<1, 1>>>( BOX, r1, r2, r3, 1.e-3, d_rb );
-    // GrainsGPU::setupRigidBody<<<1, 1>>>( SUPERQUADRIC, r1, r2, r3, 1.e-3, d_rb );
+    GrainsGPU::setupRigidBody<<<1, 1>>>( particleType, r1, r2, r3, 1.e-3, d_rb );
 
     /* ====================================================================== */
     /* Collision detection                                                    */

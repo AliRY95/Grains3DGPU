@@ -88,3 +88,24 @@ __host__ __device__ bool intersectAABB( AABB const& a,
     else // overlap
         return ( true );
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns whether the AABBs are in contact or not
+__host__ __device__ bool intersectAABB( AABB const& a, 
+                                        AABB const& b,
+                                        Vec3f const& posB2A )
+{
+    Vec3f const lenA = a.getExtent();
+    Vec3f const lenB = b.getExtent();
+    if      ( fabsf( posB2A[X] ) > ( lenA[X] + lenB[X] ) )
+        return ( false );
+    else if ( fabsf( posB2A[Y] ) > ( lenA[Y] + lenB[Y] ) )
+        return ( false );
+    else if ( fabsf( posB2A[Z] ) > ( lenA[Z] + lenB[Z] ) )
+        return ( false );
+    else // overlap
+        return ( true );
+}

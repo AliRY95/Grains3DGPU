@@ -96,7 +96,18 @@ GEOM   : $(OBJS_GEOM)
 
 $(OBJDIR)/%.o : %.cpp
 	@echo 'Compiling '$<
-	$(COMP) $(COMPFLAGS) $(MACRO) $< -o $@	
+	$(COMP) $(COMPFLAGS) $(MACRO) $< -o $@
+
+
+# DEPENDENCIES
+DEPEND  := $(INCDIR:%=-I%) $(GRAINS_SYSINC:%=-I%)
+
+depend:
+	@echo 'Generating dependencies'
+	touch ./Maketmp
+	makedepend -f ./Maketmp $(DEPEND) $(SRCFILES_WP_BASE) \
+	$(SRCFILES_WP_COMPO) $(SRCFILES_WP_GEOM) \
+	rm -f ./Maketmp ./Maketmp.bak
 
 # CLEAN
 clean : 

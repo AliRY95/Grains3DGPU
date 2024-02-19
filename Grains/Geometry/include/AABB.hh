@@ -77,7 +77,15 @@ class AABB
 __host__ __device__ bool intersectAABB( AABB const& a, 
                                         AABB const& b,
                                         Vec3f const& posA,
-	                                    Vec3f const& posB );
+	                                      Vec3f const& posB );
+                                        
+/** @brief Returns whether the AABBs are in contact or not
+ @param a first AABB
+ @param b second AABB
+ @param posB2A position of the second AABB wrt the first AABB */
+__host__ __device__ bool intersectAABB( AABB const& a, 
+                                        AABB const& b,
+                                        Vec3f const& posB2A );
 //@}
 
 

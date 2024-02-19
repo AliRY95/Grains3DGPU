@@ -23,6 +23,7 @@
 // Macro for outputting CUDA errors
 #define cudaErrCheck( ans ) { cudaAssert( ( ans ), __FILE__, __LINE__ ); }
 
+// Macros
 #define EPSILON1 1.0e-10
 #define EPSILON2 1.0e-15
 #define EPSILON3 1.0e-20
@@ -38,6 +39,7 @@ enum Direction
   W, // scalar component of quaternions
   NONE // no direction
 };
+//@}
 
 
 // /**@name Constants */

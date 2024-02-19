@@ -110,10 +110,20 @@ class RigidBody
  frame
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
-// Returns whether 2 rigid bodies intersect
 __host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
                                                RigidBody const& rbB,
                                                Transform3d const& a2w,
                                                Transform3d const& b2w );
+
+/** @brief Returns whether 2 rigid bodies intersect
+ @param rbA first rigid body
+ @param rbB second rigid body
+ @param b2a geometric tramsformation describing convex B in the A's reference
+ frame */
+__host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
+                                               RigidBody const& rbB,
+                                               Transform3d const& b2a );
+//@}
+
 
 #endif
