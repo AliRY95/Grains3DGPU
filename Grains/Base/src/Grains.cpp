@@ -4,11 +4,81 @@
 /* ========================================================================== */
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "Kernels.cu"
+
+#include "Sphere.hh"
+#include "Box.hh"
+#include "Superquadric.hh"
+#include "Convex.hh"
+
+#include "Transform3.hh"
+
+#include "RigidBody.hh"
+
+#include "ComponentManagerCPU.hh"
+#include "ComponentManagerGPU.hh"
+#include "ComponentManager.hh"
+
+#include "GrainsParameters.hh"
 
 
 using namespace std;
 
+
+/* ========================================================================== */
+/*                                    TEMP                                    */
+/* ========================================================================== */
+
+namespace GrainsCPU {
+void setupRigidBody( ConvexType cType,
+                     double a,
+                     double b,
+                     double c,
+                     double ct,
+                     RigidBody** rb )
+{
+    Convex* cvx;
+    if ( cType == SPHERE )
+    {
+        cvx = new Sphere( a );
+        *rb = new RigidBody( cvx, ct );
+    }
+    else if ( cType == BOX )
+    {
+        cvx = new Box( a, b, c );
+        *rb = new RigidBody( cvx, ct );
+    }
+    else if ( cType == SUPERQUADRIC )
+    {
+        cvx = new Superquadric( a, b, c, 2., 3. );
+        *rb = new RigidBody( cvx, ct );
+    }
+}; } // GrainsCPU namespace end
+
+namespace GrainsGPU {
+__global__ void setupRigidBody( ConvexType cType,
+                                double a,
+                                double b,
+                                double c,
+                                double ct,
+                                RigidBody** rb )
+{
+    Convex* cvx;
+    if ( cType == SPHERE )
+    {
+        cvx = new Sphere( a );
+        *rb = new RigidBody( cvx, ct );
+    }
+    else if ( cType == BOX )
+    {
+        cvx = new Box( a, b, c );
+        *rb = new RigidBody( cvx, ct );
+    }
+    else if ( cType == SUPERQUADRIC )
+    {
+        cvx = new Superquadric( a, b, c, 2., 3. );
+        *rb = new RigidBody( cvx, ct );
+    }
+}; } // GrainsGPU namespace end
 
 /* ========================================================================== */
 /*                                    Main                                    */
@@ -36,41 +106,12 @@ int main(int argc, char* argv[])
         particleType = BOX;
         break;
     }
-    /* ====================================================================== */
-    /* Creating two random Transform3 for each particles                      */
-    /* ====================================================================== */
 
-    default_random_engine generator;
-    uniform_real_distribution<double> location( 0.0, 1.0 );
-    uniform_real_distribution<double> angle( 0.0, 2. * M_PI );
-
-    // Allocating memory on host and device
-    Transform3d *h_tr3d = new Transform3d[N];
-    Transform3d *d_tr3d; // Device array
-    cudaErrCheck( cudaMalloc( (void**)&d_tr3d,
-                              N * sizeof( Transform3d ) ) );
-                             
-    // Randomize array on host
-    for( int i = 0; i < N; i++ )
-    {
-        // Random orientation
-        double aX = angle( generator );
-        double aY = angle( generator );
-        double aZ = angle( generator );
-        h_tr3d[i].setBasis( aX, aY, aZ );
-        h_tr3d[i].setOrigin( Vec3d( location( generator ),
-                                    location( generator ),
-                                    location( generator ) ) );
-    }
-
-    // Copying the arrays from host to device
-    cudaErrCheck( cudaMemcpy( d_tr3d,
-                              h_tr3d,
-                              N * sizeof( Transform3d ), 
-                              cudaMemcpyHostToDevice ) );
+    GrainsParameters grainsParameters;
+    grainsParameters.m_numComponents = N;
 
     /* ====================================================================== */
-    /* Creating convex bodies                                                 */
+    /* Creating rigid bodies and component managers                           */
     /* ====================================================================== */
 
     RigidBody** h_rb;
@@ -84,6 +125,9 @@ int main(int argc, char* argv[])
                               sizeof( RigidBody* ) ) );
     GrainsGPU::setupRigidBody<<<1, 1>>>( particleType, r1, r2, r3, 1.e-3, d_rb );
 
+    ComponentManager* h_cm = new ComponentManagerCPU();
+    ComponentManager* d_cm = new ComponentManagerGPU( *h_cm );
+
     /* ====================================================================== */
     /* Collision detection                                                    */
     /* ====================================================================== */
@@ -91,9 +135,7 @@ int main(int argc, char* argv[])
     bool *h_collision = new bool[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )
-    {
         h_collision[i] = false;
-    }
     bool *d_collision;
     cudaErrCheck( cudaMalloc( (void**)&d_collision,
                               N * sizeof(bool) ) );
@@ -104,21 +146,13 @@ int main(int argc, char* argv[])
 
     // Collision detection on host
     auto h_start = chrono::high_resolution_clock::now();
-    GrainsCPU::collisionDetectionGJK( h_rb,
-                                      h_tr3d,
-                                      h_collision,
-                                      N );
+    h_cm->detectCollision( h_rb, h_collision );
     auto h_end = chrono::high_resolution_clock::now();
 
     // Collision detection on device
-    dim3 dimBlock( 256, 1, 1 );
-    dim3 dimGrid( N / 256, 1, 1 );
     auto d_start = chrono::high_resolution_clock::now();
-    GrainsGPU::collisionDetectionGJK<<< dimGrid, dimBlock >>> ( d_rb, 
-                                                                d_tr3d,
-                                                                d_collision,
-                                                                N );
-    cudaErrCheck( cudaDeviceSynchronize() );
+    d_cm->detectCollision( d_rb, d_collision );
+    cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();
 
     /* ====================================================================== */
@@ -152,11 +186,6 @@ int main(int argc, char* argv[])
          << trueHostCount << " Collision on host, "
          << trueDeviceCount << " Collision on device, "
          << diffCount << " Different results." << endl;
-
-    delete[] h_tr3d;
-    delete[] h_collision;
-    cudaFree( d_tr3d );
-    cudaFree( d_collision );
     
   return 0;
 }

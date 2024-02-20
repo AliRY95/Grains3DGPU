@@ -7,7 +7,6 @@
 #include <new>
 #include <chrono>
 #include <string>
-#include <random>
 
 #include <cuda.h>
 #include <cuda_runtime.h>
