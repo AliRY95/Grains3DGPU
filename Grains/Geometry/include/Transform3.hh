@@ -15,7 +15,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class __align__(16) Transform3
+class Transform3
 {
   private:
     /**@name Parameters */

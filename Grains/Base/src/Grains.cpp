@@ -14,6 +14,7 @@
 
 #include "RigidBody.hh"
 
+#include "LinkedCell.hh"
 #include "ComponentManagerCPU.hh"
 #include "ComponentManagerGPU.hh"
 #include "ComponentManager.hh"
@@ -52,6 +53,12 @@ void setupRigidBody( ConvexType cType,
         cvx = new Superquadric( a, b, c, 2., 3. );
         *rb = new RigidBody( cvx, ct );
     }
+}; 
+
+void setupLinkedCell( double rMax,
+                      LinkedCellD** lc )
+{
+    *lc = new LinkedCellD( Vec3d( 0., 0., 0. ), Vec3d( 1., 1., 1. ), rMax );
 }; } // GrainsCPU namespace end
 
 namespace GrainsGPU {
@@ -78,6 +85,12 @@ __global__ void setupRigidBody( ConvexType cType,
         cvx = new Superquadric( a, b, c, 2., 3. );
         *rb = new RigidBody( cvx, ct );
     }
+};
+
+__global__ void setupLinkedCell( double rMax,
+                                 LinkedCellD** lc )
+{
+    *lc = new LinkedCellD( Vec3d( 0., 0., 0. ), Vec3d( 1., 1., 1. ), rMax );
 }; } // GrainsGPU namespace end
 
 /* ========================================================================== */
@@ -88,6 +101,7 @@ int main(int argc, char* argv[])
 {
     double userN = stod( argv[1] );
     int const N = round( userN * 24 * 256 ); // No. pair particles
+    // int const N = 7; // No. pair particles
     double r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
 
     ConvexType particleType;
@@ -107,11 +121,8 @@ int main(int argc, char* argv[])
         break;
     }
 
-    GrainsParameters grainsParameters;
-    grainsParameters.m_numComponents = N;
-
     /* ====================================================================== */
-    /* Creating rigid bodies and component managers                           */
+    /* Creating rigid bodies                                                  */
     /* ====================================================================== */
 
     RigidBody** h_rb;
@@ -125,6 +136,26 @@ int main(int argc, char* argv[])
                               sizeof( RigidBody* ) ) );
     GrainsGPU::setupRigidBody<<<1, 1>>>( particleType, r1, r2, r3, 1.e-3, d_rb );
 
+    /* ====================================================================== */
+    /* Creating linked cells                                                  */
+    /* ====================================================================== */
+
+    double maxRadius = (double) (*h_rb)->getCircumscribedRadius();
+
+    LinkedCellD** h_lc;
+    h_lc = ( LinkedCellD** ) malloc( sizeof( LinkedCellD* ) );
+    GrainsCPU::setupLinkedCell( 2. * maxRadius, h_lc );
+
+    LinkedCellD** d_lc;
+    cudaErrCheck( cudaMalloc( (void**)&d_lc,
+                              sizeof( LinkedCellD* ) ) );
+    GrainsGPU::setupLinkedCell<<<1, 1>>>( 2. * maxRadius, d_lc );
+
+
+    GrainsParameters grainsParameters;
+    grainsParameters.m_numCells = (*h_lc)->getNumCells();
+    grainsParameters.m_numComponents = N;
+
     ComponentManager* h_cm = new ComponentManagerCPU();
     ComponentManager* d_cm = new ComponentManagerGPU( *h_cm );
 
@@ -132,26 +163,26 @@ int main(int argc, char* argv[])
     /* Collision detection                                                    */
     /* ====================================================================== */
 
-    bool *h_collision = new bool[N];
+    int* h_collision = new int[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )
-        h_collision[i] = false;
-    bool *d_collision;
+        h_collision[i] = 0;
+    int* d_collision;
     cudaErrCheck( cudaMalloc( (void**)&d_collision,
-                              N * sizeof(bool) ) );
+                              N * sizeof( int ) ) );
     cudaErrCheck( cudaMemcpy( d_collision,
                               h_collision,
-                              N * sizeof(bool), 
+                              N * sizeof( int ), 
                               cudaMemcpyHostToDevice ) );
 
     // Collision detection on host
     auto h_start = chrono::high_resolution_clock::now();
-    h_cm->detectCollision( h_rb, h_collision );
+    h_cm->detectCollision( h_lc, h_rb, h_collision );
     auto h_end = chrono::high_resolution_clock::now();
 
     // Collision detection on device
     auto d_start = chrono::high_resolution_clock::now();
-    d_cm->detectCollision( d_rb, d_collision );
+    d_cm->detectCollision( d_lc, d_rb, d_collision );
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();
 
@@ -166,26 +197,32 @@ int main(int argc, char* argv[])
               << ", Speedup: " << h_time.count() / d_time.count() << endl;
 
     // accuracy
-    bool *h_d_collision = new bool[N];
+    int* h_d_collision = new int[N];
     cudaErrCheck( cudaMemcpy( h_d_collision,
                               d_collision,
-                              N * sizeof(bool), 
+                              N * sizeof( int ), 
                               cudaMemcpyDeviceToHost ) );
 
     int diffCount = 0, trueHostCount = 0, trueDeviceCount = 0;
     for( int i = 0; i < N; i++ )
     {
-        if( h_collision[i] == true )
-            trueHostCount++;
-        if( h_d_collision[i] == true )
-            trueDeviceCount++;
-        if( h_collision[i] != h_d_collision[i] )
-            diffCount++;
+        trueHostCount += h_collision[i];
+        trueDeviceCount += h_d_collision[i];
     }
+    diffCount = trueHostCount - trueDeviceCount;
     cout << N << " Particles, "
          << trueHostCount << " Collision on host, "
-         << trueDeviceCount << " Collision on device, "
-         << diffCount << " Different results." << endl;
-    
+         << trueDeviceCount << " Collision on device" << endl;
+
+    // for( int i = 0; i < N; i++ )
+    // {
+    //     cout << h_collision[i] << " ";
+    // }
+    // cout << "\n";
+    // for( int i = 0; i < N; i++ )
+    // {
+    //     cout << h_d_collision[i] << " ";
+    // }
+    // cout << "\n";
   return 0;
 }

@@ -51,15 +51,16 @@ VPATH := $(SRCDIRBASE):$(SRCDIRCOMPO):$(SRCDIRGEOM)
 # Compiler
 COMP  := nvcc
 LINK  := nvcc
-#DEBUG  := -G -g -Xcompiler -rdynamic
-DEBUG  := -g -Xcompiler -rdynamic
+# DEBUG  := -G -g -Xcompiler -rdynamic
+DEBUG :=
 
 
 # Compiler flags
 INCFLAGS  := $(INCDIR:%=-I%)
 #COMPFLAGS := $(DEBUG) -x cu -O3 -dlto -arch=sm_75 $(INCFLAGS)
-COMPFLAGS := $(DEBUG) -arch=sm_75 -O3 -dc -dlto	-rdc=true -x cu $(INCFLAGS)
-LINKFLAGS := -Xnvlink -dump-callgraph-no-demangle -arch=sm_75 -O3 -dlto -rdc=true $(INCFLAGS)
+COMPFLAGS := $(DEBUG) -O3 -arch=sm_75 -dc -dlto -rdc=true -x cu $(INCFLAGS)
+# LINKFLAGS := -Xnvlink -dump-callgraph-no-demangle -arch=sm_75 -O3 -rdc=true $(INCFLAGS)
+LINKFLAGS := -O3 -arch=sm_75 -dlto -rdc=true $(INCFLAGS)
 
 
 #------------------------------------------------------------------------------

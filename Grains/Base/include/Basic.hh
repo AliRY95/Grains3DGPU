@@ -27,6 +27,18 @@
 #define EPSILON2 1.0e-15
 #define EPSILON3 1.0e-20
 
+/** @name Structs */
+//@{    
+/** @brief Struct for 3D usngined integers, mostly used in LinkedCell */
+// struct uint3
+// {
+//   unsigned int x; // x component
+//   unsigned int y; // y component
+//   unsigned int z; // z component
+// };
+//@}
+
+
 /** @name Enumerations */
 //@{    
 /** @brief Space dimensions */

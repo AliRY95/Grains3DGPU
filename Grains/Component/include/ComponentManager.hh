@@ -3,7 +3,7 @@
 
 #include "Transform3.hh"
 #include "RigidBody.hh"
-
+#include "LinkedCell.hh"
 #include "GrainsParameters.hh"
 
 
@@ -29,7 +29,10 @@ class ComponentManager
         unsigned int* m_neighborsId; /**< array of components neighbor Id */ 
         unsigned int* m_rigidBodyId; /**< array of components rigid body Id */
         unsigned int* m_componentId; /**< array of component Ids */
+        unsigned int* m_componentCellHash; /**< array of components cell hash */
         unsigned int* m_neighborsCount; /**< array of components neighbor count */
+        unsigned int* m_cellHashStart; /**< array of cells hash start */
+        unsigned int* m_cellHashEnd; /**< array of cells hash start */
         // bool* isActive; /**< array of components activity in the simulation */
         // bool* isObstacle; /**< array of components flag for being obstacle */
         // unsigned int m_numComponents; /**< number of components */
@@ -60,27 +63,39 @@ class ComponentManager
         /** @brief Gets the array of component Ids */
         virtual unsigned int* getComponentId() const = 0;
 
+        /** @brief Gets the array of components cell hash */
+        virtual unsigned int* getComponentCellHash() const = 0;
+
         /** @brief Gets the array of components neighbor count */
         virtual unsigned int* getNeighborsCount() const = 0;
+
+        /** @brief Gets the array of cells hash start */
+        virtual unsigned int* getCellHashStart() const = 0;
         //@}
 
 
         /** @name Set methods */
         //@{
         /** @brief Sets components transformation */
-        virtual void setTransform( const Transform3d* tr ) = 0;
+        virtual void setTransform( Transform3d const* tr ) = 0;
 
         /** @brief Sets the array of components neighbor Id */
-        virtual void setNeighborsId( const unsigned int* id ) = 0;
+        virtual void setNeighborsId( unsigned int const* id ) = 0;
 
         /** @brief Sets the array of components rigid body Id */
-        virtual void setRigidBodyId( const unsigned int* id ) = 0;
+        virtual void setRigidBodyId( unsigned int const* id ) = 0;
 
         /** @brief Sets the array of component Ids */
-        virtual void setComponentId( const unsigned int* id ) = 0;
+        virtual void setComponentId( unsigned int const* id ) = 0;
 
+        /** @brief Sets the array of components cell hash */
+        virtual void setComponentCellHash( unsigned int const* hash ) = 0;
+        
         /** @brief Sets the array of components neighbor count */
-        virtual void setNeighborsCount( const unsigned int* id ) = 0;
+        virtual void setNeighborsCount( unsigned int const* count ) = 0;
+
+        /** @brief Sets the array of cells hash start */
+        virtual void setCellHashStart( unsigned int const* id ) = 0;
         //@}
 
 
@@ -93,8 +108,9 @@ class ComponentManager
         // void createNeighborList();
 
         /** @brief Detects collision between particles */
-        virtual void detectCollision( const RigidBody* const* rb, 
-                                      bool* result ) = 0;
+        virtual void detectCollision( LinkedCellD const* const* LC,
+                                      const RigidBody* const* rb, 
+                                      int* result ) = 0;
 
         // /** @brief Computes impact forces */
         // void computeForces();

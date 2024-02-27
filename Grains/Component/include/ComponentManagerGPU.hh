@@ -44,8 +44,14 @@ class ComponentManagerGPU : public ComponentManager
         /** @brief Gets the array of component Ids */
         unsigned int* getComponentId() const;
 
+        /** @brief Gets the array of components cell hash */
+        unsigned int* getComponentCellHash() const;
+
         /** @brief Gets the array of components neighbor count */
         unsigned int* getNeighborsCount() const;
+
+        /** @brief Gets the array of cells hash start */
+        unsigned int* getCellHashStart() const;
         //@}
 
 
@@ -63,8 +69,14 @@ class ComponentManagerGPU : public ComponentManager
         /** @brief Sets the array of component Ids */
         void setComponentId( unsigned int const* id );
 
+        /** @brief Sets the array of components cell hash */
+        void setComponentCellHash( unsigned int const* hash );
+
         /** @brief Sets the array of components neighbor count */
-        void setNeighborsCount( unsigned int const* id );
+        void setNeighborsCount( unsigned int const* count );
+
+        /** @brief Sets the array of cells hash start */
+        void setCellHashStart( unsigned int const* id );
         //@}
 
 
@@ -73,12 +85,15 @@ class ComponentManagerGPU : public ComponentManager
         // /** @brief Sorts particles based on a Z-curve */
         // void sortParticles();
 
-        // /** @brief Creates a neighbor list */
-        // void createNeighborList();
+        /** @brief Updates the linked cell list according to the linked cell 
+        provided
+        @param LC linked cell */
+        void updateLinkedCellList( LinkedCellD const* const* LC );
 
         /** @brief Detects collision between particles */
-        void detectCollision( RigidBody const* const* rb, 
-                              bool* results );
+        void detectCollision( LinkedCellD const* const* LC,
+                              RigidBody const* const* rb, 
+                              int* results );
 
         // /** @brief Computes impact forces */
         // void computeForces();

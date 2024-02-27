@@ -40,8 +40,14 @@ class ComponentManagerCPU : public ComponentManager
         /** @brief Gets the array of component Ids */
         unsigned int* getComponentId() const;
 
+        /** @brief Gets the array of components cell hash */
+        unsigned int* getComponentCellHash() const;
+
         /** @brief Gets the array of components neighbor count */
         unsigned int* getNeighborsCount() const;
+
+        /** @brief Gets the array of cells hash start */
+        unsigned int* getCellHashStart() const;
         //@}
 
 
@@ -59,8 +65,14 @@ class ComponentManagerCPU : public ComponentManager
         /** @brief Sets the array of component Ids */
         void setComponentId( unsigned int const* id );
 
+        /** @brief Sets the array of components cell hash */
+        void setComponentCellHash( unsigned int const* hash );
+
         /** @brief Sets the array of components neighbor count */
-        void setNeighborsCount( unsigned int const* id );
+        void setNeighborsCount( unsigned int const* count );
+
+        /** @brief Sets the array of cells hash start */
+        void setCellHashStart( unsigned int const* id );
         //@}
 
 
@@ -73,8 +85,9 @@ class ComponentManagerCPU : public ComponentManager
         // void createNeighborList();
 
         /** @brief Detects collision between particles */
-        void detectCollision( RigidBody const* const* rb, 
-                              bool* result );
+        void detectCollision( LinkedCellD const* const* LC,
+                              RigidBody const* const* rb, 
+                              int* result );
 
         // /** @brief Computes impact forces */
         // void computeForces();

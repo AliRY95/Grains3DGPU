@@ -130,8 +130,9 @@ class Vector3
         //@}
 };
 
-// static Vector3 Vector3Nul; /**< Vector3 nul (0.,0.,0.)  */
+
 typedef Vector3<float> Vec3f;
 typedef Vector3<double> Vec3d;
+
 
 #endif
