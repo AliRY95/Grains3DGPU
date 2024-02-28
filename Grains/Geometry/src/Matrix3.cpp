@@ -4,11 +4,12 @@
 // -----------------------------------------------------------------------------
 // Default constructor. Matrix is initialized to the identity matrix
 template <typename T>
-__host__ __device__ Matrix3<T>::Matrix3()
+__host__ __device__
+Matrix3<T>::Matrix3()
 {
-  setValue( T( 1 ), T( 0 ), T( 0 ), 
-            T( 0 ), T( 1 ), T( 0 ), 
-            T( 0 ), T( 0 ), T( 1 ) );
+    setValue( T( 1 ), T( 0 ), T( 0 ), 
+              T( 0 ), T( 1 ), T( 0 ), 
+              T( 0 ), T( 0 ), T( 1 ) );
 }
 
 
@@ -17,9 +18,10 @@ __host__ __device__ Matrix3<T>::Matrix3()
 // -----------------------------------------------------------------------------
 // Constructor with a 1D array of values as input
 template <typename T>
-__host__ __device__ Matrix3<T>::Matrix3( T const* mat )
+__host__ __device__
+Matrix3<T>::Matrix3( T const* mat )
 {
-  setValue( mat );
+    setValue( mat );
 }
 
 
@@ -28,11 +30,12 @@ __host__ __device__ Matrix3<T>::Matrix3( T const* mat )
 // -----------------------------------------------------------------------------
 // Constructor with 9 components as inputs
 template <typename T>
-__host__ __device__ Matrix3<T>::Matrix3( T xx, T xy, T xz,
-                                         T yx, T yy, T yz,
-                                         T zx, T zy, T zz )
+__host__ __device__
+Matrix3<T>::Matrix3( T xx, T xy, T xz,
+                     T yx, T yy, T yz,
+                     T zx, T zy, T zz )
 {
-  setValue( xx, xy, xz, yx, yy, yz, zx, zy, zz );
+    setValue( xx, xy, xz, yx, yy, yz, zx, zy, zz );
 }
 
 
@@ -41,7 +44,8 @@ __host__ __device__ Matrix3<T>::Matrix3( T xx, T xy, T xz,
 // -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
-__host__ __device__ Matrix3<T>::Matrix3( Matrix3<T> const& mat )
+__host__ __device__
+Matrix3<T>::Matrix3( Matrix3<T> const& mat )
 {
   for ( int i = 0; i < 3; ++i )
     for ( int j = 0; j < 3; ++j )
@@ -54,7 +58,8 @@ __host__ __device__ Matrix3<T>::Matrix3( Matrix3<T> const& mat )
 // -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
-__host__ __device__ Matrix3<T>::~Matrix3()
+__host__ __device__
+Matrix3<T>::~Matrix3()
 {}
 
 
@@ -63,11 +68,12 @@ __host__ __device__ Matrix3<T>::~Matrix3()
 // -----------------------------------------------------------------------------
 // Sets the matrix to a 1D array of 9 values as input
 template <typename T>
-__host__ __device__ void Matrix3<T>::setValue( T const* mat )
+__host__ __device__
+void Matrix3<T>::setValue( T const* mat )
 {
-  m_comp[X][X] = *mat++; m_comp[X][Y] = *mat++; m_comp[X][Z] = *mat++;
-  m_comp[Y][X] = *mat++; m_comp[Y][Y] = *mat++; m_comp[Y][Z] = *mat++;
-  m_comp[Z][X] = *mat++; m_comp[Z][Y] = *mat++; m_comp[Z][Z] = *mat;
+    m_comp[X][X] = *mat++; m_comp[X][Y] = *mat++; m_comp[X][Z] = *mat++;
+    m_comp[Y][X] = *mat++; m_comp[Y][Y] = *mat++; m_comp[Y][Z] = *mat++;
+    m_comp[Z][X] = *mat++; m_comp[Z][Y] = *mat++; m_comp[Z][Z] = *mat;
 }
 
 
@@ -76,13 +82,14 @@ __host__ __device__ void Matrix3<T>::setValue( T const* mat )
 // -----------------------------------------------------------------------------
 // Sets the matrix with all 9 components as inputs
 template <typename T>
-__host__ __device__ void Matrix3<T>::setValue( T xx, T xy, T xz,
-                                               T yx, T yy, T yz,
-                                               T zx, T zy, T zz )
+__host__ __device__
+void Matrix3<T>::setValue( T xx, T xy, T xz,
+                           T yx, T yy, T yz,
+                           T zx, T zy, T zz )
 {
-  m_comp[X][X] = xx; m_comp[X][Y] = xy; m_comp[X][Z] = xz;
-  m_comp[Y][X] = yx; m_comp[Y][Y] = yy; m_comp[Y][Z] = yz;
-  m_comp[Z][X] = zx; m_comp[Z][Y] = zy; m_comp[Z][Z] = zz;
+    m_comp[X][X] = xx; m_comp[X][Y] = xy; m_comp[X][Z] = xz;
+    m_comp[Y][X] = yx; m_comp[Y][Y] = yy; m_comp[Y][Z] = yz;
+    m_comp[Z][X] = zx; m_comp[Z][Y] = zy; m_comp[Z][Z] = zz;
 }
 
 
@@ -91,12 +98,13 @@ __host__ __device__ void Matrix3<T>::setValue( T xx, T xy, T xz,
 // -----------------------------------------------------------------------------
 // Returns a matrix with positive components
 template <typename T>
-__host__ __device__ Matrix3<T> Matrix3<T>::absolute() const
+__host__ __device__
+Matrix3<T> Matrix3<T>::absolute() const
 {
-  return ( Matrix3<T>(
-  	 fabs( m_comp[X][X] ), fabs( m_comp[X][Y] ), fabs( m_comp[X][Z] ),
-	   fabs( m_comp[Y][X] ), fabs( m_comp[Y][Y] ), fabs( m_comp[Y][Z] ),
-	   fabs( m_comp[Z][X] ), fabs( m_comp[Z][Y] ), fabs( m_comp[Z][Z] ) ) );
+    return ( Matrix3<T>(
+        fabs( m_comp[X][X] ), fabs( m_comp[X][Y] ), fabs( m_comp[X][Z] ),
+        fabs( m_comp[Y][X] ), fabs( m_comp[Y][Y] ), fabs( m_comp[Y][Z] ),
+        fabs( m_comp[Z][X] ), fabs( m_comp[Z][Y] ), fabs( m_comp[Z][Z] ) ) );
 }
 
 
@@ -105,12 +113,13 @@ __host__ __device__ Matrix3<T> Matrix3<T>::absolute() const
 // -----------------------------------------------------------------------------
 // Returns a matrix with positive components - specialized for floats
 template <>
-__host__ __device__ Matrix3<float> Matrix3<float>::absolute() const
+__host__ __device__
+Matrix3<float> Matrix3<float>::absolute() const
 {
-  return ( Matrix3<float>(
-  	 fabsf( m_comp[X][X] ), fabsf( m_comp[X][Y] ), fabsf( m_comp[X][Z] ),
-	   fabsf( m_comp[Y][X] ), fabsf( m_comp[Y][Y] ), fabsf( m_comp[Y][Z] ),
-	   fabsf( m_comp[Z][X] ), fabsf( m_comp[Z][Y] ), fabsf( m_comp[Z][Z] ) ) );
+    return ( Matrix3<float>(
+        fabsf( m_comp[X][X] ), fabsf( m_comp[X][Y] ), fabsf( m_comp[X][Z] ),
+        fabsf( m_comp[Y][X] ), fabsf( m_comp[Y][Y] ), fabsf( m_comp[Y][Z] ),
+        fabsf( m_comp[Z][X] ), fabsf( m_comp[Z][Y] ), fabsf( m_comp[Z][Z] ) ) );
 }
 
 
@@ -119,13 +128,14 @@ __host__ __device__ Matrix3<float> Matrix3<float>::absolute() const
 // -----------------------------------------------------------------------------
 // Returns the determinant of the matrix
 template <typename T>
-__host__ __device__ T Matrix3<T>::determinant() const
+__host__ __device__
+T Matrix3<T>::determinant() const
 {
-  return ( 
+    return ( 
     m_comp[X][X] * ( m_comp[Y][Y] * m_comp[Z][Z] - m_comp[Y][Z] * m_comp[Z][Y] )
   - m_comp[X][Y] * ( m_comp[Y][X] * m_comp[Z][Z] - m_comp[Y][Z] * m_comp[Z][X] )
   + m_comp[X][Z] * ( m_comp[Y][X] * m_comp[Z][Y] - m_comp[Y][Y] * m_comp[Z][X] )
-  );
+    );
 }
 
 
@@ -134,23 +144,25 @@ __host__ __device__ T Matrix3<T>::determinant() const
 // -----------------------------------------------------------------------------
 // Returns the inverse of the matrix
 template <typename T>
-__host__ __device__ Matrix3<T> Matrix3<T>::inverse() const
+__host__ __device__
+Matrix3<T> Matrix3<T>::inverse() const
 {
-  Vector3<T> co( m_comp[Y][Y] * m_comp[Z][Z] - m_comp[Y][Z] * m_comp[Z][Y],
-	               m_comp[Y][Z] * m_comp[Z][X] - m_comp[Y][X] * m_comp[Z][Z],
-	               m_comp[Y][X] * m_comp[Z][Y] - m_comp[Y][Y] * m_comp[Z][X] );
-  T d = (*this)[X] * co;
-//  assert( !eqz( d ) ); EPSILON = 1.e-10
-  T s = T( 1 ) / d;
-  return ( Matrix3<T>( co[X] * s,
-	( m_comp[X][Z] * m_comp[Z][Y] - m_comp[X][Y] * m_comp[Z][Z] ) * s,
-	( m_comp[X][Y] * m_comp[Y][Z] - m_comp[X][Z] * m_comp[Y][Y] ) * s,
-	co[Y] * s,
-	( m_comp[X][X] * m_comp[Z][Z] - m_comp[X][Z] * m_comp[Z][X] ) * s,
-	( m_comp[X][Z] * m_comp[Y][X] - m_comp[X][X] * m_comp[Y][Z] ) * s,
-	co[Z] * s,
-	( m_comp[X][Y] * m_comp[Z][X] - m_comp[X][X] * m_comp[Z][Y] ) * s,
-	( m_comp[X][X] * m_comp[Y][Y] - m_comp[X][Y] * m_comp[Y][X] ) * s ) );
+    Vector3<T> co( m_comp[Y][Y] * m_comp[Z][Z] - m_comp[Y][Z] * m_comp[Z][Y],
+                   m_comp[Y][Z] * m_comp[Z][X] - m_comp[Y][X] * m_comp[Z][Z],
+                   m_comp[Y][X] * m_comp[Z][Y] - m_comp[Y][Y] * m_comp[Z][X] );
+    T d = (*this)[X] * co;
+    // assert( !eqz( d ) ); EPSILON = 1.e-10
+    T s = T( 1 ) / d;
+    return ( Matrix3<T>( 
+    co[X] * s,
+    ( m_comp[X][Z] * m_comp[Z][Y] - m_comp[X][Y] * m_comp[Z][Z] ) * s,
+    ( m_comp[X][Y] * m_comp[Y][Z] - m_comp[X][Z] * m_comp[Y][Y] ) * s,
+    co[Y] * s,
+    ( m_comp[X][X] * m_comp[Z][Z] - m_comp[X][Z] * m_comp[Z][X] ) * s,
+    ( m_comp[X][Z] * m_comp[Y][X] - m_comp[X][X] * m_comp[Y][Z] ) * s,
+    co[Z] * s,
+    ( m_comp[X][Y] * m_comp[Z][X] - m_comp[X][X] * m_comp[Z][Y] ) * s,
+    ( m_comp[X][X] * m_comp[Y][Y] - m_comp[X][Y] * m_comp[Y][X] ) * s ) );
 }
 
 
@@ -159,11 +171,12 @@ __host__ __device__ Matrix3<T> Matrix3<T>::inverse() const
 // -----------------------------------------------------------------------------
 // Returns the transposed matrix
 template <typename T>
-__host__ __device__ Matrix3<T> Matrix3<T>::transpose() const
+__host__ __device__
+Matrix3<T> Matrix3<T>::transpose() const
 {
-  return ( Matrix3<T>( m_comp[X][X], m_comp[Y][X], m_comp[Z][X],
-	                     m_comp[X][Y], m_comp[Y][Y], m_comp[Z][Y],
-	                     m_comp[X][Z], m_comp[Y][Z], m_comp[Z][Z] ) );
+    return ( Matrix3<T>( m_comp[X][X], m_comp[Y][X], m_comp[Z][X],
+                         m_comp[X][Y], m_comp[Y][Y], m_comp[Z][Y],
+                         m_comp[X][Z], m_comp[Y][Z], m_comp[Z][Z] ) );
 }
 
 
@@ -172,13 +185,14 @@ __host__ __device__ Matrix3<T> Matrix3<T>::transpose() const
 // -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
-__host__ __device__ Matrix3<T>& Matrix3<T>::operator += ( Matrix3<T> const& m )
+__host__ __device__
+Matrix3<T>& Matrix3<T>::operator += ( Matrix3<T> const& m )
 {
-  setValue(
-  	m_comp[X][X] + m[X][X], m_comp[X][Y] + m[X][Y], m_comp[X][Z] + m[X][Z],
-	  m_comp[Y][X] + m[Y][X], m_comp[Y][Y] + m[Y][Y], m_comp[Y][Z] + m[Y][Z],
-	  m_comp[Z][X] + m[Z][X], m_comp[Z][Y] + m[Z][Y], m_comp[Z][Z] + m[Z][Z] );
-  return ( *this );
+    setValue(
+        m_comp[X][X] + m[X][X], m_comp[X][Y] + m[X][Y], m_comp[X][Z] + m[X][Z],
+        m_comp[Y][X] + m[Y][X], m_comp[Y][Y] + m[Y][Y], m_comp[Y][Z] + m[Y][Z],
+        m_comp[Z][X] + m[Z][X], m_comp[Z][Y] + m[Z][Y], m_comp[Z][Z] + m[Z][Z]);
+    return ( *this );
 }
 
 
@@ -187,13 +201,14 @@ __host__ __device__ Matrix3<T>& Matrix3<T>::operator += ( Matrix3<T> const& m )
 // -----------------------------------------------------------------------------
 // Operator -=
 template <typename T>
-__host__ __device__ Matrix3<T>& Matrix3<T>::operator -= ( Matrix3<T> const& m )
+__host__ __device__
+Matrix3<T>& Matrix3<T>::operator -= ( Matrix3<T> const& m )
 {
-  setValue(
-  	m_comp[X][X] - m[X][X], m_comp[X][Y] - m[X][Y], m_comp[X][Z] - m[X][Z],
-	  m_comp[Y][X] - m[Y][X], m_comp[Y][Y] - m[Y][Y], m_comp[Y][Z] - m[Y][Z],
-	  m_comp[Z][X] - m[Z][X], m_comp[Z][Y] - m[Z][Y], m_comp[Z][Z] - m[Z][Z] );
-  return ( *this );
+    setValue(
+        m_comp[X][X] - m[X][X], m_comp[X][Y] - m[X][Y], m_comp[X][Z] - m[X][Z],
+        m_comp[Y][X] - m[Y][X], m_comp[Y][Y] - m[Y][Y], m_comp[Y][Z] - m[Y][Z],
+        m_comp[Z][X] - m[Z][X], m_comp[Z][Y] - m[Z][Y], m_comp[Z][Z] - m[Z][Z]);
+    return ( *this );
 }
 
 
@@ -202,13 +217,14 @@ __host__ __device__ Matrix3<T>& Matrix3<T>::operator -= ( Matrix3<T> const& m )
 // -----------------------------------------------------------------------------
 // Operator *= by a scalar
 template <typename T>
-__host__ __device__ Matrix3<T>& Matrix3<T>::operator *= ( T d )
+__host__ __device__
+Matrix3<T>& Matrix3<T>::operator *= ( T d )
 {
-  setValue(
-  	d * m_comp[X][X], d * m_comp[X][Y], d * m_comp[X][Z],
-	  d * m_comp[Y][X], d * m_comp[Y][Y], d * m_comp[Y][Z],
-	  d * m_comp[Z][X], d * m_comp[Z][Y], d * m_comp[Z][Z] );
-  return ( *this );
+    setValue(
+        d * m_comp[X][X], d * m_comp[X][Y], d * m_comp[X][Z],
+        d * m_comp[Y][X], d * m_comp[Y][Y], d * m_comp[Y][Z],
+        d * m_comp[Z][X], d * m_comp[Z][Y], d * m_comp[Z][Z] );
+    return ( *this );
 }
 
 
@@ -217,9 +233,10 @@ __host__ __device__ Matrix3<T>& Matrix3<T>::operator *= ( T d )
 // -----------------------------------------------------------------------------
 // Operator *= by a matrix
 template <typename T>
-__host__ __device__ Matrix3<T>& Matrix3<T>::operator *= ( Matrix3<T> const& m )
+__host__ __device__
+Matrix3<T>& Matrix3<T>::operator *= ( Matrix3<T> const& m )
 {
-  setValue(
+    setValue(
     m_comp[X][X] * m[X][X] + m_comp[X][Y] * m[Y][X] + m_comp[X][Z] * m[Z][X],
     m_comp[X][X] * m[X][Y] + m_comp[X][Y] * m[Y][Y] + m_comp[X][Z] * m[Z][Y],
     m_comp[X][X] * m[X][Z] + m_comp[X][Y] * m[Y][Z] + m_comp[X][Z] * m[Z][Z],
@@ -229,7 +246,7 @@ __host__ __device__ Matrix3<T>& Matrix3<T>::operator *= ( Matrix3<T> const& m )
     m_comp[Z][X] * m[X][X] + m_comp[Z][Y] * m[Y][X] + m_comp[Z][Z] * m[Z][X],
     m_comp[Z][X] * m[X][Y] + m_comp[Z][Y] * m[Y][Y] + m_comp[Z][Z] * m[Z][Y],
     m_comp[Z][X] * m[X][Z] + m_comp[Z][Y] * m[Y][Z] + m_comp[Z][Z] * m[Z][Z] );
-  return ( *this );
+    return ( *this );
 }
 
 
@@ -238,9 +255,10 @@ __host__ __device__ Matrix3<T>& Matrix3<T>::operator *= ( Matrix3<T> const& m )
 // -----------------------------------------------------------------------------
 // i-th row accessor
 template <typename T>
-__host__ __device__ Vector3<T>& Matrix3<T>::operator [] ( unsigned int i ) const
+__host__ __device__
+Vector3<T>& Matrix3<T>::operator [] ( unsigned int i ) const
 {
-  return ( *( Vector3<T>* )m_comp[i] );
+    return ( *( Vector3<T>* )m_comp[i] );
 }
 
 
@@ -249,15 +267,16 @@ __host__ __device__ Vector3<T>& Matrix3<T>::operator [] ( unsigned int i ) const
 // -----------------------------------------------------------------------------
 // Assign operator to another matrix
 template <typename T>
-__host__ __device__ Matrix3<T>& Matrix3<T>::operator = ( Matrix3<T> const& m )
+__host__ __device__
+Matrix3<T>& Matrix3<T>::operator = ( Matrix3<T> const& m )
 {
-  if ( &m != this )
-  {
-    for ( int i = 0; i < 3; ++i )
-      for ( int j = 0; j < 3; ++j )
-        m_comp[i][j] = m.m_comp[i][j];
-  }
-  return ( *this );
+    if ( &m != this )
+    {
+        for ( int i = 0; i < 3; ++i )
+        for ( int j = 0; j < 3; ++j )
+            m_comp[i][j] = m.m_comp[i][j];
+    }
+    return ( *this );
 }
 
 
@@ -283,13 +302,14 @@ __host__ __device__ Matrix3<T>& Matrix3<T>::operator = ( Matrix3<T> const& m )
 /* ========================================================================== */
 // Matrices sum
 template <typename T>
-__host__ __device__ Matrix3<T> operator + ( Matrix3<T> const& m1,
-                                            Matrix3<T> const& m2 )
+__host__ __device__
+Matrix3<T> operator + ( Matrix3<T> const& m1,
+                        Matrix3<T> const& m2 )
 {
-  return (
-    Matrix3<T>( m1[X][X] + m2[X][X], m1[X][Y] + m2[X][Y], m1[X][Z] + m2[X][Z],
-                m1[Y][X] + m2[Y][X], m1[Y][Y] + m2[Y][Y], m1[Y][Z] + m2[Y][Z],
-                m1[Z][X] + m2[Z][X], m1[Z][Y] + m2[Z][Y], m1[Z][Z] + m2[Z][Z] ) );
+    return ( Matrix3<T>( 
+        m1[X][X] + m2[X][X], m1[X][Y] + m2[X][Y], m1[X][Z] + m2[X][Z],
+        m1[Y][X] + m2[Y][X], m1[Y][Y] + m2[Y][Y], m1[Y][Z] + m2[Y][Z],
+        m1[Z][X] + m2[Z][X], m1[Z][Y] + m2[Z][Y], m1[Z][Z] + m2[Z][Z] ) );
 }
 
 
@@ -298,11 +318,13 @@ __host__ __device__ Matrix3<T> operator + ( Matrix3<T> const& m1,
 // -----------------------------------------------------------------------------
 // Multiplies a matrix by a scalar
 template <typename T>
-__host__ __device__ Matrix3<T> operator * ( T c, Matrix3<T> const& m )
+__host__ __device__
+Matrix3<T> operator * ( T c, 
+                        Matrix3<T> const& m )
 {
-  return ( Matrix3<T>( c * m[X][X], c * m[X][Y], c * m[X][Z],
-                       c * m[Y][X], c * m[Y][Y], c * m[Y][Z],
-                       c * m[Z][X], c * m[Z][Y], c * m[Z][Z] ) );
+    return ( Matrix3<T>( c * m[X][X], c * m[X][Y], c * m[X][Z],
+                         c * m[Y][X], c * m[Y][Y], c * m[Y][Z],
+                         c * m[Z][X], c * m[Z][Y], c * m[Z][Z] ) );
 }
 
 
@@ -311,8 +333,9 @@ __host__ __device__ Matrix3<T> operator * ( T c, Matrix3<T> const& m )
 // -----------------------------------------------------------------------------
 // Matrix-vector product
 template <typename T>
-__host__ __device__ Vector3<T> operator * ( Matrix3<T> const& m, 
-                                            Vector3<T> const& v )
+__host__ __device__
+Vector3<T> operator * ( Matrix3<T> const& m, 
+                        Vector3<T> const& v )
 {
   return ( Vector3<T>( m[X] * v, m[Y] * v, m[Z] * v ) );
 }
@@ -323,11 +346,12 @@ __host__ __device__ Vector3<T> operator * ( Matrix3<T> const& m,
 // ----------------------------------------------------------------------------
 // Vector-matrix product
 template <typename T>
-__host__ __device__ Vector3<T> operator * ( Vector3<T> const& v, 
-                                            Matrix3<T> const& m )
+__host__ __device__
+Vector3<T> operator * ( Vector3<T> const& v, 
+                        Matrix3<T> const& m )
 {
-  Matrix3<T> m_tr = m.transpose();
-  return ( Vector3<T>( m_tr[X] * v, m_tr[Y] * v, m_tr[Z] * v ) );
+    Matrix3<T> m_tr = m.transpose();
+    return ( Vector3<T>( m_tr[X] * v, m_tr[Y] * v, m_tr[Z] * v ) );
 }
 
 
@@ -336,19 +360,20 @@ __host__ __device__ Vector3<T> operator * ( Vector3<T> const& v,
 // ----------------------------------------------------------------------------
 // Matrix-matrix product
 template <typename T>
-__host__ __device__ Matrix3<T> operator * ( Matrix3<T> const& m1, 
-                                            Matrix3<T> const& m2 )
+__host__ __device__ 
+Matrix3<T> operator * ( Matrix3<T> const& m1, 
+                        Matrix3<T> const& m2 )
 {
-  return Matrix3<T>(
-    m1[X][X] * m2[X][X] + m1[X][Y] * m2[Y][X] + m1[X][Z] * m2[Z][X],
-    m1[X][X] * m2[X][Y] + m1[X][Y] * m2[Y][Y] + m1[X][Z] * m2[Z][Y],
-    m1[X][X] * m2[X][Z] + m1[X][Y] * m2[Y][Z] + m1[X][Z] * m2[Z][Z],
-    m1[Y][X] * m2[X][X] + m1[Y][Y] * m2[Y][X] + m1[Y][Z] * m2[Z][X],
-    m1[Y][X] * m2[X][Y] + m1[Y][Y] * m2[Y][Y] + m1[Y][Z] * m2[Z][Y],
-    m1[Y][X] * m2[X][Z] + m1[Y][Y] * m2[Y][Z] + m1[Y][Z] * m2[Z][Z],
-    m1[Z][X] * m2[X][X] + m1[Z][Y] * m2[Y][X] + m1[Z][Z] * m2[Z][X],
-    m1[Z][X] * m2[X][Y] + m1[Z][Y] * m2[Y][Y] + m1[Z][Z] * m2[Z][Y],
-    m1[Z][X] * m2[X][Z] + m1[Z][Y] * m2[Y][Z] + m1[Z][Z] * m2[Z][Z] );
+    return Matrix3<T>(
+        m1[X][X] * m2[X][X] + m1[X][Y] * m2[Y][X] + m1[X][Z] * m2[Z][X],
+        m1[X][X] * m2[X][Y] + m1[X][Y] * m2[Y][Y] + m1[X][Z] * m2[Z][Y],
+        m1[X][X] * m2[X][Z] + m1[X][Y] * m2[Y][Z] + m1[X][Z] * m2[Z][Z],
+        m1[Y][X] * m2[X][X] + m1[Y][Y] * m2[Y][X] + m1[Y][Z] * m2[Z][X],
+        m1[Y][X] * m2[X][Y] + m1[Y][Y] * m2[Y][Y] + m1[Y][Z] * m2[Z][Y],
+        m1[Y][X] * m2[X][Z] + m1[Y][Y] * m2[Y][Z] + m1[Y][Z] * m2[Z][Z],
+        m1[Z][X] * m2[X][X] + m1[Z][Y] * m2[Y][X] + m1[Z][Z] * m2[Z][X],
+        m1[Z][X] * m2[X][Y] + m1[Z][Y] * m2[Y][Y] + m1[Z][Z] * m2[Z][Y],
+        m1[Z][X] * m2[X][Z] + m1[Z][Y] * m2[Y][Z] + m1[Z][Z] * m2[Z][Z] );
 }
 
 

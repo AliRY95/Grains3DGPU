@@ -4,7 +4,8 @@
 
 // -----------------------------------------------------------------------------
 // Default constructor
-__host__ __device__ Convex::Convex()
+__host__ __device__
+Convex::Convex()
 {}
 
 
@@ -12,7 +13,8 @@ __host__ __device__ Convex::Convex()
 
 // -----------------------------------------------------------------------------
 // Destructor
-__host__ __device__ Convex::~Convex()
+__host__ __device__
+Convex::~Convex()
 {}
 
 
@@ -26,13 +28,14 @@ __host__ __device__ Convex::~Convex()
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
-__host__ __device__ inline void computeDet( unsigned int const bits,
-                                            unsigned int const last,
-                                            unsigned int const last_bit,
-                                            unsigned int const all_bits,
-                                            Vec3d const y[4],
-                                            double dp[4][4],
-                                            double det[16][4] )
+__host__ __device__
+inline void computeDet( unsigned int const bits,
+                        unsigned int const last,
+                        unsigned int const last_bit,
+                        unsigned int const all_bits,
+                        Vec3d const y[4],
+                        double dp[4][4],
+                        double det[16][4] )
 {
     for( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<=1 )
         if (bits & bit) 
@@ -84,9 +87,10 @@ __host__ __device__ inline void computeDet( unsigned int const bits,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__  inline bool valid( unsigned int const s,
-                                        unsigned int const all_bits,
-                                        double const det[16][4] )
+__host__ __device__ 
+inline bool valid( unsigned int const s,
+                   unsigned int const all_bits,
+                   double const det[16][4] )
 {
     for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     {
@@ -108,10 +112,11 @@ __host__ __device__  inline bool valid( unsigned int const s,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__ inline void computeVec( unsigned int const bits_,
-                                            Vec3d const y[4],
-                                            double const det[16][4],
-                                            Vec3d& v )
+__host__ __device__ 
+inline void computeVec( unsigned int const bits_,
+                        Vec3d const y[4],
+                        double const det[16][4],
+                        Vec3d& v )
 {
     double sum = 0.;
     v.setValue( 0., 0., 0. );
@@ -130,8 +135,9 @@ __host__ __device__ inline void computeVec( unsigned int const bits_,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__ inline bool proper( unsigned int const s,
-                                        double const det[16][4] )
+__host__ __device__
+inline bool proper( unsigned int const s,
+                    double const det[16][4] )
 {
     for( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
         if( ( s & bit ) && det[s][i] <= EPSILON3 )
@@ -143,14 +149,15 @@ __host__ __device__ inline bool proper( unsigned int const s,
 
 
 // -----------------------------------------------------------------------------
-__host__ __device__ inline bool closest( unsigned int& bits,
-                                         unsigned int const last,
-                                         unsigned int const last_bit,
-                                         unsigned int const all_bits,
-                                         Vec3d const y[4],
-                                         double dp[4][4],
-                                         double det[16][4],
-                                         Vec3d& v )
+__host__ __device__
+inline bool closest( unsigned int& bits,
+                     unsigned int const last,
+                     unsigned int const last_bit,
+                     unsigned int const all_bits,
+                     Vec3d const y[4],
+                     double dp[4][4],
+                     double det[16][4],
+                     Vec3d& v )
 {
     unsigned int s;
     computeDet( bits, last, last_bit, all_bits, y, dp, det );
@@ -201,9 +208,10 @@ __host__ __device__ inline bool closest( unsigned int& bits,
 // -----------------------------------------------------------------------------
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
-__host__ __device__ inline bool degenerate( unsigned int const all_bits,
-                                            Vec3d const y[4],
-                                            Vec3d const& w )
+__host__ __device__
+inline bool degenerate( unsigned int const all_bits,
+                        Vec3d const y[4],
+                        Vec3d const& w )
 {
   for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
     if ( (all_bits & bit) && y[i] == w )
@@ -217,11 +225,12 @@ __host__ __device__ inline bool degenerate( unsigned int const all_bits,
 /* ========================================================================== */
 /*                            High-Level Methods                              */
 /* ========================================================================== */
-// Returns whether 2 convex shapes intersect
-__host__ __device__  bool intersectGJK( Convex const& a,
-                                        Convex const& b,
-                                        Transform3d const& a2w,
-                                        Transform3d const& b2w )
+// Returns whether 2 convex shapes intersect using the GJK algorithm
+__host__ __device__
+bool intersectGJK( Convex const& a,
+                   Convex const& b,
+                   Transform3d const& a2w,
+                   Transform3d const& b2w )
 {
     unsigned int bits = 0;           // identifies current simplex
     unsigned int last = 0;           // identifies last found support point
@@ -261,10 +270,12 @@ __host__ __device__  bool intersectGJK( Convex const& a,
 
 
 // -----------------------------------------------------------------------------
-// Returns whether 2 convex shapes intersect
-__host__ __device__  bool intersectGJK( Convex const& a,
-                                        Convex const& b,
-                                        Transform3d const& b2a )
+// Returns whether 2 convex shapes intersect using the GJK algorithm - relative
+// transformation
+__host__ __device__
+bool intersectGJK( Convex const& a,
+                   Convex const& b,
+                   Transform3d const& b2a )
 {
     unsigned int bits = 0;           // identifies current simplex
     unsigned int last = 0;           // identifies last found support point
@@ -298,25 +309,3 @@ __host__ __device__  bool intersectGJK( Convex const& a,
     } while ( bits < 15 && !v.isApproxZero() );
     return ( true );
 }
-
-
-
-
-// // ----------------------------------------------------------------------------
-// // Returns whether the bounding boxes of 2 convex shapes intersect
-// __host__ __device__  bool intersectAABB( Convex const& a,
-//                                          Convex const& b,
-//                                          Vec3d const& a2w,
-//                                          Vec3d const& b2w )
-// {
-//     Vec3d const AABB1 = a->getExtent();
-//     Vec3d const AABB2 = b->getExtent();
-//     if ( fabs( a2w[X] - b2w[X] ) > ( AABB1[X] + AABB2[X] ) )
-//         return ( false );
-//     else if ( fabs( a2w[Y] - b2w[Y] ) > ( AABB1[Y] + AABB2[Y] ) )
-//         return ( false );
-//     else if ( fabs( a2w[Z] - b2w[Z] ) > ( AABB1[Z] + AABB2[Z] ) )
-//         return ( false );
-//     else // We have an overlap
-//         return ( true );
-// }

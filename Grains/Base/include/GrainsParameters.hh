@@ -14,8 +14,8 @@ class GrainsParameters
         //@{
         static unsigned int m_numComponents; /**< number of components in simulation */
         static unsigned int m_numCells; /**< number of cells in simulation */
-        // static unsigned int m_numComponents; /**< number of components in simulation */
         //@}
 };
+
 
 #endif

@@ -58,9 +58,9 @@ DEBUG :=
 # Compiler flags
 INCFLAGS  := $(INCDIR:%=-I%)
 #COMPFLAGS := $(DEBUG) -x cu -O3 -dlto -arch=sm_75 $(INCFLAGS)
-COMPFLAGS := $(DEBUG) -O3 -arch=sm_75 -dc -dlto -rdc=true -x cu $(INCFLAGS)
+COMPFLAGS := $(DEBUG) -O3 -arch=sm_75 -dc -dlto -x cu $(INCFLAGS)
 # LINKFLAGS := -Xnvlink -dump-callgraph-no-demangle -arch=sm_75 -O3 -rdc=true $(INCFLAGS)
-LINKFLAGS := -O3 -arch=sm_75 -dlto -rdc=true $(INCFLAGS)
+LINKFLAGS := -O3 -arch=sm_75 -dlto $(INCFLAGS)
 
 
 #------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ GEOM   : $(OBJS_GEOM)
 
 $(OBJDIR)/%.o : %.cpp
 	@echo 'Compiling '$<
-	$(COMP) $(COMPFLAGS) $(MACRO) $< -o $@
+	$(COMP) $(COMPFLAGS) $< -o $@
 
 
 # DEPENDENCIES

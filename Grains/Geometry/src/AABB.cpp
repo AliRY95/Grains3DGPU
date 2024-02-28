@@ -3,7 +3,8 @@
 
 // -----------------------------------------------------------------------------
 // Constructor
-__host__ __device__ AABB::AABB()
+__host__ __device__
+AABB::AABB()
 {}
 
 
@@ -11,7 +12,8 @@ __host__ __device__ AABB::AABB()
 
 // -----------------------------------------------------------------------------
 // Constructor with half edge length as input parameters
-__host__ __device__ AABB::AABB( float x, float y, float z )
+__host__ __device__
+AABB::AABB( float x, float y, float z )
 : m_extent( Vec3f( x, y, z ) )
 {}
 
@@ -20,7 +22,8 @@ __host__ __device__ AABB::AABB( float x, float y, float z )
 
 // -----------------------------------------------------------------------------
 // Constructor with a vector containing the edge half-lengths
-__host__ __device__ AABB::AABB( Vec3f const& extent_ )
+__host__ __device__
+AABB::AABB( Vec3f const& extent_ )
 : m_extent( extent_ )
 {}
 
@@ -37,7 +40,8 @@ __host__ __device__ AABB::~AABB()
 
 // -----------------------------------------------------------------------------
 // Sets values of the edge length
-__host__ __device__ void AABB::setExtent( float x, float y, float z )
+__host__ __device__
+void AABB::setExtent( float x, float y, float z )
 {
     m_extent = Vec3f( x, y, z );
 }
@@ -48,7 +52,8 @@ __host__ __device__ void AABB::setExtent( float x, float y, float z )
 // -----------------------------------------------------------------------------
 // Sets extent values using ccording to the convex which we want to fit the AABB
 // around.
-__host__ __device__ void AABB::setExtent( Convex const& convex )
+__host__ __device__
+void AABB::setExtent( Convex const& convex )
 {
     m_extent = convex.computeAABB();
 }
@@ -58,7 +63,8 @@ __host__ __device__ void AABB::setExtent( Convex const& convex )
 
 // -----------------------------------------------------------------------------
 // Gets values of the edge length
-__host__ __device__ Vec3f const AABB::getExtent() const
+__host__ __device__
+Vec3f const AABB::getExtent() const
 {
     return ( m_extent );
 }
@@ -71,11 +77,12 @@ __host__ __device__ Vec3f const AABB::getExtent() const
 /* ========================================================================== */
 /*                              External Methods                              */
 /* ========================================================================== */
-// Returns whether the AABBs are in contact or not
-__host__ __device__ bool intersectAABB( AABB const& a, 
-                                        AABB const& b,
-                                        Vec3f const& posA,
-	                                    Vec3f const& posB )
+// Returns whether the AABBs are in contact
+__host__ __device__
+bool intersectAABB( AABB const& a, 
+                    AABB const& b,
+                    Vec3f const& posA,
+                    Vec3f const& posB )
 {
     Vec3f const lenA = a.getExtent();
     Vec3f const lenB = b.getExtent();
@@ -93,10 +100,11 @@ __host__ __device__ bool intersectAABB( AABB const& a,
 
 
 // -----------------------------------------------------------------------------
-// Returns whether the AABBs are in contact or not
-__host__ __device__ bool intersectAABB( AABB const& a, 
-                                        AABB const& b,
-                                        Vec3f const& posB2A )
+// Returns whether the AABBs are in contact - relative position
+__host__ __device__
+bool intersectAABB( AABB const& a, 
+                    AABB const& b,
+                    Vec3f const& posB2A )
 {
     Vec3f const lenA = a.getExtent();
     Vec3f const lenB = b.getExtent();

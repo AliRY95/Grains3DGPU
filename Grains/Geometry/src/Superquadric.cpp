@@ -6,11 +6,12 @@
 
 // -----------------------------------------------------------------------------
 // Constructor with half edge length as input parameters
-__host__ __device__ Superquadric::Superquadric( double a, 
-                                                double b, 
-                                                double c, 
-                                                double n1, 
-                                                double n2 )
+__host__ __device__
+Superquadric::Superquadric( double a, 
+                            double b, 
+                            double c, 
+                            double n1, 
+                            double n2 )
 : m_a( a )
 , m_b( b )
 , m_c( c )
@@ -23,7 +24,8 @@ __host__ __device__ Superquadric::Superquadric( double a,
 
 // -----------------------------------------------------------------------------
 // Destructor
-__host__ __device__ Superquadric::~Superquadric()
+__host__ __device__
+Superquadric::~Superquadric()
 {}
 
 
@@ -31,7 +33,8 @@ __host__ __device__ Superquadric::~Superquadric()
 
 // -----------------------------------------------------------------------------
 // Returns the convex type
-__host__ __device__ ConvexType Superquadric::getConvexType() const
+__host__ __device__
+ConvexType Superquadric::getConvexType() const
 {
     return ( SUPERQUADRIC );
 }
@@ -41,7 +44,9 @@ __host__ __device__ ConvexType Superquadric::getConvexType() const
 
 // -----------------------------------------------------------------------------
 // Returns the volume of the Superquadric
-__host__ __device__ double Superquadric::computeVolume() const
+// TODO: beta function for GPU
+__host__ __device__
+double Superquadric::computeVolume() const
 {
 #ifdef __CUDA_ARCH__
 
@@ -60,8 +65,10 @@ __host__ __device__ double Superquadric::computeVolume() const
 
 // -----------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
-__host__ __device__ bool Superquadric::computeInertia( double* inertia, 
-                                                     double* inertia_1 ) const
+// TODO: beta function for GPU
+__host__ __device__
+bool Superquadric::computeInertia( double* inertia, 
+                                   double* inertia_1 ) const
 {
 #ifdef __CUDA_ARCH__
 
@@ -94,7 +101,8 @@ __host__ __device__ bool Superquadric::computeInertia( double* inertia,
 
 // -----------------------------------------------------------------------------
 // Returns the circumscribed radius of the Superquadric
-__host__ __device__ double Superquadric::computeCircumscribedRadius() const
+__host__ __device__
+double Superquadric::computeCircumscribedRadius() const
 {
     if ( ( m_n1 == 2.0 ) && ( m_n2 == 2.0 ) )
         return ( max( m_a, max( m_b, m_c ) ) );
@@ -131,7 +139,8 @@ __host__ __device__ double Superquadric::computeCircumscribedRadius() const
 
 // -----------------------------------------------------------------------------
 // Returns the bounding volume to Superquadric
-__host__ __device__ Vec3f Superquadric::computeAABB() const
+__host__ __device__
+Vec3f Superquadric::computeAABB() const
 {
     return ( Vec3f( (float) m_a, 
                     (float) m_b, 
@@ -142,9 +151,10 @@ __host__ __device__ Vec3f Superquadric::computeAABB() const
 
 
 // -----------------------------------------------------------------------------
-// Superquadric support function, returns the support point P, i.e. the point on the
-// surface of the Superquadric that satisfies max(P.v)
-__host__ __device__ Vec3d Superquadric::support( Vec3d const& v ) const
+// Superquadric support function, returns the support point P, i.e. the point on
+// the surface of the Superquadric that satisfies max(P.v)
+__host__ __device__
+Vec3d Superquadric::support( Vec3d const& v ) const
 {
     double norm = v.norm2();
     if ( norm > EPSILON3 )
@@ -166,7 +176,7 @@ __host__ __device__ Vec3d Superquadric::support( Vec3d const& v ) const
             {
                 double const alpha = pow( m_c / m_b * abvz / abvy, 
                                                         1. / ( m_n1 - 1. ) );
-                double const yt = 1. / pow( 1. + pow( alpha, m_n1 ), 1. / m_n1 );
+                double const yt = 1. / pow( 1. + pow( alpha, m_n1 ), 1. / m_n1);
                 return ( Vec3d( 0., 
                                 signy * m_b * yt, 
                                 signz * alpha * m_c * yt ) );

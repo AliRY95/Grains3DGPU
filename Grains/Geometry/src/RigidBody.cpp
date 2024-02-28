@@ -5,7 +5,8 @@
 
 // -----------------------------------------------------------------------------
 // Default constructor
-__host__ __device__ RigidBody::RigidBody()
+__host__ __device__
+RigidBody::RigidBody()
 : m_convex( NULL )
 , m_crustThickness( 0. )
 , m_AABB( NULL )
@@ -16,8 +17,9 @@ __host__ __device__ RigidBody::RigidBody()
 
 // -----------------------------------------------------------------------------
 // Constructor with a convex and the crust thickness
-__host__ __device__ RigidBody::RigidBody( Convex* convex, 
-                                          double ct )
+__host__ __device__ 
+RigidBody::RigidBody( Convex* convex, 
+                      double ct )
 : m_convex( convex )
 , m_crustThickness( ct )
 {
@@ -32,7 +34,8 @@ __host__ __device__ RigidBody::RigidBody( Convex* convex,
 
 // -----------------------------------------------------------------------------
 // Destructor
-__host__ __device__ RigidBody::~RigidBody()
+__host__ __device__
+RigidBody::~RigidBody()
 {
     delete m_convex;
     delete m_AABB;
@@ -43,7 +46,8 @@ __host__ __device__ RigidBody::~RigidBody()
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's convex
-__host__ __device__ Convex* RigidBody::getConvex() const
+__host__ __device__
+Convex* RigidBody::getConvex() const
 {
     return ( m_convex );
 }
@@ -53,7 +57,8 @@ __host__ __device__ Convex* RigidBody::getConvex() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's crust thickness
-__host__ __device__ double RigidBody::getCrustThickness() const
+__host__ __device__
+double RigidBody::getCrustThickness() const
 {
     return ( m_crustThickness );
 }
@@ -63,7 +68,8 @@ __host__ __device__ double RigidBody::getCrustThickness() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's volume
-__host__ __device__ double RigidBody::getVolume() const
+__host__ __device__
+double RigidBody::getVolume() const
 {
     return ( m_volume );
 }
@@ -73,7 +79,8 @@ __host__ __device__ double RigidBody::getVolume() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's inertia
-__host__ __device__ double* RigidBody::getInertia() const
+__host__ __device__
+double* RigidBody::getInertia() const
 {
     return ( m_inertia );
 }
@@ -83,7 +90,8 @@ __host__ __device__ double* RigidBody::getInertia() const
 
 // -----------------------------------------------------------------------------
 // Returns the inverse of rigid body's inertia
-__host__ __device__ double* RigidBody::getInertia_1() const
+__host__ __device__
+double* RigidBody::getInertia_1() const
 {
     return ( m_inertia_1 );
 }
@@ -93,7 +101,8 @@ __host__ __device__ double* RigidBody::getInertia_1() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's AABB
-__host__ __device__ AABB* RigidBody::getAABB() const
+__host__ __device__
+AABB* RigidBody::getAABB() const
 {
     return ( m_AABB );
 }
@@ -103,7 +112,8 @@ __host__ __device__ AABB* RigidBody::getAABB() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's circumscribed radius
-__host__ __device__ float RigidBody::getCircumscribedRadius() const
+__host__ __device__
+float RigidBody::getCircumscribedRadius() const
 {
     return ( m_circumscribedRadius );
 }
@@ -115,10 +125,11 @@ __host__ __device__ float RigidBody::getCircumscribedRadius() const
 /*                              External Methods                              */
 /* ========================================================================== */
 // Returns whether 2 rigid bodies intersect
-__host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
-                                               RigidBody const& rbB,
-                                               Transform3d const& a2w,
-                                               Transform3d const& b2w )
+__host__ __device__
+bool intersectRigidBodies( RigidBody const& rbA,
+                           RigidBody const& rbB,
+                           Transform3d const& a2w,
+                           Transform3d const& b2w )
 {
     Convex const* convexA = rbA.getConvex();
     Convex const* convexB = rbB.getConvex();
@@ -151,10 +162,12 @@ __host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
 
 
 // -----------------------------------------------------------------------------
-// Returns whether 2 rigid bodies intersect
-__host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
-                                               RigidBody const& rbB,
-                                               Transform3d const& b2a )
+// Returns whether 2 rigid bodies intersect using the GJK algorithm - relative
+// transformation
+__host__ __device__
+bool intersectRigidBodies( RigidBody const& rbA,
+                           RigidBody const& rbB,
+                           Transform3d const& b2a )
 {
     Convex const* convexA = rbA.getConvex();
     Convex const* convexB = rbB.getConvex();
