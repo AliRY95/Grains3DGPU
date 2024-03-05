@@ -32,7 +32,8 @@ AABB::AABB( Vec3f const& extent_ )
 
 // -----------------------------------------------------------------------------
 // Destructor
-__host__ __device__ AABB::~AABB()
+__host__ __device__
+AABB::~AABB()
 {}
 
 
