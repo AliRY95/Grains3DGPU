@@ -161,6 +161,10 @@ class Vector3
         @param vec 2nd Vector3 object */
         __host__ __device__
         bool operator != ( Vector3<T> const& vec ) const;
+
+        /** @brief Conversion operator float */
+        __host__ __device__
+        operator Vector3<float> () const;
         //@}
 };
 

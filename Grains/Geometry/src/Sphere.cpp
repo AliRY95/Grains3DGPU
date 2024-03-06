@@ -95,9 +95,9 @@ double Sphere::computeCircumscribedRadius() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the bounding volume to Sphere
+// Returns the bounding box to Sphere
 __host__ __device__
-Vec3f Sphere::computeAABB() const
+Vec3f Sphere::computeBoundingBox() const
 {
     return ( Vec3f( (float) m_radius, 
                     (float) m_radius, 

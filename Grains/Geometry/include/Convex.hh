@@ -3,7 +3,7 @@
 
 
 #include "Transform3.hh"
-#include "AABB.hh"
+#include "BoundingBox.hh"
 
 
 // Convex types
@@ -73,9 +73,10 @@ class Convex
         __host__ __device__
         virtual double computeCircumscribedRadius() const = 0;
 
-        /** @brief Returns the half-length of the AABB fitted to the convex */
+        /** @brief Returns the half-length of the bounding box fitted to the 
+        convex without considering the transformation */
         __host__ __device__
-        virtual Vec3f computeAABB() const = 0;
+        virtual Vec3f computeBoundingBox() const = 0;
 
         /** @brief Convex support function, returns the support point P, i.e. 
         the point on the surface of the convex shape that satisfies max(P.v)

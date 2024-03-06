@@ -112,9 +112,9 @@ double Box::computeCircumscribedRadius() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the bounding volume to box
+// Returns the bounding box to box
 __host__ __device__
-Vec3f Box::computeAABB() const
+Vec3f Box::computeBoundingBox() const
 {
     return ( Vec3f( (float) m_extent[X], 
                     (float) m_extent[Y], 

@@ -91,9 +91,10 @@ class Box : public Convex
         bool computeInertia( double* inertia, 
                              double* inertia_1 ) const;
 
-        /** @ Returns the half-length of the AABB fitted to the box */
+        /** @ Returns the half-length of the bounding box fitted to the box 
+        without considering the transformation */
         __host__ __device__
-        Vec3f computeAABB() const;
+        Vec3f computeBoundingBox() const;
 
         /** @brief Box support function, returns the support point P, i.e. the
         point on the surface of the box that satisfies max(P.v)
