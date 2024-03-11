@@ -11,6 +11,7 @@ class Convex;
 /** @brief The class AABB.
 
     Axis Aligned Bounding Boxes (AABB) for convex bodies in single precision.
+    It is now deprecated as we use BoundingBox class for both AABB and OBB.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
