@@ -75,9 +75,10 @@ class Sphere : public Convex
         bool computeInertia( double* inertia, 
                              double* inertia_1 ) const;
 
-        /** @ Returns the half-length of the AABB fitted to the box */
+        /** @ Returns the half-length of the bounding box fitted to the sphere 
+        without considering the transformation */
         __host__ __device__
-        Vec3f computeAABB() const;
+        Vec3f computeBoundingBox() const;
 
         /** @brief Sphere support function, returns the support point P, i.e. 
         the point on the surface of the box that satisfies max(P.v)

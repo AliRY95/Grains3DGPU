@@ -375,6 +375,20 @@ bool Vector3<T>::operator != ( Vector3<T> const& vec ) const
 
 
 // -----------------------------------------------------------------------------
+// Conversion operator to float
+template <>
+__host__ __device__
+Vector3<double>::operator Vector3<float> () const
+{
+    return ( Vector3<float> ( (float) m_comp[X],
+                              (float) m_comp[Y],
+                              (float) m_comp[Z] ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Vector3<float>;
 template class Vector3<double>;

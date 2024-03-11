@@ -113,10 +113,10 @@ inline bool valid( unsigned int const s,
 
 // -----------------------------------------------------------------------------
 __host__ __device__ 
-inline void computeVec( unsigned int const bits_,
-                        Vec3d const y[4],
-                        double const det[16][4],
-                        Vec3d& v )
+inline void computeVector( unsigned int const bits_,
+                           Vec3d const y[4],
+                           double const det[16][4],
+                           Vec3d& v )
 {
     double sum = 0.;
     v.setValue( 0., 0., 0. );
@@ -129,6 +129,33 @@ inline void computeVec( unsigned int const bits_,
         }
     }
     v *= 1. / sum;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+__host__ __device__
+inline void computePoints( unsigned int const bits_,
+                           double const det[16][4],
+                           Vec3d& p1,
+                           Vec3d& p2 )
+{
+    double sum = 0.;
+    p1.setValue( 0., 0., 0. );
+    p2.setValue( 0., 0., 0. );
+    for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
+    {
+        if ( bits_ & bit )
+        {
+            sum += det[bits_][i];
+            p1 += p[i] * det[bits_][i];
+            p2 += q[i] * det[bits_][i];
+        }
+    }
+    double s = 1. / sum;
+    p1 *= s;
+    p2 *= s;
 }
 
 
@@ -168,7 +195,7 @@ inline bool closest( unsigned int& bits,
             if ( valid( s | last_bit, all_bits, det ) )
             {
                 bits = s | last_bit;
-                computeVec( bits, y, det, v );
+                computeVector( bits, y, det, v );
                 return( true );
             }
         }
@@ -188,7 +215,7 @@ inline bool closest( unsigned int& bits,
             if ( proper( s, det ) )
             {
                 Vec3d u;
-                computeVec( s, y, det, u );
+                computeVector( s, y, det, u );
                 double dist2 = u.norm2();
                 if ( dist2 < min_dist2 )
                 {
@@ -222,6 +249,17 @@ inline bool degenerate( unsigned int const all_bits,
 
 
 
+// -----------------------------------------------------------------------------
+// For num_iterations > 1000
+__host__ __device__
+void catch_me()
+{
+  printf( "closestPoints: Out on iteration > 1000\n" );
+}
+
+
+
+
 /* ========================================================================== */
 /*                            High-Level Methods                              */
 /* ========================================================================== */
@@ -236,7 +274,7 @@ bool intersectGJK( Convex const& a,
     unsigned int last = 0;           // identifies last found support point
     unsigned int last_bit = 0;       // last_bit = 1<<last
     unsigned int all_bits = 0;       // all_bits = bits|last_bit
-    Vec3d y[4];                      // support points of A-B in world coordinates
+    Vec3d y[4];                      // support points of A-B in world
     double det[16][4] = { 0. };      // cached sub-determinants
     double dp[4][4] = { 0. };
 
@@ -281,10 +319,11 @@ bool intersectGJK( Convex const& a,
     unsigned int last = 0;           // identifies last found support point
     unsigned int last_bit = 0;       // last_bit = 1<<last
     unsigned int all_bits = 0;       // all_bits = bits|last_bit
-    Vec3d y[4];                      // support points of A-B in world coordinates
+    Vec3d y[4];                      // support points of A-B in world
     double det[16][4] = { 0. };      // cached sub-determinants
     double dp[4][4] = { 0. };
 
+    // TODO: change initialization?
     Vec3d v( 1., 1., 1. ), w;
     double prod;
     
@@ -309,3 +348,131 @@ bool intersectGJK( Convex const& a,
     } while ( bits < 15 && !v.isApproxZero() );
     return ( true );
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the minimal distance between 2 convex shapes and a point per convex
+// shape that represents the tips of the minimal distance segment
+__host__ __device__
+double closestPointsGJK( Convex const& a, 
+                         Convex const& b, 
+                         Transform3d const& a2w,
+	                     Transform3d const& b2w, 
+                         Vec3d& pa, 
+                         Vec3d& pb, 
+                         int& nbIter )
+{
+    unsigned int bits = 0;           // identifies current simplex
+    unsigned int last = 0;           // identifies last found support point
+    unsigned int last_bit = 0;       // last_bit = 1<<last
+    unsigned int all_bits = 0;       // all_bits = bits|last_bit
+    Vec3d p[4];                      // support points of A in local
+    Vec3d q[4];                      // support points of B in local
+    Vec3d y[4];                      // support points of A-B in world
+    double det[16][4] = { 0. };      // cached sub-determinants
+    double dp[4][4] = { 0. };
+
+    Vec3d v = a2w( a.support( Vec3d( 0., 0., 0. ) ) ) - 
+              b2w( b.support( Vec3d( 0., 0., 0. ) ) );
+    Vec3d w;   
+    double dist = v.norm();
+    double mu = 0;
+    unsigned int num_iterations = 0;
+
+    while ( bits < 15 && dist > abs_error && num_iterations < 1000 )
+    {
+        last = 0;
+        last_bit = 1;
+        while (bits & last_bit) 
+        { 
+            ++last;
+            last_bit <<= 1;
+        }
+        p[last] = a.support( ( -v ) * a2w.getBasis() );
+        q[last] = b.support( v * b2w.getBasis() );
+        w = a2w( p[last] ) - b2w( q[last] );
+        set_max( mu, v * w / dist );
+        if ( dist - mu <= dist * EPSILON )
+            break;
+        if ( degenerate( all_bits, y, w ) )
+            break;
+        y[last] = w;
+        all_bits = bits | last_bit;
+        ++num_iterations;
+        if ( !closest( bits, last, last_bit, all_bits, y, dp, det, v ) )
+            break;
+        dist = v.norm();
+    }
+    computePoints( bits, det, pa, pb );
+    if ( num_iterations > 1000 ) 
+        catch_me();
+    else 
+        nbIter = num_iterations;
+    return ( dist );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// // Returns the minimal distance between 2 convex shapes and a point per convex
+// // shape that represents the tips of the minimal distance segment - relative 
+// // transformation
+// __host__ __device__
+// double closestPointsGJK( Convex const& a, 
+//                          Convex const& b, 
+//                          Transform3d const& b2a, 
+//                          Vec3d& pa, 
+//                          Vec3d& pb, 
+//                          int& nbIter )
+// {
+//     unsigned int bits = 0;           // identifies current simplex
+//     unsigned int last = 0;           // identifies last found support point
+//     unsigned int last_bit = 0;       // last_bit = 1<<last
+//     unsigned int all_bits = 0;       // all_bits = bits|last_bit
+//     Vec3d p[4];                      // support points of A in local
+//     Vec3d q[4];                      // support points of B in local
+//     Vec3d y[4];                      // support points of A-B in world
+//     double det[16][4] = { 0. };      // cached sub-determinants
+//     double dp[4][4] = { 0. };
+
+//     Vec3d v = a2w( a.support( Vec3d( 0., 0., 0. ) ) ) - 
+//               b2w( b.support( Vec3d( 0., 0., 0. ) ) );
+//     Vec3d w;   
+//     double dist = v.norm();
+//     double mu = 0;
+//     unsigned int num_iterations = 0;
+
+//     while ( bits < 15 && dist > abs_error && num_iterations < 1000 )
+//     {
+//         last = 0;
+//         last_bit = 1;
+//         while (bits & last_bit) 
+//         { 
+//             ++last;
+//             last_bit <<= 1;
+//         }
+//         p[last] = a.support( ( -v ) * a2w.getBasis() );
+//         q[last] = b.support( v * b2w.getBasis() );
+//         w = a2w( p[last] ) - b2w( q[last] );
+//         set_max( mu, v * w / dist );
+//         if ( dist - mu <= dist * EPSILON )
+//             break;
+//         if ( degenerate( all_bits, y, w ) )
+//             break;
+//         y[last] = w;
+//         all_bits = bits | last_bit;
+//         ++num_iterations;
+//         if ( !closest( bits, last, last_bit, all_bits, y, dp, det, v ) )
+//             break;
+//         dist = v.norm();
+//     }
+//     computePoints( bits, det, pa, pb );
+//     if ( num_iterations > 1000 ) 
+//         catch_me();
+//     else 
+//         nbIter = num_iterations;
+//     return ( dist );
+// }

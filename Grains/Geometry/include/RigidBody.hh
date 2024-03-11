@@ -2,7 +2,7 @@
 #define _RIGIDBODY_HH_
 
 
-#include "AABB.hh"
+#include "BoundingBox.hh"
 #include "Convex.hh"
 
 
@@ -23,7 +23,7 @@ class RigidBody
         double m_volume; /**< Rigid body's volume */
         double* m_inertia; /**< Rigid body's inertia */
         double* m_inertia_1; /**< Rigid body's inversed inertia */
-        AABB* m_AABB; /** Bounding volume of the convex body **/
+        BoundingBox* m_boundingBox; /** Bounding box of the convex body **/
         float m_circumscribedRadius; /**< Circumscribed radius */
         //@}
 
@@ -73,9 +73,9 @@ class RigidBody
         __host__ __device__ 
         double* getInertia_1() const;
 
-        /** @brief Gets the rigid body's AABB */
+        /** @brief Gets the rigid body's bounding box */
         __host__ __device__ 
-        AABB* getAABB() const;
+        BoundingBox* getBoundingBox() const;
 
         /** @brief Gets the rigid body's circumscribed radius */
         __host__ __device__
@@ -105,9 +105,9 @@ class RigidBody
         // @param inertia_1 inverse of the inertia tensor */
         // __host__ __device__ void setInertia_1( double* inertia_1 );
 
-        // /** @brief Sets the rigid body's AABB
+        // /** @brief Sets the rigid body's bounding box
         // @param r circumscribed radius */
-        // __host__ __device__ void setAABB( AABB const* aabb );
+        // __host__ __device__ void setOBB( OBB const* bb );
 
         // /** @brief Sets the rigid body's circumscribed radius
         // @param r circumscribed radius */

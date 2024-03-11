@@ -138,9 +138,9 @@ double Superquadric::computeCircumscribedRadius() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the bounding volume to Superquadric
+// Returns the bounding box to Superquadric
 __host__ __device__
-Vec3f Superquadric::computeAABB() const
+Vec3f Superquadric::computeBoundingBox() const
 {
     return ( Vec3f( (float) m_a, 
                     (float) m_b, 

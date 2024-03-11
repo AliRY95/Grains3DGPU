@@ -5,11 +5,12 @@
 #include "Vector3.hh"
 #include "Transform3.hh"
 
+
 // =============================================================================
 /** @brief The class LinkedCell.
 
     The broad-phase detection is done through LinkedCell class. It limits the 
-    search for collision to the neighboring components. Neighboring components
+     typename T  for collision to the neighboring components. Neighboring components
     are those who belong to adjacent cells given a uniform Cartesian grid for 
     cells.
 

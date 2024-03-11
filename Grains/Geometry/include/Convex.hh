@@ -3,7 +3,7 @@
 
 
 #include "Transform3.hh"
-#include "AABB.hh"
+#include "BoundingBox.hh"
 
 
 // Convex types
@@ -73,9 +73,10 @@ class Convex
         __host__ __device__
         virtual double computeCircumscribedRadius() const = 0;
 
-        /** @brief Returns the half-length of the AABB fitted to the convex */
+        /** @brief Returns the half-length of the bounding box fitted to the 
+        convex without considering the transformation */
         __host__ __device__
-        virtual Vec3f computeAABB() const = 0;
+        virtual Vec3f computeBoundingBox() const = 0;
 
         /** @brief Convex support function, returns the support point P, i.e. 
         the point on the surface of the convex shape that satisfies max(P.v)
@@ -89,12 +90,12 @@ class Convex
 /** @name Convex : External methods for the GJK algorithm */
 //@{
 /** @brief Returns whether 2 convex shapes intersect
- @param a convex shape A
- @param b convex shape B
- @param a2w geometric tramsformation describing convex A in the world reference
- frame
- @param b2w geometric tramsformation describing convex B in the world reference
- frame */
+@param a convex shape A
+@param b convex shape B
+@param a2w geometric tramsformation describing convex A in the world reference
+frame
+@param b2w geometric tramsformation describing convex B in the world reference
+frame */
 __host__ __device__
 bool intersectGJK( Convex const& a, 
                    Convex const& b,
@@ -102,14 +103,34 @@ bool intersectGJK( Convex const& a,
                    Transform3d const& b2w );
 
 /** @brief Returns whether 2 convex shapes intersect - relative transformation
- @param a convex shape A
- @param b convex shape B
- @param b2a geometric tramsformation describing convex B in the A's reference
+@param a convex shape A
+@param b convex shape B
+@param b2a geometric tramsformation describing convex B in the A's reference
  frame */
 __host__ __device__
 bool intersectGJK( Convex const& a, 
                    Convex const& b,
                    Transform3d const& b2a );
+
+/** @brief Returns the minimal distance between 2 convex shapes and a point per
+convex shape that represents the tips of the minimal distance segment
+@param a convex shape A
+@param b convex shape B
+@param a2w geometric tramsformation describing convex A in the world reference
+frame
+@param b2w geometric tramsformation describing convex B in the world reference
+frame
+@param pa point representing one tip of the minimal distance segment on A
+@param pb point representing the other tip of the minimal distance segment on
+B
+@param nbIter number of iterations of GJK for convergence */
+double closestPointsGJK( Convex const& a, 
+                         Convex const& b, 
+                         Transform3d const& a2w,
+	                     Transform3d const& b2w, 
+                         Vec3d& pa,
+                         Vec3d& pb,
+                         int& nbIter );
 //@}
 
 #endif

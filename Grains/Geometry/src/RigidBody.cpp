@@ -1,5 +1,5 @@
 #include "Convex.hh"
-#include "AABB.hh"
+#include "BoundingBox.hh"
 #include "RigidBody.hh"
 
 
@@ -9,7 +9,7 @@ __host__ __device__
 RigidBody::RigidBody()
 : m_convex( NULL )
 , m_crustThickness( 0. )
-, m_AABB( NULL )
+, m_boundingBox( NULL )
 {}
 
 
@@ -25,7 +25,7 @@ RigidBody::RigidBody( Convex* convex,
 {
     m_volume = m_convex->computeVolume();
     // bool tmp = m_convex->computeInertia( m_inertia, m_inertia_1 );
-    m_AABB = new AABB( m_convex->computeAABB() );
+    m_boundingBox = new BoundingBox( m_convex->computeBoundingBox() );
     m_circumscribedRadius = m_convex->computeCircumscribedRadius();
 }
 
@@ -38,7 +38,7 @@ __host__ __device__
 RigidBody::~RigidBody()
 {
     delete m_convex;
-    delete m_AABB;
+    delete m_boundingBox;
 }
 
 
@@ -100,11 +100,11 @@ double* RigidBody::getInertia_1() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's AABB
+// Returns the rigid body's bounding box
 __host__ __device__
-AABB* RigidBody::getAABB() const
+BoundingBox* RigidBody::getBoundingBox() const
 {
-    return ( m_AABB );
+    return ( m_boundingBox );
 }
 
 
@@ -138,8 +138,8 @@ bool intersectRigidBodies( RigidBody const& rbA,
     if ( convexA->getConvexType() == SPHERE && 
          convexB->getConvexType() == SPHERE )
     {
-        double radiiSum = (double) rbA.getCircumscribedRadius() + 
-                                   rbB.getCircumscribedRadius();
+        double radiiSum = (double) ( rbA.getCircumscribedRadius() + 
+                                     rbB.getCircumscribedRadius() );
         double dist2 = ( a2w.getOrigin() - b2w.getOrigin() ).norm2();
         return ( dist2 < radiiSum * radiiSum );
     }
@@ -152,8 +152,14 @@ bool intersectRigidBodies( RigidBody const& rbA,
     float dist = ( cenB - cenA ).norm();
     if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
     {
-        // if( intersectAABB( *( rbA.getAABB() ), *( rbB.getAABB() ), cenA, cenB ) )
-            return( intersectGJK( *convexA, *convexB, a2w, b2w ) );
+        if( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
+                                          *( rbB.getBoundingBox() ),
+                                          a2w, 
+                                          b2w ) )
+            return( intersectGJK( *convexA, 
+                                  *convexB,
+                                  a2w, 
+                                  b2w ) );
     }
     return ( false );
 }
@@ -176,8 +182,8 @@ bool intersectRigidBodies( RigidBody const& rbA,
     if ( convexA->getConvexType() == SPHERE && 
          convexB->getConvexType() == SPHERE )
     {
-        double radiiSum = (double) rbA.getCircumscribedRadius() + 
-                                   rbB.getCircumscribedRadius();
+        double radiiSum = (double) ( rbA.getCircumscribedRadius() + 
+                                     rbB.getCircumscribedRadius() );
         double dist2 = ( b2a.getOrigin() ).norm2();
         return ( dist2 < radiiSum * radiiSum );
     }
@@ -188,8 +194,12 @@ bool intersectRigidBodies( RigidBody const& rbA,
     float dist = posB2A.norm();
     if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
     {
-        // if( intersectAABB( *( rbA.getAABB() ), *( rbB.getAABB() ), posB2A ) )
-            return( intersectGJK( *convexA, *convexB, b2a ) );
+        if( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
+                                          *( rbB.getBoundingBox() ),
+                                          b2a ) )
+            return( intersectGJK( *convexA, 
+                                  *convexB,
+                                  b2a ) );
     }
     return ( false );
 }

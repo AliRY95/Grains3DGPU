@@ -74,9 +74,10 @@ class Superquadric : public Convex
         bool computeInertia( double* inertia, 
                              double* inertia_1 ) const;
 
-        /** @ Returns the half-length of the AABB fitted to the Superquadric */
+        /** @ Returns the half-length of the bounding box fitted to the
+        superquadric without considering the transformation */
         __host__ __device__
-        Vec3f computeAABB() const;
+        Vec3f computeBoundingBox() const;
 
         /** @brief Superquadric support function, returns the support point P,
         i.e. point on the surface of the Superquadric that satisfies max(P.v)

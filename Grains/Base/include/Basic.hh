@@ -1,3 +1,5 @@
+//TODO: FLOAT SUPPORT?
+//TODO: ADD OTHER MATH FUNCTIONS HERE.
 #ifndef _BASIC_HH_
 #define _BASIC_HH_
 
@@ -44,11 +46,11 @@
 /** @brief Space dimensions */
 enum Direction 
 {
-  X, // x direction
-  Y, // y direction
-  Z, // z direction
-  W, // scalar component of quaternions
-  NONE // no direction
+    X, // x direction
+    Y, // y direction
+    Z, // z direction
+    W, // scalar component of quaternions
+    NONE // no direction
 };
 //@}
 
@@ -76,63 +78,76 @@ enum Direction
 // //@}
 
 
-/** @name CUDA Basic methods */
+/** @name Basic methods */
 //@{
 /** @brief Returns whether a real number is approximately 0 with respect to
 EPSILON1 
 @param x the real number */
-__host__ __device__ inline bool eqz( double x )
+__host__ __device__
+inline bool eqz( double x )
 { 
-  return ( fabs(x) <= EPSILON1 );
+    return ( fabs(x) <= EPSILON1 );
 }
 
-// /** @brief Returns the minimum of 2 real numbers defined as double
-// @param x 1st real number 
-// @param y 2nd real number */    
-// __host__ __device__ inline double min( double x, double y ) 
-// { 
-//   return ( x > y ? y : x );
-// }
+/** @brief Returns the minimum of 2 real numbers defined as double
+@param x 1st real number 
+@param y 2nd real number */    
+__host__ __device__
+inline double min( double x, 
+                   double y ) 
+{ 
+    return ( x > y ? y : x );
+}
 
-// /** @brief Returns the maximum of 2 real numbers defined as double
-// @param x 1st real number 
-// @param y 2nd real number */      
-// __host__ __device__ inline double max( double x, double y ) 
-// { 
-//   return ( x < y ? y : x );
-// }
+/** @brief Returns the maximum of 2 real numbers defined as double
+@param x 1st real number 
+@param y 2nd real number */      
+__host__ __device__ 
+inline double max( double x, 
+                   double y ) 
+{ 
+    return ( x < y ? y : x );
+}
 
 /** @brief Sests the minimum of 2 real numbers defined as double to these 2
 numbers
 @param x 1st real number 
 @param y 2nd real number */     
-__host__ __device__ inline void set_min( double& x, double y )
+__host__ __device__
+inline void set_min( double& x, 
+                     double y )
 { 
-  if (x > y) x = y;
+    if (x > y) 
+        x = y;
 }
 
 /** @brief Sests the maximum of 2 real numbers defined as double to these 2
 numbers
 @param x 1st real number 
 @param y 2nd real number */ 
-__host__ __device__ inline void set_max( double& x, double y )
+__host__ __device__
+inline void set_max( double& x, 
+                     double y )
 { 
-  if (x < y) x = y; 
+    if (x < y) 
+        x = y; 
 }
 
-// /** @brief Returns an angle in radians given an angle in degrees
-// @param x angle in degrees */
-// __host__ __device__ inline double rads( double x ) 
-// { 
-//   return ( x * RADS_PER_DEG ); 
-// }
+/** @brief Returns an angle in radians given an angle in degrees
+@param x angle in degrees */
+__host__ __device__ 
+inline double rads( double x ) 
+{ 
+    return ( x * RADS_PER_DEG ); 
+}
 
-// /** @brief Returns an angle in degrees given an angle in radians
-// @param x angle in radians */
-// __host__ __device__ inline double degs( double x ) 
-// { 
-//   return ( x * DEGS_PER_RAD );
-// }
+/** @brief Returns an angle in degrees given an angle in radians
+@param x angle in radians */
+__host__ __device__
+inline double degs( double x ) 
+{ 
+    return ( x * DEGS_PER_RAD );
+}
 
 /** @brief Returns CUDA error */
 inline void cudaAssert( cudaError_t code, 

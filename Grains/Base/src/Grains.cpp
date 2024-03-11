@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
     double userN = stod( argv[1] );
     int const N = round( userN * 24 * 256 ); // No. pair particles
     // int const N = 7; // No. pair particles
-    double r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
+    double r1 = 0.1, r2 = 0.05, r3 = 0.05; // Radii for now!
 
     ConvexType particleType;
     switch ( stoi( argv[2] ) )
