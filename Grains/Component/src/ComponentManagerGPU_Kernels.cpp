@@ -165,7 +165,7 @@ void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
                                                          rigidBodyA,
                                                          transformA, 
                                                          transformB );
-                                                    //    printf( "aa" )''  
+                                                     
                 }
             }
         }

@@ -169,8 +169,8 @@ class Vector3
 };
 
 
-typedef Vector3<float> Vec3f;
-typedef Vector3<double> Vec3d;
+typedef Vector3<double> Vec3D;
+typedef Vector3<float> Vec3F;
 
 
 #endif

@@ -229,13 +229,13 @@ void ComponentManagerCPU::detectCollision( LinkedCellD const* const* LC,
                                            RigidBody const* const* rb, 
                                            int* result )
 {
-    // for ( int i = 0; i < numComponents; i++ )
-    // {
-    //     const RigidBody& AA = *( rb[m_rigidBodyId[i]] );
-    //     const Transform3d& trA = m_transform[i];
-    //     for ( int j = 0; j < numComponents; j++ ) // or start from j = i?
-    //         result[i] += intersectRigidBodies( AA, AA, trA, m_transform[j] );
-    // }
+    for ( int i = 0; i < numComponents; i++ )
+    {
+        const RigidBody& AA = *( rb[m_rigidBodyId[i]] );
+        const Transform3d& trA = m_transform[i];
+        for ( int j = 0; j < numComponents; j++ ) // or start from j = i?
+            result[i] += intersectRigidBodies( AA, AA, trA, m_transform[j] );
+    }
 
     
     // RigidBody const& AA = **rb;
@@ -252,63 +252,63 @@ void ComponentManagerCPU::detectCollision( LinkedCellD const* const* LC,
     // }
     
 
-    (*LC)->computeLinearLinkedCellHashCPU( m_transform,
-                                           numComponents,
-                                           m_componentCellHash );
+    // (*LC)->computeLinearLinkedCellHashCPU( m_transform,
+    //                                        numComponents,
+    //                                        m_componentCellHash );
 
-    thrust::sort_by_key ( m_componentCellHash,
-                          m_componentCellHash + numComponents,
-                          m_componentId );
+    // thrust::sort_by_key ( m_componentCellHash,
+    //                       m_componentCellHash + numComponents,
+    //                       m_componentId );
 
-    for ( int i = 0; i < numCells + 1; i++ )
-    {
-        m_cellHashStart[ i ] = 0;
-        m_cellHashEnd[ i ] = 0;
-    }
+    // for ( int i = 0; i < numCells + 1; i++ )
+    // {
+    //     m_cellHashStart[ i ] = 0;
+    //     m_cellHashEnd[ i ] = 0;
+    // }
 
-    for ( int i = 0; i < numComponents; i++ )
-    {
-        unsigned int hash = m_componentCellHash[ i ];
-        if ( i == 0 || hash != m_componentCellHash[ i - 1 ] )
-            m_cellHashStart[ hash ] = i;
-        if ( i > 0 )
-            m_cellHashEnd[ m_componentCellHash[ i - 1 ] ] = i;
-        if ( i == numComponents - 1 )
-            m_cellHashEnd[ hash ] = i + 1;
-    }
+    // for ( int i = 0; i < numComponents; i++ )
+    // {
+    //     unsigned int hash = m_componentCellHash[ i ];
+    //     if ( i == 0 || hash != m_componentCellHash[ i - 1 ] )
+    //         m_cellHashStart[ hash ] = i;
+    //     if ( i > 0 )
+    //         m_cellHashEnd[ m_componentCellHash[ i - 1 ] ] = i;
+    //     if ( i == numComponents - 1 )
+    //         m_cellHashEnd[ hash ] = i + 1;
+    // }
 
-    for ( int pId = 0; pId < numComponents; pId++ )
-    {
-        unsigned int const compId = m_componentId[ pId ];
-        unsigned int const cellHash = m_componentCellHash[ pId ];
-        RigidBody const& rigidBodyA = **rb; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
-        Transform3d const& transformA = m_transform[ compId ];
-        for ( int k = -1; k < 2; k++ )
-        {
-            for ( int j = -1; j < 2; j++ ) 
-            {
-                for ( int i = -1; i < 2; i++ ) 
-                {
-                    int neighboringCellHash =
-                    (*LC)->computeNeighboringCellLinearHash( cellHash, i, j, k );
-                    int startId = m_cellHashStart[ neighboringCellHash ];
-                    int endId = m_cellHashEnd[ neighboringCellHash ];
-                    for ( int id = startId; id < endId; id++ )
-                    {
-                        // TODO:
-                        // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
-                        int secondaryId = m_componentId[ id ];
-                        Transform3d const& transformB = m_transform[ secondaryId ];
-                        result[compId] += intersectRigidBodies( rigidBodyA,
-                                                            rigidBodyA,
-                                                            transformA, 
-                                                            transformB );
+    // for ( int pId = 0; pId < numComponents; pId++ )
+    // {
+    //     unsigned int const compId = m_componentId[ pId ];
+    //     unsigned int const cellHash = m_componentCellHash[ pId ];
+    //     RigidBody const& rigidBodyA = **rb; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
+    //     Transform3d const& transformA = m_transform[ compId ];
+    //     for ( int k = -1; k < 2; k++ )
+    //     {
+    //         for ( int j = -1; j < 2; j++ ) 
+    //         {
+    //             for ( int i = -1; i < 2; i++ ) 
+    //             {
+    //                 int neighboringCellHash =
+    //                 (*LC)->computeNeighboringCellLinearHash( cellHash, i, j, k );
+    //                 int startId = m_cellHashStart[ neighboringCellHash ];
+    //                 int endId = m_cellHashEnd[ neighboringCellHash ];
+    //                 for ( int id = startId; id < endId; id++ )
+    //                 {
+    //                     // TODO:
+    //                     // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
+    //                     int secondaryId = m_componentId[ id ];
+    //                     Transform3d const& transformB = m_transform[ secondaryId ];
+    //                     result[compId] += intersectRigidBodies( rigidBodyA,
+    //                                                         rigidBodyA,
+    //                                                         transformA, 
+    //                                                         transformB );
                                                             
-                    }
-                }
-            }
-        }
-    }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 

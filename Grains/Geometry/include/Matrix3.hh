@@ -192,8 +192,8 @@ Matrix3<T> operator * ( Matrix3<T> const& m1,
 //@}
 
 
-typedef Matrix3<float> Mat3f;
-typedef Matrix3<double> Mat3d;
+typedef Matrix3<double> Mat3D;
+typedef Matrix3<float> Mat3F;
 
 
 #endif

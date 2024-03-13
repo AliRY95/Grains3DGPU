@@ -1,5 +1,6 @@
-#include "Convex.hh"
 #include "BoundingBox.hh"
+#include "Convex.hh"
+#include "ContactInfo.hh"
 #include "RigidBody.hh"
 
 
@@ -202,4 +203,80 @@ bool intersectRigidBodies( RigidBody const& rbA,
                                   b2a ) );
     }
     return ( false );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the contact information (if any) for 2 rigid bodies
+__host__ __device__
+ContactInfo closestPointRigidBodies( RigidBody const& rbA,
+                                     RigidBody const& rbB,
+                                     Transform3d const& a2w,
+                                     Transform3d const& b2w )
+{
+    Convex const* convexA = rbA.getConvex();
+    Convex const* convexB = rbB.getConvex();
+
+    // General case
+    Vec3f cenA = a2w.getOrigin();
+    Vec3f cenB = b2w.getOrigin();
+    float dist = ( cenB - cenA ).norm();
+    if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
+    {
+        // TODO: RECTANGLE
+
+        // TODO: SPHERE
+        // In case the 2 rigid bodies are spheres
+        if ( convexA->getConvexType() == SPHERE && 
+             convexB->getConvexType() == SPHERE )
+            // return ( sphericalContact( *this, neighbor ) );
+
+        // General case
+        if( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
+                                          *( rbB.getBoundingBox() ),
+                                          a2w,
+                                          b2w ) )
+        {
+            int nbIterGJK = 0;
+            Vec3d ptA, ptB;
+            double distance = closestPointsGJK( *convexA, 
+                                                *convexB,
+                                                a2w,
+                                                b2w,
+                                                ptA,
+                                                ptB,
+                                                nbIterGJK );
+            // TODO: ERROR HANDLING
+            
+            // Sum of crust thicknesses
+            double ctSum = rbA.getCrustThickness() + rbB.getCrustThickness();
+
+            // Points A and B are in their respective local coordinate systems
+            // Thus we transform them into the world coordinate system
+            ptA = (*a2w)( ptA );
+            ptB = (*b2w)( ptB );
+
+            // Contact point definition as the mid point between ptA and ptB
+            Vec3d contactPt = ( ptA + ptB ) / 2.;
+
+            // Computation of the actual overlap vector
+            // If contact, crustA + crustB - distance > 0, the overlap vector is
+            // directed from B to A
+            // If no contact, crustA + crustB - distance < 0 and we do not care 
+            // about the direction of the overlap vector
+            Vec3d contactVec = ( ptA - ptB ) / distance;
+            contactVec.round();
+            contactVec *= ctSum - distance;
+
+            // Computation of the actual overlap 
+            // distance = distance - crustA - crustB
+            // If actual overlap distance < 0 => contact otherwise no contact
+            distance -= ctSum;
+
+            return ( ContactInfo( contactPt, contactVec, distance ) );
+        }
+    }
+    return ( noContact );
 }

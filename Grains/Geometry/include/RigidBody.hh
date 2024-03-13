@@ -4,6 +4,7 @@
 
 #include "BoundingBox.hh"
 #include "Convex.hh"
+#include "ContactInfo.hh"
 
 
 // =============================================================================
@@ -131,7 +132,7 @@ bool intersectRigidBodies( RigidBody const& rbA,
                            Transform3d const& a2w,
                            Transform3d const& b2w );
 
-/** @brief Returns whether 2 rigid bodies intersect - realtive transformation
+/** @brief Returns whether 2 rigid bodies intersect - relative transformation
  @param rbA first rigid body
  @param rbB second rigid body
  @param b2a geometric tramsformation describing convex B in the A's reference
@@ -140,6 +141,31 @@ __host__ __device__
 bool intersectRigidBodies( RigidBody const& rbA,
                            RigidBody const& rbB,
                            Transform3d const& b2a );
+
+/** @brief Returns the contact information (if any) for 2 rigid bodies
+ @param rbA first rigid body
+ @param rbB second rigid body
+ @param a2w geometric tramsformation describing convex A in the world reference
+ frame
+ @param b2w geometric tramsformation describing convex B in the world reference
+ frame */
+__host__ __device__
+ContactInfo closestPointsRigidBodies( RigidBody const& rbA,
+                                      RigidBody const& rbB,
+                                      Transform3d const& a2w,
+                                      Transform3d const& b2w );
+
+// TODO: LATER
+// /** @brief Returns the contact information (if any) for 2 rigid bodies - 
+// relative transformation
+//  @param rbA first rigid body
+//  @param rbB second rigid body
+//  @param b2a geometric tramsformation describing convex B in the A's reference
+//  frame */
+// __host__ __device__
+// ContactInfo closestPointsRigidBodies( RigidBody const& rbA,
+//                                       RigidBody const& rbB,
+//                                       Transform3d const& b2a );
 //@}
 
 

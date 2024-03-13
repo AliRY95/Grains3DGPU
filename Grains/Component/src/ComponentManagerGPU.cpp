@@ -353,9 +353,9 @@ void ComponentManagerGPU::detectCollision( LinkedCellD const* const* LC,
     //                                                     m_transform,
     //                                                     numComponents,
     //                                                     result );
+    
+    
     // updateLinkedCellList( LC );
-
-
     zeroOutArray<<< numBlocks, numThreads >>>( m_cellHashStart,
                                                numCells + 1 );
     zeroOutArray<<< numBlocks, numThreads >>>( m_cellHashEnd,
