@@ -150,10 +150,10 @@ bool intersectRigidBodies( RigidBody const& rbA,
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
 __host__ __device__
-ContactInfo closestPointsRigidBodies( RigidBody const& rbA,
-                                      RigidBody const& rbB,
-                                      Transform3d const& a2w,
-                                      Transform3d const& b2w );
+ContactInfoD closestPointsRigidBodies( RigidBody const& rbA,
+                                       RigidBody const& rbB,
+                                       Transform3d const& a2w,
+                                       Transform3d const& b2w );
 
 // TODO: LATER
 // /** @brief Returns the contact information (if any) for 2 rigid bodies - 

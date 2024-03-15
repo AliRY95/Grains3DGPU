@@ -145,6 +145,7 @@ void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
     RigidBody const& rigidBodyA = **a; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
     Transform3d const& transformA = tr3d[ compId ];
 
+    ContactInfoD ci;
     for ( int k = -1; k < 2; k++ ) 
     {
         for ( int j = -1; j < 2; j++ ) 
@@ -161,11 +162,15 @@ void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
                     // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
                     int secondaryId = m_compId[ id ];
                     Transform3d const& transformB = tr3d[ secondaryId ];
-                    result[compId] += intersectRigidBodies( rigidBodyA,
-                                                         rigidBodyA,
-                                                         transformA, 
-                                                         transformB );
-                                                     
+                    // result[compId] += intersectRigidBodies( rigidBodyA,
+                    //                                      rigidBodyA,
+                    //                                      transformA, 
+                    //                                      transformB );
+                    ci = closestPointsRigidBodies( rigidBodyA,
+                                                              rigidBodyA,
+                                                              transformA, 
+                                                              transformB );
+                    result[compId] += ( ci.getOverlapDistance() < 0. );
                 }
             }
         }

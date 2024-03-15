@@ -57,25 +57,20 @@ enum Direction
 
 // /**@name Constants */
 // //@{
-// const int long_string = 255; /**< long string size */
-// const double DEGS_PER_RAD = 57.29577951308232286465; /**< degree per 
-//   radian */
-// const double RADS_PER_DEG =  0.01745329251994329547; /**< radian per 
-//   degree */
-// const double PI = 3.14159265358979323846; /**< pi number */
-// const double TWO_PI = 6.28318530717958623200; /**< 2 times pi number */
-// const double LOWEPS = 1.0e-6; /**< very low precision approximation 
-//   constant */
-// const double EPSILON = 1.0e-10; /**< low precision approximation constant */
-// const double EPSILON2 = 1.0e-15; /**< high precision approximation 
-//   constant */
-// const double EPSILON3 = 1.0e-20; /**< very high precision approximation 
-//   constant */
-// const int TIMEFORMAT = 10; /**< number of significant digits after the
-//   decimal point to write time in high precision format */
-// const int POSITIONFORMAT = 16; /**< number of significant digits after the
-//   decimal point to write component position in high precision format */
-// //@}
+const int long_string = 255; /**< long string size */
+const double DEGS_PER_RAD = 57.29577951308232286465; /**< degree per radian */
+const double RADS_PER_DEG =  0.01745329251994329547; /**< radian per degree */
+const double PI = 3.14159265358979323846; /**< pi number */
+const double TWO_PI = 6.28318530717958623200; /**< 2 times pi number */
+const double LOWEPS = 1.0e-6; /**< very low precision approximation constant */
+// const double EPSILON1 = 1.0e-10; /**< low precision approximation constant */
+// const double EPSILON2 = 1.0e-15; /**< high precision approximation constant */
+// const double EPSILON3 = 1.0e-20; /**< high precision approximation constant */
+const int TIMEFORMAT = 10; /**< number of significant digits after the
+  decimal point to write time in high precision format */
+const int POSITIONFORMAT = 16; /**< number of significant digits after the
+  decimal point to write component position in high precision format */
+//@}
 
 
 /** @name Basic methods */
@@ -89,25 +84,25 @@ inline bool eqz( double x )
     return ( fabs(x) <= EPSILON1 );
 }
 
-/** @brief Returns the minimum of 2 real numbers defined as double
-@param x 1st real number 
-@param y 2nd real number */    
-__host__ __device__
-inline double min( double x, 
-                   double y ) 
-{ 
-    return ( x > y ? y : x );
-}
+// /** @brief Returns the minimum of 2 real numbers defined as double
+// @param x 1st real number 
+// @param y 2nd real number */    
+// __host__ __device__
+// inline double min( double x, 
+//                    double y ) 
+// { 
+//     return ( x > y ? y : x );
+// }
 
-/** @brief Returns the maximum of 2 real numbers defined as double
-@param x 1st real number 
-@param y 2nd real number */      
-__host__ __device__ 
-inline double max( double x, 
-                   double y ) 
-{ 
-    return ( x < y ? y : x );
-}
+// /** @brief Returns the maximum of 2 real numbers defined as double
+// @param x 1st real number 
+// @param y 2nd real number */      
+// __host__ __device__ 
+// inline double max( double x, 
+//                    double y ) 
+// { 
+//     return ( x < y ? y : x );
+// }
 
 /** @brief Sests the minimum of 2 real numbers defined as double to these 2
 numbers

@@ -82,6 +82,11 @@ class Vector3
         where EPSILON2 is defined in Basic.hh */
         __host__ __device__
         bool isApproxZero() const;
+
+        /** @brief Rounds components to +-tol
+        @param tol the required tolerance to determine if a component is zero */
+        __host__ __device__
+        void round( T tol = EPSILON1 );
         //@}
 
 
@@ -169,8 +174,8 @@ class Vector3
 };
 
 
-typedef Vector3<double> Vec3D;
-typedef Vector3<float> Vec3F;
+typedef Vector3<double> Vec3d;
+typedef Vector3<float> Vec3f;
 
 
 #endif

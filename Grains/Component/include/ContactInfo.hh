@@ -13,7 +13,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T = double>
-class ContactInfoTemplate
+class ContactInfo
 {
     protected:
         /** @name Parameters */
@@ -84,15 +84,17 @@ class ContactInfoTemplate
 };
 
 
-typedef ContactInfoTemplate<double> ContactInfo;
-typedef ContactInfoTemplate<float> ContactInfoF;
+typedef ContactInfo<double> ContactInfoD;
+typedef ContactInfo<float> ContactInfoF;
 
 
-static ContactInfo noContact( Vec3( 0., 0., 0. ), 
-                              Vec3( 0., 0., 0. ),
-                              1.e20 );
-static ContactInfoF noContactF( Vec3F( 0., 0., 0. ), 
-                                Vec3F( 0., 0., 0. ),
-                                1.e20 );	
+// __host__ __device__
+// static ContactInfoD noContact( Vec3d( 0., 0., 0. ), 
+//                               Vec3d( 0., 0., 0. ),
+//                               1.e20 );
+// __host__ __device__
+// static ContactInfoF noContactF( Vec3f( 0., 0., 0. ), 
+//                                 Vec3f( 0., 0., 0. ),
+//                                 1.e20 );	
 
 #endif

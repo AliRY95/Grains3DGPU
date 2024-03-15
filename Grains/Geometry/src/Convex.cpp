@@ -138,6 +138,8 @@ inline void computeVector( unsigned int const bits_,
 __host__ __device__
 inline void computePoints( unsigned int const bits_,
                            double const det[16][4],
+                           Vec3d const p[4],
+                           Vec3d const q[4],
                            Vec3d& p1,
                            Vec3d& p2 )
 {
@@ -381,7 +383,7 @@ double closestPointsGJK( Convex const& a,
     double mu = 0;
     unsigned int num_iterations = 0;
 
-    while ( bits < 15 && dist > abs_error && num_iterations < 1000 )
+    while ( bits < 15 && dist > EPSILON1 && num_iterations < 1000 )
     {
         last = 0;
         last_bit = 1;
@@ -394,7 +396,7 @@ double closestPointsGJK( Convex const& a,
         q[last] = b.support( v * b2w.getBasis() );
         w = a2w( p[last] ) - b2w( q[last] );
         set_max( mu, v * w / dist );
-        if ( dist - mu <= dist * EPSILON )
+        if ( dist - mu <= dist * EPSILON1 )
             break;
         if ( degenerate( all_bits, y, w ) )
             break;
@@ -405,7 +407,7 @@ double closestPointsGJK( Convex const& a,
             break;
         dist = v.norm();
     }
-    computePoints( bits, det, pa, pb );
+    computePoints( bits, det, p, q, pa, pb );
     if ( num_iterations > 1000 ) 
         catch_me();
     else 

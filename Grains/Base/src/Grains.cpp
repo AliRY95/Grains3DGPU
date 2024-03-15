@@ -13,7 +13,7 @@
 #include "Transform3.hh"
 
 #include "RigidBody.hh"
-
+#include "ContactInfo.hh"
 #include "LinkedCell.hh"
 #include "ComponentManagerCPU.hh"
 #include "ComponentManagerGPU.hh"

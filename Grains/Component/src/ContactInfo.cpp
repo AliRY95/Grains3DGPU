@@ -105,3 +105,11 @@ void ContactInfo<T>::setOverlapDistance( T d )
 {
     m_overlapDistance = d;
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+template class ContactInfo<float>;
+template class ContactInfo<double>;

@@ -124,6 +124,7 @@ frame
 @param pb point representing the other tip of the minimal distance segment on
 B
 @param nbIter number of iterations of GJK for convergence */
+__host__ __device__
 double closestPointsGJK( Convex const& a, 
                          Convex const& b, 
                          Transform3d const& a2w,

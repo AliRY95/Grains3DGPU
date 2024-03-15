@@ -153,10 +153,10 @@ bool intersectRigidBodies( RigidBody const& rbA,
     float dist = ( cenB - cenA ).norm();
     if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
     {
-        if( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
-                                          *( rbB.getBoundingBox() ),
-                                          a2w, 
-                                          b2w ) )
+        if ( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
+                                           *( rbB.getBoundingBox() ),
+                                           a2w, 
+                                           b2w ) )
             return( intersectGJK( *convexA, 
                                   *convexB,
                                   a2w, 
@@ -195,9 +195,9 @@ bool intersectRigidBodies( RigidBody const& rbA,
     float dist = posB2A.norm();
     if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
     {
-        if( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
-                                          *( rbB.getBoundingBox() ),
-                                          b2a ) )
+        if ( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
+                                           *( rbB.getBoundingBox() ),
+                                           b2a ) )
             return( intersectGJK( *convexA, 
                                   *convexB,
                                   b2a ) );
@@ -211,10 +211,10 @@ bool intersectRigidBodies( RigidBody const& rbA,
 // -----------------------------------------------------------------------------
 // Returns the contact information (if any) for 2 rigid bodies
 __host__ __device__
-ContactInfo closestPointRigidBodies( RigidBody const& rbA,
-                                     RigidBody const& rbB,
-                                     Transform3d const& a2w,
-                                     Transform3d const& b2w )
+ContactInfoD closestPointsRigidBodies( RigidBody const& rbA,
+                                       RigidBody const& rbB,
+                                       Transform3d const& a2w,
+                                       Transform3d const& b2w )
 {
     Convex const* convexA = rbA.getConvex();
     Convex const* convexB = rbB.getConvex();
@@ -229,15 +229,15 @@ ContactInfo closestPointRigidBodies( RigidBody const& rbA,
 
         // TODO: SPHERE
         // In case the 2 rigid bodies are spheres
-        if ( convexA->getConvexType() == SPHERE && 
-             convexB->getConvexType() == SPHERE )
+        // if ( convexA->getConvexType() == SPHERE && 
+        //      convexB->getConvexType() == SPHERE )
             // return ( sphericalContact( *this, neighbor ) );
 
         // General case
-        if( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
-                                          *( rbB.getBoundingBox() ),
-                                          a2w,
-                                          b2w ) )
+        if ( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
+                                           *( rbB.getBoundingBox() ),
+                                           a2w,
+                                           b2w ) )
         {
             int nbIterGJK = 0;
             Vec3d ptA, ptB;
@@ -255,8 +255,8 @@ ContactInfo closestPointRigidBodies( RigidBody const& rbA,
 
             // Points A and B are in their respective local coordinate systems
             // Thus we transform them into the world coordinate system
-            ptA = (*a2w)( ptA );
-            ptB = (*b2w)( ptB );
+            ptA = (a2w)( ptA );
+            ptB = (b2w)( ptB );
 
             // Contact point definition as the mid point between ptA and ptB
             Vec3d contactPt = ( ptA + ptB ) / 2.;
@@ -275,8 +275,15 @@ ContactInfo closestPointRigidBodies( RigidBody const& rbA,
             // If actual overlap distance < 0 => contact otherwise no contact
             distance -= ctSum;
 
-            return ( ContactInfo( contactPt, contactVec, distance ) );
+            return ( ContactInfoD( contactPt, contactVec, distance ) );
         }
+        else
+            return ( ContactInfoD( Vec3d( 0., 0., 0. ), 
+                                   Vec3d( 0., 0., 0. ),
+                                   1.e20 ) );
     }
-    return ( noContact );
+    else
+        return ( ContactInfoD( Vec3d( 0., 0., 0. ), 
+                               Vec3d( 0., 0., 0. ),
+                               1.e20 ) );
 }
