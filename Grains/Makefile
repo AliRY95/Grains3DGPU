@@ -52,9 +52,9 @@ VPATH := $(SRCDIRBASE):$(SRCDIRCOMPO):$(SRCDIRGEOM)
 COMP  := nvcc
 LINK  := nvcc
 INCFLAGS  := $(INCDIR:%=-I%)
-DEBUG := -g -G -diag-suppress 554
-COMPFLAGS := $(DEBUG) -x cu -arch=sm_75 -dc $(INCFLAGS)
-LINKFLAGS := -Xnvlink -dump-callgraph-no-demangle -arch=sm_75 -rdc=true $(INCFLAGS)
+# DEBUG := -g -G -diag-suppress 554
+# COMPFLAGS := $(DEBUG) -x cu -arch=sm_75 -dc $(INCFLAGS)
+# LINKFLAGS := -Xnvlink -dump-callgraph-no-demangle -arch=sm_75 -rdc=true $(INCFLAGS)
 DEBUG  := -g -Xcompiler -rdynamic -diag-suppress 554
 COMPFLAGS := $(DEBUG) -O3 -arch=sm_75 -dc -dlto -x cu $(INCFLAGS)
 LINKFLAGS := -O3 -arch=sm_75 -dlto $(INCFLAGS)

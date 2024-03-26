@@ -2,6 +2,7 @@
 #include "Convex.hh"
 #include "ContactInfo.hh"
 #include "RigidBody.hh"
+#include "openGJK.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -241,7 +242,14 @@ ContactInfoD closestPointsRigidBodies( RigidBody const& rbA,
         {
             int nbIterGJK = 0;
             Vec3d ptA, ptB;
-            double distance = closestPointsGJK( *convexA, 
+            // double distance = closestPointsGJK( *convexA, 
+            //                                     *convexB,
+            //                                     a2w,
+            //                                     b2w,
+            //                                     ptA,
+            //                                     ptB,
+            //                                     nbIterGJK );
+            double distance = compute_minimum_distance( *convexA, 
                                                 *convexB,
                                                 a2w,
                                                 b2w,

@@ -378,7 +378,7 @@ double closestPointsGJK( Convex const& a,
 
     Vec3d v = a2w( a.support( Vec3d( 0., 0., 0. ) ) ) - 
               b2w( b.support( Vec3d( 0., 0., 0. ) ) );
-    Vec3d w;   
+    Vec3d w;
     double dist = v.norm();
     double mu = 0;
     unsigned int num_iterations = 0;
