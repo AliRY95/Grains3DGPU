@@ -12,7 +12,7 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-template <typename T = double>
+template <typename T>
 class ContactInfo
 {
     protected:
@@ -28,7 +28,7 @@ class ContactInfo
         /** @name Constructors */
         //@{
         /** @brief Default constructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ContactInfo();
 
         /** @brief Constructor with contact point location in the world reference
@@ -37,13 +37,13 @@ class ContactInfo
         @param pt contact point
         @param vec contact vector
         @param distance_ overlap distance */
-        __host__ __device__
+        __HOSTDEVICE__
         ContactInfo( Vector3<T> const& pt, 
                      Vector3<T> const& vec, 
                      T overlap );
 
         /** @brief Destructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ~ContactInfo();
         //@}
 
@@ -51,15 +51,15 @@ class ContactInfo
         /** @name Get methods */
         //@{
         /** @brief Gets the contact point */
-        __host__ __device__
+        __HOSTDEVICE__
         Vector3<T> getContactPoint() const;
     
         /** @brief Gets the contact vector */
-        __host__ __device__
+        __HOSTDEVICE__
         Vector3<T> getContactVector() const;
 
         /** @brief Gets the overlap distance */
-        __host__ __device__
+        __HOSTDEVICE__
         T getOverlapDistance() const;
         //@}
 
@@ -68,17 +68,17 @@ class ContactInfo
         //@{
         /** @brief Sets the contact point
         @param p contact point */
-        __host__ __device__
+        __HOSTDEVICE__
         void setContactPoint( Vector3<T> const& p );
     
         /** @brief Sets the contact vector
         @param v overlap vector */
-        __host__ __device__
+        __HOSTDEVICE__
         void setContactVector( Vector3<T> const& v );
 
         /** @brief Sets the overlap distance
         @param d overlap distance  */
-        __host__ __device__
+        __HOSTDEVICE__
         void setOverlapDistance( T d );
         //@}
 };
@@ -88,11 +88,11 @@ typedef ContactInfo<double> ContactInfoD;
 typedef ContactInfo<float> ContactInfoF;
 
 
-// __host__ __device__
+// __HOSTDEVICE__
 // static ContactInfoD noContact( Vec3d( 0., 0., 0. ), 
 //                               Vec3d( 0., 0., 0. ),
 //                               1.e20 );
-// __host__ __device__
+// __HOSTDEVICE__
 // static ContactInfoF noContactF( Vec3f( 0., 0., 0. ), 
 //                                 Vec3f( 0., 0., 0. ),
 //                                 1.e20 );	

@@ -14,12 +14,13 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
+template <typename T>
 class ComponentManager
 {
     protected:
         /** @name Parameters */
         //@{
-        Transform3d* m_transform; /**< array of components transformation */
+        Transform3<T>* m_transform; /**< array of components transformation */
         // Mat3d* orientation; /**< array of components orientation */
         // Vec3d* position; /**< array of components position */
         // Vec3d* force; /**< array of components force */
@@ -52,7 +53,7 @@ class ComponentManager
         /** @name Get methods */
         //@{
         /** @brief Gets components transformation */
-        virtual Transform3d* getTransform() const = 0;
+        virtual Transform3<T>* getTransform() const = 0;
 
         /** @brief Gets the array of components neighbor Id */
         virtual unsigned int* getNeighborsId() const = 0;
@@ -77,7 +78,7 @@ class ComponentManager
         /** @name Set methods */
         //@{
         /** @brief Sets components transformation */
-        virtual void setTransform( Transform3d const* tr ) = 0;
+        virtual void setTransform( Transform3<T> const* tr ) = 0;
 
         /** @brief Sets the array of components neighbor Id */
         virtual void setNeighborsId( unsigned int const* id ) = 0;
@@ -108,8 +109,8 @@ class ComponentManager
         // void createNeighborList();
 
         /** @brief Detects collision between particles */
-        virtual void detectCollision( LinkedCellD const* const* LC,
-                                      const RigidBody* const* rb, 
+        virtual void detectCollision( LinkedCell<T> const* const* LC,
+                                      RigidBody<T> const* const* rb, 
                                       int* result ) = 0;
 
         // /** @brief Computes impact forces */

@@ -3,7 +3,8 @@
 
 // -----------------------------------------------------------------------------
 // Default constructor
-ComponentManager::ComponentManager()
+template <typename T>
+ComponentManager<T>::ComponentManager()
 {}
 
 
@@ -11,5 +12,6 @@ ComponentManager::ComponentManager()
 
 // -----------------------------------------------------------------------------
 // Destructor
-ComponentManager::~ComponentManager()
+template <typename T>
+ComponentManager<T>::~ComponentManager()
 {}

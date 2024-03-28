@@ -2,23 +2,23 @@
 #define _SPHERE_HH_
 
 
-#include "Vector3.hh"
 #include "Convex.hh"
 
 
 // =============================================================================
 /** @brief The class Sphere.
 
-    Convex with the shape of a sphere in double precision.
+    Convex with the shape of a sphere.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-class Sphere : public Convex
+template <typename T>
+class Sphere : public Convex<T>
 {
     protected:
         /** @name Parameters */
         //@{
-        double m_radius; /**< radius of the sphere */
+        T m_radius; /**< radius of the sphere */
         //@}
 
 
@@ -27,11 +27,11 @@ class Sphere : public Convex
         //@{
         /** @brief Constructor with radius
         @param r radius */
-        __host__ __device__
-        Sphere( double r );
+        __HOSTDEVICE__
+        Sphere( T r );
 
         /** @brief Destructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ~Sphere();
         //@}
 
@@ -39,12 +39,12 @@ class Sphere : public Convex
         /** @name Get methods */
         //@{
         /** @brief Gets the convex type */
-        __host__ __device__
-        ConvexType getConvexType() const;
+        __HOSTDEVICE__
+        ConvexType getConvexType() const final;
 
         /** @brief Gets the radius */
-        __host__ __device__
-        double getRadius() const;
+        __HOSTDEVICE__
+        T getRadius() const;
         //@}
 
 
@@ -52,41 +52,45 @@ class Sphere : public Convex
         //@{
         /** @brief Sets the radius
         @param r radius */
-        __host__ __device__
-        void setRadius( double r );
+        __HOSTDEVICE__
+        void setRadius( T r );
         //@}
 
 
         /** @name Methods */
         //@{
         /** @brief Returns the circumscribed radius of the sphere */
-        __host__ __device__
-        double computeCircumscribedRadius() const;
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @brief Returns the sphere volume */
-        __host__ __device__
-        double computeVolume() const;
+        __HOSTDEVICE__
+        T computeVolume() const final;
 
         /** @brief Computes the inertia tensor and the inverse of the inertia
         tensor
         @param inertia inertia tensor
         @param inertia_1 inverse of the inertia tensor */
-        __host__ __device__
-        bool computeInertia( double* inertia, 
-                             double* inertia_1 ) const;
+        __HOSTDEVICE__
+        bool computeInertia( T* inertia, 
+                             T* inertia_1 ) const final;
 
         /** @ Returns the half-length of the bounding box fitted to the sphere 
         without considering the transformation */
-        __host__ __device__
-        Vec3f computeBoundingBox() const;
+        __HOSTDEVICE__
+        Vector3<T> computeBoundingBox() const final;
 
         /** @brief Sphere support function, returns the support point P, i.e. 
         the point on the surface of the box that satisfies max(P.v)
         @param v direction */
-        __host__ __device__
-        Vec3d support( Vec3d const& v ) const;
+        __HOSTDEVICE__
+        Vector3<T> support( Vector3<T> const& v ) const final;
         //@}
 };
+
+
+typedef Sphere<float> SphereF;
+typedef Sphere<double> SphereD;
 
 
 #endif

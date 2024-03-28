@@ -8,15 +8,20 @@ INCDIRBASE := Base/include
 INCDIR += $(INCDIRBASE)
 ALLINC += $(wildcard $(INCDIRBASE)/*.hh)
 
-SRCDIRCOMPO := Component/src
-INCDIRCOMPO := Component/include
-INCDIR += $(INCDIRCOMPO)
-ALLINC += $(wildcard $(INCDIRCOMPO)/*.hh)
+SRCDIRCOMPONENT := Component/src
+INCDIRCOMPONENT := Component/include
+INCDIR += $(INCDIRCOMPONENT)
+ALLINC += $(wildcard $(INCDIRCOMPONENT)/*.hh)
 
-SRCDIRGEOM := Geometry/src
-INCDIRGEOM := Geometry/include
-INCDIR += $(INCDIRGEOM)
-ALLINC += $(wildcard $(INCDIRGEOM)/*.hh)
+SRCDIRCOLLISION := CollisionDetection/src
+INCDIRCOLLISION := CollisionDetection/include
+INCDIR += $(INCDIRCOLLISION)
+ALLINC += $(wildcard $(INCDIRCOLLISION)/*.hh)
+
+SRCDIRGEOMETRY := Geometry/src
+INCDIRGEOMETRY := Geometry/include
+INCDIR += $(INCDIRGEOMETRY)
+ALLINC += $(wildcard $(INCDIRGEOMETRY)/*.hh)
 
 
 # Source files per package
@@ -24,11 +29,14 @@ ALLINC += $(wildcard $(INCDIRGEOM)/*.hh)
 SRCFILES_WP_BASE := $(wildcard $(SRCDIRBASE)/*.cpp)
 SRCFILESBASE := $(subst $(SRCDIRBASE)/,,$(SRCFILES_WP_BASE))
 
-SRCFILES_WP_COMPO := $(wildcard $(SRCDIRCOMPO)/*.cpp)
-SRCFILESCOMPO := $(subst $(SRCDIRCOMPO)/,,$(SRCFILES_WP_COMPO))
+SRCFILES_WP_COMPONENT := $(wildcard $(SRCDIRCOMPONENT)/*.cpp)
+SRCFILESCOMPONENT := $(subst $(SRCDIRCOMPONENT)/,,$(SRCFILES_WP_COMPONENT))
 
-SRCFILES_WP_GEOM := $(wildcard $(SRCDIRGEOM)/*.cpp)
-SRCFILESGEOM := $(subst $(SRCDIRGEOM)/,,$(SRCFILES_WP_GEOM))
+SRCFILES_WP_COLLISION := $(wildcard $(SRCDIRCOLLISION)/*.cpp)
+SRCFILESCOLLISION := $(subst $(SRCDIRCOLLISION)/,,$(SRCFILES_WP_COLLISION))
+
+SRCFILES_WP_GEOMETRY := $(wildcard $(SRCDIRGEOMETRY)/*.cpp)
+SRCFILESGEOMETRY := $(subst $(SRCDIRGEOMETRY)/,,$(SRCFILES_WP_GEOMETRY))
 
 
 # Target directories
@@ -38,14 +46,15 @@ OBJDIR := obj
 # Substitutions for objects
 # Here we use the base file names combined to VPATH
 OBJS_BASE := $(SRCFILESBASE:%.cpp=$(OBJDIR)/%.o)
-OBJS_COMPO := $(SRCFILESCOMPO:%.cpp=$(OBJDIR)/%.o)
-OBJS_GEOM := $(SRCFILESGEOM:%.cpp=$(OBJDIR)/%.o)
+OBJS_COMPONENT := $(SRCFILESCOMPONENT:%.cpp=$(OBJDIR)/%.o)
+OBJS_COLLISION := $(SRCFILESCOLLISION:%.cpp=$(OBJDIR)/%.o)
+OBJS_GEOMETRY := $(SRCFILESGEOMETRY:%.cpp=$(OBJDIR)/%.o)
 
 # Defining VPATH for automatic search of source files in the 
 # different source directories 
 # This enables to have a single rule/target for all source files in 
 # various directories and all objects in a single directory
-VPATH := $(SRCDIRBASE):$(SRCDIRCOMPO):$(SRCDIRGEOM)
+VPATH := $(SRCDIRBASE):$(SRCDIRCOMPONENT):$(SRCDIRCOLLISION):$(SRCDIRGEOMETRY)
 
 
 # Compiler
@@ -66,7 +75,7 @@ LINKFLAGS := -O3 -arch=sm_75 -dlto $(INCFLAGS)
 
 all : grains
 
-grains : MESS CPINC BASE COMPO GEOM
+grains : MESS CPINC BASE COMPONENT COLLISION GEOMETRY
 	$(LINK) $(LINKFLAGS) $(OBJS_GEOM) $(OBJS_COMPO) $(OBJS_BASE) -o grains
 	@echo 'Compilation is complete'
 
@@ -84,11 +93,15 @@ BASE   : $(OBJS_BASE)
 	@echo '*** Package Base compiled'
 	@echo
 
-COMPO  : $(OBJS_COMPO)
+COMPONENT  : $(OBJS_COMPONENTS)
 	@echo '*** Package Component compiled'
 	@echo
 
-GEOM   : $(OBJS_GEOM)
+COLLISION  : $(OBJS_COLLISION)
+	@echo '*** Package Component compiled'
+	@echo
+	
+GEOMETRY   : $(OBJS_GEOMETRY)
 	@echo '*** Package Geometry compiled'
 	@echo
 
@@ -104,7 +117,7 @@ depend:
 	@echo 'Generating dependencies'
 	touch ./Maketmp
 	makedepend -f ./Maketmp $(DEPEND) $(SRCFILES_WP_BASE) \
-	$(SRCFILES_WP_COMPO) $(SRCFILES_WP_GEOM) \
+	$(SRCFILES_WP_COMPONENTS) $(SRCFILES_WP_COLLISION) $(SRCFILES_WP_GEOMETRY) \
 	rm -f ./Maketmp ./Maketmp.bak
 
 # CLEAN

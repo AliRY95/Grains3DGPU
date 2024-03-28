@@ -1,11 +1,10 @@
-#include "Basic.hh"
 #include "Vector3.hh"
 
 
 // -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>::Vector3( T def )
 {
     m_comp[X] = m_comp[Y] = m_comp[Z] = def;
@@ -17,7 +16,7 @@ Vector3<T>::Vector3( T def )
 // -----------------------------------------------------------------------------
 // Constructor with 3 components as inputs
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>::Vector3( T x,
                      T y,
                      T z )
@@ -33,7 +32,7 @@ Vector3<T>::Vector3( T x,
 // -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>::Vector3( Vector3<T> const& vec )
 {
     m_comp[X] = vec.m_comp[X];
@@ -47,7 +46,7 @@ Vector3<T>::Vector3( Vector3<T> const& vec )
 // -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>::~Vector3()
 {}
 
@@ -57,7 +56,7 @@ Vector3<T>::~Vector3()
 // -----------------------------------------------------------------------------
 /* Sets the components */
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Vector3<T>::setValue( T x,
                            T y,
                            T z )
@@ -73,7 +72,7 @@ void Vector3<T>::setValue( T x,
 // -----------------------------------------------------------------------------
 // Unitary nomalization operator
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Vector3<T>::normalize()
 {
     *this /= this->norm();
@@ -85,7 +84,7 @@ void Vector3<T>::normalize()
 // -----------------------------------------------------------------------------
 // Returns a vector corresponding to the normalized vector
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Vector3<T>::normalized() const
 {
     return ( *this / this->norm() );
@@ -97,7 +96,7 @@ Vector3<T> Vector3<T>::normalized() const
 // -----------------------------------------------------------------------------
 //Returns the norm of the vector
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 T Vector3<T>::norm() const
 {
     return ( sqrt( m_comp[X] * m_comp[X] + 
@@ -110,7 +109,7 @@ T Vector3<T>::norm() const
 // -----------------------------------------------------------------------------
 //Returns the norm of the vector - specialized for floats
 template <>
-__host__ __device__
+__HOSTDEVICE__
 float Vector3<float>::norm() const
 {
     return ( sqrtf( m_comp[X] * m_comp[X] + 
@@ -124,7 +123,7 @@ float Vector3<float>::norm() const
 // -----------------------------------------------------------------------------
 // Returns the squared norm of the vector
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 T Vector3<T>::norm2() const
 {
     return ( m_comp[X] * m_comp[X] + 
@@ -138,7 +137,7 @@ T Vector3<T>::norm2() const
 // -----------------------------------------------------------------------------
 // Determines if the vector is approximately zero or not
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 bool Vector3<T>::isApproxZero() const
 {
     return ( fabs( m_comp[X] ) < EPSILON2 && 
@@ -152,7 +151,7 @@ bool Vector3<T>::isApproxZero() const
 // -----------------------------------------------------------------------------
 // Determines if the vector is approximately zero - specialized for floats
 template <>
-__host__ __device__
+__HOSTDEVICE__
 bool Vector3<float>::isApproxZero() const
 {
     return ( fabsf( m_comp[X] ) < EPSILON2 && 
@@ -166,7 +165,7 @@ bool Vector3<float>::isApproxZero() const
 // -----------------------------------------------------------------------------
 // Rounds components to +-tol
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Vector3<T>::round( T tol )
 {
     m_comp[X] = fabs( m_comp[X] ) < tol ? 0. : m_comp[X];
@@ -180,7 +179,7 @@ void Vector3<T>::round( T tol )
 // -----------------------------------------------------------------------------
 // Rounds components to +-tol - specialized for floats
 template <>
-__host__ __device__
+__HOSTDEVICE__
 void Vector3<float>::round( float tol )
 {
     m_comp[X] = fabsf( m_comp[X] ) < tol ? 0. : m_comp[X];
@@ -194,7 +193,7 @@ void Vector3<float>::round( float tol )
 // -----------------------------------------------------------------------------
 // Addition
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Vector3<T>::operator + ( Vector3<T> const& vec ) const
 {
     return ( Vector3<T>( m_comp[X] + vec.m_comp[X],
@@ -208,7 +207,7 @@ Vector3<T> Vector3<T>::operator + ( Vector3<T> const& vec ) const
 // -----------------------------------------------------------------------------
 // Subtraction
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Vector3<T>::operator - ( Vector3<T> const& vec ) const
 {
     return ( Vector3<T>( m_comp[X] - vec.m_comp[X],
@@ -222,7 +221,7 @@ Vector3<T> Vector3<T>::operator - ( Vector3<T> const& vec ) const
 // -----------------------------------------------------------------------------
 // Multiplication by a scalar
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Vector3<T>::operator * ( T d ) const
 {
     return ( Vector3<T>( m_comp[X] * d, m_comp[Y] * d, m_comp[Z] * d ) );
@@ -234,7 +233,7 @@ Vector3<T> Vector3<T>::operator * ( T d ) const
 // -----------------------------------------------------------------------------
 // Division by a scalar
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Vector3<T>::operator / ( T d ) const
 {
     return ( Vector3<T>( m_comp[X] / d, m_comp[Y] / d, m_comp[Z] / d ) );
@@ -246,7 +245,7 @@ Vector3<T> Vector3<T>::operator / ( T d ) const
 // -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>& Vector3<T>::operator += ( Vector3<T> const& vec )
 {
     m_comp[X] += vec.m_comp[X];
@@ -261,7 +260,7 @@ Vector3<T>& Vector3<T>::operator += ( Vector3<T> const& vec )
 // -----------------------------------------------------------------------------
 // Operator -=
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>& Vector3<T>::operator -= ( Vector3<T> const& vec )
 {
     m_comp[X] -= vec.m_comp[X];
@@ -276,7 +275,7 @@ Vector3<T>& Vector3<T>::operator -= ( Vector3<T> const& vec )
 // -----------------------------------------------------------------------------
 // Unitary operator *= by a scalar
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>& Vector3<T>::operator *= ( T d )
 {
     m_comp[X] *= d;
@@ -291,7 +290,7 @@ Vector3<T>& Vector3<T>::operator *= ( T d )
 // -----------------------------------------------------------------------------
 // Unitary operator /= by a scalar
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>& Vector3<T>::operator /= ( T d )
 {
     m_comp[X] /= d;
@@ -306,7 +305,7 @@ Vector3<T>& Vector3<T>::operator /= ( T d )
 // -----------------------------------------------------------------------------
 // dot product
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 T Vector3<T>::operator * ( Vector3<T> const& vec ) const
 {
     return ( m_comp[X] * vec.m_comp[X] + 
@@ -320,7 +319,7 @@ T Vector3<T>::operator * ( Vector3<T> const& vec ) const
 // -----------------------------------------------------------------------------
 // Cross product this x vec
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Vector3<T>::operator ^ ( Vector3<T> const& vec ) const
 {
     return ( Vector3<T>( 
@@ -335,7 +334,7 @@ Vector3<T> Vector3<T>::operator ^ ( Vector3<T> const& vec ) const
 // -----------------------------------------------------------------------------
 // ith component accessor
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 T Vector3<T>::operator [] ( size_t i ) const
 {
     return ( m_comp[i] );
@@ -347,7 +346,7 @@ T Vector3<T>::operator [] ( size_t i ) const
 // -----------------------------------------------------------------------------
 // Equal operator to another Vector3 object
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T>& Vector3<T>::operator = ( Vector3<T> const& vec )
 {
     if ( &vec != this )
@@ -365,7 +364,7 @@ Vector3<T>& Vector3<T>::operator = ( Vector3<T> const& vec )
 // -----------------------------------------------------------------------------
 // Unitary operator -. Return an object with negative components
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Vector3<T>::operator - () const
 {
     return ( Vector3<T>( - m_comp[X], - m_comp[Y], - m_comp[Z] ) );
@@ -377,7 +376,7 @@ Vector3<T> Vector3<T>::operator - () const
 // -----------------------------------------------------------------------------
 // Comparison operator
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 bool Vector3<T>::operator == ( Vector3<T> const& vec ) const
 {
     return ( m_comp[X] == vec[X] && 
@@ -391,7 +390,7 @@ bool Vector3<T>::operator == ( Vector3<T> const& vec ) const
 // -----------------------------------------------------------------------------
 // Difference operator
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 bool Vector3<T>::operator != ( Vector3<T> const& vec ) const
 {
     return ( m_comp[X] != vec[X] ||
@@ -405,7 +404,7 @@ bool Vector3<T>::operator != ( Vector3<T> const& vec ) const
 // -----------------------------------------------------------------------------
 // Conversion operator to float
 template <>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<double>::operator Vector3<float> () const
 {
     return ( Vector3<float> ( (float) m_comp[X],

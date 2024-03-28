@@ -4,7 +4,7 @@
 // -----------------------------------------------------------------------------
 // Default constructor. Origin is def and matrix is identity
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Transform3<T>::Transform3( T def )
 {
     m_basis.setValue( T( 1 ), T( 0 ), T( 0 ), 
@@ -19,7 +19,7 @@ Transform3<T>::Transform3( T def )
 // -----------------------------------------------------------------------------
 // Constructor with origin coordinates as inputs and matrix is identity
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Transform3<T>::Transform3( T x, T y, T z )
 {
     m_basis.setValue( T( 1 ), T( 0 ), T( 0 ), 
@@ -35,7 +35,7 @@ Transform3<T>::Transform3( T x, T y, T z )
 // Constructor with a 1D array of 12 values as inputs containing the
 // rotation matrix coefficients following by the origin coordinates
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Transform3<T>::Transform3( T const t[12] ) 
 { 
     setValue( t );    
@@ -47,7 +47,7 @@ Transform3<T>::Transform3( T const t[12] )
 // -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Transform3<T>::Transform3( Transform3<T> const& t )
 {
     m_basis = t.m_basis;
@@ -60,7 +60,7 @@ Transform3<T>::Transform3( Transform3<T> const& t )
 // -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Transform3<T>::~Transform3()
 {}
 
@@ -70,7 +70,7 @@ Transform3<T>::~Transform3()
 // -----------------------------------------------------------------------------
 // Gets the orientation of the transformation
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Matrix3<T> Transform3<T>::getBasis() const
 {
     return ( m_basis );
@@ -82,7 +82,7 @@ Matrix3<T> Transform3<T>::getBasis() const
 // -----------------------------------------------------------------------------
 // Gets the origin of the transformation
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Transform3<T>::getOrigin() const
 {
     return ( m_origin );
@@ -94,7 +94,7 @@ Vector3<T> Transform3<T>::getOrigin() const
 // -----------------------------------------------------------------------------
 // Sets the transformation with an 1D array of 12 values as inputs 
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::setValue( T const t[12] ) 
 {
     m_basis.setValue( t[0], t[1], t[2], 
@@ -109,7 +109,7 @@ void Transform3<T>::setValue( T const t[12] )
 // -----------------------------------------------------------------------------
 // Sets the matrix part of the transformation
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::setBasis( Matrix3<T> const& m )
 {
     m_basis = m;
@@ -122,7 +122,7 @@ void Transform3<T>::setBasis( Matrix3<T> const& m )
 // Sets the matrix part of the transformation with specified rotations around 
 // each principal axis
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::setBasis( T aX, 
                               T aY,
                               T aZ )
@@ -145,12 +145,12 @@ void Transform3<T>::setBasis( T aX,
 // Sets the matrix part of the transformation with specified rotations around 
 // each principal axis - single precision
 template<>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<float>::setBasis( float aX, 
                                   float aY,
                                   float aZ )
 {
-    m_basis = Mat3f( cosf(aZ)*cosf(aY),
+    m_basis = Mat3F( cosf(aZ)*cosf(aY),
                      cosf(aZ)*sinf(aY)*sinf(aX) - sinf(aZ)*cosf(aX),
                      cosf(aZ)*sinf(aY)*cosf(aX) + sinf(aZ)*sinf(aX),
                      sinf(aZ)*cosf(aY),
@@ -167,7 +167,7 @@ void Transform3<float>::setBasis( float aX,
 // -----------------------------------------------------------------------------
 // Sets the origin of the transformation
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::setOrigin( Vector3<T> const& v ) 
 {
     m_origin = v;
@@ -179,7 +179,7 @@ void Transform3<T>::setOrigin( Vector3<T> const& v )
 // -----------------------------------------------------------------------------
 // Sets the transformation to the identity
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::setIdentity() 
 {
     m_basis.setValue( T( 1 ), T( 0 ), T( 0 ), 
@@ -194,7 +194,7 @@ void Transform3<T>::setIdentity()
 // -----------------------------------------------------------------------------
 // Set the transformation to the inverse of another transformation t
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::setToInverseTransform( Transform3<T> const& t ) 
 {
     m_basis = t.m_basis.inverse();
@@ -210,7 +210,7 @@ void Transform3<T>::setToInverseTransform( Transform3<T> const& t )
 // Composition of affine transformations: this = t2 o t1 (t1 first
 // followed by t2)
 template <typename T>
-__host__ __device__ 
+__HOSTDEVICE__ 
 void Transform3<T>::setToTransformsComposition( Transform3<T> const& t1, 
                                                 Transform3<T> const& t2 ) 
 {  
@@ -224,7 +224,7 @@ void Transform3<T>::setToTransformsComposition( Transform3<T> const& t1,
 // -----------------------------------------------------------------------------
 // Composition with a scaling transformation: this = this o scaling
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::composeWithScaling( T x,
                                         T y,
                                         T z )
@@ -243,7 +243,7 @@ void Transform3<T>::composeWithScaling( T x,
 // This composition leaves the origin unchanged but does not check that rot 
 // is indeed a rotation 
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::composeLeftByRotation( Transform3<T> const& t ) 
 {
     m_basis = t.m_basis * m_basis;
@@ -256,7 +256,7 @@ void Transform3<T>::composeLeftByRotation( Transform3<T> const& t )
 // Composition on the left by a translation:
 // this = trans(vector) o this (this first followed by trans(vector))
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::composeLeftByTranslation( Vector3<T> const& v )
 { 
     m_origin += v;
@@ -269,7 +269,7 @@ void Transform3<T>::composeLeftByTranslation( Vector3<T> const& v )
 // Composition on the left by another affine transformation: 
 // this = t o this (this first followed by t)
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::composeLeftByTransform( Transform3<T> const& t ) 
 {
     m_origin = t.m_origin + t.m_basis * m_origin;
@@ -283,7 +283,7 @@ void Transform3<T>::composeLeftByTransform( Transform3<T> const& t )
 // Composition on the right by another affine transformation: 
 // this = this o t (t first followed by this)
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::composeRightByTransform( Transform3<T> const& t ) 
 {
     m_origin += m_basis * t.m_origin;
@@ -296,7 +296,7 @@ void Transform3<T>::composeRightByTransform( Transform3<T> const& t )
 // -----------------------------------------------------------------------------
 // Relative transformation with respect to t
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 void Transform3<T>::relativeToTransform( Transform3<T> const& t ) 
 {
     Matrix3<T> const inverseRotation = ( t.m_basis ).transpose();
@@ -310,7 +310,7 @@ void Transform3<T>::relativeToTransform( Transform3<T> const& t )
 // -----------------------------------------------------------------------------
 // Returns the result of applying the transformation to the input vector
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Vector3<T> Transform3<T>::operator () ( Vector3<T> const& v ) const 
 {
     return ( Vector3<T>( m_basis[X] * v + m_origin[X], 
@@ -324,7 +324,7 @@ Vector3<T> Transform3<T>::operator () ( Vector3<T> const& v ) const
 // -----------------------------------------------------------------------------
 // Equal operator to another Transform object
 template <typename T>
-__host__ __device__
+__HOSTDEVICE__
 Transform3<T>& Transform3<T>::operator = ( Transform3<T> const& t )
 {
     if ( &t != this )

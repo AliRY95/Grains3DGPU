@@ -4,8 +4,9 @@
 
 // -----------------------------------------------------------------------------
 // Constructor with radius
-__host__ __device__ 
-Sphere::Sphere( double r )
+template <typename T>
+__HOSTDEVICE__ 
+Sphere<T>::Sphere( T r )
 : m_radius( r )
 {}
 
@@ -14,8 +15,9 @@ Sphere::Sphere( double r )
 
 // -----------------------------------------------------------------------------
 // Destructor
-__host__ __device__
-Sphere::~Sphere()
+template <typename T>
+__HOSTDEVICE__
+Sphere<T>::~Sphere()
 {}
 
 
@@ -23,8 +25,9 @@ Sphere::~Sphere()
 
 // -----------------------------------------------------------------------------
 // Returns the convex type
-__host__ __device__
-ConvexType Sphere::getConvexType() const
+template <typename T>
+__HOSTDEVICE__
+ConvexType Sphere<T>::getConvexType() const
 {
     return ( SPHERE );
 }
@@ -34,8 +37,9 @@ ConvexType Sphere::getConvexType() const
 
 // -----------------------------------------------------------------------------
 // Returns the radius
-__host__ __device__
-double Sphere::getRadius() const
+template <typename T>
+__HOSTDEVICE__
+T Sphere<T>::getRadius() const
 {
     return ( m_radius );
 }
@@ -45,8 +49,9 @@ double Sphere::getRadius() const
 
 // -----------------------------------------------------------------------------
 // Sets the radius
-__host__ __device__
-void Sphere::setRadius( double r )
+template <typename T>
+__HOSTDEVICE__
+void Sphere<T>::setRadius( T r )
 {
     m_radius = r;
 }
@@ -56,10 +61,11 @@ void Sphere::setRadius( double r )
 
 // -----------------------------------------------------------------------------
 // Returns the volume of the Sphere
-__host__ __device__
-double Sphere::computeVolume() const
+template <typename T>
+__HOSTDEVICE__
+T Sphere<T>::computeVolume() const
 {
-    return ( 4. * M_PI * m_radius * m_radius * m_radius / 3. );
+    return ( T( 4 ) * M_PI * m_radius * m_radius * m_radius / T ( 3 ) );
 }
 
 
@@ -67,15 +73,17 @@ double Sphere::computeVolume() const
 
 // -----------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
-__host__ __device__
-bool Sphere::computeInertia( double* inertia, 
-                             double* inertia_1 ) const
+template <typename T>
+__HOSTDEVICE__
+bool Sphere<T>::computeInertia( T* inertia, 
+                                        T* inertia_1 ) const
 {
-    inertia[1] = inertia[2] = inertia[4] = 0.;
-    inertia[5] = inertia[3] = inertia[0] = 8. * M_PI / 15. * pow( m_radius, 5.);
+    inertia[1] = inertia[2] = inertia[4] = T( 0 );
+    inertia[5] = inertia[3] = inertia[0] = T( 8 ) * M_PI / T( 15 ) * 
+                                                        pow( m_radius, T( 5 ));
 
-    inertia_1[1] = inertia_1[2] = inertia_1[4] = 0.;
-    inertia_1[5] = inertia_1[3] = inertia_1[0] = 1. / inertia[0];
+    inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
+    inertia_1[5] = inertia_1[3] = inertia_1[0] = T( 1 ) / inertia[0];
 
     return ( true );
 }
@@ -85,8 +93,9 @@ bool Sphere::computeInertia( double* inertia,
 
 // -----------------------------------------------------------------------------
 // Returns the circumscribed radius of the Sphere
-__host__ __device__
-double Sphere::computeCircumscribedRadius() const
+template <typename T>
+__HOSTDEVICE__
+T Sphere<T>::computeCircumscribedRadius() const
 {
     return ( m_radius );
 }
@@ -96,12 +105,13 @@ double Sphere::computeCircumscribedRadius() const
 
 // -----------------------------------------------------------------------------
 // Returns the bounding box to Sphere
-__host__ __device__
-Vec3f Sphere::computeBoundingBox() const
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Sphere<T>::computeBoundingBox() const
 {
-    return ( Vec3f( (float) m_radius, 
-                    (float) m_radius, 
-                    (float) m_radius ) );
+    return ( Vector3<T>( m_radius, 
+                         m_radius, 
+                         m_radius ) );
 }
 
 
@@ -110,15 +120,24 @@ Vec3f Sphere::computeBoundingBox() const
 // -----------------------------------------------------------------------------
 // Sphere support function, returns the support point P, i.e. the point on the
 // surface of the Sphere that satisfies max(P.v)
-__host__ __device__
-Vec3d Sphere::support( Vec3d const& v ) const
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Sphere<T>::support( Vector3<T> const& v ) const
 {
-    double norm = v.norm2();
-    if ( norm < EPSILON3 )
-        return ( Vec3d() );
+    T norm = v.norm2();
+    if ( norm < HIGHEPS )
+        return ( Vector3<T>() );
     else
     {
-        double r = m_radius / norm;
-        return ( Vec3d( v[X] * r, v[Y] * r, v[Z] * r ) );
+        T r = m_radius / norm;
+        return ( Vector3<T>( v[X] * r, v[Y] * r, v[Z] * r ) );
     }
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+template class Sphere<float>;
+template class Sphere<double>;

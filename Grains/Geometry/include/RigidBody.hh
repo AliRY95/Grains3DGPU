@@ -10,44 +10,45 @@
 // =============================================================================
 /** @brief The class RigidBody.
 
-    Rigid bodies.
+    Rigid bodies comprising their shapes and physical attributes.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
+template <typename T>
 class RigidBody
 {
     protected:
         /**@name Parameters */
         //@{
-        Convex* m_convex; /**< Convex shape */
-        double m_crustThickness; /**< Rigid body's crust thickness */
-        double m_volume; /**< Rigid body's volume */
-        double* m_inertia; /**< Rigid body's inertia */
-        double* m_inertia_1; /**< Rigid body's inversed inertia */
-        BoundingBox* m_boundingBox; /** Bounding box of the convex body **/
-        float m_circumscribedRadius; /**< Circumscribed radius */
+        Convex<T>* m_convex; /**< Convex shape */
+        T m_crustThickness; /**< Rigid body's crust thickness */
+        T m_volume; /**< Rigid body's volume */
+        T* m_inertia; /**< Rigid body's inertia */
+        T* m_inertia_1; /**< Rigid body's inversed inertia */
+        BoundingBox<T>* m_boundingBox; /** Bounding box of the convex body **/
+        T m_circumscribedRadius; /**< Circumscribed radius */
         //@}
 
     public:
         /**@name Constructeurs */
         //@{
         /** @brief Default constructor */
-        __host__ __device__
+        __HOSTDEVICE__
         RigidBody();
 
         /** @brief Constructor with a convex
         @param convex convex
         @param ct crust thickness of the rigid body */
-        __host__ __device__
-        RigidBody( Convex* convex, double ct );
+        __HOSTDEVICE__
+        RigidBody( Convex<T>* convex, T ct );
 
         /** @brief Copy constructor
         @param rb RigidBody object to be copied */
-        __host__ __device__
-        RigidBody( RigidBody const& rb );
+        __HOSTDEVICE__
+        RigidBody( RigidBody<T> const& rb );
 
         /** @brief Destructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ~RigidBody();
         //@}
 
@@ -55,66 +56,71 @@ class RigidBody
         /**@name Get methods */
         //@{
         /** @brief Gets the rigid body's convex */
-        __host__ __device__ 
-        Convex* getConvex() const;
+        __HOSTDEVICE__ 
+        Convex<T>* getConvex() const;
 
         /** @brief Gets the rigid body's crust thickness */
-        __host__ __device__ 
-        double getCrustThickness() const;
+        __HOSTDEVICE__ 
+        T getCrustThickness() const;
         
         /** @brief Gets the rigid body's volume */
-        __host__ __device__ 
-        double getVolume() const;
+        __HOSTDEVICE__ 
+        T getVolume() const;
 
         /** @brief Gets the rigid body's inertia */
-        __host__ __device__ 
-        double* getInertia() const;
+        __HOSTDEVICE__ 
+        T* getInertia() const;
 
         /** @brief Gets the inverse of rigid body's inertia */
-        __host__ __device__ 
-        double* getInertia_1() const;
+        __HOSTDEVICE__ 
+        T* getInertia_1() const;
 
         /** @brief Gets the rigid body's bounding box */
-        __host__ __device__ 
-        BoundingBox* getBoundingBox() const;
+        __HOSTDEVICE__ 
+        BoundingBox<T>* getBoundingBox() const;
 
         /** @brief Gets the rigid body's circumscribed radius */
-        __host__ __device__
-        float getCircumscribedRadius() const;
+        __HOSTDEVICE__
+        T getCircumscribedRadius() const;
         //@}
 
-            
+        
         /**@name Set methods */
         //@{
+        // TODO: IMPLEMENT SET METHODS
         // /** @brief Sets the rigid body's convex
         // @param convex convex object */
-        // __host__ __device__ void setConvex( Convex const* convex );
+        // __HOSTDEVICE__ void setConvex( Convex const* convex );
         
         // /** @brief Sets the rigid body's curst thickness
         // @param ct crust thickness */
-        // __host__ __device__ void setCrustThickness( double ct );
+        // __HOSTDEVICE__ void setCrustThickness( double ct );
 
         // /** @brief Sets the rigid body's volume
         // @param v volume */
-        // __host__ __device__ void setVolume( double v );
+        // __HOSTDEVICE__ void setVolume( double v );
 
         // /** @brief Sets the rigid body's inertia
         // @param inertia inertia tensor */
-        // __host__ __device__ void setInertia( double* inertia );
+        // __HOSTDEVICE__ void setInertia( double* inertia );
 
         // /** @brief Sets the inverse of rigid body's inertia
         // @param inertia_1 inverse of the inertia tensor */
-        // __host__ __device__ void setInertia_1( double* inertia_1 );
+        // __HOSTDEVICE__ void setInertia_1( double* inertia_1 );
 
         // /** @brief Sets the rigid body's bounding box
         // @param r circumscribed radius */
-        // __host__ __device__ void setOBB( OBB const* bb );
+        // __HOSTDEVICE__ void setOBB( OBB const* bb );
 
         // /** @brief Sets the rigid body's circumscribed radius
         // @param r circumscribed radius */
-        // __host__ __device__ void setCircumscribedRadius( float r );
+        // __HOSTDEVICE__ void setCircumscribedRadius( float r );
         //@}
 };
+
+
+typedef RigidBody<float> RigidBodyF;
+typedef RigidBody<double> RigidBodyD;
 
 
 /** @name RigidBody : External methods collision detection */
@@ -126,21 +132,23 @@ class RigidBody
  frame
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
-__host__ __device__ 
-bool intersectRigidBodies( RigidBody const& rbA,
-                           RigidBody const& rbB,
-                           Transform3d const& a2w,
-                           Transform3d const& b2w );
+ template <typename T>
+__HOSTDEVICE__ 
+bool intersectRigidBodies( RigidBody<T> const& rbA,
+                           RigidBody<T> const& rbB,
+                           Transform3<T> const& a2w,
+                           Transform3<T> const& b2w );
 
 /** @brief Returns whether 2 rigid bodies intersect - relative transformation
  @param rbA first rigid body
  @param rbB second rigid body
  @param b2a geometric tramsformation describing convex B in the A's reference
  frame */
-__host__ __device__
-bool intersectRigidBodies( RigidBody const& rbA,
-                           RigidBody const& rbB,
-                           Transform3d const& b2a );
+ template <typename T>
+__HOSTDEVICE__
+bool intersectRigidBodies( RigidBody<T> const& rbA,
+                           RigidBody<T> const& rbB,
+                           Transform3<T> const& b2a );
 
 /** @brief Returns the contact information (if any) for 2 rigid bodies
  @param rbA first rigid body
@@ -149,11 +157,12 @@ bool intersectRigidBodies( RigidBody const& rbA,
  frame
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
-__host__ __device__
-ContactInfoD closestPointsRigidBodies( RigidBody const& rbA,
-                                       RigidBody const& rbB,
-                                       Transform3d const& a2w,
-                                       Transform3d const& b2w );
+ template <typename T>
+__HOSTDEVICE__
+ContactInfo<T> closestPointsRigidBodies( RigidBody<T> const& rbA,
+                                         RigidBody<T> const& rbB,
+                                         Transform3<T> const& a2w,
+                                         Transform3<T> const& b2w );
 
 // TODO: LATER
 // /** @brief Returns the contact information (if any) for 2 rigid bodies - 
@@ -162,7 +171,7 @@ ContactInfoD closestPointsRigidBodies( RigidBody const& rbA,
 //  @param rbB second rigid body
 //  @param b2a geometric tramsformation describing convex B in the A's reference
 //  frame */
-// __host__ __device__
+// __HOSTDEVICE__
 // ContactInfo closestPointsRigidBodies( RigidBody const& rbA,
 //                                       RigidBody const& rbB,
 //                                       Transform3d const& b2a );

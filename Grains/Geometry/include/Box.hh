@@ -2,23 +2,23 @@
 #define _BOX_HH_
 
 
-#include "Vector3.hh"
 #include "Convex.hh"
 
 
 // =============================================================================
 /** @brief The class Box.
 
-    Convex with the shape of a box in double precision.
+    Convex with the shape of a box.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-class Box : public Convex
+template <typename T>
+class Box : public Convex<T>
 {
     protected:
         /** @name Parameters */
         //@{
-        Vec3d m_extent; /**< vector containing the half-legnth of the edges */
+        Vector3<T> m_extent; /**< vector containing the half-legnth of edges */
         //@}
 
 
@@ -29,18 +29,18 @@ class Box : public Convex
         @param x 1st component
         @param y 2nd component
         @param z 3rd component */
-        __host__ __device__ 
-        Box( double x,
-             double y,
-             double z );
+        __HOSTDEVICE__
+        Box( T x,
+             T y,
+             T z );
 
         /** @brief Constructor with a vector containing the edge half-lengths
         @param extent_ vector of half-lengths */
-        __host__ __device__
-        Box( Vec3d const& extent_ );
+        __HOSTDEVICE__
+        Box( Vector3<T> const& extent_ );
 
         /** @brief Destructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ~Box();
         //@}
 
@@ -48,15 +48,15 @@ class Box : public Convex
         /** @name Get methods */
         //@{
         /** @brief Returns the convex type */
-        __host__ __device__
-        ConvexType getConvexType() const;
+        __HOSTDEVICE__
+        ConvexType getConvexType() const final;
 
         /** @brief Gets values of the edge length
         @param x 1st component
         @param y 2nd component
         @param z 3rd component */
-        __host__ __device__
-        Vec3d getExtent() const;
+        __HOSTDEVICE__
+        Vector3<T> getExtent() const;
         //@}
 
 
@@ -66,43 +66,47 @@ class Box : public Convex
         @param x 1st component
         @param y 2nd component
         @param z 3rd component */
-        __host__ __device__
-        void setExtent( double x,
-                        double y,
-                        double z );
+        __HOSTDEVICE__
+        void setExtent( T x,
+                        T y,
+                        T z );
         //@}
 
 
         /** @name Methods */
         //@{
         /** @brief Returns the circumscribed radius of the box */
-        __host__ __device__ 
-        double computeCircumscribedRadius() const;
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @brief Returns the box volume */
-        __host__ __device__
-        double computeVolume() const;
+        __HOSTDEVICE__
+        T computeVolume() const final;
 
         /** @brief Computes the inertia tensor and the inverse of the inertia
         tensor
         @param inertia inertia tensor
         @param inertia_1 inverse of the inertia tensor */
-        __host__ __device__ 
-        bool computeInertia( double* inertia, 
-                             double* inertia_1 ) const;
+        __HOSTDEVICE__
+        bool computeInertia( T* inertia, 
+                             T* inertia_1 ) const final;
 
         /** @ Returns the half-length of the bounding box fitted to the box 
         without considering the transformation */
-        __host__ __device__
-        Vec3f computeBoundingBox() const;
+        __HOSTDEVICE__
+        Vector3<T> computeBoundingBox() const final;
 
         /** @brief Box support function, returns the support point P, i.e. the
         point on the surface of the box that satisfies max(P.v)
         @param v direction */
-        __host__ __device__
-        Vec3d support( Vec3d const& v ) const;
+        __HOSTDEVICE__
+        Vector3<T> support( Vector3<T> const& v ) const final;
         //@}
 };
+
+
+typedef Box<float> BoxF;
+typedef Box<double> BoxD;
 
 
 #endif

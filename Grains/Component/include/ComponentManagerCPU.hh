@@ -12,7 +12,8 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-class ComponentManagerCPU : public ComponentManager
+template <typename T>
+class ComponentManagerCPU : public ComponentManager<T>
 {
     public:
         /** @name Constructors */
@@ -29,7 +30,7 @@ class ComponentManagerCPU : public ComponentManager
         /** @name Get methods */
         //@{
         /** @brief Gets components transformation */
-        Transform3d* getTransform() const;
+        Transform3<T>* getTransform() const;
 
         /** @brief Gets the array of components neighbor Id */
         unsigned int* getNeighborsId() const;
@@ -54,7 +55,7 @@ class ComponentManagerCPU : public ComponentManager
         /** @name Set methods */
         //@{
         /** @brief Sets components transformation */
-        void setTransform( Transform3d const* tr );
+        void setTransform( Transform3<T> const* tr );
 
         /** @brief Sets the array of components neighbor Id */
         void setNeighborsId( unsigned int const* id );
@@ -85,8 +86,8 @@ class ComponentManagerCPU : public ComponentManager
         // void createNeighborList();
 
         /** @brief Detects collision between particles */
-        void detectCollision( LinkedCellD const* const* LC,
-                              RigidBody const* const* rb, 
+        void detectCollision( LinkedCell<T> const* const* LC,
+                              RigidBody<T> const* const* rb, 
                               int* result );
 
         // /** @brief Computes impact forces */

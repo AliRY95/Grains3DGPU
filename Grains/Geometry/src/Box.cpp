@@ -1,12 +1,14 @@
-#include "Convex.hh"
 #include "Box.hh"
 
 
 // -----------------------------------------------------------------------------
 // Constructor with half edge length as input parameters
-__host__ __device__ 
-Box::Box( double x, double y, double z )
-: m_extent( Vec3d( x, y, z ) )
+template <typename T>
+__HOSTDEVICE__ 
+Box<T>::Box( T x, 
+             T y,
+             T z )
+: m_extent( Vector3<T>( x, y, z ) )
 {}
 
 
@@ -14,8 +16,9 @@ Box::Box( double x, double y, double z )
 
 // -----------------------------------------------------------------------------
 // Constructor with a vector containing the edge half-lengths
-__host__ __device__
-Box::Box( Vec3d const& extent_ )
+template <typename T>
+__HOSTDEVICE__
+Box<T>::Box( Vector3<T> const& extent_ )
 : m_extent( extent_ )
 {}
 
@@ -24,8 +27,9 @@ Box::Box( Vec3d const& extent_ )
 
 // -----------------------------------------------------------------------------
 // Destructor
-__host__ __device__
-Box::~Box()
+template <typename T>
+__HOSTDEVICE__
+Box<T>::~Box()
 {}
 
 
@@ -33,8 +37,9 @@ Box::~Box()
 
 // -----------------------------------------------------------------------------
 // Returns the convex type
-__host__ __device__
-ConvexType Box::getConvexType() const
+template <typename T>
+__HOSTDEVICE__
+ConvexType Box<T>::getConvexType() const
 {
     return ( BOX );
 }
@@ -44,8 +49,9 @@ ConvexType Box::getConvexType() const
 
 // -----------------------------------------------------------------------------
 // Gets values of the edge length
-__host__ __device__
-Vec3d Box::getExtent() const
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Box<T>::getExtent() const
 {
     return ( m_extent );
 }
@@ -55,10 +61,11 @@ Vec3d Box::getExtent() const
 
 // -----------------------------------------------------------------------------
 // Sets values of the edge length
-__host__ __device__
-void Box::setExtent( double x, double y, double z )
+template <typename T>
+__HOSTDEVICE__
+void Box<T>::setExtent( T x, T y, T z )
 {
-    m_extent = Vec3d( x, y, z );
+    m_extent = Vector3<T>( x, y, z );
 }
 
 
@@ -66,10 +73,11 @@ void Box::setExtent( double x, double y, double z )
 
 // -----------------------------------------------------------------------------
 // Returns the volume of the box
-__host__ __device__
-double Box::computeVolume() const
+template <typename T>
+__HOSTDEVICE__
+T Box<T>::computeVolume() const
 {
-    return ( 8.0 * m_extent[X] * m_extent[Y] * m_extent[Z] );
+    return ( T( 8 ) * m_extent[X] * m_extent[Y] * m_extent[Z] );
 }
 
 
@@ -77,22 +85,23 @@ double Box::computeVolume() const
 
 // -----------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
-__host__ __device__
-bool Box::computeInertia( double* inertia, 
-                          double* inertia_1 ) const
+template <typename T>
+__HOSTDEVICE__
+bool Box<T>::computeInertia( T* inertia, 
+                             T* inertia_1 ) const
 {
-    inertia[1] = inertia[2] = inertia[4] = 0.0;
-    inertia[0] = 8.0 * m_extent[X] * m_extent[Y] * m_extent[Z]
-    * ( m_extent[Y] * m_extent[Y] + m_extent[Z] * m_extent[Z] ) / 3.0;
-    inertia[3] = 8.0 * m_extent[X] * m_extent[Y] * m_extent[Z]
-    * ( m_extent[X] * m_extent[X] + m_extent[Z] * m_extent[Z] ) / 3.0;
-    inertia[5] = 8.0 * m_extent[X] * m_extent[Y] * m_extent[Z]
-    * ( m_extent[Y] * m_extent[Y] + m_extent[X] * m_extent[X] ) / 3.0;
+    inertia[1] = inertia[2] = inertia[4] = T( 0 );
+    inertia[0] = T( 8 ) * m_extent[X] * m_extent[Y] * m_extent[Z]
+    * ( m_extent[Y] * m_extent[Y] + m_extent[Z] * m_extent[Z] ) / T( 3 );
+    inertia[3] = T( 8 ) * m_extent[X] * m_extent[Y] * m_extent[Z]
+    * ( m_extent[X] * m_extent[X] + m_extent[Z] * m_extent[Z] ) / T( 3 );
+    inertia[5] = T( 8 ) * m_extent[X] * m_extent[Y] * m_extent[Z]
+    * ( m_extent[Y] * m_extent[Y] + m_extent[X] * m_extent[X] ) / T( 3 );
 
-    inertia_1[1] = inertia_1[2] = inertia_1[4] = 0.0;
-    inertia_1[0] = 1.0 / inertia[0];
-    inertia_1[3] = 1.0 / inertia[3];
-    inertia_1[5] = 1.0 / inertia[5];
+    inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
+    inertia_1[0] = T( 1 ) / inertia[0];
+    inertia_1[3] = T( 1 ) / inertia[3];
+    inertia_1[5] = T( 1 ) / inertia[5];
 
     return ( true );
 }
@@ -102,8 +111,9 @@ bool Box::computeInertia( double* inertia,
 
 // -----------------------------------------------------------------------------
 // Returns the circumscribed radius of the box
-__host__ __device__
-double Box::computeCircumscribedRadius() const
+template <typename T>
+__HOSTDEVICE__
+T Box<T>::computeCircumscribedRadius() const
 {
     return ( m_extent.norm() );
 }
@@ -113,12 +123,13 @@ double Box::computeCircumscribedRadius() const
 
 // -----------------------------------------------------------------------------
 // Returns the bounding box to box
-__host__ __device__
-Vec3f Box::computeBoundingBox() const
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Box<T>::computeBoundingBox() const
 {
-    return ( Vec3f( (float) m_extent[X], 
-                    (float) m_extent[Y], 
-                    (float) m_extent[Z] ) );
+    return ( Vector3<T>( m_extent[X], 
+                         m_extent[Y], 
+                         m_extent[Z] ) );
 }
 
 
@@ -127,14 +138,23 @@ Vec3f Box::computeBoundingBox() const
 // -----------------------------------------------------------------------------
 // Box support function, returns the support point P, i.e. the point on the
 // surface of the box that satisfies max(P.v)
-__host__ __device__
-Vec3d Box::support( Vec3d const& v ) const
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Box<T>::support( Vector3<T> const& v ) const
 {
-    double norm = v.norm2();
-    if ( norm < EPSILON3 )
-        return ( Vec3d() );
+    T norm = v.norm2();
+    if ( norm < HIGHEPS )
+        return ( Vector3<T>() );
     else
-        return ( Vec3d( v[X] < 0. ? -m_extent[X] : m_extent[X],
-                        v[Y] < 0. ? -m_extent[Y] : m_extent[Y],
-                        v[Z] < 0. ? -m_extent[Z] : m_extent[Z] ) );
+        return ( Vector3<T>( v[X] < T( 0 ) ? -m_extent[X] : m_extent[X],
+                             v[Y] < T( 0 ) ? -m_extent[Y] : m_extent[Y],
+                             v[Z] < T( 0 ) ? -m_extent[Z] : m_extent[Z] ) );
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+template class Box<float>;
+template class Box<double>;

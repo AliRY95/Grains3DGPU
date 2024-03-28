@@ -12,7 +12,8 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-class ComponentManagerGPU : public ComponentManager
+template <typename T>
+class ComponentManagerGPU : public ComponentManager<T>
 {
     public:
         /** @name Constructors */
@@ -23,7 +24,7 @@ class ComponentManagerGPU : public ComponentManager
 
         /** @brief Constructor with host data as input
         @param cm component manager on host */
-        ComponentManagerGPU( ComponentManager const& cm );
+        ComponentManagerGPU( ComponentManager<T> const& cm );
 
         /** @brief Destructor */
         ~ComponentManagerGPU();
@@ -33,7 +34,7 @@ class ComponentManagerGPU : public ComponentManager
         /** @name Get methods */
         //@{
         /** @brief Gets components transformation */
-        Transform3d* getTransform() const;
+        Transform3<T>* getTransform() const;
 
         /** @brief Gets the array of components neighbor Id */
         unsigned int* getNeighborsId() const;
@@ -58,7 +59,7 @@ class ComponentManagerGPU : public ComponentManager
         /** @name Set methods */
         //@{
         /** @brief Sets components transformation */
-        void setTransform( Transform3d const* tr );
+        void setTransform( Transform3<T> const* tr );
 
         /** @brief Sets the array of components neighbor Id */
         void setNeighborsId( unsigned int const* id );
@@ -88,11 +89,11 @@ class ComponentManagerGPU : public ComponentManager
         /** @brief Updates the linked cell list according to the linked cell 
         provided
         @param LC linked cell */
-        void updateLinkedCellList( LinkedCellD const* const* LC );
+        void updateLinkedCellList( LinkedCell<T> const* const* LC );
 
         /** @brief Detects collision between particles */
-        void detectCollision( LinkedCellD const* const* LC,
-                              RigidBody const* const* rb, 
+        void detectCollision( LinkedCell<T> const* const* LC,
+                              RigidBody<T> const* const* rb, 
                               int* results );
 
         // /** @brief Computes impact forces */

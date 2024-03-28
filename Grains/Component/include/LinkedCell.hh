@@ -82,7 +82,7 @@ class LinkedCell
                                    int k ) const;
 
         /** @brief Returns the linear cell hash value for a neighboring cell in
-        the direction given by (i, j, k) - note that
+        the direction given by (i, j, k)
         @param i relative position of the neighboring cell in the x-direction
         @param j relative position of the neighboring cell in the y-direction
         @param k relative position of the neighboring cell in the z-direction */
@@ -132,13 +132,13 @@ for all components using GPU - Kernel
 // template <typename T>
 __global__ 
 void computeLinearLinkedCellHashGPU_kernel( LinkedCell<double> const* const* LC,
-                                            Transform3d const* pos,
+                                            Tr3D const* pos,
                                             unsigned int numComponents,
                                             unsigned int* componentCellHash );
 //@}
 
 
-// typedef LinkedCell<float> LinkedCellF;
+typedef LinkedCell<float> LinkedCellF;
 typedef LinkedCell<double> LinkedCellD;
 
 
