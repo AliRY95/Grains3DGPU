@@ -1,3 +1,4 @@
+#include "MatrixMath.hh"
 #include "BoundingBox.hh"
 #include "Transform3.hh"
 #include "OBB.hh"
@@ -304,3 +305,17 @@ bool intersectAxisAlignedBoundingBox( BoundingBox<T> const& bbA,
 #undef TESTCASE3_F
 
 
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+#define X( T ) \
+template                                                                       \
+__HOSTDEVICE__                                                                 \
+bool intersectOrientedBoundingBox( BoundingBox<T> const& bbA,                  \
+                                   BoundingBox<T> const& bbB,                  \
+                                   Transform3<T> const& trA2W,                 \
+                                   Transform3<T> const& trB2W );
+X( float )
+X( double )
+#undef X

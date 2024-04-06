@@ -1,6 +1,8 @@
-#include "GJK.hh"
-// #include "GJK_SV.hh"
+#include "MatrixMath.hh"
 #include "OBB.hh"
+#include "GJK.hh"
+#include "GJK_SV.hh"
+#include "openGJK.hh"
 #include "RigidBody.hh"
 
 // -----------------------------------------------------------------------------
@@ -263,13 +265,13 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T> const& rbA,
                                            ptA,
                                            ptB,
                                            nbIterGJK );
-            // T distance = compute_minimum_distance( *convexA, 
-            //                                     *convexB,
-            //                                     a2w,
-            //                                     b2w,
-            //                                     ptA,
-            //                                     ptB,
-            //                                     nbIterGJK );
+            // T distance = closestPointsGJK_SV( *convexA, 
+            //                                   *convexB,
+            //                                   a2w,
+            //                                   b2w,
+            //                                   ptA,
+            //                                   ptB,
+            //                                   nbIterGJK );
             // TODO: ERROR HANDLING
             
             // Sum of crust thicknesses
@@ -281,7 +283,7 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T> const& rbA,
             ptB = (b2w)( ptB );
 
             // Contact point definition as the mid point between ptA and ptB
-            Vector3<T> contactPt = ( ptA + ptB ) / 2.;
+            Vector3<T> contactPt = ( ptA + ptB ) / T( 2 );
 
             // Computation of the actual overlap vector
             // If contact, crustA + crustB - distance > 0, the overlap vector is
@@ -309,3 +311,19 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T> const& rbA,
                                  Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ),
                                  1.e20 ) );
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+#define X( T ) \
+template                                                                       \
+__HOSTDEVICE__                                                                 \
+ContactInfo<T> closestPointsRigidBodies( RigidBody<T> const& rbA,              \
+                                         RigidBody<T> const& rbB,              \
+                                         Transform3<T> const& a2w,             \
+                                         Transform3<T> const& b2w );           
+X( float )
+X( double )
+#undef X

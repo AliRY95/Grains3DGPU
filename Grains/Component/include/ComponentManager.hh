@@ -1,6 +1,7 @@
 #ifndef _COMPONENTMANAGER_HH_
 #define _COMPONENTMANAGER_HH_
 
+
 #include "Transform3.hh"
 #include "RigidBody.hh"
 #include "LinkedCell.hh"
@@ -121,5 +122,7 @@ class ComponentManager
         //@}
 };
 
+typedef ComponentManager<float> ComponentManager_d;
+typedef ComponentManager<double> ComponentManager_f;
 
 #endif

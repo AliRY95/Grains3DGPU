@@ -334,5 +334,14 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
 }
 
 
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+// template class ComponentManagerCPU<float>;
+template class ComponentManagerCPU<double>;
+
+
 #undef numCells
 #undef numComponents
+

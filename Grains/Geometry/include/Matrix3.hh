@@ -108,29 +108,6 @@ class Matrix3
 
         /**@name Operators */
         //@{
-        __HOSTDEVICE__
-        Matrix3<T> operator + ( Matrix3<T> const& m );
-
-        /** @brief Scalar-matrix product
-        @param c the scalar */
-        __HOSTDEVICE__
-        Matrix3<T> operator * ( T c );
-
-        /** @brief Matrix-vector product
-        @param v the vector */
-        __HOSTDEVICE__ 
-        Vector3<T> operator * ( Vector3<T> const& v );
-
-        /** @brief Vector-matrix product
-        @param v the vector */
-        __HOSTDEVICE__
-        Vector3<T> operator ^ ( Vector3<T> const& v );
-
-        /** @brief Matrix-matrix product
-        @param m right matrix */
-        __HOSTDEVICE__
-        Matrix3<T> operator * ( Matrix3<T> const& m );
-
         /** @brief Operator +=
         @param mat 2nd Matrix3 object */
         __HOSTDEVICE__
@@ -161,7 +138,8 @@ class Matrix3
         __HOSTDEVICE__
         Matrix3<T>& operator = ( Matrix3<T> const& mat );
 
-        /** @brief Unitary operator -. Returns an object with negative components */
+        /** @brief Unitary operator -. Returns an object with negative 
+        components */
         __HOSTDEVICE__
         Matrix3<T>& operator - ();
 };

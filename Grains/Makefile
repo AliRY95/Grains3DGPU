@@ -76,7 +76,7 @@ LINKFLAGS := -O3 -arch=sm_75 -dlto $(INCFLAGS)
 all : grains
 
 grains : MESS CPINC BASE COMPONENT COLLISION GEOMETRY
-	$(LINK) $(LINKFLAGS) $(OBJS_GEOM) $(OBJS_COMPO) $(OBJS_BASE) -o grains
+	$(LINK) $(LINKFLAGS) $(OBJS_GEOMETRY) $(OBJS_COMPONENT) $(OBJS_COLLISION) $(OBJS_BASE) -o grains
 	@echo 'Compilation is complete'
 
 MESS   :
@@ -93,12 +93,12 @@ BASE   : $(OBJS_BASE)
 	@echo '*** Package Base compiled'
 	@echo
 
-COMPONENT  : $(OBJS_COMPONENTS)
+COMPONENT  : $(OBJS_COMPONENT)
 	@echo '*** Package Component compiled'
 	@echo
 
 COLLISION  : $(OBJS_COLLISION)
-	@echo '*** Package Component compiled'
+	@echo '*** Package Collision compiled'
 	@echo
 	
 GEOMETRY   : $(OBJS_GEOMETRY)

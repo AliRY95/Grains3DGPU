@@ -1,12 +1,14 @@
 #ifndef _MISCMATH_HH_
 #define _MISCMATH_HH_
 
+
 #include "Basic.hh"
+
 
 // =============================================================================
 /** @brief Miscellaneous math functions as header-only.
 
-    @author A.Yazdani - 2023 - Construction */
+    @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 /** @name Math functions */
 //@{

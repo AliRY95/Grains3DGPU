@@ -13,7 +13,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class ComponentManagerGPU : public ComponentManager<T>
+class ComponentManagerGPU : public ComponentManager<double>
 {
     public:
         /** @name Constructors */
@@ -103,6 +103,10 @@ class ComponentManagerGPU : public ComponentManager<T>
         // void updateParticles();
         //@}
 };
+
+
+typedef ComponentManagerGPU<float> ComponentManagerGPU_d;
+typedef ComponentManagerGPU<double> ComponentManagerGPU_f;
 
 
 #endif

@@ -1,3 +1,4 @@
+#include "VectorMath.hh"
 #include "Matrix3.hh"
 
 
@@ -177,86 +178,6 @@ Matrix3<T> Matrix3<T>::transpose() const
     return ( Matrix3<T>( m_comp[X][X], m_comp[Y][X], m_comp[Z][X],
                          m_comp[X][Y], m_comp[Y][Y], m_comp[Z][Y],
                          m_comp[X][Z], m_comp[Y][Z], m_comp[Z][Z] ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Matrices sum
-template <typename T>
-__HOSTDEVICE__
-Matrix3<T> Matrix3<T>::operator + ( Matrix3<T> const& m )
-{
-    return ( Matrix3<T>( 
-    m_comp[X][X] + m[X][X], m_comp[X][Y] + m[X][Y], m_comp[X][Z] + m[X][Z],
-    m_comp[Y][X] + m[Y][X], m_comp[Y][Y] + m[Y][Y], m_comp[Y][Z] + m[Y][Z],
-    m_comp[Z][X] + m[Z][X], m_comp[Z][Y] + m[Z][Y], m_comp[Z][Z] + m[Z][Z] ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Multiplies a matrix by a scalar
-template <typename T>
-__HOSTDEVICE__
-Matrix3<T> Matrix3<T>::operator * ( T c )
-{
-    return ( Matrix3<T>( 
-            c * m_comp[X][X], c * m_comp[X][Y], c * m_comp[X][Z],
-            c * m_comp[Y][X], c * m_comp[Y][Y], c * m_comp[Y][Z],
-            c * m_comp[Z][X], c * m_comp[Z][Y], c * m_comp[Z][Z] ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Matrix-vector product
-template <typename T>
-__HOSTDEVICE__
-Vector3<T> Matrix3<T>::operator * ( Vector3<T> const& v )
-{
-    return ( 
-    Vector3<T>( 
-        m_comp[X][X] * v[X] + m_comp[X][Y] * v[Y] + m_comp[X][X] * v[Z],
-        m_comp[Y][X] * v[X] + m_comp[Y][Y] * v[Y] + m_comp[Y][X] * v[Z],
-        m_comp[Z][X] * v[X] + m_comp[Z][Y] * v[Y] + m_comp[Z][X] * v[Z] ) );
-}
-
-
-
-
-// ----------------------------------------------------------------------------
-// Vector-matrix product
-template <typename T>
-__HOSTDEVICE__
-Vector3<T> Matrix3<T>::operator ^ ( Vector3<T> const& v )
-{
-    Matrix3<T> m_tr = this->transpose();
-    return ( Vector3<T>( m_tr[X] * v, m_tr[Y] * v, m_tr[Z] * v ) );
-}
-
-
-
-
-// ----------------------------------------------------------------------------
-// Matrix-matrix product
-template <typename T>
-__HOSTDEVICE__ 
-Matrix3<T> Matrix3<T>::operator * ( Matrix3<T> const& m )
-{
-    return Matrix3<T>(
-    m_comp[X][X] * m[X][X] + m_comp[X][Y] * m[Y][X] + m_comp[X][Z] * m[Z][X],
-    m_comp[X][X] * m[X][Y] + m_comp[X][Y] * m[Y][Y] + m_comp[X][Z] * m[Z][Y],
-    m_comp[X][X] * m[X][Z] + m_comp[X][Y] * m[Y][Z] + m_comp[X][Z] * m[Z][Z],
-    m_comp[Y][X] * m[X][X] + m_comp[Y][Y] * m[Y][X] + m_comp[Y][Z] * m[Z][X],
-    m_comp[Y][X] * m[X][Y] + m_comp[Y][Y] * m[Y][Y] + m_comp[Y][Z] * m[Z][Y],
-    m_comp[Y][X] * m[X][Z] + m_comp[Y][Y] * m[Y][Z] + m_comp[Y][Z] * m[Z][Z],
-    m_comp[Z][X] * m[X][X] + m_comp[Z][Y] * m[Y][X] + m_comp[Z][Z] * m[Z][X],
-    m_comp[Z][X] * m[X][Y] + m_comp[Z][Y] * m[Y][Y] + m_comp[Z][Z] * m[Z][Y],
-    m_comp[Z][X] * m[X][Z] + m_comp[Z][Y] * m[Y][Z] + m_comp[Z][Z] * m[Z][Z] );
 }
 
 

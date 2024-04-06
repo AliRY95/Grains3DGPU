@@ -38,32 +38,35 @@ void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
 /** @brief Returns the collisions for all given components using N-squared and a
 thread-per-particle policy
 @param fix later */
+template <typename T>
 __global__ 
-void collisionDetectionN2( RigidBody const* const* a,
-                           Transform3d const* tr3d,
+void collisionDetectionN2( RigidBody<T> const* const* a,
+                           Transform3<T> const* tr3d,
                            int numComponents,
                            int* result );
 
 /** @brief Returns the collisions for all given components using N-squared and a
 thread-per-particle policy - using relative position and orientation
 @param fix later */
+template <typename T>
 __global__ 
-void collisionDetectionRelativeN2( RigidBody const* const* a,
-                                   Transform3d const* tr3d,
+void collisionDetectionRelativeN2( RigidBody<T> const* const* a,
+                                   Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result );
 
 /** @brief Returns the collisions for all given components using LinkedCell and
 a thread-per-particle policy
 @param fix later */
+template <typename T>
 __global__ 
-void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
+void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                    unsigned int* m_compId,
                                    unsigned int* m_componentCellHash,
                                    unsigned int* m_cellHashStart,
                                    unsigned int* m_cellHashEnd,
-                                   RigidBody const* const* a,
-                                   Transform3d const* tr3d,
+                                   RigidBody<T> const* const* a,
+                                   Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result );
 //@}

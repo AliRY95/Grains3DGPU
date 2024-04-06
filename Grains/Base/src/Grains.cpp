@@ -140,14 +140,14 @@ int main(int argc, char* argv[])
 
     RigidBody<TYPE>** h_rb;
     h_rb = ( RigidBody<TYPE>** ) malloc( sizeof( RigidBody<TYPE>* ) );
-    GrainsCPU::setupRigidBody( particleType, r1, r2, r3, 1.e-3, h_rb );
+    GrainsCPU::setupRigidBody( particleType, r1, r2, r3, TYPE( 1.e-3 ), h_rb );
 
     // Copying the array from host to device
     // __constant__ RigidBody d_rb[1];
     RigidBody<TYPE>** d_rb;
     cudaErrCheck( cudaMalloc( (void**)&d_rb,
                               sizeof( RigidBody<TYPE>* ) ) );
-    GrainsGPU::setupRigidBody<<<1, 1>>>( particleType, r1, r2, r3, 1.e-3, d_rb );
+    GrainsGPU::setupRigidBody<<<1, 1>>>( particleType, r1, r2, r3, TYPE( 1.e-3 ), d_rb );
 
     /* ====================================================================== */
     /* Creating linked cells                                                  */

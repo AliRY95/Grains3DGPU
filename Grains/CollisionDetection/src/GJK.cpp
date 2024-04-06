@@ -1,3 +1,4 @@
+#include "MatrixMath.hh"
 #include "GJK.hh"
 
 
@@ -11,8 +12,8 @@ static INLINE void computeDet( unsigned int const bits,
                                unsigned int const last_bit,
                                unsigned int const all_bits,
                                Vector3<T> const y[4],
-                               T __RESTRICT__ dp[4][4],
-                               T __RESTRICT__ det[16][4] )
+                               T dp[4][4],
+                               T det[16][4] )
 {
     for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<=1 )
         if (bits & bit) 
@@ -104,7 +105,7 @@ static INLINE void computeVector( unsigned int const bits_,
         if ( bits_ & bit )
         {
             sum += det[bits_][i];
-            v += y[i] * det[bits_][i];
+            v += det[bits_][i] * y[i];
         }
     }
     v *= T( 1 ) / sum;
@@ -131,8 +132,8 @@ static INLINE void computePoints( unsigned int const bits_,
         if ( bits_ & bit )
         {
             sum += det[bits_][i];
-            p1 += p[i] * det[bits_][i];
-            p2 += q[i] * det[bits_][i];
+            p1 += det[bits_][i] * p[i];
+            p2 += det[bits_][i] * q[i];
         }
     }
     T s = T( 1 ) / sum;
@@ -166,8 +167,8 @@ static INLINE bool closest( unsigned int& bits,
                             unsigned int const last_bit,
                             unsigned int const all_bits,
                             Vector3<T> const y[4],
-                            T __RESTRICT__ dp[4][4],
-                            T __RESTRICT__ det[16][4],
+                            T dp[4][4],
+                            T det[16][4],
                             Vector3<T>& v )
 {
     unsigned int s;
@@ -363,8 +364,8 @@ T closestPointsGJK( Convex<T> const& a,
     T det[16][4] = { T( 0 ) };       // cached sub-determinants
     T dp[4][4] = { T( 0 ) };
 
-    Vector3<T> v = a2w( a.support( Vector3<T>( 0., 0., 0. ) ) ) - 
-                   b2w( b.support( Vector3<T>( 0., 0., 0. ) ) );
+    Vector3<T> v = a2w( a.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) ) - 
+                   b2w( b.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) );
     Vector3<T> w;
     T dist = v.norm();
     T mu = 0;
@@ -465,3 +466,22 @@ T closestPointsGJK( Convex<T> const& a,
 //         nbIter = num_iterations;
 //     return ( dist );
 // }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+#define X( T ) \
+template                                                                       \
+__HOSTDEVICE__                                                                 \
+T closestPointsGJK( Convex<T> const& a,                                        \
+                    Convex<T> const& b,                                        \
+                    Transform3<T> const& a2w,                                  \
+	                Transform3<T> const& b2w,                                  \
+                    Vector3<T>& pa,                                            \
+                    Vector3<T>& pb,                                            \
+                    int& nbIter );
+X( float )
+X( double )
+#undef X

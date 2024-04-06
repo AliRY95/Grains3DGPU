@@ -23,7 +23,7 @@ ComponentManagerGPU<T>::ComponentManagerGPU()
 {
     // Allocating memory on host
     cudaErrCheck( cudaMalloc( (void**)&m_transform,
-                              numComponents * sizeof( Transform3d ) ) );
+                              numComponents * sizeof( Transform3<T> ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
                               numComponents * numComponents * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_rigidBodyId,
@@ -59,11 +59,11 @@ ComponentManagerGPU<T>::ComponentManagerGPU()
 // Constructor with the number of particles randomly positioned in the 
 // computational domain
 template <typename T>
-ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManager const& cm )
+ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManager<T> const& cm )
 {
     // Allocating memory on host
     cudaErrCheck( cudaMalloc( (void**)&m_transform,
-                              numComponents * sizeof( Transform3d ) ) );
+                              numComponents * sizeof( Transform3<T> ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
                               numComponents * numComponents * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_rigidBodyId,
@@ -416,6 +416,14 @@ void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                                                             numComponents,
                                                             result );
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+// template class ComponentManagerGPU<float>;
+template class ComponentManagerGPU<double>;
 
 
 #undef numCells

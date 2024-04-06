@@ -79,16 +79,17 @@ void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
 // -----------------------------------------------------------------------------
 // N-squared collision detection kernel using a thread-per-particle policy
 // TODO: CLEAN
+template <typename T>
 __global__ 
-void collisionDetectionN2( RigidBody const* const* a,
-                           Transform3d const* tr3d,
+void collisionDetectionN2( RigidBody<T> const* const* a,
+                           Transform3<T> const* tr3d,
                            int numComponents,
                            int* result )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-    RigidBody const& AA = **a;
-    Transform3d const& trA = tr3d[tid];
+    RigidBody<T> const& AA = **a;
+    Transform3<T> const& trA = tr3d[tid];
     for ( int j = 0; j < numComponents; j++ )
         result[tid] += intersectRigidBodies( AA, AA, trA, tr3d[j] );
 }
@@ -99,17 +100,18 @@ void collisionDetectionN2( RigidBody const* const* a,
 // -----------------------------------------------------------------------------
 // N-squared collision detection kernel with relative transformation
 // TODO: CLEAN
+template <typename T>
 __global__ 
-void collisionDetectionRelativeN2( RigidBody const* const* a,
-                                   Transform3d const* tr3d,
+void collisionDetectionRelativeN2( RigidBody<T> const* const* a,
+                                   Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-    RigidBody const& AA = **a;
-    Transform3d const& trA = tr3d[tid];
-    Transform3d trB2A;
+    RigidBody<T> const& AA = **a;
+    Transform3<T> const& trA = tr3d[tid];
+    Transform3<T> trB2A;
     for ( int j = 0; j < numComponents; j++ )
     {
         trB2A = tr3d[j];
@@ -124,14 +126,15 @@ void collisionDetectionRelativeN2( RigidBody const* const* a,
 // -----------------------------------------------------------------------------
 // LinkedCell collision detection kernel 
 // TODO: CLEAN -- A LOT OF THINGS
+template <typename T>
 __global__ 
-void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
+void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                    unsigned int* m_compId,
                                    unsigned int* m_componentCellHash,
                                    unsigned int* m_cellHashStart,
                                    unsigned int* m_cellHashEnd,
-                                   RigidBody const* const* a,
-                                   Transform3d const* tr3d,
+                                   RigidBody<T> const* const* a,
+                                   Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result )
 {
@@ -142,10 +145,10 @@ void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
     
     unsigned int const compId = m_compId[ tid ];
     unsigned int const cellHash = m_componentCellHash[ tid ];
-    RigidBody const& rigidBodyA = **a; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
-    Transform3d const& transformA = tr3d[ compId ];
+    RigidBody<T> const& rigidBodyA = **a; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
+    Transform3<T> const& transformA = tr3d[ compId ];
 
-    ContactInfoD ci;
+    ContactInfo<T> ci;
     for ( int k = -1; k < 2; k++ ) 
     {
         for ( int j = -1; j < 2; j++ ) 
@@ -161,7 +164,7 @@ void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
                     // TODO:
                     // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
                     int secondaryId = m_compId[ id ];
-                    Transform3d const& transformB = tr3d[ secondaryId ];
+                    Transform3<T> const& transformB = tr3d[ secondaryId ];
                     // result[compId] += intersectRigidBodies( rigidBodyA,
                     //                                      rigidBodyA,
                     //                                      transformA, 
@@ -176,3 +179,24 @@ void collisionDetectionLinkedCell( LinkedCellD const* const* LC,
         }
     }
 }
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+#define X( T )                                                                 \
+template                                                                       \
+__global__                                                                     \
+void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,             \
+                                   unsigned int* m_compId,                     \
+                                   unsigned int* m_componentCellHash,          \
+                                   unsigned int* m_cellHashStart,              \
+                                   unsigned int* m_cellHashEnd,                \
+                                   RigidBody<T> const* const* a,               \
+                                   Transform3<T> const* tr3d,                  \
+                                   int numComponents,                          \
+                                   int* result );                              
+X( float )
+X( double )
+#undef X

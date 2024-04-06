@@ -91,26 +91,6 @@ class Vector3
 
         /** @name Operators */
         //@{
-        /** @brief Addition
-        @param vec 2nd Vector3 object */
-        __HOSTDEVICE__
-        Vector3<T> operator + ( Vector3<T> const& vec ) const;
-
-        /** @brief Subtraction
-        @param vec 2nd object */
-        __HOSTDEVICE__
-        Vector3<T> operator - ( Vector3<T> const& vec ) const;
-        
-        /** @brief Multiplication by a scalar
-        @param d multiplication factor */
-        __HOSTDEVICE__
-        Vector3<T> operator * ( T d ) const;
-        
-        /** @brief Division by a scalar
-        @param d division factor */
-        __HOSTDEVICE__
-        Vector3<T> operator / ( T d ) const;
-
         /** @brief Operator +=
         @param vec 2nd Vector3 object */
         __HOSTDEVICE__
@@ -130,17 +110,7 @@ class Vector3
         @param d division factor */
         __HOSTDEVICE__
         Vector3<T>& operator /= ( T d );
-
-        /** @brief dot product
-        @param vec 2nd Vector3 object */
-        __HOSTDEVICE__
-        T operator * ( Vector3<T> const& vec ) const;
         
-        /** @brief Cross product this x rhv
-        @param vec 2nd Vector3 object */
-        __HOSTDEVICE__
-        Vector3<T> operator ^ ( Vector3<T> const& vec ) const;
-
         /** @brief ith component accessor
         @param i component index */
         __HOSTDEVICE__

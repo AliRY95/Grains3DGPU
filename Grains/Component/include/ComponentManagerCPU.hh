@@ -13,7 +13,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class ComponentManagerCPU : public ComponentManager<T>
+class ComponentManagerCPU : public ComponentManager<double>
 {
     public:
         /** @name Constructors */
@@ -97,6 +97,10 @@ class ComponentManagerCPU : public ComponentManager<T>
         // void updateParticles();
         //@}
 };
+
+
+typedef ComponentManagerCPU<float> ComponentManagerCPU_d;
+typedef ComponentManagerCPU<double> ComponentManagerCPU_f;
 
 
 #endif

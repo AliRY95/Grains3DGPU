@@ -129,10 +129,10 @@ for all components using GPU - Kernel
 @param pos position of components
 @param numComponents number of components
 @param componentCellHash hash values for particles */
-// template <typename T>
+template <typename T>
 __global__ 
-void computeLinearLinkedCellHashGPU_kernel( LinkedCell<double> const* const* LC,
-                                            Tr3D const* pos,
+void computeLinearLinkedCellHashGPU_kernel( LinkedCell<T> const* const* LC,
+                                            Transform3<T> const* pos,
                                             unsigned int numComponents,
                                             unsigned int* componentCellHash );
 //@}

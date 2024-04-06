@@ -1,3 +1,4 @@
+#include "VectorMath.hh"
 #include "Vector3.hh"
 
 
@@ -94,7 +95,7 @@ Vector3<T> Vector3<T>::normalized() const
 
 
 // -----------------------------------------------------------------------------
-//Returns the norm of the vector
+// Returns the norm of the vector
 template <typename T>
 __HOSTDEVICE__
 T Vector3<T>::norm() const
@@ -107,7 +108,7 @@ T Vector3<T>::norm() const
 
 
 // -----------------------------------------------------------------------------
-//Returns the norm of the vector - specialized for floats
+// Returns the norm of the vector - specialized for floats
 template <>
 __HOSTDEVICE__
 float Vector3<float>::norm() const
@@ -121,7 +122,7 @@ float Vector3<float>::norm() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the squared norm of the vector
+// Returns the norm squared of the vector
 template <typename T>
 __HOSTDEVICE__
 T Vector3<T>::norm2() const
@@ -191,58 +192,6 @@ void Vector3<float>::round( float tol )
 
 
 // -----------------------------------------------------------------------------
-// Addition
-template <typename T>
-__HOSTDEVICE__
-Vector3<T> Vector3<T>::operator + ( Vector3<T> const& vec ) const
-{
-    return ( Vector3<T>( m_comp[X] + vec.m_comp[X],
-                         m_comp[Y] + vec.m_comp[Y], 
-                         m_comp[Z] + vec.m_comp[Z] ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Subtraction
-template <typename T>
-__HOSTDEVICE__
-Vector3<T> Vector3<T>::operator - ( Vector3<T> const& vec ) const
-{
-    return ( Vector3<T>( m_comp[X] - vec.m_comp[X],
-                         m_comp[Y] - vec.m_comp[Y], 
-                         m_comp[Z] - vec.m_comp[Z] ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Multiplication by a scalar
-template <typename T>
-__HOSTDEVICE__
-Vector3<T> Vector3<T>::operator * ( T d ) const
-{
-    return ( Vector3<T>( m_comp[X] * d, m_comp[Y] * d, m_comp[Z] * d ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Division by a scalar
-template <typename T>
-__HOSTDEVICE__
-Vector3<T> Vector3<T>::operator / ( T d ) const
-{
-    return ( Vector3<T>( m_comp[X] / d, m_comp[Y] / d, m_comp[Z] / d ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
 __HOSTDEVICE__
@@ -297,35 +246,6 @@ Vector3<T>& Vector3<T>::operator /= ( T d )
     m_comp[Y] /= d;
     m_comp[Z] /= d;
     return ( *this );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// dot product
-template <typename T>
-__HOSTDEVICE__
-T Vector3<T>::operator * ( Vector3<T> const& vec ) const
-{
-    return ( m_comp[X] * vec.m_comp[X] + 
-             m_comp[Y] * vec.m_comp[Y] +
-             m_comp[Z] * vec.m_comp[Z] );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Cross product this x vec
-template <typename T>
-__HOSTDEVICE__
-Vector3<T> Vector3<T>::operator ^ ( Vector3<T> const& vec ) const
-{
-    return ( Vector3<T>( 
-        m_comp[1] * vec.m_comp[2] - m_comp[2] * vec.m_comp[1],
-      - m_comp[0] * vec.m_comp[2] + m_comp[2] * vec.m_comp[0],
-        m_comp[0] * vec.m_comp[1] - m_comp[1] * vec.m_comp[0] ) );
 }
 
 

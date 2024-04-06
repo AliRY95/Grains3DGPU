@@ -1,3 +1,4 @@
+#include "VectorMath.hh"
 #include "Transform3.hh"
 #include "LinkedCell.hh"
 
@@ -78,7 +79,7 @@ uint3 LinkedCell<T>::computeCellId( Vector3<T> const& p ) const
 // floats
 template <>
 __host__ __device__ 
-uint3 LinkedCell<float>::computeCellId( Vec3f const& p ) const
+uint3 LinkedCell<float>::computeCellId( Vector3<float> const& p ) const
 {
     uint3 cellId;
     cellId.x = floorf( ( p[X] - m_minCorner[X] ) / m_cellExtent );
@@ -192,11 +193,11 @@ void LinkedCell<T>::computeLinearLinkedCellHashGPU( Transform3<T> const* tr,
 /*                              External Methods                              */
 /* ========================================================================== */
 // Kernel for computing the linear linked cell hash values for all components
-// template <typename T>
 // TODO: CLEAN
+template <typename T>
 __global__ 
-void computeLinearLinkedCellHashGPU_kernel( LinkedCellD const* const* LC,
-                                            Transform3d const* tr,
+void computeLinearLinkedCellHashGPU_kernel( LinkedCell<T> const* const* LC,
+                                            Transform3<T> const* tr,
                                             unsigned int numComponents,
                                             unsigned int* componentCellHash )
 {
@@ -214,14 +215,16 @@ void computeLinearLinkedCellHashGPU_kernel( LinkedCellD const* const* LC,
 
 // -----------------------------------------------------------------------------
 // Explicit instantiation
-// template class LinkedCell<float>;
+template class LinkedCell<float>;
 template class LinkedCell<double>;
-// TODO: Better workaround for this
-// #define X( T ) \
-// template void __global__ computeLinearLinkedCellHashGPU_kernel( LinkedCell<T> const& LC,\
-//                                                                 Transform3<T> const* tr,\
-//                                                                 unsigned int numComponents,\
-//                                                                 unsigned int* componentCellHash );
-// X( float )
-// X( double )
-// #undef X
+
+#define X( T )                                                                 \
+template                                                                       \
+__global__                                                                     \
+void computeLinearLinkedCellHashGPU_kernel( LinkedCell<T> const* const*  LC,   \
+                                            Transform3<T> const* tr,           \
+                                            unsigned int numComponents,        \
+                                            unsigned int* componentCellHash );
+X( float )
+X( double )
+#undef X
