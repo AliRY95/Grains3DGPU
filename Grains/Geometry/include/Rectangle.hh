@@ -1,5 +1,5 @@
-#ifndef _SUPERQUADRIC_HH_
-#define _SUPERQUADRIC_HH_
+#ifndef _RECTANGLE_HH_
+#define _RECTANGLE_HH_
 
 
 #include "ReaderXML.hh"
@@ -7,78 +7,79 @@
 
 
 // =============================================================================
-/** @brief The class Superquadric.
+/** @brief The class Rectangle.
 
-    Convex with the shape of a superquadric.
+    Convex with the shape of a rectangle.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class Superquadric : public Convex<T>
+class Rectangle : public Convex<T>
 {
     protected:
         /** @name Parameters */
         //@{
-        T m_a; /**< scale parameter along the x-axis */
-        T m_b; /**< scale parameter along the y-axis */
-        T m_c; /**< scale parameter along the z-axis */
-        T m_n1; /**< first exponent */
-        T m_n2; /**< second exponent */
+        T m_LX; /**< half-legnth of the X edge */
+        T m_LY; /**< half-legnth of the Y edge */
         //@}
 
 
     public:
         /** @name Constructors */
         //@{
-        /** @brief Constructor with inputs
-        @param a scale parameter along the x-axis
-        @param b scale parameter along the y-axis
-        @param c scale parameter along the z-axis
-        @param n1 first exponent
-        @param n2 second exponent */
-        __HOSTDEVICE__ 
-        Superquadric( T a = T( 0 ), 
-                      T b = T( 0 ), 
-                      T c = T( 0 ),
-                      T n1 = T( 2 ), 
-                      T n2 = T( 2 ) );
+        /** @brief Constructor with the dimensions of the rectangle
+        @param x 1st component
+        @param y 2nd component */
+        __HOSTDEVICE__
+        Rectangle( T x = T( 0 ),
+                   T y = T( 0 ) );
 
         /** @brief Constructor with an input stream
         @param fileIn input stream */
         __HOST__
-        Superquadric( std::istream& fileIn );
+        Rectangle( std::istream& fileIn );
 
         /** @brief Constructor with an XML node as an input parameter
         @param root XML node */
         __HOST__
-        Superquadric( DOMNode* root );
+        Rectangle( DOMNode* root );
 
         /** @brief Destructor */
         __HOSTDEVICE__
-        ~Superquadric();
+        ~Rectangle();
         //@}
 
 
         /** @name Get methods */
         //@{
-        /** @brief Gets the convex type */
+        /** @brief Returns the convex type */
         __HOSTDEVICE__
         ConvexType getConvexType() const final;
         //@}
 
 
+        /** @name Set methods */
+        //@{
+        /** @brief Sets values of the edge length
+        @param x 1st component
+        @param y 2nd component */
+        __HOSTDEVICE__
+        void setExtent( T x,
+                        T y );
+        //@}
+
+
         /** @name Methods */
         //@{
-        /** @brief Computes and returns the circumscribed radius of the 
-        Superquadric */
+        /** @brief Returns the circumscribed radius of the box */
         __HOSTDEVICE__
         T computeCircumscribedRadius() const final;
 
-        /** @brief Returns the Superquadric volume */
+        /** @brief Returns the rectangle volume (area) */
         __HOSTDEVICE__
         T computeVolume() const final;
 
-        /** @brief Computes the inertia tensor and the inverse of the inertia 
+        /** @brief Computes the inertia tensor and the inverse of the inertia
         tensor
         @param inertia inertia tensor
         @param inertia_1 inverse of the inertia tensor */
@@ -87,12 +88,12 @@ class Superquadric : public Convex<T>
                              T* inertia_1 ) const final;
 
         /** @ Returns the half-length of the bounding box fitted to the
-        superquadric without considering the transformation */
+        rectangle without considering the transformation */
         __HOSTDEVICE__
         Vector3<T> computeBoundingBox() const final;
 
-        /** @brief Superquadric support function, returns the support point P,
-        i.e. point on the surface of the Superquadric that satisfies max(P.v)
+        /** @brief Rectnagle support function, returns the support point P, i.e.
+        the point on the surface of the rectangle that satisfies max(P.v)
         @param v direction */
         __HOSTDEVICE__
         Vector3<T> support( Vector3<T> const& v ) const final;
@@ -111,17 +112,17 @@ class Superquadric : public Convex<T>
         __HOST__
         void writeConvex( std::ostream& fileOut ) const final;
 
-        /** @brief Returns the number of points to write the superquadric in a 
+        /** @brief Returns the number of points to write the rectangle in a 
         Paraview format */
         __HOST__
         int numberOfPoints_PARAVIEW() const final;
 
         /** @brief Returns the number of elementary polytopes to write the 
-        superquadric in a Paraview format */
+        rectangle in a Paraview format */
         __HOST__
         int numberOfCells_PARAVIEW() const final;
 
-        /** @brief Returns a list of points describing the superquadric in a 
+        /** @brief Returns a list of points describing the rectangle in a 
         Paraview format
         @param transform geometric transformation
         @param translation additional center of mass translation */
@@ -131,8 +132,7 @@ class Superquadric : public Convex<T>
                                                 Vector3<T> const* translation )
                                                 const final;
 
-        /** @brief Writes the connectivity of the superquadric in a Paraview 
-        format
+        /** @brief Writes the connectivity of the rectangle in a Paraview format
         @param connectivity connectivity of Paraview polytopes
         @param offsets connectivity offsets
         @param cellstype Paraview polytopes type
@@ -148,8 +148,8 @@ class Superquadric : public Convex<T>
 };
 
 
-typedef Superquadric<float> SuperquadricF;
-typedef Superquadric<double> SuperquadricD;
+typedef Rectangle<float> RectangleF;
+typedef Rectangle<double> RectangleD;
 
 
 #endif

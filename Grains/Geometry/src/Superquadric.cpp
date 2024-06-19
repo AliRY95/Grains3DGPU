@@ -345,7 +345,8 @@ Vector3<T> Superquadric<T>::support( Vector3<T> const& v ) const
 
 // -----------------------------------------------------------------------------
 // Superquadric support function, returns the support point P, i.e. the point on
-// the surface of the Superquadric that satisfies max(P.v) - 
+// the surface of the Superquadric that satisfies max(P.v) - specialized for
+// floats
 template <>
 __HOSTDEVICE__
 Vector3<float> Superquadric<float>::support( Vector3<float> const& v ) const

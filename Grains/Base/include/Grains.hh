@@ -1,17 +1,8 @@
 #ifndef _GRAINS_HH_
 #define _GRAINS_HH_
 
-#include "GrainsExec.hh"
-#include "AllComponents.hh"
-#include "App.hh"
-#include "solvercomputingtime.hh"
-#include "computingtime.hh"
+#include "ComponentManager.hh"
 #include "LinkedCell.hh"
-#include <list>
-#include <vector>
-#include <string>
-#include <iostream>
-
 #include "ReaderXML.hh"
 
 
@@ -51,11 +42,11 @@ class Grains
         @param rootElement XML root */
         virtual void initialize( DOMElement* rootElement );
 
-        /** @brief Runs the simulation over the prescribed time interval */
-        virtual void Simulation() ; 
+        // /** @brief Runs the simulation over the prescribed time interval */
+        // virtual void Simulation() ; 
 
-        /** @brief Tasks to perform after time-stepping */
-        virtual void finalize();
+        // /** @brief Tasks to perform after time-stepping */
+        // virtual void finalize();
         //@}
 
 

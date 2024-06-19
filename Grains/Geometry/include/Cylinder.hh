@@ -1,5 +1,5 @@
-#ifndef _SUPERQUADRIC_HH_
-#define _SUPERQUADRIC_HH_
+#ifndef _CYLINDER_HH_
+#define _CYLINDER_HH_
 
 
 #include "ReaderXML.hh"
@@ -7,23 +7,20 @@
 
 
 // =============================================================================
-/** @brief The class Superquadric.
+/** @brief The class Cylinder.
 
-    Convex with the shape of a superquadric.
+    Convex with the shape of a cylinder.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class Superquadric : public Convex<T>
+class Cylinder : public Convex<T>
 {
     protected:
         /** @name Parameters */
         //@{
-        T m_a; /**< scale parameter along the x-axis */
-        T m_b; /**< scale parameter along the y-axis */
-        T m_c; /**< scale parameter along the z-axis */
-        T m_n1; /**< first exponent */
-        T m_n2; /**< second exponent */
+        T m_radius; /**< cylinder radius */
+        T m_halfHeight; /**< cylinder half height */
         //@}
 
 
@@ -31,31 +28,25 @@ class Superquadric : public Convex<T>
         /** @name Constructors */
         //@{
         /** @brief Constructor with inputs
-        @param a scale parameter along the x-axis
-        @param b scale parameter along the y-axis
-        @param c scale parameter along the z-axis
-        @param n1 first exponent
-        @param n2 second exponent */
+        @param r cylinder radius
+        @param h cylinder height */
         __HOSTDEVICE__ 
-        Superquadric( T a = T( 0 ), 
-                      T b = T( 0 ), 
-                      T c = T( 0 ),
-                      T n1 = T( 2 ), 
-                      T n2 = T( 2 ) );
+        Cylinder( T r = T( 0 ), 
+                  T h = T( 0 ) );
 
         /** @brief Constructor with an input stream
         @param fileIn input stream */
         __HOST__
-        Superquadric( std::istream& fileIn );
+        Cylinder( std::istream& fileIn );
 
         /** @brief Constructor with an XML node as an input parameter
         @param root XML node */
         __HOST__
-        Superquadric( DOMNode* root );
+        Cylinder( DOMNode* root );
 
         /** @brief Destructor */
         __HOSTDEVICE__
-        ~Superquadric();
+        ~Cylinder();
         //@}
 
 
@@ -70,11 +61,11 @@ class Superquadric : public Convex<T>
         /** @name Methods */
         //@{
         /** @brief Computes and returns the circumscribed radius of the 
-        Superquadric */
+        cylinder */
         __HOSTDEVICE__
         T computeCircumscribedRadius() const final;
 
-        /** @brief Returns the Superquadric volume */
+        /** @brief Returns the cylinder volume */
         __HOSTDEVICE__
         T computeVolume() const final;
 
@@ -87,12 +78,12 @@ class Superquadric : public Convex<T>
                              T* inertia_1 ) const final;
 
         /** @ Returns the half-length of the bounding box fitted to the
-        superquadric without considering the transformation */
+        cylinder without considering the transformation */
         __HOSTDEVICE__
         Vector3<T> computeBoundingBox() const final;
 
-        /** @brief Superquadric support function, returns the support point P,
-        i.e. point on the surface of the Superquadric that satisfies max(P.v)
+        /** @brief Cylinder support function, returns the support point P,
+        i.e. point on the surface of the cylinder that satisfies max(P.v)
         @param v direction */
         __HOSTDEVICE__
         Vector3<T> support( Vector3<T> const& v ) const final;
@@ -111,17 +102,17 @@ class Superquadric : public Convex<T>
         __HOST__
         void writeConvex( std::ostream& fileOut ) const final;
 
-        /** @brief Returns the number of points to write the superquadric in a 
+        /** @brief Returns the number of points to write the cylinder in a 
         Paraview format */
         __HOST__
         int numberOfPoints_PARAVIEW() const final;
 
         /** @brief Returns the number of elementary polytopes to write the 
-        superquadric in a Paraview format */
+        cylinder in a Paraview format */
         __HOST__
         int numberOfCells_PARAVIEW() const final;
 
-        /** @brief Returns a list of points describing the superquadric in a 
+        /** @brief Returns a list of points describing the cylinder in a 
         Paraview format
         @param transform geometric transformation
         @param translation additional center of mass translation */
@@ -131,7 +122,7 @@ class Superquadric : public Convex<T>
                                                 Vector3<T> const* translation )
                                                 const final;
 
-        /** @brief Writes the connectivity of the superquadric in a Paraview 
+        /** @brief Writes the connectivity of the cylinder in a Paraview 
         format
         @param connectivity connectivity of Paraview polytopes
         @param offsets connectivity offsets
@@ -148,8 +139,8 @@ class Superquadric : public Convex<T>
 };
 
 
-typedef Superquadric<float> SuperquadricF;
-typedef Superquadric<double> SuperquadricD;
+typedef Cylinder<float> CylinderF;
+typedef Cylinder<double> CylinderD;
 
 
 #endif
