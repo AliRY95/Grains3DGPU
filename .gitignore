@@ -45,8 +45,9 @@
 ### Folders ###
 Grains/include/
 Grains/obj/
-Grains/DraftCodes/
-
+Grains/lib/
+# Grains/DraftCodes/
+XERCES-2.8.0/
 
 ### MISC ###
 *.vscode
