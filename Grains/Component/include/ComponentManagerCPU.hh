@@ -86,8 +86,9 @@ class ComponentManagerCPU : public ComponentManager<double>
         // void createNeighborList();
 
         /** @brief Detects collision between particles */
+        // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
-                              RigidBody<T> const* const* rb, 
+                              RigidBody<T, double> const* const* rb, 
                               int* result );
 
         // /** @brief Computes impact forces */

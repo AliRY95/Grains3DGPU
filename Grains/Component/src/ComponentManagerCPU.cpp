@@ -243,7 +243,7 @@ void ComponentManagerCPU<T>::setCellHashStart( unsigned int const* id )
 // Detects collision between particles
 template <typename T>
 void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T> const* const* rb, 
+                                              RigidBody<T, double> const* const* rb, 
                                               int* result )
 {
     // for ( int i = 0; i < numComponents; i++ )
@@ -298,7 +298,7 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
     {
         unsigned int const compId = m_componentId[ pId ];
         unsigned int const cellHash = m_componentCellHash[ pId ];
-        RigidBody<T> const& rigidBodyA = **rb; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
+        RigidBody<T, double> const& rigidBodyA = **rb; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
         Transform3<T> const& transformA = m_transform[ compId ];
         for ( int k = -1; k < 2; k++ )
         {

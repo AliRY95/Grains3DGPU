@@ -264,6 +264,18 @@ T Vector3<T>::operator [] ( size_t i ) const
 
 
 // -----------------------------------------------------------------------------
+// ith component accessor - modifiable lvalue
+template <typename T>
+__HOSTDEVICE__
+T& Vector3<T>::operator [] ( size_t i )
+{
+    return ( m_comp[i] );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Equal operator to another Vector3 object
 template <typename T>
 __HOSTDEVICE__
@@ -335,7 +347,42 @@ Vector3<double>::operator Vector3<float> () const
 
 
 
+// --------------------------------------------------------------------------
+// Output operator
+template <typename T>
+__HOST__
+std::ostream& operator << ( std::ostream& fileOut, 
+                                        Vector3<T> const& v )
+{
+    fileOut << v[X] << " " << v[Y] << " " << v[Z];
+    return ( fileOut );
+}
+
+
+
+
+// --------------------------------------------------------------------------
+// Input operator
+template <typename T>
+__HOST__
+std::istream& operator >> ( std::istream& fileIn, 
+                                        Vector3<T>& v )
+{
+    fileIn >> v[X] >> v[Y] >> v[Z];
+    return ( fileIn );
+}
+
+
+
+
 // -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Vector3<float>;
 template class Vector3<double>;
+
+#define X( T ) \
+template std::ostream& operator << <T>( std::ostream& fileOut, Vector3<T> const& v );\
+template std::istream& operator >> <T>( std::istream& fileIn, Vector3<T>& v );
+X( float )
+X( double )
+#undef X

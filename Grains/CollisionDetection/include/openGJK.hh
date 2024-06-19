@@ -40,11 +40,11 @@
  *
  * Default is set to 64-bit (Double). Change this to quickly play around with 16- and 32-bit. */
 // #ifdef USE_32BITS
-// #define gkFloat   float
-// #define gkEpsilon FLT_EPSILON
+#define gkFloat   float
+#define gkEpsilon FLT_EPSILON
 // #else
-#define gkFloat   double
-#define gkEpsilon DBL_EPSILON
+// #define gkFloat   double
+// #define gkEpsilon DBL_EPSILON
 // #endif
 
 /*! @brief Data structure for simplex.

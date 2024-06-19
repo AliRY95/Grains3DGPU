@@ -15,12 +15,12 @@ static INLINE void computeDet( unsigned int const bits,
                                T dp[4][4],
                                T det[16][4] )
 {
-    for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<=1 )
-        if (bits & bit) 
+    for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
+        if ( bits & bit ) 
             dp[i][last] = dp[last][i] = y[i] * y[last];
     dp[last][last] = y[last] * y[last];
 
-    det[last_bit][last] = 1.;
+    det[last_bit][last] = T( 1 );
     for ( unsigned int j = 0, sj = 1; j < 4; ++j, sj <<= 1 )
     {
         if ( bits & sj )

@@ -180,6 +180,10 @@ class Transform3
         @param t the other Transform object */
         __HOSTDEVICE__
         Transform3<T>& operator = ( Transform3<T> const& t );
+
+        /** @brief Conversion operator float */
+        __HOSTDEVICE__
+        operator Transform3<float> () const;
         //@}  
 };
 

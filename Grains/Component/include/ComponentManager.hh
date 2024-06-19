@@ -110,8 +110,9 @@ class ComponentManager
         // void createNeighborList();
 
         /** @brief Detects collision between particles */
+        // template <typename U>
         virtual void detectCollision( LinkedCell<T> const* const* LC,
-                                      RigidBody<T> const* const* rb, 
+                                      RigidBody<T, double> const* const* rb, 
                                       int* result ) = 0;
 
         // /** @brief Computes impact forces */

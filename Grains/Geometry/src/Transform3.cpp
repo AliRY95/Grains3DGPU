@@ -162,7 +162,7 @@ void Transform3<float>::setBasis( float aX,
                      cosf(aY)*cosf(aX) );
 }
 
-
+ 
 
 
 // -----------------------------------------------------------------------------
@@ -334,6 +334,24 @@ Transform3<T>& Transform3<T>::operator = ( Transform3<T> const& t )
         m_origin = t.m_origin;
     }
     return ( *this );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Conversion operator to float
+template <>
+__HOSTDEVICE__
+Transform3<double>::operator Transform3<float> () const
+{
+    Matrix3<double> const m = m_basis;
+    Vector3<double> const v = m_origin;
+    float const t[12] = { (float) m[X][X], (float) m[X][Y], (float) m[X][Z],
+                          (float) m[Y][X], (float) m[Y][Y], (float) m[Y][Z],
+                          (float) m[Z][X], (float) m[Z][Y], (float) m[Z][Z],
+                          (float) v[X]   , (float) v[Y]   , (float) v[X]    };
+    return ( Transform3<float> ( t ) );
 }
 
 

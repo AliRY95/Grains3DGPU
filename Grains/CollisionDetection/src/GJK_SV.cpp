@@ -2,8 +2,10 @@
 #include "GJK_SV.hh"
 
 
-#define eps_rel22        (gkFloat) gkEpsilon * 1e4f
-#define eps_tot22        (gkFloat) gkEpsilon * 1e2f
+// #define eps_rel22        FLT_EPSILON * 1e4f
+// #define eps_tot22        FLT_EPSILON * 1e2f
+#define eps_rel22        1.0e-10
+#define eps_tot22        FLT_EPSILON * 1e2f
 
 
 /* ========================================================================== */
@@ -227,7 +229,7 @@ static INLINE void S3D( Simplex<T>& s,
     Vector3<T> si, sj, sk;
     int testLineThree, testLineFour, testPlaneTwo, 
         testPlaneThree, testPlaneFour, dotTotal;
-    int i, j, k, t;
+    int i, j, k;
 
     s1 = s.vrtx[3];
     s2 = s.vrtx[2];
@@ -703,33 +705,45 @@ T closestPointsGJK_SV( Convex<T> const& a,
 {
     unsigned int k = 0;                // iteration counter
     int const mk = 25;                 // maximum number of GJK iterations
-
+    T const eps_rel = eps_rel22;       // tolerance on relative
+    T const eps_tot = eps_tot22;       // tolerance on absolute distance
+    T const eps_rel2 = eps_rel * eps_rel;
+    T const eps_tot2 = eps_tot * eps_tot;
     unsigned int i;
     /* Initialise search direction */
-    Vector3<T> v = a2w( a.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) ) - 
-                   b2w( b.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) );
-    Vector3<T> w;
+    Vector3<T> c2c = a2w.getOrigin() - b2w.getOrigin();
+    Vector3<T> w = a2w( a.support( ( -c2c ) * a2w.getBasis() ) ) - 
+                   b2w( b.support( c2c * b2w.getBasis() ) );
+    Vector3<T> v = w;
+    Vector3<T> d = w;
     T norm2Wmax = 0;
+    T momentum = T( 0 ), oneMinusMomentum = T( 1 );
+    T dist2 = norm2( v );
 
     /* Initalise simplex */
     Simplex<T> s = { 1, { Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) } };
-    s.vrtx[0] = v;
+    s.vrtx[0] = w;
 
     /* Begin GJK iteration */
     do {
+        momentum = ( k + T( 1 ) ) / ( k + T( 3 ) );
+        oneMinusMomentum = T( 1 ) - momentum;
+        d = momentum * d + 
+            momentum * oneMinusMomentum * w +
+            oneMinusMomentum * oneMinusMomentum * v;
         k++;
 
-        w = a2w( a.support( ( -v ) * a2w.getBasis() ) ) - 
-            b2w( b.support( v * b2w.getBasis() ) );
+        w = a2w( a.support( ( -d ) * a2w.getBasis() ) ) - 
+            b2w( b.support( d * b2w.getBasis() ) );
 
         // Test first exit condition (new point already in simplex/can't move
         // further)
-        T exeedtol_rel = ( norm2( v ) - ( v * w ) );
-        if ( exeedtol_rel < LOWEPS * norm2( v ) || 
-             exeedtol_rel < LOWEPS )
+        T exeedtol_rel = ( dist2 - ( v * w ) );
+        if ( exeedtol_rel < eps_rel * dist2 || 
+             exeedtol_rel < eps_tot22 )
             break;
 
-        if ( norm2( v ) < LOWEPS )
+        if ( dist2 < eps_rel2 )
             break;
 
         // Add new vertex to simplex
@@ -739,6 +753,7 @@ T closestPointsGJK_SV( Convex<T> const& a,
 
         /* Invoke distance sub-algorithm */
         subalgorithm( s, v );
+        dist2 = norm2( v );
 
         /* Test */
         for ( int jj = 0; jj < s.nvrtx; jj++ )
@@ -748,12 +763,12 @@ T closestPointsGJK_SV( Convex<T> const& a,
                 norm2Wmax = tesnorm;
         }
 
-        if ( norm2( v ) < EPSILON2 * norm2Wmax )
+        if ( dist2 < eps_tot2 * norm2Wmax )
             break;
 
     } while ( ( s.nvrtx != 4 ) && ( k != mk ) );
     nbIter = k;
-    return ( norm( v ) );
+    return ( sqrt( dist2 ) );
 }
 
 

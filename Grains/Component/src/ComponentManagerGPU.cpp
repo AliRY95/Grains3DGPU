@@ -364,7 +364,7 @@ void ComponentManagerGPU<T>::updateLinkedCellList(
 // TODO: thread safety flag and MaxOccupancy
 template <typename T>
 void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T> const* const* rb, 
+                                              RigidBody<T, double> const* const* rb, 
                                               int* result )
 {
     unsigned int numThreads = 256;

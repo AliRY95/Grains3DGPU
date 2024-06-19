@@ -1,6 +1,7 @@
 #ifndef _VECTOR3_HH_
 #define _VECTOR3_HH_
 
+#include "Basic.hh"
 #include "MiscMath.hh"
 
 
@@ -10,6 +11,13 @@
     Vector/Point in a 3D space.
 
     @author A.Yazdani - 2023 - Construction */
+// =============================================================================
+// Forward declaration
+// template <typename T> class Vector3;
+// template <typename T> std::ostream& operator << ( std::ostream &fileOut, 
+//                                                   Vector3<T> const& v );
+// template <typename T> std::istream& operator >> ( std::istream &fileIn, 
+//                                                   Vector3<T>& v );
 // =============================================================================
 template <typename T>
 class Vector3
@@ -116,6 +124,11 @@ class Vector3
         __HOSTDEVICE__
         T operator [] ( size_t i ) const;
 
+        /** @brief ith component accessor - modifiable lvalue
+        @param i component index */
+        __HOSTDEVICE__
+        T& operator [] ( size_t i );
+
         /** @brief Assign operator to another Vector3 object
         @param vec rhs Vector3 object */
         __HOSTDEVICE__
@@ -140,7 +153,45 @@ class Vector3
         __HOSTDEVICE__
         operator Vector3<float> () const;
         //@}
+
+        // /** @name I/O methods */
+        // //@{
+        // /** @brief Input operator
+        // @param fileIn input stream
+        // @param v vector */
+        // __HOST__
+        // std::istream& operator >> ( std::istream& fileIn, 
+        //                                 Vector3<T>& v );
+
+        // /** @brief Output operator
+        // @param fileOut output stream
+        // @param v vector */
+        // __HOST__
+        // std::ostream& operator << ( std::ostream& fileOut, 
+        //                                 Vector3<T> const& v );
+        // //@}
 };
+
+
+
+/** @name External Methods - I/O methods */
+//@{
+/** @brief Input operator
+@param fileIn input stream
+@param v vector */
+template <typename T>
+__HOST__
+std::istream& operator >> ( std::istream& fileIn, 
+                            Vector3<T>& v );
+
+/** @brief Output operator
+@param fileOut output stream
+@param g vector */
+template <typename T>
+__HOST__
+std::ostream& operator << ( std::ostream& fileOut, 
+                            Vector3<T> const& v );
+//@}
 
 
 typedef Vector3<float> Vec3F;

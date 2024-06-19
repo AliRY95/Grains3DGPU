@@ -14,7 +14,7 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-template <typename T>
+template <typename T, typename U>
 class RigidBody
 {
     protected:
@@ -25,8 +25,8 @@ class RigidBody
         T m_volume; /**< Rigid body's volume */
         T* m_inertia; /**< Rigid body's inertia */
         T* m_inertia_1; /**< Rigid body's inversed inertia */
-        BoundingBox<T>* m_boundingBox; /** Bounding box of the convex body **/
-        T m_circumscribedRadius; /**< Circumscribed radius */
+        BoundingBox<U>* m_boundingBox; /** Bounding box of the convex body **/
+        U m_circumscribedRadius; /**< Circumscribed radius */
         //@}
 
     public:
@@ -45,7 +45,7 @@ class RigidBody
         /** @brief Copy constructor
         @param rb RigidBody object to be copied */
         __HOSTDEVICE__
-        RigidBody( RigidBody<T> const& rb );
+        RigidBody( RigidBody<T, U> const& rb );
 
         /** @brief Destructor */
         __HOSTDEVICE__
@@ -77,11 +77,11 @@ class RigidBody
 
         /** @brief Gets the rigid body's bounding box */
         __HOSTDEVICE__ 
-        BoundingBox<T>* getBoundingBox() const;
+        BoundingBox<U>* getBoundingBox() const;
 
         /** @brief Gets the rigid body's circumscribed radius */
         __HOSTDEVICE__
-        T getCircumscribedRadius() const;
+        U getCircumscribedRadius() const;
         //@}
 
         
@@ -119,8 +119,9 @@ class RigidBody
 };
 
 
-typedef RigidBody<float> RigidBodyF;
-typedef RigidBody<double> RigidBodyD;
+typedef RigidBody<float, float> RigidBodyF;
+typedef RigidBody<double, float> RigidBodyDF;
+typedef RigidBody<double, double> RigidBodyD;
 
 
 /** @name RigidBody : External methods collision detection */
@@ -132,10 +133,10 @@ typedef RigidBody<double> RigidBodyD;
  frame
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
- template <typename T>
+ template <typename T, typename U>
 __HOSTDEVICE__ 
-bool intersectRigidBodies( RigidBody<T> const& rbA,
-                           RigidBody<T> const& rbB,
+bool intersectRigidBodies( RigidBody<T, U> const& rbA,
+                           RigidBody<T, U> const& rbB,
                            Transform3<T> const& a2w,
                            Transform3<T> const& b2w );
 
@@ -144,11 +145,25 @@ bool intersectRigidBodies( RigidBody<T> const& rbA,
  @param rbB second rigid body
  @param b2a geometric tramsformation describing convex B in the A's reference
  frame */
- template <typename T>
+ template <typename T, typename U>
 __HOSTDEVICE__
-bool intersectRigidBodies( RigidBody<T> const& rbA,
-                           RigidBody<T> const& rbB,
+bool intersectRigidBodies( RigidBody<T, U> const& rbA,
+                           RigidBody<T, U> const& rbB,
                            Transform3<T> const& b2a );
+
+/** @brief Returns the contact information (if any) for 2 rigid bodies
+ @param rbA first rigid body
+ @param rbB second rigid body
+ @param a2w geometric tramsformation describing convex A in the world reference
+ frame
+ @param b2w geometric tramsformation describing convex B in the world reference
+ frame */
+ template <typename T, typename U>
+__HOSTDEVICE__
+ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
+                                         RigidBody<T, U> const& rbB,
+                                         Transform3<T> const& a2w,
+                                         Transform3<T> const& b2w );
 
 /** @brief Returns the contact information (if any) for 2 rigid bodies
  @param rbA first rigid body
@@ -159,11 +174,11 @@ bool intersectRigidBodies( RigidBody<T> const& rbA,
  frame */
  template <typename T>
 __HOSTDEVICE__
-ContactInfo<T> closestPointsRigidBodies( RigidBody<T> const& rbA,
-                                         RigidBody<T> const& rbB,
+ContactInfo<T> closestPointsRigidBodies( RigidBody<T, T> const& rbA,
+                                         RigidBody<T, T> const& rbB,
                                          Transform3<T> const& a2w,
                                          Transform3<T> const& b2w );
-
+                                         
 // TODO: LATER
 // /** @brief Returns the contact information (if any) for 2 rigid bodies - 
 // relative transformation

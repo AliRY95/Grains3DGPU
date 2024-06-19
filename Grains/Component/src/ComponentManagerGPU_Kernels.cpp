@@ -79,16 +79,16 @@ void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
 // -----------------------------------------------------------------------------
 // N-squared collision detection kernel using a thread-per-particle policy
 // TODO: CLEAN
-template <typename T>
+template <typename T, typename U>
 __global__ 
-void collisionDetectionN2( RigidBody<T> const* const* a,
+void collisionDetectionN2( RigidBody<T, U> const* const* a,
                            Transform3<T> const* tr3d,
                            int numComponents,
                            int* result )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-    RigidBody<T> const& AA = **a;
+    RigidBody<T, U> const& AA = **a;
     Transform3<T> const& trA = tr3d[tid];
     for ( int j = 0; j < numComponents; j++ )
         result[tid] += intersectRigidBodies( AA, AA, trA, tr3d[j] );
@@ -100,16 +100,16 @@ void collisionDetectionN2( RigidBody<T> const* const* a,
 // -----------------------------------------------------------------------------
 // N-squared collision detection kernel with relative transformation
 // TODO: CLEAN
-template <typename T>
+template <typename T, typename U>
 __global__ 
-void collisionDetectionRelativeN2( RigidBody<T> const* const* a,
+void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
                                    Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-    RigidBody<T> const& AA = **a;
+    RigidBody<T, U> const& AA = **a;
     Transform3<T> const& trA = tr3d[tid];
     Transform3<T> trB2A;
     for ( int j = 0; j < numComponents; j++ )
@@ -126,14 +126,14 @@ void collisionDetectionRelativeN2( RigidBody<T> const* const* a,
 // -----------------------------------------------------------------------------
 // LinkedCell collision detection kernel 
 // TODO: CLEAN -- A LOT OF THINGS
-template <typename T>
+template <typename T, typename U>
 __global__ 
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                    unsigned int* m_compId,
                                    unsigned int* m_componentCellHash,
                                    unsigned int* m_cellHashStart,
                                    unsigned int* m_cellHashEnd,
-                                   RigidBody<T> const* const* a,
+                                   RigidBody<T, U> const* const* a,
                                    Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result )
@@ -145,7 +145,7 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
     
     unsigned int const compId = m_compId[ tid ];
     unsigned int const cellHash = m_componentCellHash[ tid ];
-    RigidBody<T> const& rigidBodyA = **a; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
+    RigidBody<T, U> const& rigidBodyA = **a; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
     Transform3<T> const& transformA = tr3d[ compId ];
 
     ContactInfo<T> ci;
@@ -185,7 +185,7 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
 
 // -----------------------------------------------------------------------------
 // Explicit instantiation
-#define X( T )                                                                 \
+#define X( T, U )                                                              \
 template                                                                       \
 __global__                                                                     \
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,             \
@@ -193,10 +193,11 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,             \
                                    unsigned int* m_componentCellHash,          \
                                    unsigned int* m_cellHashStart,              \
                                    unsigned int* m_cellHashEnd,                \
-                                   RigidBody<T> const* const* a,               \
+                                   RigidBody<T, U> const* const* a,            \
                                    Transform3<T> const* tr3d,                  \
                                    int numComponents,                          \
                                    int* result );                              
-X( float )
-X( double )
+X( float, float )
+X( double, float )
+X( double, double )
 #undef X

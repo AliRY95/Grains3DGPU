@@ -2,6 +2,7 @@
 #define _SPHERE_HH_
 
 
+#include "ReaderXML.hh"
 #include "Convex.hh"
 
 
@@ -29,6 +30,16 @@ class Sphere : public Convex<T>
         @param r radius */
         __HOSTDEVICE__
         Sphere( T r );
+
+        /** @brief Constructor with an input stream
+        @param fileIn input stream */
+        __HOST__
+        Sphere( std::istream& fileIn );
+
+        /** @brief Constructor with an XML node as an input parameter
+        @param root XML node */
+        __HOST__
+        Sphere( DOMNode* root );
 
         /** @brief Destructor */
         __HOSTDEVICE__
@@ -85,6 +96,53 @@ class Sphere : public Convex<T>
         @param v direction */
         __HOSTDEVICE__
         Vector3<T> support( Vector3<T> const& v ) const final;
+        //@}
+
+
+        /** @name I/O methods */
+        //@{
+        /** @brief Input operator
+        @param fileIn input stream */
+        __HOST__
+        void readConvex( std::istream& fileIn ) final;
+
+        /** @brief Output operator
+        @param fileOut output stream */
+        __HOST__
+        void writeConvex( std::ostream& fileOut ) const final;
+
+        /** @brief Returns the number of points to write the sphere in a 
+        Paraview format */
+        __HOST__
+        int numberOfPoints_PARAVIEW() const final;
+
+        /** @brief Returns the number of elementary polytopes to write the 
+        sphere in a Paraview format */
+        __HOST__
+        int numberOfCells_PARAVIEW() const final;
+
+        /** @brief Returns a list of points describing the sphere in a Paraview
+        format
+        @param transform geometric transformation
+        @param translation additional center of mass translation */
+        __HOST__
+        std::list<Vector3<T>> writePoints_PARAVIEW( 
+                                                Transform3<T> const& transform,
+                                                Vector3<T> const* translation )
+                                                const final;
+
+        /** @brief Writes the connectivity of the sphere in a Paraview format
+        @param connectivity connectivity of Paraview polytopes
+        @param offsets connectivity offsets
+        @param cellstype Paraview polytopes type
+        @param firstpoint_globalnumber global number of the 1st point
+        @param last_offset last offset used for the previous convex shape */
+        __HOST__
+        void writeConnection_PARAVIEW( std::list<int>& connectivity,
+                                       std::list<int>& offsets, 
+                                       std::list<int>& cellstype, 
+                                       int& firstpoint_globalnumber,
+                                       int& last_offset ) const final;
         //@}
 };
 

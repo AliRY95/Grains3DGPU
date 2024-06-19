@@ -640,13 +640,14 @@ T closestPointsGJK_SV2( Convex<T> const& a,
   gkFloat v[3];
   gkFloat norm2Wmax = 0;
 
-  Vector3<T> vVec;
+  Vector3<T> vVec = a2w( a.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) ) - 
+                    b2w( b.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) );
   Vector3<T> wVec;
 
   /* Initialise search direction */
-  v[0] = 0.;
-  v[1] = 0.;
-  v[2] = 0.;
+  v[0] = vVec[X];
+  v[1] = vVec[Y];
+  v[2] = vVec[Z];
 
   /* Initalise simplex */
   gkSimplex s = { 1, { 0. } };

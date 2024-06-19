@@ -2,6 +2,7 @@
 #define _CONVEX_HH_
 
 
+#include <list>
 #include "Transform3.hh"
 #include "BoundingBox.hh"
 
@@ -85,6 +86,69 @@ class Convex
         __HOSTDEVICE__
         virtual Vector3<T> support( Vector3<T> const& v ) const = 0;
         //@}
+
+
+        /** @name I/O methods */
+        //@{
+        /** @brief Input operator
+        @param fileIn input stream */
+        __HOST__
+        virtual void readConvex( std::istream& fileIn ) = 0;
+
+        /** @brief Output operator
+        @param fileOut output stream */
+        __HOST__
+        virtual void writeConvex( std::ostream& fileOut ) const = 0;
+
+        /** @brief Returns the number of points to write the convex in a 
+        Paraview format */
+        __HOST__
+        virtual int numberOfPoints_PARAVIEW() const = 0;
+
+        /** @brief Returns the number of elementary polytopes to write the 
+        convex in a Paraview format */
+        __HOST__
+        virtual int numberOfCells_PARAVIEW() const = 0;
+
+        /** @brief Returns a list of points describing the convex in a Paraview
+        format
+        @param transform geometric transformation
+        @param translation additional center of mass translation */
+        __HOST__
+        virtual std::list<Vector3<T>> writePoints_PARAVIEW( 
+                                                Transform3<T> const& transform,
+                                                Vector3<T> const* translation )
+                                                const = 0;
+
+        /** @brief Writes the connectivity of the convex in a Paraview format
+        @param connectivity connectivity of Paraview polytopes
+        @param offsets connectivity offsets
+        @param cellstype Paraview polytopes type
+        @param firstpoint_globalnumber global number of the 1st point
+        @param last_offset last offset used for the previous convex shape */
+        __HOST__
+        virtual void writeConnection_PARAVIEW( std::list<int>& connectivity,
+                                               std::list<int>& offsets, 
+                                               std::list<int>& cellstype, 
+                                               int& firstpoint_globalnumber,
+                                               int& last_offset ) const = 0;
+        //@}
+
+
+        // /** @name Operators */
+        // //@{
+        // /** @brief Input operator
+        // @param fileIn input stream
+        // @param convex Convex object*/
+        // std::istream& operator >> ( std::istream& fileIn,
+        //                             Convex<T>& convex );
+
+        // /** @brief Output operator
+        // @param fileOut output stream
+        // @param convex Convex object */
+        // std::ostream& operator << ( std::ostream& fileOut, 
+        //                             Convex<T> const& convex );
+        // //@}        
 };
 
 

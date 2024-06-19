@@ -4,6 +4,9 @@
 #include <float.h>
 #include <stdio.h>
 #include <iostream>
+#include <ostream>
+#include <istream>
+#include <list>
 #include <cmath>
 #include <new>
 #include <chrono>
@@ -47,6 +50,14 @@ enum Direction
 #define HIGHEPS        1.0e-20
 #define TIMEFORMAT     10
 #define POSITIONFORMAT 16
+#define shiftString0   "" 
+#define shiftString1   " "
+#define shiftString2   "  "
+#define shiftString3   "   "
+#define shiftString6   "      "
+#define shiftString9   "         "
+#define shiftString12  "            "
+#define shiftString15  "               "
 //@}
 
 

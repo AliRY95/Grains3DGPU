@@ -23,6 +23,11 @@ INCDIRGEOMETRY := Geometry/include
 INCDIR += $(INCDIRGEOMETRY)
 ALLINC += $(wildcard $(INCDIRGEOMETRY)/*.hh)
 
+SRCDIRXML := XML/src
+INCDIRXML := XML/include
+INCDIR += $(INCDIRXML)
+ALLINC += $(wildcard $(INCDIRXML)/*.hh)
+
 
 # Source files per package
 # _WP_ means "with path"
@@ -38,9 +43,13 @@ SRCFILESCOLLISION := $(subst $(SRCDIRCOLLISION)/,,$(SRCFILES_WP_COLLISION))
 SRCFILES_WP_GEOMETRY := $(wildcard $(SRCDIRGEOMETRY)/*.cpp)
 SRCFILESGEOMETRY := $(subst $(SRCDIRGEOMETRY)/,,$(SRCFILES_WP_GEOMETRY))
 
+SRCFILES_WP_XML := $(wildcard $(SRCDIRXML)/*.cpp)
+SRCFILESXML := $(subst $(SRCDIRXML)/,,$(SRCFILES_WP_XML))
+
 
 # Target directories
 OBJDIR := obj
+LIBDIR := lib
 
 
 # Substitutions for objects
@@ -49,24 +58,21 @@ OBJS_BASE := $(SRCFILESBASE:%.cpp=$(OBJDIR)/%.o)
 OBJS_COMPONENT := $(SRCFILESCOMPONENT:%.cpp=$(OBJDIR)/%.o)
 OBJS_COLLISION := $(SRCFILESCOLLISION:%.cpp=$(OBJDIR)/%.o)
 OBJS_GEOMETRY := $(SRCFILESGEOMETRY:%.cpp=$(OBJDIR)/%.o)
+OBJS_XML := $(SRCFILESXML:%.cpp=$(OBJDIR)/%.o)
+
 
 # Defining VPATH for automatic search of source files in the 
 # different source directories 
 # This enables to have a single rule/target for all source files in 
 # various directories and all objects in a single directory
-VPATH := $(SRCDIRBASE):$(SRCDIRCOMPONENT):$(SRCDIRCOLLISION):$(SRCDIRGEOMETRY)
+VPATH := $(SRCDIRBASE):$(SRCDIRCOMPONENT):$(SRCDIRCOLLISION):$(SRCDIRGEOMETRY):$(SRCDIRXML)
 
 
 # Compiler
-COMP  := nvcc
-LINK  := nvcc
-INCFLAGS  := $(INCDIR:%=-I%)
-# DEBUG := -g -G -diag-suppress 554
-# COMPFLAGS := $(DEBUG) -x cu -arch=sm_75 -dc $(INCFLAGS)
-# LINKFLAGS := -Xnvlink -dump-callgraph-no-demangle -arch=sm_75 -rdc=true $(INCFLAGS)
-DEBUG  := -g -Xcompiler -rdynamic -diag-suppress 554
-COMPFLAGS := $(DEBUG) -O3 -arch=sm_75 -dc -dlto -x cu $(INCFLAGS)
-LINKFLAGS := -O3 -arch=sm_75 -dlto $(INCFLAGS)
+INCFLAGS  := $(INCDIR:%=-I%) $(GRAINS_XERCES_INCDIR:%=-I%)
+COMPFLAGS := $(GRAINS_GPU_COMPILER_FLAGS) $(INCFLAGS)
+LINKFLAGS := $(GRAINS_GPU_LINKER_FLAGS) $(GRAINS_Z_FLAGS) $(GRAINS_XERCES_FLAGS)
+# $(error   LINKFLAGS is $(GRAINS_GPU_COMPILER) $(LINKFLAGS))
 
 
 #------------------------------------------------------------------------------
@@ -75,13 +81,15 @@ LINKFLAGS := -O3 -arch=sm_75 -dlto $(INCFLAGS)
 
 all : grains
 
-grains : MESS CPINC BASE COMPONENT COLLISION GEOMETRY
-	$(LINK) $(LINKFLAGS) $(OBJS_GEOMETRY) $(OBJS_COMPONENT) $(OBJS_COLLISION) $(OBJS_BASE) -o grains
+grains : MESS CPINC BASE COMPONENT COLLISION GEOMETRY XML
+		$(GRAINS_GPU_COMPILER) $(LINKFLAGS) -o $(LIBDIR)/grains \
+		$(OBJS_XML) $(OBJS_GEOMETRY) $(OBJS_COMPONENT) $(OBJS_COLLISION) \
+		$(OBJS_BASE)
 	@echo 'Compilation is complete'
 
 MESS   :
 	@echo '***********************************************************'
-	@echo 'GRAINS compiling with nvcc'
+	@echo 'GRAINS compiling with' $(GRAINS_CPP_COMPILER_DIST)-$(GRAINS_CPP_COMPILER_VERSION)', and' $(GRAINS_GPU_COMPILER_DIST)-$(GRAINS_GPU_COMPILER_VERSION)
 	@echo '***********************************************************'
 
 CPINC  : 
@@ -105,9 +113,13 @@ GEOMETRY   : $(OBJS_GEOMETRY)
 	@echo '*** Package Geometry compiled'
 	@echo
 
+XML    : $(OBJS_XML)
+	@echo '*** Package XML compiled'
+	@echo
+
 $(OBJDIR)/%.o : %.cpp
 	@echo 'Compiling '$<
-	$(COMP) $(COMPFLAGS) $< -o $@
+	$(GRAINS_GPU_COMPILER) $(COMPFLAGS) -D_XML -diag-suppress 554 $< -o $@
 
 
 # DEPENDENCIES
@@ -118,6 +130,7 @@ depend:
 	touch ./Maketmp
 	makedepend -f ./Maketmp $(DEPEND) $(SRCFILES_WP_BASE) \
 	$(SRCFILES_WP_COMPONENTS) $(SRCFILES_WP_COLLISION) $(SRCFILES_WP_GEOMETRY) \
+	$(SRCFILES_WP_XML)
 	rm -f ./Maketmp ./Maketmp.bak
 
 # CLEAN
@@ -125,3 +138,4 @@ clean :
 	@echo 'Grains : Deleting object and library files'
 	rm -f $(INCDIROUT)/*
 	rm -f $(OBJDIR)/*.o
+	rm -f $(LIBDIR)/*

@@ -79,7 +79,7 @@ class ComponentManagerGPU : public ComponentManager<double>
         /** @brief Sets the array of cells hash start */
         void setCellHashStart( unsigned int const* id );
         //@}
-
+        
 
         /** @name Methods */
         //@{
@@ -92,8 +92,9 @@ class ComponentManagerGPU : public ComponentManager<double>
         void updateLinkedCellList( LinkedCell<T> const* const* LC );
 
         /** @brief Detects collision between particles */
+        // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
-                              RigidBody<T> const* const* rb, 
+                              RigidBody<T, double> const* const* rb, 
                               int* results );
 
         // /** @brief Computes impact forces */
