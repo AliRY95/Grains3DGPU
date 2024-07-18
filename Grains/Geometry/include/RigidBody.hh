@@ -4,7 +4,7 @@
 
 #include "BoundingBox.hh"
 #include "Convex.hh"
-#include "ContactInfo.hh"
+#include "ReaderXML.hh"
 
 
 // =============================================================================
@@ -29,6 +29,7 @@ class RigidBody
         U m_circumscribedRadius; /**< Circumscribed radius */
         //@}
 
+
     public:
         /**@name Constructeurs */
         //@{
@@ -36,11 +37,17 @@ class RigidBody
         __HOSTDEVICE__
         RigidBody();
 
-        /** @brief Constructor with a convex
+        /** @brief Constructor with a convex and the crust thickness
         @param convex convex
         @param ct crust thickness of the rigid body */
         __HOSTDEVICE__
         RigidBody( Convex<T>* convex, T ct );
+
+        /** @brief Constructor with an XML input
+        @param convex convex
+        @param ct crust thickness of the rigid body */
+        __HOST__
+        RigidBody( DOMNode* root );
 
         /** @brief Copy constructor
         @param rb RigidBody object to be copied */
@@ -115,82 +122,13 @@ class RigidBody
         // /** @brief Sets the rigid body's circumscribed radius
         // @param r circumscribed radius */
         // __HOSTDEVICE__ void setCircumscribedRadius( float r );
-        //@}
+        //@}        
 };
 
 
 typedef RigidBody<float, float> RigidBodyF;
 typedef RigidBody<double, float> RigidBodyDF;
 typedef RigidBody<double, double> RigidBodyD;
-
-
-/** @name RigidBody : External methods collision detection */
-//@{
-/** @brief Returns whether 2 rigid bodies intersect
- @param rbA first rigid body
- @param rbB second rigid body
- @param a2w geometric tramsformation describing convex A in the world reference
- frame
- @param b2w geometric tramsformation describing convex B in the world reference
- frame */
- template <typename T, typename U>
-__HOSTDEVICE__ 
-bool intersectRigidBodies( RigidBody<T, U> const& rbA,
-                           RigidBody<T, U> const& rbB,
-                           Transform3<T> const& a2w,
-                           Transform3<T> const& b2w );
-
-/** @brief Returns whether 2 rigid bodies intersect - relative transformation
- @param rbA first rigid body
- @param rbB second rigid body
- @param b2a geometric tramsformation describing convex B in the A's reference
- frame */
- template <typename T, typename U>
-__HOSTDEVICE__
-bool intersectRigidBodies( RigidBody<T, U> const& rbA,
-                           RigidBody<T, U> const& rbB,
-                           Transform3<T> const& b2a );
-
-/** @brief Returns the contact information (if any) for 2 rigid bodies
- @param rbA first rigid body
- @param rbB second rigid body
- @param a2w geometric tramsformation describing convex A in the world reference
- frame
- @param b2w geometric tramsformation describing convex B in the world reference
- frame */
- template <typename T, typename U>
-__HOSTDEVICE__
-ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
-                                         RigidBody<T, U> const& rbB,
-                                         Transform3<T> const& a2w,
-                                         Transform3<T> const& b2w );
-
-/** @brief Returns the contact information (if any) for 2 rigid bodies
- @param rbA first rigid body
- @param rbB second rigid body
- @param a2w geometric tramsformation describing convex A in the world reference
- frame
- @param b2w geometric tramsformation describing convex B in the world reference
- frame */
- template <typename T>
-__HOSTDEVICE__
-ContactInfo<T> closestPointsRigidBodies( RigidBody<T, T> const& rbA,
-                                         RigidBody<T, T> const& rbB,
-                                         Transform3<T> const& a2w,
-                                         Transform3<T> const& b2w );
-                                         
-// TODO: LATER
-// /** @brief Returns the contact information (if any) for 2 rigid bodies - 
-// relative transformation
-//  @param rbA first rigid body
-//  @param rbB second rigid body
-//  @param b2a geometric tramsformation describing convex B in the A's reference
-//  frame */
-// __HOSTDEVICE__
-// ContactInfo closestPointsRigidBodies( RigidBody const& rbA,
-//                                       RigidBody const& rbB,
-//                                       Transform3d const& b2a );
-//@}
 
 
 #endif

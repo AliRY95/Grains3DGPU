@@ -72,7 +72,6 @@ VPATH := $(SRCDIRBASE):$(SRCDIRCOMPONENT):$(SRCDIRCOLLISION):$(SRCDIRGEOMETRY):$
 INCFLAGS  := $(INCDIR:%=-I%) $(GRAINS_XERCES_INCDIR:%=-I%)
 COMPFLAGS := $(GRAINS_GPU_COMPILER_FLAGS) $(INCFLAGS)
 LINKFLAGS := $(GRAINS_GPU_LINKER_FLAGS) $(GRAINS_Z_FLAGS) $(GRAINS_XERCES_FLAGS)
-# $(error   LINKFLAGS is $(GRAINS_GPU_COMPILER) $(LINKFLAGS))
 
 
 #------------------------------------------------------------------------------
@@ -119,7 +118,7 @@ XML    : $(OBJS_XML)
 
 $(OBJDIR)/%.o : %.cpp
 	@echo 'Compiling '$<
-	$(GRAINS_GPU_COMPILER) $(COMPFLAGS) -D_XML -diag-suppress 554 $< -o $@
+	$(GRAINS_GPU_COMPILER) $(COMPFLAGS) -D_XML $< -o $@
 
 
 # DEPENDENCIES

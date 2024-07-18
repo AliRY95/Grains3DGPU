@@ -1,8 +1,8 @@
 #ifndef _VECTOR3_HH_
 #define _VECTOR3_HH_
 
+
 #include "Basic.hh"
-#include "MiscMath.hh"
 
 
 // =============================================================================

@@ -1,5 +1,6 @@
-#include "MatrixMath.hh"
 #include "GJK.hh"
+#include "MiscMath.hh"
+#include "MatrixMath.hh"
 
 
 /* ========================================================================== */
@@ -364,14 +365,14 @@ T closestPointsGJK( Convex<T> const& a,
     T det[16][4] = { T( 0 ) };       // cached sub-determinants
     T dp[4][4] = { T( 0 ) };
 
-    Vector3<T> v = a2w( a.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) ) - 
-                   b2w( b.support( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) ) );
+    Vector3<T> v = a2w( a.support( zeroVector3T ) ) - 
+                   b2w( b.support( zeroVector3T ) );
     Vector3<T> w;
     T dist = v.norm();
     T mu = 0;
     unsigned int num_iterations = 0;
 
-    while ( bits < 15 && dist > EPSILON1 && num_iterations < 1000 )
+    while ( bits < 15 && dist > EPSILON2 && num_iterations < 1000 )
     {
         last = 0;
         last_bit = 1;

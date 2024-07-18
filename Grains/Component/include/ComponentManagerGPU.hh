@@ -3,18 +3,42 @@
 
 
 #include "ComponentManager.hh"
+#include "ComponentManagerCPU.hh"
 
 
 // =============================================================================
-/** @brief The class ComponentManager.
+/** @brief The class ComponentManagerGPU.
 
     Components in the simulation running on GPU.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class ComponentManagerGPU : public ComponentManager<double>
+class ComponentManagerGPU : public ComponentManager<T>
 {
+    protected:
+        /** @name Parameters */
+        //@{
+        Transform3<T>* m_transform; /**< array of components transformation */
+        // Mat3d* orientation; /**< array of components orientation */
+        // Vec3d* position; /**< array of components position */
+        // Vec3d* force; /**< array of components force */
+        // Vec3d* torque; /**< array of components torque */
+        // Vec3d* translationalVelocity; /**< array of components velocity */
+        // Vec3d* angularVelocity; /**< array of components angular velocity */
+        unsigned int* m_neighborsId; /**< array of components neighbor Id */ 
+        unsigned int* m_rigidBodyId; /**< array of components rigid body Id */
+        unsigned int* m_componentId; /**< array of component Ids */
+        unsigned int* m_componentCellHash; /**< array of components cell hash */
+        unsigned int* m_neighborsCount; /**< array of components neighbor count */
+        unsigned int* m_cellHashStart; /**< array of cells hash start */
+        unsigned int* m_cellHashEnd; /**< array of cells hash start */
+        // bool* isActive; /**< array of components activity in the simulation */
+        // bool* isObstacle; /**< array of components flag for being obstacle */
+        // unsigned int m_numComponents; /**< number of components */
+        //@}
+
+        
     public:
         /** @name Constructors */
         //@{
@@ -24,7 +48,7 @@ class ComponentManagerGPU : public ComponentManager<double>
 
         /** @brief Constructor with host data as input
         @param cm component manager on host */
-        ComponentManagerGPU( ComponentManager<T> const& cm );
+        ComponentManagerGPU( ComponentManagerCPU<T> const& cm );
 
         /** @brief Destructor */
         ~ComponentManagerGPU();
@@ -94,7 +118,7 @@ class ComponentManagerGPU : public ComponentManager<double>
         /** @brief Detects collision between particles */
         // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
-                              RigidBody<T, double> const* const* rb, 
+                              RigidBody<T, T> const* const* rb, 
                               int* results );
 
         // /** @brief Computes impact forces */

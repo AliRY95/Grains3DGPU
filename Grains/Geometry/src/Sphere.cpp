@@ -1,6 +1,5 @@
-#include "VectorMath.hh"
-#include "Convex.hh"
 #include "Sphere.hh"
+#include "VectorMath.hh"
 
 
 #define visuNodeNbPerQar 8 
@@ -82,6 +81,18 @@ __HOSTDEVICE__
 void Sphere<T>::setRadius( T r )
 {
     m_radius = r;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns a clone of the sphere
+template <typename T>
+__HOSTDEVICE__
+Convex<T>* Sphere<T>::clone() const
+{
+    return( new Sphere<T>( m_radius ) );
 }
 
 

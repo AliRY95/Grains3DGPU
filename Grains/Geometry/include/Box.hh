@@ -86,9 +86,9 @@ class Box : public Convex<T>
 
         /** @name Methods */
         //@{
-        /** @brief Returns the circumscribed radius of the box */
+        /** @brief Returns a clone of the box */
         __HOSTDEVICE__
-        T computeCircumscribedRadius() const final;
+        Convex<T>* clone() const final;
 
         /** @brief Returns the box volume */
         __HOSTDEVICE__
@@ -101,6 +101,10 @@ class Box : public Convex<T>
         __HOSTDEVICE__
         bool computeInertia( T* inertia, 
                              T* inertia_1 ) const final;
+
+        /** @brief Returns the circumscribed radius of the box */
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @ Returns the half-length of the bounding box fitted to the box 
         without considering the transformation */

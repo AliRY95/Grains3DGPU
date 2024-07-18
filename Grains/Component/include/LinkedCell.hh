@@ -33,7 +33,7 @@ class LinkedCell
         /** @name Constructors */
         //@{
         /** @brief Default constructor */
-        __host__ __device__ 
+        __HOSTDEVICE__
         LinkedCell();
 
         /** @brief Constructor with min and max points along with extent of each
@@ -41,13 +41,13 @@ class LinkedCell
         @param min min point of the linked cell 
         @param max max point of the linked cell 
         @param extent size of cells */
-        __host__ __device__ 
+        __HOSTDEVICE__
         LinkedCell( Vector3<T> const& min, 
                     Vector3<T> const& max,
                     T extent );
 
         /** @brief Destructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ~LinkedCell();
         //@}
 
@@ -55,7 +55,7 @@ class LinkedCell
         /** @name Get methods */
         //@{
         /** @brief Gets the number of cells */
-        __host__ __device__ 
+        __HOSTDEVICE__
         int getNumCells() const;
         //@}
 
@@ -64,19 +64,19 @@ class LinkedCell
         //@{
         /** @brief Returns the 3d Id of the cell which the point belongs to
         @param p point */
-        __host__ __device__
+        __HOSTDEVICE__
         uint3 computeCellId( Vector3<T> const& p ) const;
 
         /** @brief Returns the linear cell hash value from the 3d Id of the cell
         @param cellId 3d cell Id */
-        __host__ __device__
+        __HOSTDEVICE__
         int computeLinearCellHash( uint3 const& cellId ) const;
 
         /** @brief Returns the linear cell hash value from the 3d Id of the cell
         @param i position of the cell in the x-direction
         @param j position of the cell in the y-direction
         @param k position of the cell in the z-direction */
-        __host__ __device__
+        __HOSTDEVICE__
         int computeLinearCellHash( int i,
                                    int j,
                                    int k ) const;
@@ -86,22 +86,22 @@ class LinkedCell
         @param i relative position of the neighboring cell in the x-direction
         @param j relative position of the neighboring cell in the y-direction
         @param k relative position of the neighboring cell in the z-direction */
-        __host__ __device__ 
+        __HOSTDEVICE__
         int computeNeighboringCellLinearHash( int cellHash,
                                               int i,
                                               int j,
-                                              int k ) const; 
-                                                      
+                                              int k ) const;                          
         
         /** @brief Computes and stores the linear cell hash values in 
         componentCellHash for all components using CPU
         @param pos position of components
         @param numComponents number of components
         @param componentCellHash hash values for particles */
-        void computeLinearLinkedCellHashCPU( Transform3<T> const* tr,
-                                             unsigned int numComponents,
-                                             unsigned int* componentCellHash )
-                                             const;
+        void computeLinearLinkedCellHashCPU( 
+                                std::vector<Transform3<T>> const& tr,
+                                unsigned int numComponents,
+                                std::vector<unsigned int>& componentCellHash )
+                                const;
 
         /** @brief Computes and stores the linear cell hash values in 
         componentCellHash for all components using GPU - Wrapper
@@ -113,29 +113,14 @@ class LinkedCell
                                              unsigned int* componentCellHash )
                                              const;
 
-        // /** @brief Returns the Morton cell hash value from the 3d Id of the cell
+        /** @brief Returns the Morton cell hash value from the 3d Id of the cell
         // @param cellId 3d cell Id */
-        // __host__ __device__ unsigned int computeMortonCellHash( 
-        //                                           Vec3ui8 const& cellId ) const;
+        // __HOSTDEVICE__ 
+        // unsigned int computeMortonCellHash( int i,
+        //                                     int j,
+        //                                     int k ) const;
         //@}
 };
-
-
-/** @name LinkedCell : External methods */
-//@{
-/** @brief Computes and stores the linear cell hash values in  componentCellHash
-for all components using GPU - Kernel
-@param LC linked cell
-@param pos position of components
-@param numComponents number of components
-@param componentCellHash hash values for particles */
-template <typename T>
-__global__ 
-void computeLinearLinkedCellHashGPU_kernel( LinkedCell<T> const* const* LC,
-                                            Transform3<T> const* pos,
-                                            unsigned int numComponents,
-                                            unsigned int* componentCellHash );
-//@}
 
 
 typedef LinkedCell<float> LinkedCellF;

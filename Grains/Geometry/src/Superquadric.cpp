@@ -1,7 +1,5 @@
-#define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
-#include <bits/stdc++.h>
-#include "Convex.hh"
 #include "Superquadric.hh"
+#include "MiscMath.hh"
 
 
 // multiple of 4
@@ -72,6 +70,42 @@ __HOSTDEVICE__
 ConvexType Superquadric<T>::getConvexType() const
 {
     return ( SUPERQUADRIC );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the extent in a Vector3 format
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Superquadric<T>::getExtent() const
+{
+    return ( Vector3<T>( m_a, m_b, m_c ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the exponents (blockiness) in a Vector3 format with Z = 0
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Superquadric<T>::getExponent() const
+{
+    return ( Vector3<T>( m_n1, m_n2, T( 0 ) ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns a clone of the superquadric
+template <typename T>
+__HOSTDEVICE__
+Convex<T>* Superquadric<T>::clone() const
+{
+    return ( new Superquadric<T>( m_a, m_b, m_c, m_n1, m_n2 ) );
 }
 
 

@@ -268,7 +268,7 @@ static INLINE void S3D( Simplex<T>& s,
     switch ( testPlaneTwo + testPlaneThree + testPlaneFour )
     {
         case 3:
-            v = Vector3<T>( T( 0 ), T( 0 ), T( 0 ) );
+            v = zeroVector3T;
             s.nvrtx = 4;
             break;
         case 2:
@@ -721,7 +721,7 @@ T closestPointsGJK_SV( Convex<T> const& a,
     T dist2 = norm2( v );
 
     /* Initalise simplex */
-    Simplex<T> s = { 1, { Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ) } };
+    Simplex<T> s = { 1, { zeroVector3T } };
     s.vrtx[0] = w;
 
     /* Begin GJK iteration */

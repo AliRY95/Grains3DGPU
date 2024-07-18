@@ -55,6 +55,10 @@ class Rectangle : public Convex<T>
         /** @brief Returns the convex type */
         __HOSTDEVICE__
         ConvexType getConvexType() const final;
+
+        /** @brief Returns the edge lengths in a Vector3 format with Z = 0 */
+        __HOSTDEVICE__
+        Vector3<T> getExtent() const;
         //@}
 
 
@@ -71,9 +75,9 @@ class Rectangle : public Convex<T>
 
         /** @name Methods */
         //@{
-        /** @brief Returns the circumscribed radius of the box */
+        /** @brief Returns a clone of the rectangle */
         __HOSTDEVICE__
-        T computeCircumscribedRadius() const final;
+        Convex<T>* clone() const final;
 
         /** @brief Returns the rectangle volume (area) */
         __HOSTDEVICE__
@@ -86,6 +90,10 @@ class Rectangle : public Convex<T>
         __HOSTDEVICE__
         bool computeInertia( T* inertia, 
                              T* inertia_1 ) const final;
+
+        /** @brief Returns the circumscribed radius of the box */
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @ Returns the half-length of the bounding box fitted to the
         rectangle without considering the transformation */

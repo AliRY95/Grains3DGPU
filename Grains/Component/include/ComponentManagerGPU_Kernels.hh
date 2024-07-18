@@ -21,7 +21,7 @@
 /** @brief Zeros out the array
 @param array array to be zero-ed out
 @param numElements number of elements in the array */
-__global__ 
+__GLOBAL__ 
 void zeroOutArray( unsigned int* array,
                    unsigned int numElements );
 
@@ -29,7 +29,7 @@ void zeroOutArray( unsigned int* array,
 @param componentCellHash sorted array of cell hash values
 @param numComponents number of components
 @param cellStartAndEnd start and end indices as s1, e1, s2, e2, ... */
-__global__ 
+__GLOBAL__
 void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
                                      unsigned int numComponents,
                                      unsigned int* cellStart,
@@ -39,7 +39,7 @@ void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
 thread-per-particle policy
 @param fix later */
 template <typename T, typename U>
-__global__ 
+__GLOBAL__ 
 void collisionDetectionN2( RigidBody<T, U> const* const* a,
                            Transform3<T> const* tr3d,
                            int numComponents,
@@ -49,7 +49,7 @@ void collisionDetectionN2( RigidBody<T, U> const* const* a,
 thread-per-particle policy - using relative position and orientation
 @param fix later */
 template <typename T, typename U>
-__global__ 
+__GLOBAL__ 
 void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
                                    Transform3<T> const* tr3d,
                                    int numComponents,
@@ -59,7 +59,7 @@ void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
 a thread-per-particle policy
 @param fix later */
 template <typename T, typename U>
-__global__ 
+__GLOBAL__ 
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                    unsigned int* m_compId,
                                    unsigned int* m_componentCellHash,

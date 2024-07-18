@@ -1,5 +1,5 @@
-#include "Convex.hh"
 #include "Cone.hh"
+#include "VectorMath.hh"
 
 
 // multiple of 4
@@ -14,6 +14,7 @@ Cone<T>::Cone( T r,
                T h )
 : m_bottomRadius( r )
 , m_quarterHeight( h / T( 4 ) )
+, m_sinAngle( r / sqrt( r * r + h * h ) )  
 {}
 
 
@@ -40,6 +41,8 @@ Cone<T>::Cone( DOMNode* root )
     m_bottomRadius  = T( ReaderXML::getNodeAttr_Double( root, "Radius" ) );
     m_quarterHeight  = T( ReaderXML::getNodeAttr_Double( root, "Height" ) )
                                                                  / T( 4 );
+    m_sinAngle = m_bottomRadius / sqrt( m_bottomRadius * m_bottomRadius 
+  	                            + T( 16 ) * m_quarterHeight * m_quarterHeight ); 
 }
 
 
@@ -62,6 +65,42 @@ __HOSTDEVICE__
 ConvexType Cone<T>::getConvexType() const
 {
     return ( CONE );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the radius
+template <typename T>
+__HOSTDEVICE__
+T Cone<T>::getRadius() const
+{
+    return ( m_bottomRadius );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the height
+template <typename T>
+__HOSTDEVICE__
+T Cone<T>::getHeight() const
+{
+    return ( T( 4 ) * m_quarterHeight );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns a clone of the cone
+template <typename T>
+__HOSTDEVICE__
+Convex<T>* Cone<T>::clone() const
+{
+    return( new Cone<T>( m_bottomRadius, T( 4 ) * m_quarterHeight ) );
 }
 
 
@@ -121,13 +160,13 @@ T Cone<T>::computeCircumscribedRadius() const
 
 // -----------------------------------------------------------------------------
 // Returns the circumscribed radius of the cone - specialized for floats
-template <typename T>
+template <>
 __HOSTDEVICE__
-T Cone<float>::computeCircumscribedRadius() const
+float Cone<float>::computeCircumscribedRadius() const
 {
     return ( max( sqrtf( m_bottomRadius * m_bottomRadius + 
                          m_quarterHeight * m_quarterHeight ),
-                  T( 3 ) * m_quarterHeight ) );
+                  3.f * m_quarterHeight ) );
 }
 
 
@@ -140,9 +179,9 @@ template <typename T>
 __HOSTDEVICE__
 Vector3<T> Cone<T>::computeBoundingBox() const
 {
-    return ( Vector3<T>( m_radius, 
+    return ( Vector3<T>( m_bottomRadius, 
                          T( 2 ) * m_quarterHeight, 
-                         m_radius ) );
+                         m_bottomRadius ) );
 }
 
 
@@ -155,7 +194,7 @@ template <typename T>
 __HOSTDEVICE__
 Vector3<T> Cone<T>::support( Vector3<T> const& v ) const
 {
-    if ( v[Y] > Norm( v ) * m_sinAngle ) 
+    if ( v[Y] > norm( v ) * m_sinAngle ) 
         return ( Vector3<T>( T( 0 ), 
                              T( 3 ) * m_quarterHeight, 
                              T( 0 ) ) );
@@ -184,9 +223,9 @@ Vector3<T> Cone<T>::support( Vector3<T> const& v ) const
 // the surface of the cone that satisfies max(P.v) - specialized for floats
 template <>
 __HOSTDEVICE__
-Vector3<float> Cylinder<float>::support( Vector3<float> const& v ) const
+Vector3<float> Cone<float>::support( Vector3<float> const& v ) const
 {
-    if ( v[Y] > Norm( v ) * m_sinAngle ) 
+    if ( v[Y] > norm( v ) * m_sinAngle ) 
         return ( Vector3<float>( 0.f, 
                                  3.f * m_quarterHeight, 
                                  0.f ) );
@@ -218,8 +257,8 @@ void Cone<T>::readConvex( std::istream& fileIn )
 {
     fileIn >> m_bottomRadius >> m_quarterHeight;
     m_quarterHeight /= T( 4 );
-    m_sinAngle = m_bottomRadius / sqrt( m_bottomRadius * m_bottomRadius + 
-	                                    m_quarterHeight * m_quarterHeight );
+    m_sinAngle = m_bottomRadius / sqrt( m_bottomRadius * m_bottomRadius 
+  	                            + T( 16 ) * m_quarterHeight * m_quarterHeight ); 
 }
 
 
@@ -231,7 +270,7 @@ template <typename T>
 __HOST__
 void Cone<T>::writeConvex( std::ostream& fileOut ) const
 {
-    fileOut << "Cone with radius " << m_radius
+    fileOut << "Cone with radius " << m_bottomRadius
             << ", and height " << T( 4 ) * m_quarterHeight << ".\n";
 }
 
@@ -255,7 +294,7 @@ int Cone<T>::numberOfPoints_PARAVIEW() const
 // Paraview format
 template <typename T>
 __HOST__
-int cone<T>::numberOfCells_PARAVIEW() const
+int Cone<T>::numberOfCells_PARAVIEW() const
 {
     return ( visuNodeNbOnPer );
 }
@@ -325,22 +364,22 @@ void Cone<T>::writeConnection_PARAVIEW( std::list<int>& connectivity,
     {
         connectivity.push_back( firstpoint_globalnumber + i );
         connectivity.push_back( firstpoint_globalnumber + i + 1 );
-        connectivity.push_back( firstpoint_globalnumber + m_visuNodeNbOnPer );
-        connectivity.push_back( firstpoint_globalnumber + m_visuNodeNbOnPer
+        connectivity.push_back( firstpoint_globalnumber + visuNodeNbOnPer );
+        connectivity.push_back( firstpoint_globalnumber + visuNodeNbOnPer
                                  + 1 );
         last_offset += 4;
         offsets.push_back( last_offset );
         cellstype.push_back( 10 );
     }
-    connectivity.push_back( firstpoint_globalnumber + m_visuNodeNbOnPer - 1 );
+    connectivity.push_back( firstpoint_globalnumber + visuNodeNbOnPer - 1 );
     connectivity.push_back( firstpoint_globalnumber );
-    connectivity.push_back( firstpoint_globalnumber + m_visuNodeNbOnPer );
-    connectivity.push_back( firstpoint_globalnumber + m_visuNodeNbOnPer + 1 );
+    connectivity.push_back( firstpoint_globalnumber + visuNodeNbOnPer );
+    connectivity.push_back( firstpoint_globalnumber + visuNodeNbOnPer + 1 );
     last_offset += 4;
     offsets.push_back( last_offset );
     cellstype.push_back( 10 );
 
-    firstpoint_globalnumber += m_visuNodeNbOnPer + 2;
+    firstpoint_globalnumber += visuNodeNbOnPer + 2;
 }
 
 
@@ -350,3 +389,5 @@ void Cone<T>::writeConnection_PARAVIEW( std::list<int>& connectivity,
 // Explicit instantiation
 template class Cone<float>;
 template class Cone<double>;
+
+#undef   visuNodeNbOnPer

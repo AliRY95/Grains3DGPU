@@ -50,8 +50,8 @@ BoundingBox<T>::~BoundingBox()
 template <typename T>
 __HOSTDEVICE__
 void BoundingBox<T>::setExtent( T x,
-                             T y,
-                             T z )
+                                T y,
+                                T z )
 {
     m_extent = Vector3<T>( x, y, z );
 }
@@ -79,6 +79,20 @@ __HOSTDEVICE__
 Vector3<T> const BoundingBox<T>::getExtent() const
 {
     return ( m_extent );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns a clone of the box
+template <typename T>
+__HOSTDEVICE__
+BoundingBox<T>* BoundingBox<T>::clone() const
+{
+    return( new BoundingBox<T>( m_extent[X],
+                                m_extent[Y],
+                                m_extent[Z] ) );
 }
 
 

@@ -12,7 +12,7 @@
     The original GJK distance query algorithm using the Johnson subalgorithm 
     with the backup procedure. It supports both single and double floating point
     operations, but it is not recommended to use the single precision version as
-    it is prune to numerical instabilities.
+    it is prone to numerical instabilities.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================

@@ -21,6 +21,7 @@ class Cone : public Convex<T>
         //@{
         T m_bottomRadius; /**< cone base radius */
         T m_quarterHeight; /**< cone quarter height */
+        T m_sinAngle; /**< sine of the half-angle at the center */  
         //@}
 
 
@@ -55,15 +56,22 @@ class Cone : public Convex<T>
         /** @brief Gets the convex type */
         __HOSTDEVICE__
         ConvexType getConvexType() const final;
+
+        /** @brief Gets the radius */
+        __HOSTDEVICE__
+        T getRadius() const;
+
+        /** @brief Gets the height */
+        __HOSTDEVICE__
+        T getHeight() const;
         //@}
 
 
         /** @name Methods */
         //@{
-        /** @brief Computes and returns the circumscribed radius of the 
-        cone */
+        /** @brief Returns a clone of the cone */
         __HOSTDEVICE__
-        T computeCircumscribedRadius() const final;
+        Convex<T>* clone() const final;
 
         /** @brief Returns the cone volume */
         __HOSTDEVICE__
@@ -76,6 +84,11 @@ class Cone : public Convex<T>
         __HOSTDEVICE__
         bool computeInertia( T* inertia, 
                              T* inertia_1 ) const final;
+
+        /** @brief Computes and returns the circumscribed radius of the 
+        cone */
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @ Returns the half-length of the bounding box fitted to the
         cone without considering the transformation */

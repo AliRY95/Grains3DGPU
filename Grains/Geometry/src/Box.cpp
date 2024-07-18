@@ -1,4 +1,5 @@
 #include "Box.hh"
+#include "VectorMath.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -92,6 +93,20 @@ __HOSTDEVICE__
 void Box<T>::setExtent( T x, T y, T z )
 {
     m_extent = Vector3<T>( x, y, z );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns a clone of the box
+template <typename T>
+__HOSTDEVICE__
+Convex<T>* Box<T>::clone() const
+{
+    return( new Box<T>( T( 2 ) * m_extent[X],
+                        T( 2 ) * m_extent[Y],
+                        T( 2 ) * m_extent[Z] ) );
 }
 
 

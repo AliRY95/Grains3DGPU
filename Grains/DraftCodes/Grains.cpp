@@ -67,14 +67,14 @@ template <typename T>
 void setupLinkedCell( T rMax,
                       LinkedCell<T>** lc )
 {
-    *lc = new LinkedCell<T>( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ), 
+    *lc = new LinkedCell<T>( zeroVector3T, 
                              Vector3<T>( T( 1 ), T( 1 ), T( 1 ) ), 
                              rMax );
 }; } // GrainsCPU namespace end
 
 namespace GrainsGPU {
 template <typename T, typename U>
-__global__ void setupRigidBody( ConvexType cType,
+__GLOBAL__ void setupRigidBody( ConvexType cType,
                                 T a,
                                 T b,
                                 T c,
@@ -100,10 +100,10 @@ __global__ void setupRigidBody( ConvexType cType,
 };
 
 template <typename T>
-__global__ void setupLinkedCell( T rMax,
+__GLOBAL__ void setupLinkedCell( T rMax,
                                  LinkedCell<T>** lc )
 {
-    *lc = new LinkedCell<T>( Vector3<T>( T( 0 ), T( 0 ), T( 0 ) ), 
+    *lc = new LinkedCell<T>( zeroVector3T, 
                              Vector3<T>( T( 1 ), T( 1 ), T( 1 ) ), 
                              rMax );
 }; } // GrainsGPU namespace end

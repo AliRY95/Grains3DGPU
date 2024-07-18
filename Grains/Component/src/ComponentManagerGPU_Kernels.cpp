@@ -2,11 +2,14 @@
 #include <cooperative_groups.h>
 
 #include "ComponentManagerGPU_Kernels.hh"
+#include "CollisionDetection.hh"
+#include "LinkedCell.hh"
+#include "LinkedCell_Kernels.hh"
 
 
 // -----------------------------------------------------------------------------
 // Zeros out the array
-__global__ 
+__GLOBAL__ 
 void zeroOutArray( unsigned int* array,
                    unsigned int numElements )
 {
@@ -23,7 +26,7 @@ void zeroOutArray( unsigned int* array,
 
 // -----------------------------------------------------------------------------
 // Returns the start Id for each hash value in cellStart
-__global__ 
+__GLOBAL__ 
 void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
                                      unsigned int numComponents,
                                      unsigned int* cellStart,
@@ -80,7 +83,7 @@ void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
 // N-squared collision detection kernel using a thread-per-particle policy
 // TODO: CLEAN
 template <typename T, typename U>
-__global__ 
+__GLOBAL__ 
 void collisionDetectionN2( RigidBody<T, U> const* const* a,
                            Transform3<T> const* tr3d,
                            int numComponents,
@@ -90,8 +93,13 @@ void collisionDetectionN2( RigidBody<T, U> const* const* a,
 
     RigidBody<T, U> const& AA = **a;
     Transform3<T> const& trA = tr3d[tid];
+    ContactInfo<T> ci;
     for ( int j = 0; j < numComponents; j++ )
-        result[tid] += intersectRigidBodies( AA, AA, trA, tr3d[j] );
+    {
+        // result[tid] += intersectRigidBodies( AA, AA, trA, tr3d[j] );
+        ci = closestPointsRigidBodies( AA, AA, trA, tr3d[j] );
+        result[j] += ( ci.getOverlapDistance() < 0. );
+    }
 }
 
 
@@ -101,7 +109,7 @@ void collisionDetectionN2( RigidBody<T, U> const* const* a,
 // N-squared collision detection kernel with relative transformation
 // TODO: CLEAN
 template <typename T, typename U>
-__global__ 
+__GLOBAL__ 
 void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
                                    Transform3<T> const* tr3d,
                                    int numComponents,
@@ -127,7 +135,7 @@ void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
 // LinkedCell collision detection kernel 
 // TODO: CLEAN -- A LOT OF THINGS
 template <typename T, typename U>
-__global__ 
+__GLOBAL__ 
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                    unsigned int* m_compId,
                                    unsigned int* m_componentCellHash,
@@ -187,7 +195,13 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
 // Explicit instantiation
 #define X( T, U )                                                              \
 template                                                                       \
-__global__                                                                     \
+__GLOBAL__                                                                     \
+void collisionDetectionN2( RigidBody<T, U> const* const* a,                    \
+                           Transform3<T> const* tr3d,                          \
+                           int numComponents,                                  \
+                           int* result );                                      \
+template                                                                       \
+__GLOBAL__                                                                     \
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,             \
                                    unsigned int* m_compId,                     \
                                    unsigned int* m_componentCellHash,          \

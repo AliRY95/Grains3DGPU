@@ -55,15 +55,22 @@ class Cylinder : public Convex<T>
         /** @brief Gets the convex type */
         __HOSTDEVICE__
         ConvexType getConvexType() const final;
+
+        /** @brief Gets the radius */
+        __HOSTDEVICE__
+        T getRadius() const;
+
+        /** @brief Gets the height */
+        __HOSTDEVICE__
+        T getHeight() const;
         //@}
 
 
         /** @name Methods */
         //@{
-        /** @brief Computes and returns the circumscribed radius of the 
-        cylinder */
+        /** @brief Returns a clone of the cylinder */
         __HOSTDEVICE__
-        T computeCircumscribedRadius() const final;
+        Convex<T>* clone() const final;
 
         /** @brief Returns the cylinder volume */
         __HOSTDEVICE__
@@ -76,6 +83,11 @@ class Cylinder : public Convex<T>
         __HOSTDEVICE__
         bool computeInertia( T* inertia, 
                              T* inertia_1 ) const final;
+
+        /** @brief Computes and returns the circumscribed radius of the 
+        cylinder */
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @ Returns the half-length of the bounding box fitted to the
         cylinder without considering the transformation */

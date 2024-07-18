@@ -5,15 +5,16 @@
 #include "thrust/iterator/zip_iterator.h"
 #include "thrust/sort.h"
 
-#include "ComponentManager.hh"
+// #include "ComponentManager.hh"
 #include "ComponentManagerGPU.hh"
 #include "ComponentManagerGPU_Kernels.hh"
-
 #include "GrainsParameters.hh"
+#include "LinkedCell_Kernels.hh"
+#include "LinkedCell.hh"
 
 
-#define numComponents (GrainsParameters::m_numComponents)
-#define numCells (GrainsParameters::m_numCells)
+#define numComponents (GrainsParameters<T>::m_numComponents)
+#define numCells (GrainsParameters<T>::m_numCells)
 // -----------------------------------------------------------------------------
 // Constructor with the number of particles randomly positioned in the 
 // computational domain
@@ -59,7 +60,7 @@ ComponentManagerGPU<T>::ComponentManagerGPU()
 // Constructor with the number of particles randomly positioned in the 
 // computational domain
 template <typename T>
-ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManager<T> const& cm )
+ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManagerCPU<T> const& cm )
 {
     // Allocating memory on host
     cudaErrCheck( cudaMalloc( (void**)&m_transform,
@@ -81,11 +82,11 @@ ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManager<T> const& cm )
 
 
     // Copying the arrays from host to device
-    setTransform( cm.getTransform() );
-    setNeighborsId( cm.getNeighborsId() );
-    setRigidBodyId( cm.getRigidBodyId() );
-    setComponentId( cm.getComponentId() );
-    setNeighborsCount( cm.getNeighborsCount() );
+    setTransform( cm.getTransform().data() );
+    // setNeighborsId( cm.getNeighborsId().data() );
+    setRigidBodyId( cm.getRigidBodyId().data() );
+    setComponentId( cm.getComponentId().data() );
+    // setNeighborsCount( cm.getNeighborsCount().data() );
 }
 
 
@@ -322,8 +323,7 @@ void ComponentManagerGPU<T>::setCellHashStart( unsigned int const* id )
 // -----------------------------------------------------------------------------
 // Updates the linked cell list according to the linked cell provided
 template <typename T>
-void ComponentManagerGPU<T>::updateLinkedCellList( 
-                                                LinkedCell<T> const* const* LC )
+void ComponentManagerGPU<T>::updateLinkedCellList( LinkedCell<T> const* const* LC )
 {
     // First - finding the cell hash for each particle
     // LC->computeLinearLinkedCellHashGPU( m_transform, 
@@ -364,7 +364,7 @@ void ComponentManagerGPU<T>::updateLinkedCellList(
 // TODO: thread safety flag and MaxOccupancy
 template <typename T>
 void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T, double> const* const* rb, 
+                                              RigidBody<T, T> const* const* rb, 
                                               int* result )
 {
     unsigned int numThreads = 256;
@@ -381,6 +381,9 @@ void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
     zeroOutArray<<< numBlocks, numThreads >>>( m_cellHashEnd,
                                                numCells + 1 );
     unsigned int sMemSize = sizeof( unsigned int ) * ( numThreads + 1 );
+    // LC->computeLinearLinkedCellHashGPU( m_transform,
+    //                                     numComponents,
+    //                                     m_componentCellHash );
     computeLinearLinkedCellHashGPU_kernel<<< numBlocks, numThreads >>>
                                                         ( LC,
                                                           m_transform, 
@@ -393,7 +396,7 @@ void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
       thrust::device_ptr<unsigned int>( m_componentCellHash + numComponents ),
       thrust::device_ptr<unsigned int>( m_componentId ) );
     
-    // Third - reseting the cellStart array anf finding the start location of 
+    // Third - reseting the cellStart array and finding the start location of 
     // each hash
     // TODO: RESET m_cellHashStartEnd
     // unsigned int numThreads = 256;
@@ -422,7 +425,7 @@ void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
 
 // -----------------------------------------------------------------------------
 // Explicit instantiation
-// template class ComponentManagerGPU<float>;
+template class ComponentManagerGPU<float>;
 template class ComponentManagerGPU<double>;
 
 

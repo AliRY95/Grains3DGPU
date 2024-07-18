@@ -2,9 +2,7 @@
 #define _CONVEX_HH_
 
 
-#include <list>
 #include "Transform3.hh"
-#include "BoundingBox.hh"
 
 
 // Convex types
@@ -15,7 +13,7 @@ enum ConvexType {
     CONE,
     SUPERQUADRIC,
     POLYHEDRON,
-    RECTANGLE2D
+    RECTANGLE
 };
 
 
@@ -58,6 +56,10 @@ class Convex
 
         /** @name Methods */
         //@{
+        /** @brief Returns a clone of the convex */
+        __HOSTDEVICE__
+        virtual Convex<T>* clone() const = 0;
+
         /** @brief Returns the volume of the convex shape */
         __HOSTDEVICE__
         virtual T computeVolume() const = 0;

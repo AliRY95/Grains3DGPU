@@ -1,21 +1,52 @@
 #include <random>
 
-#include "ComponentManager.hh"
 #include "ComponentManagerCPU.hh"
-
+#include "ComponentManager.hh"
 #include "GrainsParameters.hh"
+#include "LinkedCell.hh"
+#include "CollisionDetection.hh"
+#include "VectorMath.hh"
+
+
+#include <algorithm>
+#include <execution>
+#include <omp.h>
+
+
+#define numComponents (GrainsParameters<T>::m_numComponents)
+#define numCells (GrainsParameters<T>::m_numCells)
+/* ========================================================================== */
+/*                             Low-Level Methods                              */
+/* ========================================================================== */
+// Sorts one vector based on another vector
+static INLINE void sortByKey( std::vector<unsigned int>& data, 
+                              std::vector<unsigned int> const& key)
+{
+    // Create a vector of indices
+    std::vector<std::size_t> indices( data.size() );
+    for ( std::size_t i = 0; i < indices.size(); ++i )
+        indices[i] = i;
+
+    // Sort the indices based on the key vector
+    std::sort( indices.begin(), 
+               indices.end(), 
+               [&key]( std::size_t i1, std::size_t i2 ) 
+               { return key[i1] < key[i2]; } );
+
+    // Reorder the data vector based on the sorted indices
+    std::vector<unsigned int> sortedData( data.size() );
+    for ( std::size_t i = 0; i < indices.size(); ++i )
+        sortedData[i] = data[ indices[i] ];
+    data = sortedData;
+}
 
 
 
-#include "thrust/for_each.h"
-#include "thrust/iterator/zip_iterator.h"
-#include "thrust/sort.h"
 
 
-
-#define numComponents (GrainsParameters::m_numComponents)
-#define numCells (GrainsParameters::m_numCells)
-// -----------------------------------------------------------------------------
+/* ========================================================================== */
+/*                            High-Level Methods                              */
+/* ========================================================================== */
 // Constructor with the number of particles randomly positioned in the 
 // computational domain
 // TODO: Cases with multiple RigidBodies
@@ -24,35 +55,43 @@ ComponentManagerCPU<T>::ComponentManagerCPU()
 {
     // Randomly initializing transforms
     std::default_random_engine generator;
-    std::uniform_real_distribution<T> location( T( 0 ), T( 1 ) );
+    std::uniform_real_distribution<T> locationX( T( 0 ), 
+                                        GrainsParameters<T>::m_dimension[X] );
+    std::uniform_real_distribution<T> locationY( T( 0 ), 
+                                        GrainsParameters<T>::m_dimension[Y] );
+    std::uniform_real_distribution<T> locationZ( T( 0 ), 
+                                        GrainsParameters<T>::m_dimension[Z] );
     std::uniform_real_distribution<T> angle( T( 0 ), T( 2 * M_PI ) );
 
-    // Allocating memory on host
-    m_transform = new Transform3<T>[numComponents];
-    m_neighborsId = new unsigned int[numComponents * numComponents];
-    m_rigidBodyId = new unsigned int[numComponents];
-    m_componentId = new unsigned int[numComponents];
-    m_componentCellHash = new unsigned int[numComponents];
-    m_neighborsCount = new unsigned int[numComponents];
-    m_cellHashStart = new unsigned int[numCells + 1];
-    m_cellHashEnd = new unsigned int[numCells + 1];
-    // Initialzing the arrays
+    // Initialzing the vectors
+    Transform3<T> tr;
     for( int i = 0; i < numComponents; i++ )
     {
         // m_transform
-        T aX = angle( generator );
-        T aY = angle( generator );
-        T aZ = angle( generator );
-        m_transform[i].setBasis( aX, aY, aZ );
-        m_transform[i].setOrigin( Vector3( location( generator ),
-                                           location( generator ),
-                                           location( generator ) ) );
+        tr.setBasis( angle( generator ), 
+                     angle( generator ), 
+                     angle( generator ) );
+        tr.setOrigin( GrainsParameters<T>::m_origin + 
+                      Vector3<T>( locationX( generator ),
+                                  locationY( generator ),
+                                  locationZ( generator ) ) );
+        m_transform.push_back( tr );
         
         // m_rigidBodyId
-        m_rigidBodyId[i] = 0;
+        m_rigidBodyId.push_back( 0 );
+
+        // m_componentCellHash
+        m_componentCellHash.push_back( 0 );
 
         // m_compId
-        m_componentId[i] = i;
+        m_componentId.push_back( i );
+    }
+
+
+    for ( int i = 0; i < numCells + 1; i++ )
+    {
+        m_cellHashStart.push_back( 0 );
+        m_cellHashEnd.push_back( 0 );
     }
 }
 
@@ -63,16 +102,7 @@ ComponentManagerCPU<T>::ComponentManagerCPU()
 // Destructor
 template <typename T>
 ComponentManagerCPU<T>::~ComponentManagerCPU()
-{
-    delete[] m_transform;
-    delete[] m_neighborsId;
-    delete[] m_rigidBodyId;
-    delete[] m_componentId;
-    delete[] m_componentCellHash;
-    delete[] m_neighborsCount;
-    delete[] m_cellHashStart;
-    delete[] m_cellHashEnd;
-}
+{}
 
 
 
@@ -81,7 +111,7 @@ ComponentManagerCPU<T>::~ComponentManagerCPU()
 // -----------------------------------------------------------------------------
 // Gets components transformation
 template <typename T>
-Transform3<T>* ComponentManagerCPU<T>::getTransform() const
+std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
 {
     return( m_transform );
 }
@@ -92,7 +122,7 @@ Transform3<T>* ComponentManagerCPU<T>::getTransform() const
 // -----------------------------------------------------------------------------
 // Gets the array of components neighbor Id
 template <typename T>
-unsigned int* ComponentManagerCPU<T>::getNeighborsId() const
+std::vector<unsigned int> ComponentManagerCPU<T>::getNeighborsId() const
 {
     return( m_neighborsId );
 }
@@ -103,7 +133,7 @@ unsigned int* ComponentManagerCPU<T>::getNeighborsId() const
 // -----------------------------------------------------------------------------
 // Gets the array of components rigid body Id
 template <typename T>
-unsigned int* ComponentManagerCPU<T>::getRigidBodyId() const
+std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
 {
     return( m_rigidBodyId );
 }
@@ -114,7 +144,7 @@ unsigned int* ComponentManagerCPU<T>::getRigidBodyId() const
 // -----------------------------------------------------------------------------
 // Gets the array of component Ids
 template <typename T>
-unsigned int* ComponentManagerCPU<T>::getComponentId() const
+std::vector<unsigned int> ComponentManagerCPU<T>::getComponentId() const
 {
     return( m_componentId );
 }
@@ -125,7 +155,7 @@ unsigned int* ComponentManagerCPU<T>::getComponentId() const
 // -----------------------------------------------------------------------------
 // Gets the array of components cell hash
 template <typename T>
-unsigned int* ComponentManagerCPU<T>::getComponentCellHash() const
+std::vector<unsigned int> ComponentManagerCPU<T>::getComponentCellHash() const
 {
     return( m_componentCellHash );
 }
@@ -136,7 +166,7 @@ unsigned int* ComponentManagerCPU<T>::getComponentCellHash() const
 // -----------------------------------------------------------------------------
 // Gets the array of components neighbor count
 template <typename T>
-unsigned int* ComponentManagerCPU<T>::getNeighborsCount() const
+std::vector<unsigned int> ComponentManagerCPU<T>::getNeighborsCount() const
 {
     return( m_neighborsCount );
 }
@@ -147,7 +177,7 @@ unsigned int* ComponentManagerCPU<T>::getNeighborsCount() const
 // -----------------------------------------------------------------------------
 // Gets the array of cells hash start
 template <typename T>
-unsigned int* ComponentManagerCPU<T>::getCellHashStart() const
+std::vector<unsigned int> ComponentManagerCPU<T>::getCellHashStart() const
 {
     return( m_cellHashStart );
 }
@@ -158,10 +188,9 @@ unsigned int* ComponentManagerCPU<T>::getCellHashStart() const
 // -----------------------------------------------------------------------------
 // Sets components transformation
 template <typename T>
-void ComponentManagerCPU<T>::setTransform( Transform3<T> const* tr )
+void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& tr )
 {
-    for ( int i = 0; i < numComponents; i++ )
-        m_transform[i] = tr[i];
+    m_transform = tr;
 }
 
 
@@ -170,10 +199,9 @@ void ComponentManagerCPU<T>::setTransform( Transform3<T> const* tr )
 // -----------------------------------------------------------------------------
 // Sets the array of components neighbor Id
 template <typename T>
-void ComponentManagerCPU<T>::setNeighborsId( unsigned int const* id )
+void ComponentManagerCPU<T>::setNeighborsId( std::vector<unsigned int> const& id )
 {
-    for ( int i = 0; i < numComponents; i++ )
-        m_neighborsId[i] = id[i];
+    m_neighborsId = id;
 }
 
 
@@ -182,10 +210,9 @@ void ComponentManagerCPU<T>::setNeighborsId( unsigned int const* id )
 // -----------------------------------------------------------------------------
 // Sets the array of components rigid body Id
 template <typename T>
-void ComponentManagerCPU<T>::setRigidBodyId( unsigned int const* id )
+void ComponentManagerCPU<T>::setRigidBodyId( std::vector<unsigned int> const& id )
 {
-    for ( int i = 0; i < numComponents; i++ )
-        m_rigidBodyId[i] = id[i];
+    m_rigidBodyId = id;
 }
 
 
@@ -194,10 +221,9 @@ void ComponentManagerCPU<T>::setRigidBodyId( unsigned int const* id )
 // -----------------------------------------------------------------------------
 // Sets the array of component Ids
 template <typename T>
-void ComponentManagerCPU<T>::setComponentId( unsigned int const* id )
+void ComponentManagerCPU<T>::setComponentId( std::vector<unsigned int> const& id )
 {
-    for ( int i = 0; i < numComponents; i++ )
-        m_componentId[i] = id[i];
+    m_componentId = id;
 }
 
 
@@ -206,10 +232,9 @@ void ComponentManagerCPU<T>::setComponentId( unsigned int const* id )
 // -----------------------------------------------------------------------------
 // Sets the array of components cell hash
 template <typename T>
-void ComponentManagerCPU<T>::setComponentCellHash( unsigned int const* hash )
+void ComponentManagerCPU<T>::setComponentCellHash( std::vector<unsigned int> const& hash )
 {
-     for ( int i = 0; i < numComponents; i++ )
-        m_componentCellHash[i] = hash[i];
+    m_componentCellHash = hash;
 }
 
 
@@ -218,10 +243,9 @@ void ComponentManagerCPU<T>::setComponentCellHash( unsigned int const* hash )
 // -----------------------------------------------------------------------------
 // Sets the array of components neighbor count
 template <typename T>
-void ComponentManagerCPU<T>::setNeighborsCount( unsigned int const* count )
+void ComponentManagerCPU<T>::setNeighborsCount( std::vector<unsigned int> const& count )
 {
-     for ( int i = 0; i < numComponents; i++ )
-        m_neighborsCount[i] = count[i];
+    m_neighborsCount = count;
 }
 
 
@@ -230,10 +254,9 @@ void ComponentManagerCPU<T>::setNeighborsCount( unsigned int const* count )
 // -----------------------------------------------------------------------------
 // Sets the array of cells hash start
 template <typename T>
-void ComponentManagerCPU<T>::setCellHashStart( unsigned int const* id )
+void ComponentManagerCPU<T>::setCellHashStart( std::vector<unsigned int> const& id )
 {
-     for ( int i = 0; i < numCells + 1; i++ )
-        m_cellHashStart[i] = id[i];
+    m_cellHashStart = id;
 }
 
 
@@ -243,62 +266,59 @@ void ComponentManagerCPU<T>::setCellHashStart( unsigned int const* id )
 // Detects collision between particles
 template <typename T>
 void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T, double> const* const* rb, 
+                                              RigidBody<T, T> const* const* rb, 
                                               int* result )
 {
-    // for ( int i = 0; i < numComponents; i++ )
-    // {
-    //     const RigidBody& AA = *( rb[m_rigidBodyId[i]] );
-    //     const Transform3d& trA = m_transform[i];
-    //     for ( int j = 0; j < numComponents; j++ ) // or start from j = i?
-    //         result[i] += intersectRigidBodies( AA, AA, trA, m_transform[j] );
-    // }
+    // // for ( int i = 0; i < numComponents; i++ )
+    // // {
+    // //     const RigidBody& AA = *( rb[m_rigidBodyId[i]] );
+    // //     const Transform3d& trA = m_transform[i];
+    // //     for ( int j = 0; j < numComponents; j++ ) // or start from j = i?
+    // //         result[i] += intersectRigidBodies( AA, AA, trA, m_transform[j] );
+    // // }
 
     
-    // RigidBody const& AA = **rb;
-    // for ( int i = 0; i < N; i++ )
-    // {
-    //     Transform3d trA = tr3d[i];
-    //     Transform3d trB2A;
-    //     for ( int j = 0; j < N; j++ ) // or start from j = i?
-    //     {
-    //         trB2A = tr3d[j];
-    //         trB2A.relativeToTransform( trA );
-    //         result[i] = intersectRigidBodies( AA, AA, trB2A );
-    //     }
-    // }
-    
+    // // RigidBody const& AA = **rb;
+    // // for ( int i = 0; i < N; i++ )
+    // // {
+    // //     Transform3d trA = tr3d[i];
+    // //     Transform3d trB2A;
+    // //     for ( int j = 0; j < N; j++ ) // or start from j = i?
+    // //     {
+    // //         trB2A = tr3d[j];
+    // //         trB2A.relativeToTransform( trA );
+    // //         result[i] = intersectRigidBodies( AA, AA, trB2A );
+    // //     }
+    // // }
 
     (*LC)->computeLinearLinkedCellHashCPU( m_transform,
-                                           numComponents,
-                                           m_componentCellHash );
+                                       numComponents,
+                                       m_componentCellHash );
 
-    thrust::sort_by_key ( m_componentCellHash,
-                          m_componentCellHash + numComponents,
-                          m_componentId );
+    sortByKey( m_componentCellHash, m_componentId );
 
-    for ( int i = 0; i < numCells + 1; i++ )
-    {
-        m_cellHashStart[ i ] = 0;
-        m_cellHashEnd[ i ] = 0;
-    }
-
+    std::fill( m_cellHashStart.begin(), m_cellHashStart.end(), 0 );
+    std::fill( m_cellHashEnd.begin(), m_cellHashEnd.end(), 0 );
+    
     for ( int i = 0; i < numComponents; i++ )
     {
-        unsigned int hash = m_componentCellHash[ i ];
-        if ( i == 0 || hash != m_componentCellHash[ i - 1 ] )
-            m_cellHashStart[ hash ] = i;
+        unsigned int hash = m_componentCellHash.at( i );
+        if ( i == 0 )
+            m_cellHashStart.at( hash ) = i;
+        if ( i != 0 && hash != m_componentCellHash.at( i - 1 ) )
+            m_cellHashStart.at( hash ) = i;
         if ( i > 0 )
-            m_cellHashEnd[ m_componentCellHash[ i - 1 ] ] = i;
+            m_cellHashEnd.at( m_componentCellHash.at( i - 1 ) ) = i;
         if ( i == numComponents - 1 )
-            m_cellHashEnd[ hash ] = i + 1;
+            m_cellHashEnd.at( hash ) = i + 1;
     }
-
+    
+    #pragma omp parallel for
     for ( int pId = 0; pId < numComponents; pId++ )
     {
         unsigned int const compId = m_componentId[ pId ];
         unsigned int const cellHash = m_componentCellHash[ pId ];
-        RigidBody<T, double> const& rigidBodyA = **rb; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
+        RigidBody<T, T> const& rigidBodyA = **rb; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
         Transform3<T> const& transformA = m_transform[ compId ];
         for ( int k = -1; k < 2; k++ )
         {
@@ -338,7 +358,7 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
 
 // -----------------------------------------------------------------------------
 // Explicit instantiation
-// template class ComponentManagerCPU<float>;
+template class ComponentManagerCPU<float>;
 template class ComponentManagerCPU<double>;
 
 

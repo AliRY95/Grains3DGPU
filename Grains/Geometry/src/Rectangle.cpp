@@ -7,8 +7,8 @@ template <typename T>
 __HOSTDEVICE__ 
 Rectangle<T>::Rectangle( T x, 
                          T y )
-: m_LX( LX / T( 2 ) )
-, m_LY( LY / T( 2 ) )
+: m_LX( x / T( 2 ) )
+, m_LY( y / T( 2 ) )
 {}
 
 
@@ -62,6 +62,18 @@ ConvexType Rectangle<T>::getConvexType() const
 
 
 // -----------------------------------------------------------------------------
+// Returns the edge lengths in a Vector3 format with Z = 0
+template <typename T>
+__HOSTDEVICE__
+Vector3<T> Rectangle<T>::getExtent() const
+{
+    return ( Vector3<T>( m_LX, m_LY, T( 0 ) ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Sets values of the edge length
 template <typename T>
 __HOSTDEVICE__
@@ -70,6 +82,18 @@ void Rectangle<T>::setExtent( T x,
 {
     m_LX = x / T( 2 );
     m_LY = y / T( 2 );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns a clone of the rectangle
+template <typename T>
+__HOSTDEVICE__
+Convex<T>* Rectangle<T>::clone() const
+{
+    return( new Rectangle<T>( T( 2 ) * m_LX, T( 2 ) * m_LY ) );
 }
 
 
@@ -170,7 +194,7 @@ template <typename T>
 __HOST__
 void Rectangle<T>::readConvex( std::istream& fileIn )
 {
-    fileIn >> m_extent;
+    fileIn >> m_LX >> m_LY;
 }
 
 
@@ -223,7 +247,6 @@ std::list<Vector3<T>> Rectangle<T>::writePoints_PARAVIEW(
                                         Vector3<T> const* translation ) const
 {
     std::list<Vector3<T>> ParaviewPoints;
-    list<Vector3<T>> ParaviewPoints;
     Vector3<T> p;
     p.setValue( - m_LX, - m_LY, T( 0 ) );
     ParaviewPoints.push_back( transform( p ) );

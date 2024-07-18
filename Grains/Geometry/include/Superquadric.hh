@@ -64,15 +64,22 @@ class Superquadric : public Convex<T>
         /** @brief Gets the convex type */
         __HOSTDEVICE__
         ConvexType getConvexType() const final;
+
+        /** @brief Gets the extent in a Vector3 format */
+        __HOSTDEVICE__
+        Vector3<T> getExtent() const;
+
+        /** @brief Gets the exponents (blockiness) in a Vector3 format (Z=0) */
+        __HOSTDEVICE__
+        Vector3<T> getExponent() const;
         //@}
 
 
         /** @name Methods */
         //@{
-        /** @brief Computes and returns the circumscribed radius of the 
-        Superquadric */
+        /** @brief Returns a clone of the superquadric */
         __HOSTDEVICE__
-        T computeCircumscribedRadius() const final;
+        Convex<T>* clone() const final;
 
         /** @brief Returns the Superquadric volume */
         __HOSTDEVICE__
@@ -85,6 +92,11 @@ class Superquadric : public Convex<T>
         __HOSTDEVICE__
         bool computeInertia( T* inertia, 
                              T* inertia_1 ) const final;
+
+        /** @brief Computes and returns the circumscribed radius of the 
+        Superquadric */
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @ Returns the half-length of the bounding box fitted to the
         superquadric without considering the transformation */

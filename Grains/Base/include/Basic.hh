@@ -1,6 +1,8 @@
 #ifndef _BASIC_HH_
 #define _BASIC_HH_
 
+#define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
+#include <bits/stdc++.h>
 #include <float.h>
 #include <stdio.h>
 #include <iostream>
@@ -58,6 +60,9 @@ enum Direction
 #define shiftString9   "         "
 #define shiftString12  "            "
 #define shiftString15  "               "
+#define zeroVector3T   Vector3<T>( T( 0 ), T( 0 ), T( 0 ) )
+#define zeroVector3D   Vector3D( 0., 0., 0. )
+#define zeroVector3F   Vector3F( 0.f, 0.f, 0.f )
 //@}
 
 
@@ -67,12 +72,14 @@ enum Direction
     #define __HOST__          __host__
     #define __DEVICE__        __device__
     #define __HOSTDEVICE__    __host__ __device__
+    #define __GLOBAL__        __global__
     #define INLINE            __forceinline__
     #define __RESTRICT__      __restrict__
 #else
     #define __HOST__          
     #define __DEVICE__        __device__
     #define __HOSTDEVICE__
+    #define __GLOBAL__        
     #define INLINE            inline
     #define __RESTRICT__      restrict
 #endif

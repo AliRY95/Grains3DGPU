@@ -42,4 +42,8 @@ class GrainsParameters
 };
 
 
+typedef GrainsParameters<float> GrainsParamatersF;
+typedef GrainsParameters<double> GrainsParamatersD;
+
+
 #endif

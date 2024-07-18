@@ -13,8 +13,31 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class ComponentManagerCPU : public ComponentManager<double>
+class ComponentManagerCPU : public ComponentManager<T>
 {
+    protected:
+        /** @name Parameters */
+        //@{
+        std::vector<Transform3<T>> m_transform; /**< components transformation */
+        // Mat3d* orientation; /**< array of components orientation */
+        // Vec3d* position; /**< array of components position */
+        // Vec3d* force; /**< array of components force */
+        // Vec3d* torque; /**< array of components torque */
+        // Vec3d* translationalVelocity; /**< array of components velocity */
+        // Vec3d* angularVelocity; /**< array of components angular velocity */
+        std::vector<unsigned int> m_neighborsId; /**< components neighbor Id */ 
+        std::vector<unsigned int> m_rigidBodyId; /**< components rigid body Id */
+        std::vector<unsigned int> m_componentId; /**< components Id */
+        std::vector<unsigned int> m_componentCellHash; /**< components cell hash */
+        std::vector<unsigned int> m_neighborsCount; /**< components neighbor count */
+        std::vector<unsigned int> m_cellHashStart; /**< cells hash start */
+        std::vector<unsigned int> m_cellHashEnd; /**< cells hash start */
+        // bool* isActive; /**< array of components activity in the simulation */
+        // bool* isObstacle; /**< array of components flag for being obstacle */
+        // unsigned int m_numComponents; /**< number of components */
+        //@}
+
+        
     public:
         /** @name Constructors */
         //@{
@@ -30,50 +53,50 @@ class ComponentManagerCPU : public ComponentManager<double>
         /** @name Get methods */
         //@{
         /** @brief Gets components transformation */
-        Transform3<T>* getTransform() const;
+        std::vector<Transform3<T>> getTransform() const;
 
         /** @brief Gets the array of components neighbor Id */
-        unsigned int* getNeighborsId() const;
+        std::vector<unsigned int> getNeighborsId() const;
 
         /** @brief Gets the array of components rigid body Id */
-        unsigned int* getRigidBodyId() const;
+        std::vector<unsigned int> getRigidBodyId() const;
 
         /** @brief Gets the array of component Ids */
-        unsigned int* getComponentId() const;
+        std::vector<unsigned int> getComponentId() const;
 
         /** @brief Gets the array of components cell hash */
-        unsigned int* getComponentCellHash() const;
+        std::vector<unsigned int> getComponentCellHash() const;
 
         /** @brief Gets the array of components neighbor count */
-        unsigned int* getNeighborsCount() const;
+        std::vector<unsigned int> getNeighborsCount() const;
 
         /** @brief Gets the array of cells hash start */
-        unsigned int* getCellHashStart() const;
+        std::vector<unsigned int> getCellHashStart() const;
         //@}
 
 
         /** @name Set methods */
         //@{
         /** @brief Sets components transformation */
-        void setTransform( Transform3<T> const* tr );
+        void setTransform( std::vector<Transform3<T>> const& tr );
 
         /** @brief Sets the array of components neighbor Id */
-        void setNeighborsId( unsigned int const* id );
+        void setNeighborsId( std::vector<unsigned int> const& id );
 
         /** @brief Sets the array of components rigid body Id */
-        void setRigidBodyId( unsigned int const* id );
+        void setRigidBodyId( std::vector<unsigned int> const& id );
 
         /** @brief Sets the array of component Ids */
-        void setComponentId( unsigned int const* id );
+        void setComponentId( std::vector<unsigned int> const& id );
 
         /** @brief Sets the array of components cell hash */
-        void setComponentCellHash( unsigned int const* hash );
+        void setComponentCellHash( std::vector<unsigned int> const& hash );
 
         /** @brief Sets the array of components neighbor count */
-        void setNeighborsCount( unsigned int const* count );
+        void setNeighborsCount( std::vector<unsigned int> const& count );
 
         /** @brief Sets the array of cells hash start */
-        void setCellHashStart( unsigned int const* id );
+        void setCellHashStart( std::vector<unsigned int> const& id );
         //@}
 
 
@@ -88,7 +111,7 @@ class ComponentManagerCPU : public ComponentManager<double>
         /** @brief Detects collision between particles */
         // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
-                              RigidBody<T, double> const* const* rb, 
+                              RigidBody<T, T> const* const* rb, 
                               int* result );
 
         // /** @brief Computes impact forces */

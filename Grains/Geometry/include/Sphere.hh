@@ -70,9 +70,9 @@ class Sphere : public Convex<T>
 
         /** @name Methods */
         //@{
-        /** @brief Returns the circumscribed radius of the sphere */
+        /** @brief Returns a clone of the sphere */
         __HOSTDEVICE__
-        T computeCircumscribedRadius() const final;
+        Convex<T>* clone() const final;
 
         /** @brief Returns the sphere volume */
         __HOSTDEVICE__
@@ -85,6 +85,10 @@ class Sphere : public Convex<T>
         __HOSTDEVICE__
         bool computeInertia( T* inertia, 
                              T* inertia_1 ) const final;
+
+        /** @brief Returns the circumscribed radius of the sphere */
+        __HOSTDEVICE__
+        T computeCircumscribedRadius() const final;
 
         /** @ Returns the half-length of the bounding box fitted to the sphere 
         without considering the transformation */

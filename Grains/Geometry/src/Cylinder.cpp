@@ -1,4 +1,3 @@
-#include "Convex.hh"
 #include "Cylinder.hh"
 
 
@@ -10,7 +9,7 @@
 // Constructor with radius and height as input parameters
 template <typename T>
 __HOSTDEVICE__
-Cylinder<T>::Cylidner( T r,
+Cylinder<T>::Cylinder( T r,
                        T h )
 : m_radius( r )
 , m_halfHeight( h / T( 2 ) )
@@ -68,6 +67,42 @@ ConvexType Cylinder<T>::getConvexType() const
 
 
 // -----------------------------------------------------------------------------
+// Returns the radius
+template <typename T>
+__HOSTDEVICE__
+T Cylinder<T>::getRadius() const
+{
+    return ( m_radius );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the height
+template <typename T>
+__HOSTDEVICE__
+T Cylinder<T>::getHeight() const
+{
+    return ( T( 2 ) * m_halfHeight );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns a clone of the cylinder
+template <typename T>
+__HOSTDEVICE__
+Convex<T>* Cylinder<T>::clone() const
+{
+    return( new Cylinder<T>( m_radius, T( 2 ) * m_halfHeight ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Returns the volume of the cylinder
 template <typename T>
 __HOSTDEVICE__
@@ -117,9 +152,9 @@ T Cylinder<T>::computeCircumscribedRadius() const
 
 // -----------------------------------------------------------------------------
 // Returns the circumscribed radius of the cylinder - specialized for floats
-template <typename T>
+template <>
 __HOSTDEVICE__
-T Cylinder<float>::computeCircumscribedRadius() const
+float Cylinder<float>::computeCircumscribedRadius() const
 {
     return ( sqrtf( m_radius * m_radius + m_halfHeight * m_halfHeight ) );
 }
@@ -149,7 +184,7 @@ __HOSTDEVICE__
 Vector3<T> Cylinder<T>::support( Vector3<T> const& v ) const
 {
     T s = sqrt( v[X] * v[X] + v[Z] * v[Z] );
-    if ( s > EPSILON )
+    if ( s > EPSILON1 )
     {
         T d = m_radius / s;
         return ( Vector3<T>( v[X] * d,
@@ -172,8 +207,8 @@ template <>
 __HOSTDEVICE__
 Vector3<float> Cylinder<float>::support( Vector3<float> const& v ) const
 {
-    T s = sqrtf( v[X] * v[X] + v[Z] * v[Z] );
-    if ( s > EPSILON )
+    float s = sqrtf( v[X] * v[X] + v[Z] * v[Z] );
+    if ( s > EPSILON1 )
     {
         float d = m_radius / s;
         return ( Vector3<float>( v[X] * d,
@@ -332,7 +367,7 @@ void Cylinder<T>::writeConnection_PARAVIEW( std::list<int>& connectivity,
     offsets.push_back( last_offset );
     cellstype.push_back( 13 );
 
-    firstpoint_globalnumber += 2 * m_visuNodeNbOnPer + 2;
+    firstpoint_globalnumber += 2 * visuNodeNbOnPer + 2;
 }
 
 
@@ -342,3 +377,5 @@ void Cylinder<T>::writeConnection_PARAVIEW( std::list<int>& connectivity,
 // Explicit instantiation
 template class Cylinder<float>;
 template class Cylinder<double>;
+
+#undef visuNodeNbOnPer

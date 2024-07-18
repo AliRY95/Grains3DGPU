@@ -2,7 +2,6 @@
 #define _BOUNDINGBOX_HH_
 
 
-#include "Transform3.hh"
 #include "Convex.hh"
 
 
@@ -13,8 +12,7 @@ template <typename> class Convex;
 // =============================================================================
 /** @brief The class BoundingBox.
 
-    Bounding Boxes (AABB/BoundingBox) collision detection for convex bodies in 
-    single precision.
+    Bounding Boxes (AABB/BoundingBox) collision detection for convex bodies.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
@@ -79,6 +77,10 @@ class BoundingBox
         @param z 3rd component */
         __HOSTDEVICE__
         Vector3<T> const getExtent() const;
+
+        /** @brief Returns a clone of the bounding box */
+        __HOSTDEVICE__
+        BoundingBox<T>* clone() const;
         //@}
 };
 
