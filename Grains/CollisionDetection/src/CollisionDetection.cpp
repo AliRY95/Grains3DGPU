@@ -36,6 +36,48 @@ bool intersectRigidBodies( RigidBody<T, U> const& rbA,
     {
         if ( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
                                            *( rbB.getBoundingBox() ),
+                                           Transform3<U>( a2w ),
+                                           Transform3<U>( b2w ) ) )
+            return( intersectGJK( *convexA, 
+                                  *convexB,
+                                  a2w, 
+                                  b2w ) );
+    }
+    return ( false );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns whether 2 rigid bodies intersect
+template <typename T>
+__HOSTDEVICE__
+bool intersectRigidBodies( RigidBody<T, T> const& rbA,
+                           RigidBody<T, T> const& rbB,
+                           Transform3<T> const& a2w,
+                           Transform3<T> const& b2w )
+{
+    Convex<T> const* convexA = rbA.getConvex();
+    Convex<T> const* convexB = rbB.getConvex();
+
+    // In case the 2 rigid bodies are spheres
+    if ( convexA->getConvexType() == SPHERE && 
+         convexB->getConvexType() == SPHERE )
+    {
+        T radiiSum = rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius();
+        T dist2 = ( a2w.getOrigin() - b2w.getOrigin() ).norm2();
+        return ( dist2 < radiiSum * radiiSum );
+    }
+
+    // General case
+    Vector3<T> cenA = a2w.getOrigin();
+    Vector3<T> cenB = b2w.getOrigin();
+    T dist = ( cenB - cenA ).norm();
+    if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
+    {
+        if ( intersectOrientedBoundingBox( *( rbA.getBoundingBox() ), 
+                                           *( rbB.getBoundingBox() ),
                                            a2w, 
                                            b2w ) )
             return( intersectGJK( *convexA, 
@@ -160,20 +202,20 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
         {
             int nbIterGJK = 0;
             Vector3<T> ptA, ptB;
-            // T distance = closestPointsGJK( *convexA, 
-            //                                *convexB,
-            //                                a2w,
-            //                                b2w,
-            //                                ptA,
-            //                                ptB,
-            //                                nbIterGJK );
-            T distance = closestPointsGJK_SV( *convexA, 
-                                              *convexB,
-                                              a2w,
-                                              b2w,
-                                              ptA,
-                                              ptB,
-                                              nbIterGJK );
+            T distance = closestPointsGJK( *convexA, 
+                                           *convexB,
+                                           a2w,
+                                           b2w,
+                                           ptA,
+                                           ptB,
+                                           nbIterGJK );
+            // T distance = closestPointsGJK_SV2( *convexA, 
+            //                                   *convexB,
+            //                                   a2w,
+            //                                   b2w,
+            //                                   ptA,
+            //                                   ptB,
+            //                                   nbIterGJK );
             // TODO: ERROR HANDLING
             // printf( "%d\n", nbIterGJK );
             // Sum of crust thicknesses
@@ -287,22 +329,22 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, T> const& rbA,
         {
             int nbIterGJK = 0;
             Vector3<T> ptA, ptB;
-            // T distance = closestPointsGJK( *convexA, 
-            //                                *convexB,
-            //                                a2w,
-            //                                b2w,
-            //                                ptA,
-            //                                ptB,
-            //                                nbIterGJK );
-            T distance = closestPointsGJK_SV2( *convexA, 
-                                              *convexB,
-                                              a2w,
-                                              b2w,
-                                              ptA,
-                                              ptB,
-                                              nbIterGJK );
+            T distance = closestPointsGJK( *convexA, 
+                                           *convexB,
+                                           a2w,
+                                           b2w,
+                                           ptA,
+                                           ptB,
+                                           nbIterGJK );
+            // T distance = closestPointsGJK_SV2( *convexA, 
+            //                                   *convexB,
+            //                                   a2w,
+            //                                   b2w,
+            //                                   ptA,
+            //                                   ptB,
+            //                                   nbIterGJK );
             // TODO: ERROR HANDLING
-            // printf( "%d\n", nbIterGJK );
+            
             // Sum of crust thicknesses
             T ctSum = rbA.getCrustThickness() + rbB.getCrustThickness();
 
@@ -345,23 +387,14 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, T> const& rbA,
 
 
 // -----------------------------------------------------------------------------
-// TODO: ERROR in INTERSECT functions
 // Explicit instantiation
-// #define X( T, U ) \
-// template                                                                       \
-// __HOSTDEVICE__                                                                 \
-// bool intersectRigidBodies( RigidBody<T, U> const& rbA,                         \
-//                            RigidBody<T, U> const& rbB,                         \
-//                            Transform3<T> const& a2w,                           \
-//                            Transform3<T> const& b2w );                         \
-//                                                                                \
-// template                                                                       \
-// __HOSTDEVICE__                                                                 \
-// bool intersectRigidBodies( RigidBody<T, U> const& rbA,                         \
-//                            RigidBody<T, U> const& rbB,                         \
-//                            Transform3<T> const& b2w );                         \
-                                                                               
 #define X( T, U ) \
+template                                                                       \
+__HOSTDEVICE__                                                                 \
+bool intersectRigidBodies( RigidBody<T, U> const& rbA,                         \
+                           RigidBody<T, U> const& rbB,                         \
+                           Transform3<T> const& a2w,                           \
+                           Transform3<T> const& b2w );                         \
 template                                                                       \
 __HOSTDEVICE__                                                                 \
 ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,           \

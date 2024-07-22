@@ -5,6 +5,8 @@
 #include "GrainsParameters.hh"
 #include "RigidBody.hh"
 #include "ComponentManager.hh"
+#include "ComponentManagerCPU.hh"
+#include "ComponentManagerGPU.hh"
 #include "ReaderXML.hh"
 
 
@@ -31,14 +33,22 @@ class Grains
         /** \brief Same thing as above but on device if using GPU. Note that we
         force to use single precision for bounding volume. */
         RigidBody<T, T>** m_d_rigidBodyList;
-        /** \brief Manager of the components in the simulation. We use a pointer
-        here as we want to use runtime polymorphism for switching between 
-        ComponentManagerCPU and ComponentManagerGPU. */
-        ComponentManager<T>* m_components;
+        /** \brief Manager of the components in the simulation on the host mem. 
+        We use a pointer here as we want to use runtime polymorphism for
+        switching between ComponentManagerCPU and ComponentManagerGPU. */
+        ComponentManagerCPU<T>* m_components;
+        /** \brief Manager of the components in the simulation on the device 
+        memory. We use a pointer here as we want to use runtime polymorphism for
+        switching between ComponentManagerCPU and ComponentManagerGPU. */
+        ComponentManagerGPU<T>* m_d_components;
         /** \brief Linked cell for broad-phase. We use a pointer because
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
         LinkedCell<T>** m_linkedCell;
+        /** \brief Linked cell for broad-phase. We use a pointer because
+        the linkedCell is directly instantiated on device in the case that we
+        run Grains on GPU. */
+        LinkedCell<T>** m_d_linkedCell;
         /** \brief Time integration. We use a pointer because the linkedCell is 
         directly instantiated on device in the case that we
         run Grains on GPU. */

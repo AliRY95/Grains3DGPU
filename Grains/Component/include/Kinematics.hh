@@ -1,6 +1,7 @@
 #ifndef _KINEMATICS_HH_
 #define _KINEMATICS_HH_
 
+
 #include "Vector3.hh"
 
 
@@ -12,7 +13,7 @@
     @author G.FERRER - Institut Francais du Petrole - 2000 - Creation 
     @author A.WACHS - 2019 - Major cleaning & refactoring */
 // ============================================================================
-template <typename T = double>
+template <typename T>
 class Kinematics
 {
     protected:
@@ -32,11 +33,18 @@ class Kinematics
         /**@name Constructors */
         //@{
         /** @brief Default constructor */
-        __host__ __device__ 
+        __HOSTDEVICE__
         Kinematics();
 
+        /** @brief Constructor with a u and a omega as input parameters
+        @param u translational velocity
+        @param omega angular velocity */
+        __HOSTDEVICE__
+        Kinematics( Vector3<T> const& u, 
+                    Vector3<T> const& omega );
+
         /** @brief Destructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ~Kinematics();
         //@}
 
@@ -44,11 +52,11 @@ class Kinematics
         /** @name Get methods */
         //@{
         /** @brief Gets translational velocity of the kinematics */
-        __host__ __device__ 
+        __HOSTDEVICE__
         Vector3<T> getTranslationalVelocity() const;
         
         /** @brief Gets angular velocity of the kinematics */
-        __host__ __device__ 
+        __HOSTDEVICE__
         Vector3<T> getAngularVelocity() const;
         //@}
     
@@ -57,12 +65,12 @@ class Kinematics
         //@{
         /** @brief Sets the translational velocity of the kinematics
         @param u translation velocity */
-        __host__ __device__ 
+        __HOSTDEVICE__
         void setTranslationalVelocity( Vector3<T> const& u );
 
         /** @brief Sets the angular velocity of the kinematics
         @param omega angular velocity */
-        __host__ __device__
+        __HOSTDEVICE__
         void setAngularVelocity( Vector3<T> const& omega );
         //@}
 
@@ -71,10 +79,14 @@ class Kinematics
         //@{
         /** @brief Returns the total velocity U + om x R given R 
         @param R arm vector */
-        __host__ __device__
+        __HOSTDEVICE__
         Vector3<T> Velocity( Vector3<T> const& R ) const;
         //@}    
 };
+
+
+typedef Kinematics<float> KinematicsF;
+typedef Kinematics<double> KinematicsD;
 
 
 #endif

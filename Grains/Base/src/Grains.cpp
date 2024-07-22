@@ -144,17 +144,15 @@ void Grains<T>::Construction( DOMElement* rootElement )
         LC_coeff = T( 1 );
     cout << shiftString9 << "Cell size factor = " << LC_coeff << endl;
 
+
     if ( GrainsParameters<T>::m_isGPU )
     {
-        // Let's find the min and max for linked cell, as we cannot pass Vector3
-        // objects to GPU kernels
-
         // allocating memory for only one int for the number of cells
         int* d_numCells;
         cudaMalloc( ( void** ) &d_numCells, sizeof( int ) );
 
 
-        cudaErrCheck( cudaMalloc( (void**)&m_linkedCell,
+        cudaErrCheck( cudaMalloc( (void**)&m_d_linkedCell,
                                     sizeof( LinkedCell<T>* ) ) );
         createLinkedCellOnGPU<<<1, 1>>>( 
             GrainsParameters<T>::m_origin[X],
@@ -164,7 +162,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
             GrainsParameters<T>::m_origin[Y] + GrainsParameters<T>::m_dimension[Y], 
             GrainsParameters<T>::m_origin[Z] + GrainsParameters<T>::m_dimension[Z], 
             LC_coeff * T( 2 ) * linkedCellSize,
-            m_linkedCell,
+            m_d_linkedCell,
             d_numCells );
 
         // copying the variable to host
@@ -177,8 +175,9 @@ void Grains<T>::Construction( DOMElement* rootElement )
              << GrainsParameters<T>::m_numCells <<
              " cells is created on device." << endl;
     }
-    else
-    {
+    // else
+    // {
+        m_linkedCell = ( LinkedCell<T>** ) malloc( sizeof( LinkedCell<T>* ) );
         *m_linkedCell = new LinkedCell<T>( 
             GrainsParameters<T>::m_origin,
             GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
@@ -187,15 +186,15 @@ void Grains<T>::Construction( DOMElement* rootElement )
         cout << shiftString6 << "LinkedCell with "
              << GrainsParameters<T>::m_numCells <<
              " cells is created on host." << endl;
-    }
+    // }
 
     // Setting the number of particles in the simulation
     GrainsParameters<T>::m_numComponents = numTotalParticles;
-    ComponentManagerCPU<T>* h_components = new ComponentManagerCPU<T>();
+    m_components = new ComponentManagerCPU<T>();
     if ( GrainsParameters<T>::m_isGPU )
-        m_components = new ComponentManagerGPU<T>( *h_components );
-    else
-        m_components = new ComponentManagerCPU<T>();
+        m_d_components = new ComponentManagerGPU<T>( *m_components );
+    // else
+    //     m_components = new ComponentManagerCPU<T>();
 
 //     // Link obstacles with the linked cell grid
 //     m_collision->Link( m_allcomponents.getObstacles() );

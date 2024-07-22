@@ -476,6 +476,13 @@ T closestPointsGJK( Convex<T> const& a,
 #define X( T ) \
 template                                                                       \
 __HOSTDEVICE__                                                                 \
+bool intersectGJK( Convex<T> const& a,                                         \
+                   Convex<T> const& b,                                         \
+                   Transform3<T> const& a2w,                                   \
+                   Transform3<T> const& b2w );                                 \
+                                                                               \
+template                                                                       \
+__HOSTDEVICE__                                                                 \
 T closestPointsGJK( Convex<T> const& a,                                        \
                     Convex<T> const& b,                                        \
                     Transform3<T> const& a2w,                                  \

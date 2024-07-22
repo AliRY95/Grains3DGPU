@@ -172,6 +172,9 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                     // TODO:
                     // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
                     int secondaryId = m_compId[ id ];
+                    // To skip the self-collision
+                    if ( secondaryId == compId )
+                        continue;
                     Transform3<T> const& transformB = tr3d[ secondaryId ];
                     // result[compId] += intersectRigidBodies( rigidBodyA,
                     //                                      rigidBodyA,
@@ -181,7 +184,10 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                                               rigidBodyA,
                                                               transformA, 
                                                               transformB );
-                    result[compId] += ( ci.getOverlapDistance() < 0. );
+                    // if( ci.getOverlapDistance() < T( 0 ) )
+                    //     printf( "%d %d %f \n", compId, secondaryId,
+                    //     ci.getOverlapDistance() );
+                    result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
                 }
             }
         }

@@ -30,6 +30,20 @@ bool intersectRigidBodies( RigidBody<T, U> const& rbA,
                            Transform3<T> const& a2w,
                            Transform3<T> const& b2w );
 
+/** @brief Returns whether 2 rigid bodies intersect
+ @param rbA first rigid body
+ @param rbB second rigid body
+ @param a2w geometric transformation describing convex A in the world reference
+ frame
+ @param b2w geometric transformation describing convex B in the world reference
+ frame */
+ template <typename T>
+__HOSTDEVICE__ 
+bool intersectRigidBodies( RigidBody<T, T> const& rbA,
+                           RigidBody<T, T> const& rbB,
+                           Transform3<T> const& a2w,
+                           Transform3<T> const& b2w );
+                           
 /** @brief Returns whether 2 rigid bodies intersect - relative transformation
  @param rbA first rigid body
  @param rbB second rigid body

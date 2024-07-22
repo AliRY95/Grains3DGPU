@@ -1,12 +1,12 @@
-#include "Vector3.hh"
 #include "Torce.hh"
+#include "Vector3.hh"
 
 
 // -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
-__host__ __device__
-Torce::Torce()
+__HOSTDEVICE__
+Torce<T>::Torce()
 {}
 
 
@@ -15,8 +15,9 @@ Torce::Torce()
 // -----------------------------------------------------------------------------
 // Constructor with a torque and a force as input parameters
 template <typename T>
-__host__ __device__
-Torce::Torce( Vector3<T> const& t, Vector3<T> const& f )
+__HOSTDEVICE__
+Torce<T>::Torce( Vector3<T> const& t, 
+                 Vector3<T> const& f )
 : m_torque( t )
 , m_force( f )
 {}
@@ -27,8 +28,8 @@ Torce::Torce( Vector3<T> const& t, Vector3<T> const& f )
 // -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
-__host__ __device__
-Torce::~Torce()
+__HOSTDEVICE__
+Torce<T>::~Torce()
 {}
 
 
@@ -37,8 +38,8 @@ Torce::~Torce()
 // -----------------------------------------------------------------------------
 // Gets the total torque of the torce
 template <typename T>
-__host__ __device__
-Vector3<T> Torce::getTorque() const
+__HOSTDEVICE__
+Vector3<T> Torce<T>::getTorque() const
 {
     return ( m_torque );
 }
@@ -49,8 +50,8 @@ Vector3<T> Torce::getTorque() const
 // -----------------------------------------------------------------------------
 // Gets the total force of the torce
 template <typename T>
-__host__ __device__
-Vector3<T> Torce::getForce() const
+__HOSTDEVICE__
+Vector3<T> Torce<T>::getForce() const
 {
     return ( m_force );
 }
@@ -61,8 +62,8 @@ Vector3<T> Torce::getForce() const
 // -----------------------------------------------------------------------------
 // Sets the total torque of the torce
 template <typename T>
-__host__ __device__
-void Torce::setTorque( Vector3<T> const& t )
+__HOSTDEVICE__
+void Torce<T>::setTorque( Vector3<T> const& t )
 {
     m_torque = t;
 }
@@ -73,8 +74,8 @@ void Torce::setTorque( Vector3<T> const& t )
 // -----------------------------------------------------------------------------
 // Sets the total force of the torce
 template <typename T>
-__host__ __device__
-void Torce::setForce( Vector3<T> const& f )
+__HOSTDEVICE__
+void Torce<T>::setForce( Vector3<T> const& f )
 {
     m_force = f;
 }
@@ -85,8 +86,8 @@ void Torce::setForce( Vector3<T> const& f )
 // -----------------------------------------------------------------------------
 // Adds a force to the torce
 template <typename T>
-__host__ __device__
-void Torce::addTorque( Vector3<T> const& t )
+__HOSTDEVICE__
+void Torce<T>::addTorque( Vector3<T> const& t )
 {
     m_torque += t;
 }
@@ -97,8 +98,8 @@ void Torce::addTorque( Vector3<T> const& t )
 // -----------------------------------------------------------------------------
 // Adds a force to the torce
 template <typename T>
-__host__ __device__
-void Torce::addForce( Vector3<T> const& f )
+__HOSTDEVICE__
+void Torce<T>::addForce( Vector3<T> const& f )
 {
     m_force += f;
 }
@@ -106,3 +107,7 @@ void Torce::addForce( Vector3<T> const& f )
 
 
 
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+template class Torce<float>;
+template class Torce<double>;

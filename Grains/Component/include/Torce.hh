@@ -13,7 +13,7 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-template <typename T = double>
+template <typename T>
 class Torce
 {
     private:
@@ -27,18 +27,18 @@ class Torce
         /**@name Constructors */
         //@{
         /** @brief Default constructor */
-        __host__ __device__
+        __HOSTDEVICE__
         Torce();
 
         /** @brief Constructor with a torque and a force as input parameters
         @param t torque
         @param f force */
-        __host__ __device__
+        __HOSTDEVICE__
         Torce( Vector3<T> const& t, 
                Vector3<T> const& f );
 
         /** @brief Destructor */
-        __host__ __device__
+        __HOSTDEVICE__
         ~Torce();
         //@}
 
@@ -46,11 +46,11 @@ class Torce
         /**@name Get methods */
         //@{
         /** @brief Gets the total torque of the torce */
-        __host__ __device__
+        __HOSTDEVICE__
         Vector3<T> getTorque() const;
 
         /** @brief Gets the total force of the torce */
-        __host__ __device__
+        __HOSTDEVICE__
         Vector3<T> getForce() const;
         //@}  
 
@@ -59,12 +59,12 @@ class Torce
         //@{
         /** @brief Sets the torque of the torce
         @param t torque */
-        __host__ __device__
+        __HOSTDEVICE__
         void setTorque( Vector3<T> const& t );
 
         /** @brief Sets the force of the torce
         @param f force */
-        __host__ __device__
+        __HOSTDEVICE__
         void setForce( Vector3<T> const& f );
         //@}
 
@@ -73,14 +73,19 @@ class Torce
         //@{
         /** @brief Adds a torque to the torce
         @param t the added torque */
-        __host__ __device__
+        __HOSTDEVICE__
         void addTorque( Vector3<T> const& t );
 
         /** @brief Adds a force to the torce
         @param f the added force */
-        __host__ __device__
+        __HOSTDEVICE__
         void addForce( Vector3<T> const& f ); 
         //@}    
 };
+
+
+typedef Torce<float> TorceF;
+typedef Torce<double> TorceD;
+
 
 #endif

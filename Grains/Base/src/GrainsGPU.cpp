@@ -58,31 +58,43 @@ void GrainsGPU<T>::simulate()
 
     // Collision detection on host
     auto h_start = chrono::high_resolution_clock::now();
+    // ComponentManagerCPU<T>* mmm = static_cast<ComponentManagerCPU<T>*>(Grains<T>::m_components);
+    // std::vector<Transform3<T>> tr = mmm->getTransform();
+    // cout << tr[0].getOrigin() << endl;
     Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
-                                              Grains<T>::m_d_rigidBodyList,
-                                              d_collision );
-    cudaDeviceSynchronize();
+                                              Grains<T>::m_rigidBodyList,
+                                              h_collision );
     auto h_end = chrono::high_resolution_clock::now();
-
+    // Collision detection on device
+    auto d_start = chrono::high_resolution_clock::now();
+    Grains<T>::m_d_components->detectCollision( Grains<T>::m_d_linkedCell, 
+                                                Grains<T>::m_d_rigidBodyList,
+                                                d_collision );
+    cudaDeviceSynchronize();
+    auto d_end = chrono::high_resolution_clock::now();
 
 
 
     // Time comparison
     chrono::duration<double> h_time = h_end - h_start;
-    std::cout << "GPU: " << h_time.count() << endl;
+    chrono::duration<double> d_time = d_end - d_start;
+    std::cout << "CPU: " << h_time.count() << endl;
+    std::cout << "GPU: " << d_time.count() << endl;
     int* h_d_collision = new int[N];
     cudaErrCheck( cudaMemcpy( h_d_collision,
                               d_collision,
                               N * sizeof( int ), 
                               cudaMemcpyDeviceToHost ) );
     // accuracy
-    int colCount = 0;
+    int hCount = 0, dCount = 0;
     for( int i = 0; i < N; i++ )
     {
-        colCount += h_d_collision[i];
+        hCount += h_collision[i];
+        dCount += h_d_collision[i];
     }
     cout << N << " Particles, "
-         << colCount << " Collisions. " << endl;
+         << hCount << " collisions on CPU, and "
+         << dCount << " collisions on GPU. " << endl;
 }
 
 

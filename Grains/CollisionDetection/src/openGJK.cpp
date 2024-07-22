@@ -2,10 +2,6 @@
 #include "MatrixMath.hh"
 
 
-#define eps_rel22        (T) gkEpsilon * 1e4f
-#define eps_tot22        (T) gkEpsilon * 1e2f
-
-
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
@@ -730,8 +726,8 @@ T closestPointsGJK_SV2( Convex<T> const& a,
 {
     unsigned int k = 0;                /**< Iteration counter                 */
     const int mk = 25;                 /**< Maximum number of GJK iterations  */
-    const T eps_rel = EPSILON1;        /**< Tolerance on relative             */
-    const T eps_tot = EPSILON2;        /**< Tolerance on absolute distance    */
+    const T eps_rel = 1.e-6;           /**< Tolerance on relative             */
+    const T eps_tot = 1.e-10;          /**< Tolerance on absolute distance    */
     const T eps_rel2 = eps_rel * eps_rel;
     unsigned int i;
     T w[3];

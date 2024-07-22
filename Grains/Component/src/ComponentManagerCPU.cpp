@@ -13,6 +13,12 @@
 #include <omp.h>
 
 
+
+#include "thrust/for_each.h"
+#include "thrust/iterator/zip_iterator.h"
+#include "thrust/sort.h"
+
+
 #define numComponents (GrainsParameters<T>::m_numComponents)
 #define numCells (GrainsParameters<T>::m_numCells)
 /* ========================================================================== */
@@ -20,10 +26,11 @@
 /* ========================================================================== */
 // Sorts one vector based on another vector
 static INLINE void sortByKey( std::vector<unsigned int>& data, 
-                              std::vector<unsigned int> const& key)
+                              std::vector<unsigned int>& key )
 {
     // Create a vector of indices
-    std::vector<std::size_t> indices( data.size() );
+    std::size_t N = data.size();
+    std::vector<std::size_t> indices( N );
     for ( std::size_t i = 0; i < indices.size(); ++i )
         indices[i] = i;
 
@@ -33,10 +40,15 @@ static INLINE void sortByKey( std::vector<unsigned int>& data,
                [&key]( std::size_t i1, std::size_t i2 ) 
                { return key[i1] < key[i2]; } );
 
-    // Reorder the data vector based on the sorted indices
-    std::vector<unsigned int> sortedData( data.size() );
-    for ( std::size_t i = 0; i < indices.size(); ++i )
+    // Reorder the key and data vectors based on the sorted indices
+    std::vector<unsigned int> sortedData( N );
+    std::vector<unsigned int> sortedKey( N );
+    for ( std::size_t i = 0; i < N; ++i )
+    {
+        sortedKey[i] = key[ indices[i] ];
         sortedData[i] = data[ indices[i] ];
+    }
+    key = sortedKey;
     data = sortedData;
 }
 
@@ -295,7 +307,7 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                                        numComponents,
                                        m_componentCellHash );
 
-    sortByKey( m_componentCellHash, m_componentId );
+    sortByKey( m_componentId, m_componentCellHash );
 
     std::fill( m_cellHashStart.begin(), m_cellHashStart.end(), 0 );
     std::fill( m_cellHashEnd.begin(), m_cellHashEnd.end(), 0 );
@@ -313,7 +325,7 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
             m_cellHashEnd.at( hash ) = i + 1;
     }
     
-    #pragma omp parallel for
+    // #pragma omp parallel for
     for ( int pId = 0; pId < numComponents; pId++ )
     {
         unsigned int const compId = m_componentId[ pId ];
@@ -335,6 +347,9 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                         // TODO:
                         // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
                         int secondaryId = m_componentId[ id ];
+                        // To skip the self-collision
+                        if ( secondaryId == compId )
+                            continue;
                         Transform3<T> const& transformB = m_transform[ secondaryId ];
                         // result[compId] += intersectRigidBodies( rigidBodyA,
                         //                                     rigidBodyA,
@@ -344,8 +359,10 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                                                                     rigidBodyA,
                                                                     transformA, 
                                                                     transformB );
-                        // std::cout << ci.getOverlapDistance() << "\n";
-                        result[compId] += ( ci.getOverlapDistance() < 0. );
+                        // if( ci.getOverlapDistance() < T( 0 ) )
+                        //     cout << compId << " " << secondaryId << " " <<
+                        //     ci.getOverlapDistance() << endl;
+                        result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
                     }
                 }
             }
