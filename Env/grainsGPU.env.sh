@@ -53,19 +53,23 @@ echo -e '\033[31mXERCES_ROOT\033[0m =' $GRAINS_XERCES_ROOT
 export GRAINS_CPP_COMPILER_FLAGS="-m64 -O3 -fPIC -std=c++11 \
     -Wno-ctor-dtor-privacy \
     -Wall -Wextra -Wconversion -Wshadow -Wpedantic -Wwrite-strings \
-    -fmax-errors=n"
+    -fmax-errors=8 \
+    -g"
 export GRAINS_CPP_LINKER_FLAGS="${GRAINS_CPP_COMPILER_FLAGS} -shared"
 ###########
 export GRAINS_GPU_COMPILER="${GRAINS_GPU_COMPILER_BINDIR}/${GRAINS_GPU_COMPILER}"
 export GRAINS_GPU_LINKER="${GRAINS_GPU_COMPILER_BINDIR}/${GRAINS_GPU_COMPILER}"
-export GRAINS_GPU_COMPILER_FLAGS="-t=0 -x cu -m64 -O3 -dlto -dc \
+export GRAINS_GPU_COMPILER_FLAGS="-t=0 -O3 -x cu -m64 -dlto -dc \
     -std=c++17 -arch=sm_75 \
     -cudart static -cudadevrt static \
-    -maxrregcount=64 -use_fast_math -extra-device-vectorization -restrict \
-    -Xcompiler "-rdynamic,-fPIC""
+    -maxrregcount=128 -use_fast_math -extra-device-vectorization -restrict \
+    -Xcompiler "-rdynamic,-fPIC,-fopenmp" \
+    -g -diag-suppress 554"
 export GRAINS_GPU_LINKER_FLAGS="-O3 -dlto -arch=sm_75 -lcudart \
-    -maxrregcount=64 -use_fast_math -extra-device-vectorization -restrict \
-    -lcudart -lcudadevrt"
+    -maxrregcount=128 -use_fast_math -extra-device-vectorization -restrict \
+    -lcudart -lcudadevrt \
+    -lgomp \
+    -g"
 ###########
 export GRAINS_XERCES_FLAGS="-L${GRAINS_XERCES_LIBDIR} -lxerces-c -lxerces-depdom"
 ###########
@@ -75,6 +79,6 @@ export GRAINS_Z_FLAGS="-L${GRAINS_Z_LIB} -lz"
 
 
 # LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${XERCESC_ROOT}/lib
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GRAINS_XERCES_LIBDIR}
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GRAINS_ROOT}/lib
 # End LD_LIBRARY_PATH

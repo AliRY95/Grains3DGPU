@@ -39,6 +39,7 @@
 
 <!ELEMENT Grains3D (Construction, Forces, Simulation)>
 <!ATTLIST Grains3D Type (Standard|MPI) "Standard">
+<!ATTLIST Grains3D Precision (Single|Double) "Double">
 
   <!ELEMENT Construction (LinkedCell, Origin?, Periodicity?, DomainDecomposition?, MPI?, ContactForceModels, BoundingVolume?, Particles?, Obstacles?, Reload?)>
     <!ELEMENT LinkedCell EMPTY>

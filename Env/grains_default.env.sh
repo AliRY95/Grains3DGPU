@@ -36,7 +36,6 @@ fi
 export GRAINS_GENCCFLAGS="-m${GRAINS_BITS_DEFAULT} ${GRAINS_COMPIL_OPT} -fPIC -Wall -Wwrite-strings -Wconversion -Wshadow -Wno-deprecated -Wno-comment ${GCCFLAGS}"
 export GRAINS_MPICCFLAGS="-DMPICH_IGNORE_CXX_SEEK -DMPICH_SKIP_MPICXX -DOMPI_IGNORE_CXX_SEEK -DOMPI_SKIP_MPICXX"
 
-
 # System include directories to generate dependencies 
 GRAINS_SYSINC="${GRAINS_MPI_INCDIR} ${XERCESCROOT}/include"
 # Next line depends on the operating system. Not mandatory to change, 
