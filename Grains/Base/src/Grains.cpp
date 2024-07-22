@@ -1,150 +1,210 @@
-/* ========================================================================== */
-/*                Discrete Element Method Using NVIDIA CUDA                   */
-/*                      Alireza Yazdani, July 2023                            */
-/* ========================================================================== */
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include "Kernels.cu"
-
-
-using namespace std;
+#include "Grains.hh"
+#include "VectorMath.hh"
+#include "ComponentManagerCPU.hh"
+#include "ComponentManagerGPU.hh"
+#include "RigidBody.hh"
+#include "RigidBodyGPUWrapper.hh"
+#include "LinkedCell_Kernels.hh"
 
 
 /* ========================================================================== */
-/*                                    Main                                    */
+/*                            High-Level Methods                              */
 /* ========================================================================== */
-/* Main Function */
-int main(int argc, char* argv[])
-{
-    double userN = stod( argv[1] );
-    int const N = round( userN * 24 * 256 ); // No. pair particles
-    double r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
+// Default constructor
+template <typename T>
+Grains<T>::Grains()
+{}
 
-    /* ====================================================================== */
-    /* Creating two random Transform3 for each particles                      */
-    /* ====================================================================== */
 
-    default_random_engine generator;
-    uniform_real_distribution<double> location( 0.0, 1.0 );
-    uniform_real_distribution<double> angle( 0.0, 2. * M_PI );
 
-    // Allocating memory on host and device
-    Transform3d *h_tr3d = new Transform3d[N];
-    Transform3d *d_tr3d; // Device array
-    cudaErrCheck( cudaMalloc( (void**)&d_tr3d,
-                              N * sizeof( Transform3d ) ) );
-                             
-    // Randomize array on host
-    for( int i = 0; i < N; i++ )
-    {
-        // Random orientation
-        double aX = angle( generator );
-        double aY = angle( generator );
-        double aZ = angle( generator );
-        h_tr3d[i].setBasis( aX, aY, aZ );
-        h_tr3d[i].setOrigin( Vec3d( location( generator ),
-                                    location( generator ),
-                                    location( generator ) ) );
-    }
 
-    // Copying the arrays from host to device
-    cudaErrCheck( cudaMemcpy( d_tr3d,
-                              h_tr3d,
-                              N * sizeof( Transform3d ), 
-                              cudaMemcpyHostToDevice ) );
+// -----------------------------------------------------------------------------
+// Destructor
+template <typename T>
+Grains<T>::~Grains()
+{}
 
-    /* ====================================================================== */
-    /* Creating convex bodies                                                 */
-    /* ====================================================================== */
 
-    RigidBody** h_rb;
-    h_rb = ( RigidBody** ) malloc( sizeof( RigidBody* ) );
-    // GrainsCPU::setupRigidBody( SPHERE, r1, r2, r3, 1.e-3, h_rb );
-    GrainsCPU::setupRigidBody( BOX, r1, r2, r3, 1.e-3, h_rb );
-    // GrainsCPU::setupRigidBody( SUPERQUADRIC, r1, r2, r3, 1.e-3, h_rb );
 
-    // Copying the array from host to device
-    // __constant__ RigidBody d_rb[1];
-    RigidBody** d_rb;
-    cudaErrCheck( cudaMalloc( (void**)&d_rb,
-                              sizeof( RigidBody* ) ) );
-    // GrainsGPU::setupRigidBody<<<1, 1>>>( SPHERE, r1, r2, r3, 1.e-3, d_rb );
-    GrainsGPU::setupRigidBody<<<1, 1>>>( BOX, r1, r2, r3, 1.e-3, d_rb );
-    // GrainsGPU::setupRigidBody<<<1, 1>>>( SUPERQUADRIC, r1, r2, r3, 1.e-3, d_rb );
 
-    /* ====================================================================== */
-    /* Collision detection                                                    */
-    /* ====================================================================== */
-
-    bool *h_collision = new bool[N];
-    // Zeroing out
-    for( int i = 0; i < N; i++ )
-    {
-        h_collision[i] = false;
-    }
-    bool *d_collision;
-    cudaErrCheck( cudaMalloc( (void**)&d_collision,
-                              N * sizeof(bool) ) );
-    cudaErrCheck( cudaMemcpy( d_collision,
-                              h_collision,
-                              N * sizeof(bool), 
-                              cudaMemcpyHostToDevice ) );
-
-    // Collision detection on host
-    auto h_start = chrono::high_resolution_clock::now();
-    GrainsCPU::collisionDetectionGJK( h_rb,
-                                      h_tr3d,
-                                      h_collision,
-                                      N );
-    auto h_end = chrono::high_resolution_clock::now();
-
-    // Collision detection on device
-    dim3 dimBlock( 256, 1, 1 );
-    dim3 dimGrid( N / 256, 1, 1 );
-    auto d_start = chrono::high_resolution_clock::now();
-    GrainsGPU::collisionDetectionGJK<<< dimGrid, dimBlock >>> ( d_rb, 
-                                                                d_tr3d,
-                                                                d_collision,
-                                                                N );
-    cudaErrCheck( cudaDeviceSynchronize() );
-    auto d_end = chrono::high_resolution_clock::now();
-
-    /* ====================================================================== */
-    /* Results                                                                */
-    /* ====================================================================== */
-    // Time comparison
-    chrono::duration<double> h_time = h_end - h_start;
-    chrono::duration<double> d_time = d_end - d_start;
-    std::cout << "CPU: " << h_time.count()
-              << ", GPU: " << d_time.count() 
-              << ", Speedup: " << h_time.count() / d_time.count() << endl;
-
-    // accuracy
-    bool *h_d_collision = new bool[N];
-    cudaErrCheck( cudaMemcpy( h_d_collision,
-                              d_collision,
-                              N * sizeof(bool), 
-                              cudaMemcpyDeviceToHost ) );
-
-    int diffCount = 0, trueHostCount = 0, trueDeviceCount = 0;
-    for( int i = 0; i < N; i++ )
-    {
-        if( h_collision[i] == true )
-            trueHostCount++;
-        if( h_d_collision[i] == true )
-            trueDeviceCount++;
-        if( h_collision[i] != h_d_collision[i] )
-            diffCount++;
-    }
-    cout << N << " Particles, "
-         << trueHostCount << " Collision on host, "
-         << trueDeviceCount << " Collision on device, "
-         << diffCount << " Different results." << endl;
-
-    delete[] h_tr3d;
-    delete[] h_collision;
-    cudaFree( d_tr3d );
-    cudaFree( d_collision );
+// -----------------------------------------------------------------------------
+// Initializes the simulation using the XML input
+template <typename T>
+void Grains<T>::initialize( DOMElement* rootElement )
+{   
+    // Read the input file
+    // Type - CPU or GPU
+    string option = ReaderXML::getNodeAttr_String( rootElement, "Type" );
+    if ( option == "Standard" ) 
+        GrainsParameters<T>::m_isGPU = false;
+    else if ( option == "GPU" )
+        GrainsParameters<T>::m_isGPU = true;
     
-  return 0;
+
+    /* */
+    Construction( rootElement );
+    // Forces( rootElement );
+    // AdditionalFeatures( rootElement );
 }
+
+
+
+
+/* ========================================================================== */
+/*                            Low-Level Methods                               */
+/* ========================================================================== */
+// Constructs the simulation -- Reads the Construction part of the XML input to
+// set the parameters
+template <typename T>
+void Grains<T>::Construction( DOMElement* rootElement )
+{
+    DOMNode* root = ReaderXML::getNode( rootElement, "Construction" );
+    if ( !root )
+    {
+        cout << shiftString0 << "Construction section cannot be found!" << endl;
+        exit( 1 );
+    }
+
+    // Domain size: origin, max coordinates and periodicity
+    DOMNode* domain = ReaderXML::getNode( root, "LinkedCell" );
+    GrainsParameters<T>::m_dimension.setValue( 
+        T( ReaderXML::getNodeAttr_Double( domain, "MX" ) ),
+        T( ReaderXML::getNodeAttr_Double( domain, "MY" ) ),
+        T( ReaderXML::getNodeAttr_Double( domain, "MZ" ) ) );
+
+    DOMNode* domain_origin = ReaderXML::getNode( root, "Origin" );
+    if ( domain_origin )
+        GrainsParameters<T>::m_origin.setValue( 
+            T( ReaderXML::getNodeAttr_Double( domain_origin, "OX" ) ),
+            T( ReaderXML::getNodeAttr_Double( domain_origin, "OY" ) ),
+            T( ReaderXML::getNodeAttr_Double( domain_origin, "OZ" ) ) );
+    else
+        GrainsParameters<T>::m_origin.setValue( T( 0 ), T( 0 ), T( 0 ) );
+
+    // if the simulation is periodic
+    GrainsParameters<T>::m_isPeriodic = false;
+
+
+    // Particles
+    DOMNode* particles = ReaderXML::getNode( root, "Particles" );
+    DOMNodeList* allParticles = ReaderXML::getNodes( rootElement, "Particle" );
+    int numRigidBodies = int( allParticles->getLength() );
+    int numEachRigidBody[ numRigidBodies ];
+    int numTotalParticles = 0;
+    T linkedCellSize = T( 0 );
+    if ( particles )
+    {
+        cout << shiftString6 << "Reading new particle types ..." << endl;
+
+        // Memory allocation for m_rigidBodyList with respect to the number of 
+        // shapes in the simulation
+        m_rigidBodyList = ( RigidBody<T, T>** ) malloc( 
+                            numRigidBodies * sizeof( RigidBody<T, T>* ) );
+        
+        // Populating the array with different kind of rigid bodies in the XML
+        // file
+        for ( int i = 0; i < numRigidBodies; i++ )
+        {
+            DOMNode* nParticle = allParticles->item( i );
+            numEachRigidBody[ i ] = 
+                            ReaderXML::getNodeAttr_Int( nParticle, "Number" );
+
+            // Create the Rigid Body
+            m_rigidBodyList[ i ] = new RigidBody<T, T>( nParticle );
+
+            // Finding the max circumscribed radius among all shapes
+            if ( m_rigidBodyList[i]->getCircumscribedRadius() > linkedCellSize )
+                linkedCellSize = m_rigidBodyList[i]->getCircumscribedRadius();
+            
+            // Sum to find total number of particles
+            numTotalParticles += numEachRigidBody[ i ];
+        }
+
+        // if it is a GPU simulation, we allocate memory on device as well 
+        if ( GrainsParameters<T>::m_isGPU )
+        {
+            cudaErrCheck( cudaMalloc( (void**) &m_d_rigidBodyList,
+                            numRigidBodies * sizeof( RigidBody<T, T>* ) ) );
+            RigidBodyCopyHostToDevice( m_rigidBodyList, 
+                                       m_d_rigidBodyList,
+                                       numRigidBodies );
+            cudaDeviceSynchronize();
+        }
+
+        cout << shiftString6 << "Reading particle types completed!" << endl;
+    }
+
+    // Scaling coefficient of linked cell size
+    cout << shiftString6 << "Constructing linked cell ..." << endl;
+    T LC_coeff = T( 1 );
+    DOMNode* nLC = ReaderXML::getNode( root, "LinkedCell" );
+    if ( ReaderXML::hasNodeAttr( nLC, "CellSizeFactor" ) )
+      LC_coeff = T( ReaderXML::getNodeAttr_Double( nLC, "CellSizeFactor" ) );
+    if ( LC_coeff < T( 1 ) ) 
+        LC_coeff = T( 1 );
+    cout << shiftString9 << "Cell size factor = " << LC_coeff << endl;
+
+
+    if ( GrainsParameters<T>::m_isGPU )
+    {
+        // allocating memory for only one int for the number of cells
+        int* d_numCells;
+        cudaMalloc( ( void** ) &d_numCells, sizeof( int ) );
+
+
+        cudaErrCheck( cudaMalloc( (void**)&m_d_linkedCell,
+                                    sizeof( LinkedCell<T>* ) ) );
+        createLinkedCellOnGPU<<<1, 1>>>( 
+            GrainsParameters<T>::m_origin[X],
+            GrainsParameters<T>::m_origin[Y],
+            GrainsParameters<T>::m_origin[Z],
+            GrainsParameters<T>::m_origin[X] + GrainsParameters<T>::m_dimension[X], 
+            GrainsParameters<T>::m_origin[Y] + GrainsParameters<T>::m_dimension[Y], 
+            GrainsParameters<T>::m_origin[Z] + GrainsParameters<T>::m_dimension[Z], 
+            LC_coeff * T( 2 ) * linkedCellSize,
+            m_d_linkedCell,
+            d_numCells );
+
+        // copying the variable to host
+        cudaMemcpy( &GrainsParameters<T>::m_numCells, 
+                    d_numCells, 
+                    sizeof( int ), 
+                    cudaMemcpyDeviceToHost );
+        cudaDeviceSynchronize();
+        cout << shiftString6 << "LinkedCell with "
+             << GrainsParameters<T>::m_numCells <<
+             " cells is created on device." << endl;
+    }
+    // else
+    // {
+        m_linkedCell = ( LinkedCell<T>** ) malloc( sizeof( LinkedCell<T>* ) );
+        *m_linkedCell = new LinkedCell<T>( 
+            GrainsParameters<T>::m_origin,
+            GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
+            LC_coeff * T( 2 ) * linkedCellSize );
+        GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
+        cout << shiftString6 << "LinkedCell with "
+             << GrainsParameters<T>::m_numCells <<
+             " cells is created on host." << endl;
+    // }
+
+    // Setting the number of particles in the simulation
+    GrainsParameters<T>::m_numComponents = numTotalParticles;
+    m_components = new ComponentManagerCPU<T>();
+    if ( GrainsParameters<T>::m_isGPU )
+        m_d_components = new ComponentManagerGPU<T>( *m_components );
+    // else
+    //     m_components = new ComponentManagerCPU<T>();
+
+//     // Link obstacles with the linked cell grid
+//     m_collision->Link( m_allcomponents.getObstacles() );
+//   }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+template class Grains<float>;
+template class Grains<double>;

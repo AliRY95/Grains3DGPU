@@ -1,14 +1,15 @@
-#include "Convex.hh"
-#include "AABB.hh"
 #include "RigidBody.hh"
+#include "ConvexBuilderFactory.hh"
 
 
 // -----------------------------------------------------------------------------
 // Default constructor
-__host__ __device__ RigidBody::RigidBody()
+template <typename T, typename U>
+__HOSTDEVICE__
+RigidBody<T, U>::RigidBody()
 : m_convex( NULL )
-, m_crustThickness( 0. )
-, m_AABB( NULL )
+, m_crustThickness( T( 0 ) )
+, m_boundingBox( NULL )
 {}
 
 
@@ -16,15 +17,66 @@ __host__ __device__ RigidBody::RigidBody()
 
 // -----------------------------------------------------------------------------
 // Constructor with a convex and the crust thickness
-__host__ __device__ RigidBody::RigidBody( Convex* convex, 
-                                          double ct )
+// TODO: inertia
+template <typename T, typename U>
+__HOSTDEVICE__
+RigidBody<T, U>::RigidBody( Convex<T>* convex, 
+                            T ct )
 : m_convex( convex )
 , m_crustThickness( ct )
 {
     m_volume = m_convex->computeVolume();
     // bool tmp = m_convex->computeInertia( m_inertia, m_inertia_1 );
-    m_AABB = new AABB( m_convex->computeAABB() );
-    m_circumscribedRadius = m_convex->computeCircumscribedRadius();
+    // We cast type T to U just in case they are different.
+    // It happens only at the start when the rigid body is created.
+    m_boundingBox = new 
+                    BoundingBox( Vector3<U>( m_convex->computeBoundingBox() ) );
+    m_circumscribedRadius = U( m_convex->computeCircumscribedRadius() );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Constructor with an XML input
+// TODO: inertia
+template <typename T, typename U>
+__HOST__
+RigidBody<T, U>::RigidBody( DOMNode* root )
+{
+    // Convex
+    DOMNode* shape = ReaderXML::getNode( root, "Convex" );
+    m_convex = ConvexBuilderFactory<T>::create( shape );
+    m_crustThickness = 
+                T( ReaderXML::getNodeAttr_Double( shape, "CrustThickness" ) );
+    m_volume = m_convex->computeVolume();
+    // bool tmp = m_convex->computeInertia( m_inertia, m_inertia_1 );
+    // We cast type T to U just in case they are different.
+    // It happens only at the start when the rigid body is created.
+    m_boundingBox = new 
+                    BoundingBox( Vector3<U>( m_convex->computeBoundingBox() ) );
+    m_circumscribedRadius = U( m_convex->computeCircumscribedRadius() );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Copy constructor
+template <typename T, typename U>
+__HOSTDEVICE__
+RigidBody<T, U>::RigidBody( RigidBody<T, U> const& rb )
+: m_convex( NULL )
+, m_crustThickness( rb.m_crustThickness )
+, m_volume( rb.m_volume )
+// , m_inertia()
+, m_boundingBox( NULL )
+, m_circumscribedRadius( rb.m_circumscribedRadius )
+{
+    if ( rb.m_convex )
+        m_convex = rb.m_convex->clone();
+    if ( rb.m_boundingBox )
+        m_boundingBox = rb.m_boundingBox->clone();
 }
 
 
@@ -32,10 +84,12 @@ __host__ __device__ RigidBody::RigidBody( Convex* convex,
 
 // -----------------------------------------------------------------------------
 // Destructor
-__host__ __device__ RigidBody::~RigidBody()
+template <typename T, typename U>
+__HOSTDEVICE__
+RigidBody<T, U>::~RigidBody()
 {
     delete m_convex;
-    delete m_AABB;
+    delete m_boundingBox;
 }
 
 
@@ -43,7 +97,9 @@ __host__ __device__ RigidBody::~RigidBody()
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's convex
-__host__ __device__ Convex* RigidBody::getConvex() const
+template <typename T, typename U>
+__HOSTDEVICE__
+Convex<T>* RigidBody<T, U>::getConvex() const
 {
     return ( m_convex );
 }
@@ -53,7 +109,9 @@ __host__ __device__ Convex* RigidBody::getConvex() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's crust thickness
-__host__ __device__ double RigidBody::getCrustThickness() const
+template <typename T, typename U>
+__HOSTDEVICE__
+T RigidBody<T, U>::getCrustThickness() const
 {
     return ( m_crustThickness );
 }
@@ -63,7 +121,9 @@ __host__ __device__ double RigidBody::getCrustThickness() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's volume
-__host__ __device__ double RigidBody::getVolume() const
+template <typename T, typename U>
+__HOSTDEVICE__
+T RigidBody<T, U>::getVolume() const
 {
     return ( m_volume );
 }
@@ -73,7 +133,9 @@ __host__ __device__ double RigidBody::getVolume() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's inertia
-__host__ __device__ double* RigidBody::getInertia() const
+template <typename T, typename U>
+__HOSTDEVICE__
+T* RigidBody<T, U>::getInertia() const
 {
     return ( m_inertia );
 }
@@ -83,7 +145,9 @@ __host__ __device__ double* RigidBody::getInertia() const
 
 // -----------------------------------------------------------------------------
 // Returns the inverse of rigid body's inertia
-__host__ __device__ double* RigidBody::getInertia_1() const
+template <typename T, typename U>
+__HOSTDEVICE__
+T* RigidBody<T, U>::getInertia_1() const
 {
     return ( m_inertia_1 );
 }
@@ -92,10 +156,12 @@ __host__ __device__ double* RigidBody::getInertia_1() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's AABB
-__host__ __device__ AABB* RigidBody::getAABB() const
+// Returns the rigid body's bounding box
+template <typename T, typename U>
+__HOSTDEVICE__
+BoundingBox<U>* RigidBody<T, U>::getBoundingBox() const
 {
-    return ( m_AABB );
+    return ( m_boundingBox );
 }
 
 
@@ -103,7 +169,9 @@ __host__ __device__ AABB* RigidBody::getAABB() const
 
 // -----------------------------------------------------------------------------
 // Returns the rigid body's circumscribed radius
-__host__ __device__ float RigidBody::getCircumscribedRadius() const
+template <typename T, typename U>
+__HOSTDEVICE__
+U RigidBody<T, U>::getCircumscribedRadius() const
 {
     return ( m_circumscribedRadius );
 }
@@ -111,38 +179,8 @@ __host__ __device__ float RigidBody::getCircumscribedRadius() const
 
 
 
-/* ========================================================================== */
-/*                              External Methods                              */
-/* ========================================================================== */
-// Returns whether 2 rigid bodies intersect
-__host__ __device__ bool intersectRigidBodies( RigidBody const& rbA,
-                                               RigidBody const& rbB,
-                                               Transform3d const& a2w,
-                                               Transform3d const& b2w )
-{
-    Convex const* convexA = rbA.getConvex();
-    Convex const* convexB = rbB.getConvex();
-
-    // In case the 2 rigid bodies are spheres
-    if ( convexA->getConvexType() == SPHERE && 
-         convexB->getConvexType() == SPHERE )
-    {
-        double radiiSum = (double) rbA.getCircumscribedRadius() + 
-                                   rbB.getCircumscribedRadius();
-        double dist2 = ( a2w.getOrigin() - b2w.getOrigin() ).norm2();
-        return ( dist2 < radiiSum * radiiSum );
-    }
-
-    // General case
-    Vec3d temp = a2w.getOrigin();
-    Vec3f cenA( ( float ) temp[X], ( float ) temp[Y], ( float ) temp[Z] );
-    temp = b2w.getOrigin();
-    Vec3f cenB( ( float ) temp[X], ( float ) temp[Y], ( float ) temp[Z] );
-    float dist = ( cenB - cenA ).norm();
-    if ( dist < rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() )
-    {
-        if( intersectAABB( *( rbA.getAABB() ), *( rbB.getAABB() ), cenA, cenB ) )
-            return( intersectGJK( *convexA, *convexB, a2w, b2w ) );
-    }
-    return ( false );
-}
+// -----------------------------------------------------------------------------
+// Explicit instantiation
+template class RigidBody<float, float>;
+template class RigidBody<double, float>;
+template class RigidBody<double, double>;
