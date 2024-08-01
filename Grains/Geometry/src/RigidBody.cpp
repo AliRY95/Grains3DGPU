@@ -8,7 +8,6 @@ template <typename T, typename U>
 __HOSTDEVICE__
 RigidBody<T, U>::RigidBody()
 : m_convex( NULL )
-, m_crustThickness( T( 0 ) )
 , m_boundingBox( NULL )
 {}
 
@@ -21,12 +20,14 @@ RigidBody<T, U>::RigidBody()
 template <typename T, typename U>
 __HOSTDEVICE__
 RigidBody<T, U>::RigidBody( Convex<T>* convex, 
-                            T ct )
+                            T ct,
+                            T density )
 : m_convex( convex )
 , m_crustThickness( ct )
 {
     m_volume = m_convex->computeVolume();
-    // bool tmp = m_convex->computeInertia( m_inertia, m_inertia_1 );
+    m_mass = density * m_volume;
+    m_convex->computeInertia( m_inertia, m_inertia_1 );
     // We cast type T to U just in case they are different.
     // It happens only at the start when the rigid body is created.
     m_boundingBox = new 
@@ -50,7 +51,9 @@ RigidBody<T, U>::RigidBody( DOMNode* root )
     m_crustThickness = 
                 T( ReaderXML::getNodeAttr_Double( shape, "CrustThickness" ) );
     m_volume = m_convex->computeVolume();
-    // bool tmp = m_convex->computeInertia( m_inertia, m_inertia_1 );
+    T density = T( ReaderXML::getNodeAttr_Double( root, "Density" ) );
+    m_mass = density * m_volume;
+    m_convex->computeInertia( m_inertia, m_inertia_1 );
     // We cast type T to U just in case they are different.
     // It happens only at the start when the rigid body is created.
     m_boundingBox = new 
@@ -69,7 +72,7 @@ RigidBody<T, U>::RigidBody( RigidBody<T, U> const& rb )
 : m_convex( NULL )
 , m_crustThickness( rb.m_crustThickness )
 , m_volume( rb.m_volume )
-// , m_inertia()
+, m_mass( rb.m_mass )
 , m_boundingBox( NULL )
 , m_circumscribedRadius( rb.m_circumscribedRadius )
 {
@@ -77,6 +80,11 @@ RigidBody<T, U>::RigidBody( RigidBody<T, U> const& rb )
         m_convex = rb.m_convex->clone();
     if ( rb.m_boundingBox )
         m_boundingBox = rb.m_boundingBox->clone();
+    for ( int i = 0; i < 6; ++i )
+    {
+        m_inertia[i] = rb.m_inertia[i];
+        m_inertia_1[i] = rb.m_inertia_1[i];
+    }
 }
 
 
@@ -132,12 +140,25 @@ T RigidBody<T, U>::getVolume() const
 
 
 // -----------------------------------------------------------------------------
+// Returns the rigid body's volume
+template <typename T, typename U>
+__HOSTDEVICE__
+T RigidBody<T, U>::getMass() const
+{
+    return ( m_mass );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Returns the rigid body's inertia
 template <typename T, typename U>
 __HOSTDEVICE__
-T* RigidBody<T, U>::getInertia() const
+void RigidBody<T, U>::getInertia( T (&inertia)[6] ) const
 {
-    return ( m_inertia );
+    for ( int i = 0; i < 6; ++i )
+        inertia[i] = m_inertia[i];
 }
 
 
@@ -147,9 +168,10 @@ T* RigidBody<T, U>::getInertia() const
 // Returns the inverse of rigid body's inertia
 template <typename T, typename U>
 __HOSTDEVICE__
-T* RigidBody<T, U>::getInertia_1() const
+void RigidBody<T, U>::getInertia_1( T (&inertia_1)[6] ) const
 {
-    return ( m_inertia_1 );
+    for ( int i = 0; i < 6; ++i )
+        inertia_1[i] = m_inertia_1[i];
 }
 
 

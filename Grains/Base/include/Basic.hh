@@ -63,6 +63,7 @@ enum Direction
 #define zeroVector3T   Vector3<T>( T( 0 ), T( 0 ), T( 0 ) )
 #define zeroVector3D   Vector3D( 0., 0., 0. )
 #define zeroVector3F   Vector3F( 0.f, 0.f, 0.f )
+#define noContact      ContactInfo<T>( zeroVector3T, zeroVector3T, T( 0 ) )
 //@}
 
 

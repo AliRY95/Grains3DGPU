@@ -4,7 +4,7 @@
 #include "ComponentManagerGPU_Kernels.hh"
 #include "CollisionDetection.hh"
 #include "LinkedCell.hh"
-#include "LinkedCell_Kernels.hh"
+#include "LinkedCellGPUWrapper.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -156,7 +156,6 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
     RigidBody<T, U> const& rigidBodyA = **a; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
     Transform3<T> const& transformA = tr3d[ compId ];
 
-    ContactInfo<T> ci;
     for ( int k = -1; k < 2; k++ ) 
     {
         for ( int j = -1; j < 2; j++ ) 
@@ -180,14 +179,15 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                     //                                      rigidBodyA,
                     //                                      transformA, 
                     //                                      transformB );
-                    ci = closestPointsRigidBodies( rigidBodyA,
-                                                              rigidBodyA,
-                                                              transformA, 
-                                                              transformB );
-                    // if( ci.getOverlapDistance() < T( 0 ) )
-                    //     printf( "%d %d %f \n", compId, secondaryId,
-                    //     ci.getOverlapDistance() );
+                    ContactInfo<T> ci = closestPointsRigidBodies( rigidBodyA,
+                                                                  rigidBodyA,
+                                                                  transformA, 
+                                                                  transformB );
                     result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
+                    // Vector3<T> relVelocityAtContact = 
+                    // m_kinematics[compId].getVelocityAtPoint( ci.getContactPoint() ) -
+                    // m_kinematics[secondaryId].getVelocityAtPoint( ci.getContactPoint() );
+                    // Vector3<T> relAngVelocity = 
                 }
             }
         }

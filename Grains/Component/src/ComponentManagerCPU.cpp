@@ -1,4 +1,7 @@
 #include <random>
+#include <algorithm>
+#include <execution>
+#include <omp.h>
 
 #include "ComponentManagerCPU.hh"
 #include "ComponentManager.hh"
@@ -8,24 +11,13 @@
 #include "VectorMath.hh"
 
 
-#include <algorithm>
-#include <execution>
-#include <omp.h>
-
-
-
-#include "thrust/for_each.h"
-#include "thrust/iterator/zip_iterator.h"
-#include "thrust/sort.h"
-
-
 #define numComponents (GrainsParameters<T>::m_numComponents)
 #define numCells (GrainsParameters<T>::m_numCells)
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
-// Sorts one vector based on another vector
-static INLINE void sortByKey( std::vector<unsigned int>& data, 
+// Sorts both vectors data and key based on the key values
+static INLINE void sortByKey( std::vector<int>& data, 
                               std::vector<unsigned int>& key )
 {
     // Create a vector of indices
@@ -41,7 +33,7 @@ static INLINE void sortByKey( std::vector<unsigned int>& data,
                { return key[i1] < key[i2]; } );
 
     // Reorder the key and data vectors based on the sorted indices
-    std::vector<unsigned int> sortedData( N );
+    std::vector<int> sortedData( N );
     std::vector<unsigned int> sortedKey( N );
     for ( std::size_t i = 0; i < N; ++i )
     {
@@ -55,15 +47,29 @@ static INLINE void sortByKey( std::vector<unsigned int>& data,
 
 
 
-
 /* ========================================================================== */
 /*                            High-Level Methods                              */
 /* ========================================================================== */
-// Constructor with the number of particles randomly positioned in the 
+// Default constructor
+template <typename T>
+ComponentManagerCPU<T>::ComponentManagerCPU()
+{}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Constructor with the number of particles, randomly positioned in the 
 // computational domain
 // TODO: Cases with multiple RigidBodies
 template <typename T>
-ComponentManagerCPU<T>::ComponentManagerCPU()
+ComponentManagerCPU<T>::ComponentManagerCPU( 
+                                    std::vector<unsigned int> numEachRigidBody,
+                                    unsigned int nObstacles,
+                                    unsigned int nCells )
+: m_nParticles( numEachRigidBody.back() )
+, m_nObstacles( nObstacles )
+, m_nCells( nCells )
 {
     // Randomly initializing transforms
     std::default_random_engine generator;
@@ -75,10 +81,16 @@ ComponentManagerCPU<T>::ComponentManagerCPU()
                                         GrainsParameters<T>::m_dimension[Z] );
     std::uniform_real_distribution<T> angle( T( 0 ), T( 2 * M_PI ) );
 
-    // Initialzing the vectors
+    // Initialzing the vectors for particles
+    unsigned int rb_counter = 0;
     Transform3<T> tr;
-    for( int i = 0; i < numComponents; i++ )
+    for( int i = 0; i < m_nParticles; i++ )
     {
+        // m_rigidBodyId
+        if ( i == numEachRigidBody[ rb_counter ] )
+            ++rb_counter;
+        m_rigidBodyId.push_back( rb_counter );
+
         // m_transform
         tr.setBasis( angle( generator ), 
                      angle( generator ), 
@@ -89,18 +101,24 @@ ComponentManagerCPU<T>::ComponentManagerCPU()
                                   locationZ( generator ) ) );
         m_transform.push_back( tr );
         
-        // m_rigidBodyId
-        m_rigidBodyId.push_back( 0 );
+        m_kinematics.push_back( Kinematics<T>() );
 
-        // m_componentCellHash
-        m_componentCellHash.push_back( 0 );
+        m_torce.push_back( Torce<T>() );
 
         // m_compId
         m_componentId.push_back( i );
+
+        // m_componentCellHash
+        m_componentCellHash.push_back( 0 );
     }
 
+    // Initialzing the vectors for obstacles
 
-    for ( int i = 0; i < numCells + 1; i++ )
+
+    // Initialzing the vectors for cells
+    // The size of these vectors is one bigger that nCells because we reserve
+    // cellID = 0.
+    for ( int i = 0; i < m_nCells + 1; i++ )
     {
         m_cellHashStart.push_back( 0 );
         m_cellHashEnd.push_back( 0 );
@@ -121,6 +139,50 @@ ComponentManagerCPU<T>::~ComponentManagerCPU()
 
 
 // -----------------------------------------------------------------------------
+// Gets the number of particles in manager
+template <typename T>
+unsigned int ComponentManagerCPU<T>::getNumberOfParticles() const
+{
+    return( m_nParticles );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets the number of obstacles in manager
+template <typename T>
+unsigned int ComponentManagerCPU<T>::getNumberOfObstacles() const
+{
+    return( m_nObstacles );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets the number of cells in manager
+template <typename T>
+unsigned int ComponentManagerCPU<T>::getNumberOfCells() const
+{
+    return( m_nCells );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets components rigid body Id
+template <typename T>
+std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
+{
+    return( m_rigidBodyId );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Gets components transformation
 template <typename T>
 std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
@@ -132,22 +194,22 @@ std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
 
 
 // -----------------------------------------------------------------------------
-// Gets the array of components neighbor Id
+// Gets components kinematics
 template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getNeighborsId() const
+std::vector<Kinematics<T>> ComponentManagerCPU<T>::getKinematics() const
 {
-    return( m_neighborsId );
+    return( m_kinematics );
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Gets the array of components rigid body Id
+// Gets components torce
 template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
+std::vector<Torce<T>> ComponentManagerCPU<T>::getTorce() const
 {
-    return( m_rigidBodyId );
+    return( m_torce );
 }
 
 
@@ -156,64 +218,9 @@ std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
 // -----------------------------------------------------------------------------
 // Gets the array of component Ids
 template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getComponentId() const
+std::vector<int> ComponentManagerCPU<T>::getComponentId() const
 {
     return( m_componentId );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets the array of components cell hash
-template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getComponentCellHash() const
-{
-    return( m_componentCellHash );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets the array of components neighbor count
-template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getNeighborsCount() const
-{
-    return( m_neighborsCount );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets the array of cells hash start
-template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getCellHashStart() const
-{
-    return( m_cellHashStart );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Sets components transformation
-template <typename T>
-void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& tr )
-{
-    m_transform = tr;
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Sets the array of components neighbor Id
-template <typename T>
-void ComponentManagerCPU<T>::setNeighborsId( std::vector<unsigned int> const& id )
-{
-    m_neighborsId = id;
 }
 
 
@@ -231,11 +238,22 @@ void ComponentManagerCPU<T>::setRigidBodyId( std::vector<unsigned int> const& id
 
 
 // -----------------------------------------------------------------------------
-// Sets the array of component Ids
+// Sets components transformation
 template <typename T>
-void ComponentManagerCPU<T>::setComponentId( std::vector<unsigned int> const& id )
+void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& t )
 {
-    m_componentId = id;
+    m_transform = t;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets the array of components neighbor Id
+template <typename T>
+void ComponentManagerCPU<T>::setKinematics( std::vector<Kinematics<T>> const& k )
+{
+    m_kinematics = k;
 }
 
 
@@ -244,31 +262,57 @@ void ComponentManagerCPU<T>::setComponentId( std::vector<unsigned int> const& id
 // -----------------------------------------------------------------------------
 // Sets the array of components cell hash
 template <typename T>
-void ComponentManagerCPU<T>::setComponentCellHash( std::vector<unsigned int> const& hash )
+void ComponentManagerCPU<T>::setTorce( std::vector<Torce<T>> const& t )
 {
-    m_componentCellHash = hash;
+    m_torce = t;
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Sets the array of components neighbor count
+// Sets the array of component Ids
 template <typename T>
-void ComponentManagerCPU<T>::setNeighborsCount( std::vector<unsigned int> const& count )
+void ComponentManagerCPU<T>::setComponentId( std::vector<int> const& id )
 {
-    m_neighborsCount = count;
+    m_componentId = id;
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Sets the array of cells hash start
+// Updates linked cell information in manager
 template <typename T>
-void ComponentManagerCPU<T>::setCellHashStart( std::vector<unsigned int> const& id )
+void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 {
-    m_cellHashStart = id;
+    // Updating m_componentCellHash according to the linkedCell. That is, 
+    // assigning a hash value to each particle based on the cell it belongs to.
+    (*LC)->computeLinearLinkedCellHashCPU( m_transform,
+                                           m_nParticles,
+                                           m_componentCellHash );
+
+    // Sorting the hash values and componentIds according to the hash values
+    sortByKey( m_componentId, m_componentCellHash );
+
+    // Reseting start and end of each cell hash value
+    std::fill( m_cellHashStart.begin(), m_cellHashStart.end(), 0 );
+    std::fill( m_cellHashEnd.begin(), m_cellHashEnd.end(), 0 );
+
+
+    // Finding the start and end of each cell hash value
+    for ( int i = 0; i < m_nParticles; i++ )
+    {
+        unsigned int hash = m_componentCellHash[ i ];
+        if ( i == 0 )
+            m_cellHashStart[ hash ] = i;
+        if ( i != 0 && hash != m_componentCellHash[ i - 1 ] )
+            m_cellHashStart.at( hash ) = i;
+        if ( i > 0 )
+            m_cellHashEnd[ m_componentCellHash[ i - 1 ] ] = i;
+        if ( i == numComponents - 1 )
+            m_cellHashEnd[ hash ] = i + 1;
+    }
 }
 
 
@@ -303,70 +347,47 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
     // //     }
     // // }
 
-    (*LC)->computeLinearLinkedCellHashCPU( m_transform,
-                                       numComponents,
-                                       m_componentCellHash );
-
-    sortByKey( m_componentId, m_componentCellHash );
-
-    std::fill( m_cellHashStart.begin(), m_cellHashStart.end(), 0 );
-    std::fill( m_cellHashEnd.begin(), m_cellHashEnd.end(), 0 );
-    
-    for ( int i = 0; i < numComponents; i++ )
-    {
-        unsigned int hash = m_componentCellHash.at( i );
-        if ( i == 0 )
-            m_cellHashStart.at( hash ) = i;
-        if ( i != 0 && hash != m_componentCellHash.at( i - 1 ) )
-            m_cellHashStart.at( hash ) = i;
-        if ( i > 0 )
-            m_cellHashEnd.at( m_componentCellHash.at( i - 1 ) ) = i;
-        if ( i == numComponents - 1 )
-            m_cellHashEnd.at( hash ) = i + 1;
-    }
+    // updating links between components and linked cell
+    updateLinks( LC );
     
     // #pragma omp parallel for
-    for ( int pId = 0; pId < numComponents; pId++ )
+    for ( int pId = 0; pId < m_nParticles; pId++ )
     {
+        // Parameters of the primary particle
         unsigned int const compId = m_componentId[ pId ];
         unsigned int const cellHash = m_componentCellHash[ pId ];
-        RigidBody<T, T> const& rigidBodyA = **rb; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
-        Transform3<T> const& transformA = m_transform[ compId ];
-        for ( int k = -1; k < 2; k++ )
-        {
-            for ( int j = -1; j < 2; j++ ) 
-            {
-                for ( int i = -1; i < 2; i++ ) 
-                {
-                    int neighboringCellHash =
-                    (*LC)->computeNeighboringCellLinearHash( cellHash, i, j, k );
-                    int startId = m_cellHashStart[ neighboringCellHash ];
-                    int endId = m_cellHashEnd[ neighboringCellHash ];
-                    for ( int id = startId; id < endId; id++ )
-                    {
-                        // TODO:
-                        // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
-                        int secondaryId = m_componentId[ id ];
-                        // To skip the self-collision
-                        if ( secondaryId == compId )
-                            continue;
-                        Transform3<T> const& transformB = m_transform[ secondaryId ];
-                        // result[compId] += intersectRigidBodies( rigidBodyA,
-                        //                                     rigidBodyA,
-                        //                                     transformA, 
-                        //                                     transformB );
-                        ContactInfo<T> ci = closestPointsRigidBodies( rigidBodyA,
-                                                                    rigidBodyA,
-                                                                    transformA, 
-                                                                    transformB );
-                        // if( ci.getOverlapDistance() < T( 0 ) )
-                        //     cout << compId << " " << secondaryId << " " <<
-                        //     ci.getOverlapDistance() << endl;
-                        result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
-                    }
+        RigidBody<T, T> const& rbA = *( rb[ m_rigidBodyId[ compId ] ] );
+        Transform3<T> const& trA = m_transform[ compId ];
+        for ( int k = -1; k < 2; k++ ) {
+        for ( int j = -1; j < 2; j++ ) { 
+        for ( int i = -1; i < 2; i++ ) {
+            int neighboringCellHash =
+                (*LC)->computeNeighboringCellLinearHash( cellHash, i, j, k );
+            int startId = m_cellHashStart[ neighboringCellHash ];
+            int endId = m_cellHashEnd[ neighboringCellHash ];
+            for ( int id = startId; id < endId; id++ )
+            {           
+                unsigned int const secondaryId = m_componentId[ id ];
+                // To skip self-collision
+                if ( secondaryId == compId )
+                    continue;
+                RigidBody<T, T> const& rbB = 
+                                        *( rb[ m_rigidBodyId[ secondaryId ] ] );
+                Transform3<T> const& trB = m_transform[ secondaryId ];
+                // result[compId] += intersectRigidBodies( rigidBodyA,
+                //                                     rigidBodyA,
+                //                                     transformA, 
+                //                                     transformB );
+                ContactInfo<T> ci = closestPointsRigidBodies( rbA,
+                                                            rbB,
+                                                            trA, 
+                                                            trB );
+                // if( ci.getOverlapDistance() < T( 0 ) )
+                //     cout << compId << " " << secondaryId << " " <<
+                //     ci.getOverlapDistance() << endl;
+                result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
                 }
-            }
-        }
+        } } }
     }
 }
 

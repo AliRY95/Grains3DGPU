@@ -18,32 +18,53 @@ class ComponentManagerCPU : public ComponentManager<T>
     protected:
         /** @name Parameters */
         //@{
-        std::vector<Transform3<T>> m_transform; /**< components transformation */
-        // Mat3d* orientation; /**< array of components orientation */
-        // Vec3d* position; /**< array of components position */
-        // Vec3d* force; /**< array of components force */
-        // Vec3d* torque; /**< array of components torque */
-        // Vec3d* translationalVelocity; /**< array of components velocity */
-        // Vec3d* angularVelocity; /**< array of components angular velocity */
-        std::vector<unsigned int> m_neighborsId; /**< components neighbor Id */ 
-        std::vector<unsigned int> m_rigidBodyId; /**< components rigid body Id */
-        std::vector<unsigned int> m_componentId; /**< components Id */
-        std::vector<unsigned int> m_componentCellHash; /**< components cell hash */
-        std::vector<unsigned int> m_neighborsCount; /**< components neighbor count */
-        std::vector<unsigned int> m_cellHashStart; /**< cells hash start */
-        std::vector<unsigned int> m_cellHashEnd; /**< cells hash start */
-        // bool* isActive; /**< array of components activity in the simulation */
-        // bool* isObstacle; /**< array of components flag for being obstacle */
-        // unsigned int m_numComponents; /**< number of components */
+        /** \brief number of particles in manager */
+        unsigned int m_nParticles;
+        /** \brief number of obstacles in manager */
+        unsigned int m_nObstacles;
+        /** \brief number of cells in manager */
+        unsigned int m_nCells;
+        /** \brief components rigid body Id */
+        std::vector<unsigned int> m_rigidBodyId; 
+        /** \brief components transformation */
+        std::vector<Transform3<T>> m_transform; 
+        /** \brief array of components kinematics */
+        std::vector<Kinematics<T>> m_kinematics; 
+        /** \brief array of components torce */
+        std::vector<Torce<T>> m_torce; 
+        /** \brief components Id with positive values for particles and negative
+        values for obstacles. */
+        std::vector<int> m_componentId; 
+        /** \brief components cell hash */
+        std::vector<unsigned int> m_componentCellHash; 
+        /** \brief cells hash start */
+        std::vector<unsigned int> m_cellHashStart; 
+        /** \brief cells hash end */
+        std::vector<unsigned int> m_cellHashEnd; 
+
+        // /**< components neighbor Id */ 
+        // std::vector<unsigned int> m_neighborsId; 
+        // /**< components neighbor count */
+        // std::vector<unsigned int> m_neighborsCount; 
+        /**< array of components activity in the simulation */
+        // std::vector<bool> m_isActive; 
         //@}
 
         
     public:
         /** @name Constructors */
         //@{
-        /** @brief Constructor with the number of particles randomly positioned 
-        in the computational domain - Change to XML later !!!! */
+        /** @brief Default constructor */
         ComponentManagerCPU();
+
+        /** @brief Constructor with the number of particles, obstacles, and
+        cells. Particles are assumed to have the same shape (rigid body ID). 
+        Transformations are randomly chosen in the global domain taken from 
+        GrainsParameters, while kinematics and torce are set to zero.
+        It is not checked whether the particles are intersecting. */
+        ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
+                             unsigned int nObstacles,
+                             unsigned int nCells );
 
         /** @brief Destructor */
         ~ComponentManagerCPU();
@@ -52,51 +73,60 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @name Get methods */
         //@{
+        /** @brief Gets the number of particles in manager */
+        unsigned int getNumberOfParticles() const;
+
+        /** @brief Gets the number of obstacles in manager */
+        unsigned int getNumberOfObstacles() const;
+
+        /** @brief Gets the number of cells in manager */
+        unsigned int getNumberOfCells() const;
+
+        /** @brief Gets components rigid body Id */
+        std::vector<unsigned int> getRigidBodyId() const;
+
         /** @brief Gets components transformation */
         std::vector<Transform3<T>> getTransform() const;
 
-        /** @brief Gets the array of components neighbor Id */
-        std::vector<unsigned int> getNeighborsId() const;
+        /** @brief Gets components kinematics */
+        std::vector<Kinematics<T>> getKinematics() const;
 
-        /** @brief Gets the array of components rigid body Id */
-        std::vector<unsigned int> getRigidBodyId() const;
+        /** @brief Gets components torce */
+        std::vector<Torce<T>> getTorce() const;
 
         /** @brief Gets the array of component Ids */
-        std::vector<unsigned int> getComponentId() const;
+        std::vector<int> getComponentId() const;
 
-        /** @brief Gets the array of components cell hash */
-        std::vector<unsigned int> getComponentCellHash() const;
+        // /** @brief Gets the array of components neighbor Id */
+        // std::vector<unsigned int> getNeighborsId() const;
 
-        /** @brief Gets the array of components neighbor count */
-        std::vector<unsigned int> getNeighborsCount() const;
-
-        /** @brief Gets the array of cells hash start */
-        std::vector<unsigned int> getCellHashStart() const;
+        // /** @brief Gets the array of components neighbor count */
+        // std::vector<unsigned int> getNeighborsCount() const;
         //@}
 
 
         /** @name Set methods */
         //@{
-        /** @brief Sets components transformation */
-        void setTransform( std::vector<Transform3<T>> const& tr );
-
-        /** @brief Sets the array of components neighbor Id */
-        void setNeighborsId( std::vector<unsigned int> const& id );
-
         /** @brief Sets the array of components rigid body Id */
         void setRigidBodyId( std::vector<unsigned int> const& id );
 
+        /** @brief Sets components transformation */
+        void setTransform( std::vector<Transform3<T>> const& t );
+
+        /** @brief Sets components kinematics */
+        void setKinematics( std::vector<Kinematics<T>> const& k );
+
+        /** @brief Sets components torce */
+        void setTorce( std::vector<Torce<T>> const& t );
+
         /** @brief Sets the array of component Ids */
-        void setComponentId( std::vector<unsigned int> const& id );
+        void setComponentId( std::vector<int> const& id );
 
-        /** @brief Sets the array of components cell hash */
-        void setComponentCellHash( std::vector<unsigned int> const& hash );
-
-        /** @brief Sets the array of components neighbor count */
-        void setNeighborsCount( std::vector<unsigned int> const& count );
-
-        /** @brief Sets the array of cells hash start */
-        void setCellHashStart( std::vector<unsigned int> const& id );
+        // /** @brief Sets the array of components neighbor Id */
+        // void setNeighborsId( std::vector<unsigned int> const& id );
+        
+        // /** @brief Sets the array of components neighbor count */
+        // void setNeighborsCount( std::vector<unsigned int> const& count );
         //@}
 
 
@@ -108,14 +138,15 @@ class ComponentManagerCPU : public ComponentManager<T>
         // /** @brief Creates a neighbor list */
         // void createNeighborList();
 
-        /** @brief Detects collision between particles */
+        /** @brief updates links between components and linked cell */
+        // template <typename U>
+        void updateLinks( LinkedCell<T> const* const* LC );
+        
+        /** @brief Detects collision between components */
         // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
                               RigidBody<T, T> const* const* rb, 
                               int* result );
-
-        // /** @brief Computes impact forces */
-        // void computeForces();
 
         // /** @brief Updates the position and velocities of particles */
         // void updateParticles();

@@ -79,7 +79,13 @@ class Torce
         /** @brief Adds a force to the torce
         @param f the added force */
         __HOSTDEVICE__
-        void addForce( Vector3<T> const& f ); 
+        void addForce( Vector3<T> const& f );
+
+        /** @brief Adds a force to the torce
+        @param f the added force */
+        __HOSTDEVICE__
+        void addForce( Vector3<T> const& f,
+                       Vector3<T> const& p );
         //@}    
 };
 

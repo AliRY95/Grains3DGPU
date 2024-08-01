@@ -113,11 +113,40 @@ static INLINE int sgn( T x )
 
 
 // -----------------------------------------------------------------------------
+/** @brief Returns the beta function of 2 doubles using the gamma function. 
+The reason we implement this is that beta functions are not supported on device
+code.
+@param x the number */
+__HOSTDEVICE__
+static INLINE double grainsBeta( double x, double y )
+{ 
+    return ( tgamma( x ) * tgamma( y ) / tgamma( x + y ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+/** @brief Returns the beta function of 2 floats using the gamma function. 
+The reason we implement this is that beta functions are not supported on device
+code.
+@param x the number */
+__HOSTDEVICE__
+static INLINE float grainsBetaf( float x, float y )
+{ 
+    return ( tgammaf( x ) * tgammaf( y ) / tgammaf( x + y ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // /** @brief Returns a matrix that rotates vector src to vector dest,
 // i.e. dest = mat * src
 // @param src the source vector
 // @param dest the destination vector */
 // Matrix3<T> getRotationMatrix( Vector3 const& src, Vector3 const& dest );
+
 //@}
 
 

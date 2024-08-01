@@ -4,6 +4,7 @@
 
 #include "GrainsParameters.hh"
 #include "RigidBody.hh"
+#include "HODCContactForceModel.hh"
 #include "ComponentManager.hh"
 #include "ComponentManagerCPU.hh"
 #include "ComponentManagerGPU.hh"
@@ -23,6 +24,7 @@ class Grains
     protected:
         /** @name Parameters */
         //@{
+        // TODO: COMMENTS!
         /** \brief Parameters used in the simulation on the host memory. */
         GrainsParameters<T> m_parameters;
         /** \brief List of rigid bodies as a double pointer. The first ptr is
@@ -49,6 +51,14 @@ class Grains
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
         LinkedCell<T>** m_d_linkedCell;
+        /** \brief Linked cell for broad-phase. We use a pointer because
+        the linkedCell is directly instantiated on device in the case that we
+        run Grains on GPU. */
+        HODCContactForceModel<T>** m_contactForce;
+        /** \brief Linked cell for broad-phase. We use a pointer because
+        the linkedCell is directly instantiated on device in the case that we
+        run Grains on GPU. */
+        HODCContactForceModel<T>** m_d_contactForce;
         /** \brief Time integration. We use a pointer because the linkedCell is 
         directly instantiated on device in the case that we
         run Grains on GPU. */

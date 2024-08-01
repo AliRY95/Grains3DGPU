@@ -69,8 +69,8 @@ class Convex
         @param inertia inertia tensor
         @param inertia_1 inverse of the inertia tensor */
         __HOSTDEVICE__
-        virtual bool computeInertia( T* inertia, 
-                                     T* inertia_1 ) const = 0;
+        virtual void computeInertia( T (&inertia)[6], 
+                                     T (&inertia_1)[6] ) const = 0;
 
         /** @brief Computes and returns the circumscribed radius of the 
         reference convex shape */

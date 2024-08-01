@@ -1,5 +1,5 @@
-#ifndef _LINKEDCELL_KERNELS_HH_
-#define _LINKEDCELL_KERNELS_HH_
+#ifndef _LINKEDCELLGPUWRAPPER_HH_
+#define _LINKEDCELLGPUWRAPPER_HH_
 
 
 #include "LinkedCell.hh"
@@ -8,29 +8,27 @@
 
 
 // =============================================================================
-/** @brief The header for GPU kernels used in the LinkedCell class.
+/** @brief Header for LinkedCellGPUWrapper.
 
     Various GPU kernels used in the LinkedCell class.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-/** @name LinkedCell_Kernels : External methods */
+/** @name LinkedCellGPUWrapper : External methods */
 //@{
-/** @brief Creates a LinkedCell object
+/** @brief Creates a LinkedCell object on device and returns the number of cells
+after the construction
 @param min smallest corner of the domain
 @param max greatest corner of the domain 
 @param size size of each cell 
-@param LC pointer to the linked cell object to be created
+@param LC device pointer to the linked cell object to be created
 @param numCells number of cells after constructing the linked cell */
 template <typename T>
-__GLOBAL__ 
-// void createLinkedCellonGPU( Vector3<T> const& min,
-//                             Vector3<T> const& max,
-void createLinkedCellOnGPU( T minX, T minY, T minZ,
-                            T maxX, T maxY, T maxZ,
-                            T size,
-                            LinkedCell<T>** LC,
-                            int* numCells );
+__HOST__
+int createLinkedCellOnDevice( Vector3<T> min,
+                              Vector3<T> max,
+                              T size,
+                              LinkedCell<T>** LC );
 
 /** @brief Computes the linear linked cell hash values for all components
 @param LC linked cell

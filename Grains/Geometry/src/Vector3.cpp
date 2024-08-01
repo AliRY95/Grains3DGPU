@@ -352,7 +352,7 @@ Vector3<double>::operator Vector3<float> () const
 template <typename T>
 __HOST__
 std::ostream& operator << ( std::ostream& fileOut, 
-                                        Vector3<T> const& v )
+                            Vector3<T> const& v )
 {
     fileOut << v[X] << " " << v[Y] << " " << v[Z];
     return ( fileOut );
@@ -366,7 +366,7 @@ std::ostream& operator << ( std::ostream& fileOut,
 template <typename T>
 __HOST__
 std::istream& operator >> ( std::istream& fileIn, 
-                                        Vector3<T>& v )
+                            Vector3<T>& v )
 {
     fileIn >> v[X] >> v[Y] >> v[Z];
     return ( fileIn );
@@ -381,8 +381,11 @@ template class Vector3<float>;
 template class Vector3<double>;
 
 #define X( T ) \
-template std::ostream& operator << <T>( std::ostream& fileOut, Vector3<T> const& v );\
-template std::istream& operator >> <T>( std::istream& fileIn, Vector3<T>& v );
+template std::ostream& operator << <T>( std::ostream& fileOut,                 \
+                                        Vector3<T> const& v );                 \
+                                                                               \
+template std::istream& operator >> <T>( std::istream& fileIn,                  \
+                                        Vector3<T>& v );
 X( float )
 X( double )
 #undef X
