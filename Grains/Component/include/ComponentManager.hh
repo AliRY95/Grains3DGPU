@@ -4,6 +4,8 @@
 
 #include "RigidBody.hh"
 #include "LinkedCell.hh"
+#include "Kinematics.hh"
+#include "Torce.hh"
 #include "GrainsParameters.hh"
 
 
@@ -11,7 +13,7 @@
 /** @brief The class ComponentManager.
 
     This is just an abstract class to make sure all derived classess follow the
-    same set of variables and methods.
+    same set of methods.
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================

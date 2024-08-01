@@ -90,8 +90,8 @@ class Superquadric : public Convex<T>
         @param inertia inertia tensor
         @param inertia_1 inverse of the inertia tensor */
         __HOSTDEVICE__
-        bool computeInertia( T* inertia, 
-                             T* inertia_1 ) const final;
+        void computeInertia( T (&inertia)[6], 
+                             T (&inertia_1)[6] ) const final;
 
         /** @brief Computes and returns the circumscribed radius of the 
         Superquadric */

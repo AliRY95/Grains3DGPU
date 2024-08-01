@@ -118,21 +118,19 @@ T Cylinder<T>::computeVolume() const
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__
-bool Cylinder<T>::computeInertia( T* inertia, 
-                                  T* inertia_1 ) const
+void Cylinder<T>::computeInertia( T (&inertia)[6], 
+                                  T (&inertia_1)[6] ) const
 {
+    T r2 = m_radius * m_radius;
+    T c = T( .5 ) * T( PI ) * m_halfHeight * r2;
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
-    T const constant = T( .5 ) * T( PI ) * m_halfHeight * m_radius * m_radius;
-    inertia[0] = inertia[5] = constant
-                        * ( T( 4 ) * m_halfHeight * m_halfHeight / T( 3 ) + 
-                        m_radius * m_radius );
-    inertia[3] = T( 2 ) * constant * m_radius * m_radius;
+    inertia[0] = inertia[5] = 
+                    c * ( T( 4 ) * m_halfHeight * m_halfHeight / T( 3 ) + r2 );
+    inertia[3] = T( 2 ) * c * r2;
 
     inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
     inertia_1[5] = inertia_1[0] = T( 1 ) / inertia[0];
     inertia_1[3] = T( 1 ) / inertia[3];
-
-    return ( true );
 }
 
 

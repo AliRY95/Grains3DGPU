@@ -115,8 +115,8 @@ T Rectangle<T>::computeVolume() const
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__
-bool Rectangle<T>::computeInertia( T* inertia, 
-                                   T* inertia_1 ) const
+void Rectangle<T>::computeInertia( T (&inertia)[6], 
+                                   T (&inertia_1)[6] ) const
 {
     // Active 2D plane is XY -> rotation around Z
     inertia[1] = inertia[2] = inertia[4]= T( 0 );
@@ -128,8 +128,6 @@ bool Rectangle<T>::computeInertia( T* inertia,
     inertia_1[0] = T( 1 ) / inertia[0];
     inertia_1[3] = T( 1 ) / inertia[3];
     inertia_1[5] = T( 1 ) / inertia[5];
-
-    return ( true );
 }
 
 

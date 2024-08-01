@@ -114,17 +114,15 @@ T Sphere<T>::computeVolume() const
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__
-bool Sphere<T>::computeInertia( T* inertia, 
-                                T* inertia_1 ) const
+void Sphere<T>::computeInertia( T (&inertia)[6], 
+                                T (&inertia_1)[6] ) const
 {
+    T r5 = m_radius * m_radius * m_radius * m_radius * m_radius;
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
-    inertia[5] = inertia[3] = inertia[0] = T( 8 ) * M_PI / T( 15 ) * 
-                                                        pow( m_radius, T( 5 ));
+    inertia[5] = inertia[3] = inertia[0] = T( 8 ) * T( M_PI ) / T( 15 ) * r5;
 
     inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
     inertia_1[5] = inertia_1[3] = inertia_1[0] = T( 1 ) / inertia[0];
-
-    return ( true );
 }
 
 

@@ -123,22 +123,19 @@ T Cone<T>::computeVolume() const
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__
-bool Cone<T>::computeInertia( T* inertia, 
-                              T* inertia_1 ) const
+void Cone<T>::computeInertia( T (&inertia)[6], 
+                              T (&inertia_1)[6] ) const
 {
+    T r2 = m_bottomRadius * m_bottomRadius;
+    T c = T( .2 ) * T( PI ) * m_quarterHeight * r2;
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
-    T const constant = T( .2 ) * m_quarterHeight * m_bottomRadius 
-                                                    * m_bottomRadius * T( PI );
-  inertia[0] = inertia[5] = constant *
-                            ( T( 4 ) * m_quarterHeight * m_quarterHeight 
-                            + m_bottomRadius * m_bottomRadius );
-  inertia[3] = T( 2 ) * constant * m_bottomRadius * m_bottomRadius;
+    inertia[0] = inertia[5] =
+                        c * ( T( 4 ) * m_quarterHeight * m_quarterHeight + r2 );
+    inertia[3] = T( 2 ) * c * r2;
 
-  inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
-  inertia_1[5] = inertia_1[0] = T( 1 ) / inertia[0];
-  inertia_1[3] = T( 1 ) / inertia[3];
-
-    return ( true );
+    inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
+    inertia_1[5] = inertia_1[0] = T( 1 ) / inertia[0];
+    inertia_1[3] = T( 1 ) / inertia[3];
 }
 
 
@@ -390,4 +387,4 @@ void Cone<T>::writeConnection_PARAVIEW( std::list<int>& connectivity,
 template class Cone<float>;
 template class Cone<double>;
 
-#undef   visuNodeNbOnPer
+#undef visuNodeNbOnPer

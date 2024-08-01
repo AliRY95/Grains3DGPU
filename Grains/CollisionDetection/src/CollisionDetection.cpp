@@ -173,7 +173,7 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
         else
             return ( ContactInfo<T>( zeroVector3T, 
                                      zeroVector3T,
-                                     1.e20 ) );
+                                     T( 0 ) ) );
     }
 
     
@@ -216,10 +216,18 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
             //                                   ptA,
             //                                   ptB,
             //                                   nbIterGJK );
+            
             // TODO: ERROR HANDLING
-            // printf( "%d\n", nbIterGJK );
+            
             // Sum of crust thicknesses
             T ctSum = rbA.getCrustThickness() + rbB.getCrustThickness();
+
+            // Computation of the actual overlap 
+            // distance = distance - crustA - crustB
+            // If actual overlap distance < 0 => contact otherwise no contact
+            distance -= ctSum;
+            if ( distance > T( 0 ) )
+                return( noContact );
 
             // Points A and B are in their respective local coordinate systems
             // Thus we transform them into the world coordinate system
@@ -234,26 +242,14 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
             // directed from B to A
             // If no contact, crustA + crustB - distance < 0 and we do not care 
             // about the direction of the overlap vector
-            Vector3<T> contactVec = ( ptA - ptB ) / distance;
-            contactVec.round();
-            contactVec *= ctSum - distance;
-
-            // Computation of the actual overlap 
-            // distance = distance - crustA - crustB
-            // If actual overlap distance < 0 => contact otherwise no contact
-            distance -= ctSum;
+            Vector3<T> contactVec = ptA - ptB;
+            contactVec.normalize();
 
             return ( ContactInfo<T>( contactPt, contactVec, distance ) );
         }
-        else
-            return ( ContactInfo<T>( zeroVector3T, 
-                                     zeroVector3T,
-                                     1.e20 ) );
     }
-    else
-        return ( ContactInfo<T>( zeroVector3T, 
-                                 zeroVector3T,
-                                 1.e20 ) );
+    
+    return ( noContact );
 }
 
 
@@ -300,9 +296,7 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, T> const& rbA,
                                     overlap ) );
         }
         else
-            return ( ContactInfo<T>( zeroVector3T, 
-                                     zeroVector3T,
-                                     1.e20 ) );
+            return ( noContact );
     }
 
     
@@ -343,10 +337,18 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, T> const& rbA,
             //                                   ptA,
             //                                   ptB,
             //                                   nbIterGJK );
-            // TODO: ERROR HANDLING
             
+            // TODO: ERROR HANDLING
+
             // Sum of crust thicknesses
             T ctSum = rbA.getCrustThickness() + rbB.getCrustThickness();
+            
+            // Computation of the actual overlap 
+            // distance = distance - crustA - crustB
+            // If actual overlap distance < 0 => contact otherwise no contact
+            distance -= ctSum;
+            if ( distance > T( 0 ) )
+                return( noContact );
 
             // Points A and B are in their respective local coordinate systems
             // Thus we transform them into the world coordinate system
@@ -357,30 +359,15 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, T> const& rbA,
             Vector3<T> contactPt = ( ptA + ptB ) / T( 2 );
 
             // Computation of the actual overlap vector
-            // If contact, crustA + crustB - distance > 0, the overlap vector is
-            // directed from B to A
-            // If no contact, crustA + crustB - distance < 0 and we do not care 
-            // about the direction of the overlap vector
-            Vector3<T> contactVec = ( ptA - ptB ) / distance;
-            contactVec.round();
-            contactVec *= ctSum - distance;
-
-            // Computation of the actual overlap 
-            // distance = distance - crustA - crustB
-            // If actual overlap distance < 0 => contact otherwise no contact
-            distance -= ctSum;
+            // the overlap vector is directed from B to A
+            Vector3<T> contactVec = ptA - ptB;
+            contactVec.normalize();
 
             return ( ContactInfo<T>( contactPt, contactVec, distance ) );
         }
-        else
-            return ( ContactInfo<T>( zeroVector3T, 
-                                     zeroVector3T,
-                                     1.e20 ) );
     }
-    else
-        return ( ContactInfo<T>( zeroVector3T, 
-                                 zeroVector3T,
-                                 1.e20 ) );
+    
+    return ( noContact );
 }
 
 

@@ -157,11 +157,29 @@ float Superquadric<float>::computeVolume() const
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__
-bool Superquadric<T>::computeInertia( T* inertia, 
-                                              T* inertia_1 ) const
+void Superquadric<T>::computeInertia( T (&inertia)[6], 
+                                      T (&inertia_1)[6] ) const
 {
 #ifdef __CUDA_ARCH__
-    // TODO: beta function for GPU
+    T const eps1 = T( 2 ) / m_n1;
+    T const eps2 = T( 2 ) / m_n2;
+    T const C = T( 0.4 ) * m_a * m_b * m_c * eps1 * eps2 ;
+
+    T const prod1 = grainsBeta( T( 1.5 ) * eps2, T( 0.5 ) * eps2 ) * 
+                    grainsBeta( T( 2 ) * eps1, T( 0.5 ) * eps1 );
+    T const prod2 = m_c * m_c * 
+                    grainsBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) * 
+                    grainsBeta( T( 1.5 ) * eps1, eps1 );
+
+    inertia[1] = inertia[2] = inertia[4] = T( 0 );
+    inertia[0] = C * ( m_b * m_b * prod1 + prod2 );
+    inertia[3] = C * ( m_a * m_a * prod1  + prod2 );
+    inertia[5] = C * ( m_a * m_a + m_b * m_b ) * prod1;
+
+    inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
+    inertia_1[0] = T( 1 ) / inertia[0];
+    inertia_1[3] = T( 1 ) / inertia[3];
+    inertia_1[5] = T( 1 ) / inertia[5];
 #else
     T const eps1 = T( 2 ) / m_n1;
     T const eps2 = T( 2 ) / m_n2;
@@ -182,8 +200,6 @@ bool Superquadric<T>::computeInertia( T* inertia,
     inertia_1[0] = T( 1 ) / inertia[0];
     inertia_1[3] = T( 1 ) / inertia[3];
     inertia_1[5] = T( 1 ) / inertia[5];
-
-    return ( true );
 #endif
 }
 
@@ -195,11 +211,29 @@ bool Superquadric<T>::computeInertia( T* inertia,
 // specialized for floats
 template <>
 __HOSTDEVICE__
-bool Superquadric<float>::computeInertia( float* inertia, 
-                                                  float* inertia_1 ) const
+void Superquadric<float>::computeInertia( float (&inertia)[6], 
+                                          float (&inertia_1)[6] ) const
 {
 #ifdef __CUDA_ARCH__
-    // TODO: beta function for GPU
+    float const eps1 = 2.f / m_n1;
+    float const eps2 = 2.f / m_n2;
+    float const C = 0.4f * m_a * m_b * m_c * eps1 * eps2 ;
+
+    float const prod1 = grainsBetaf( 1.5f * eps2, 0.5f * eps2 ) * 
+                        grainsBetaf( 2.f * eps1, 0.5f * eps1 );
+    float const prod2 = m_c * m_c * 
+                        grainsBetaf( 0.5f * eps2, 0.5f * eps2 ) * 
+                        grainsBetaf( 1.5f * eps1, eps1 );
+
+    inertia[1] = inertia[2] = inertia[4] = 0.f;
+    inertia[0] = C * ( m_b * m_b * prod1 + prod2 );
+    inertia[3] = C * ( m_a * m_a * prod1  + prod2 );
+    inertia[5] = C * ( m_a * m_a + m_b * m_b ) * prod1;
+
+    inertia_1[1] = inertia_1[2] = inertia_1[4] = 0.f;
+    inertia_1[0] = 1.f / inertia[0];
+    inertia_1[3] = 1.f / inertia[3];
+    inertia_1[5] = 1.f / inertia[5];
 #else
     float const eps1 = 2.f / m_n1;
     float const eps2 = 2.f / m_n2;
@@ -220,8 +254,6 @@ bool Superquadric<float>::computeInertia( float* inertia,
     inertia_1[0] = 1.f / inertia[0];
     inertia_1[3] = 1.f / inertia[3];
     inertia_1[5] = 1.f / inertia[5];
-
-    return ( true );
 #endif
 }
 

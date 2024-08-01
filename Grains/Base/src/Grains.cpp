@@ -4,7 +4,8 @@
 #include "ComponentManagerGPU.hh"
 #include "RigidBody.hh"
 #include "RigidBodyGPUWrapper.hh"
-#include "LinkedCell_Kernels.hh"
+#include "LinkedCellGPUWrapper.hh"
+#include "HODCContactForceModelGPUWrapper.hh"
 
 
 /* ========================================================================== */
@@ -58,6 +59,8 @@ void Grains<T>::initialize( DOMElement* rootElement )
 template <typename T>
 void Grains<T>::Construction( DOMElement* rootElement )
 {
+    // -------------------------------------------------------------------------
+    // Checking if Construction node is available
     DOMNode* root = ReaderXML::getNode( rootElement, "Construction" );
     if ( !root )
     {
@@ -65,6 +68,10 @@ void Grains<T>::Construction( DOMElement* rootElement )
         exit( 1 );
     }
 
+
+
+
+    // -------------------------------------------------------------------------
     // Domain size: origin, max coordinates and periodicity
     DOMNode* domain = ReaderXML::getNode( root, "LinkedCell" );
     GrainsParameters<T>::m_dimension.setValue( 
@@ -85,12 +92,19 @@ void Grains<T>::Construction( DOMElement* rootElement )
     GrainsParameters<T>::m_isPeriodic = false;
 
 
+
+
+    // -------------------------------------------------------------------------
     // Particles
     DOMNode* particles = ReaderXML::getNode( root, "Particles" );
     DOMNodeList* allParticles = ReaderXML::getNodes( rootElement, "Particle" );
-    int numRigidBodies = int( allParticles->getLength() );
-    int numEachRigidBody[ numRigidBodies ];
-    int numTotalParticles = 0;
+    // Number of unique shapes (rigid bodies) in the simulation
+    unsigned int numRigidBodies = int( allParticles->getLength() );
+    // Number of each unique shape in the simulation. For simplicity, we keep it
+    // accumulative. Vector [2, 5] means we have 2 id0 ridid bodies and then 
+    // 5 - 2 = 3 id1 rigid bodies. it also indicates that there are 5 particles
+    // in the simulation.
+    std::vector<unsigned int> numEachRigidBody( numRigidBodies, 0 );
     T linkedCellSize = T( 0 );
     if ( particles )
     {
@@ -106,7 +120,11 @@ void Grains<T>::Construction( DOMElement* rootElement )
         for ( int i = 0; i < numRigidBodies; i++ )
         {
             DOMNode* nParticle = allParticles->item( i );
-            numEachRigidBody[ i ] = 
+            if ( i == 0 )
+                numEachRigidBody[ i ] =  
+                            ReaderXML::getNodeAttr_Int( nParticle, "Number" );
+            else
+                numEachRigidBody[ i ] = numEachRigidBody[ i - 1 ] + 
                             ReaderXML::getNodeAttr_Int( nParticle, "Number" );
 
             // Create the Rigid Body
@@ -115,9 +133,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
             // Finding the max circumscribed radius among all shapes
             if ( m_rigidBodyList[i]->getCircumscribedRadius() > linkedCellSize )
                 linkedCellSize = m_rigidBodyList[i]->getCircumscribedRadius();
-            
-            // Sum to find total number of particles
-            numTotalParticles += numEachRigidBody[ i ];
         }
 
         // if it is a GPU simulation, we allocate memory on device as well 
@@ -134,6 +149,10 @@ void Grains<T>::Construction( DOMElement* rootElement )
         cout << shiftString6 << "Reading particle types completed!" << endl;
     }
 
+
+
+
+    // -------------------------------------------------------------------------
     // Scaling coefficient of linked cell size
     cout << shiftString6 << "Constructing linked cell ..." << endl;
     T LC_coeff = T( 1 );
@@ -144,38 +163,9 @@ void Grains<T>::Construction( DOMElement* rootElement )
         LC_coeff = T( 1 );
     cout << shiftString9 << "Cell size factor = " << LC_coeff << endl;
 
-
-    if ( GrainsParameters<T>::m_isGPU )
-    {
-        // allocating memory for only one int for the number of cells
-        int* d_numCells;
-        cudaMalloc( ( void** ) &d_numCells, sizeof( int ) );
-
-
-        cudaErrCheck( cudaMalloc( (void**)&m_d_linkedCell,
-                                    sizeof( LinkedCell<T>* ) ) );
-        createLinkedCellOnGPU<<<1, 1>>>( 
-            GrainsParameters<T>::m_origin[X],
-            GrainsParameters<T>::m_origin[Y],
-            GrainsParameters<T>::m_origin[Z],
-            GrainsParameters<T>::m_origin[X] + GrainsParameters<T>::m_dimension[X], 
-            GrainsParameters<T>::m_origin[Y] + GrainsParameters<T>::m_dimension[Y], 
-            GrainsParameters<T>::m_origin[Z] + GrainsParameters<T>::m_dimension[Z], 
-            LC_coeff * T( 2 ) * linkedCellSize,
-            m_d_linkedCell,
-            d_numCells );
-
-        // copying the variable to host
-        cudaMemcpy( &GrainsParameters<T>::m_numCells, 
-                    d_numCells, 
-                    sizeof( int ), 
-                    cudaMemcpyDeviceToHost );
-        cudaDeviceSynchronize();
-        cout << shiftString6 << "LinkedCell with "
-             << GrainsParameters<T>::m_numCells <<
-             " cells is created on device." << endl;
-    }
-    // else
+    // Creating linked cell
+    // TODO: FIX when finalizing
+    // if ( !GrainsParameters<T>::m_isGPU )
     // {
         m_linkedCell = ( LinkedCell<T>** ) malloc( sizeof( LinkedCell<T>* ) );
         *m_linkedCell = new LinkedCell<T>( 
@@ -187,18 +177,72 @@ void Grains<T>::Construction( DOMElement* rootElement )
              << GrainsParameters<T>::m_numCells <<
              " cells is created on host." << endl;
     // }
+    // else
+    // {
+        cudaErrCheck( cudaMalloc( (void**)&m_d_linkedCell,
+                                   sizeof( LinkedCell<T>* ) ) );
+        int d_numCells = createLinkedCellOnDevice( 
+            GrainsParameters<T>::m_origin,
+            GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
+            LC_coeff * T( 2 ) * linkedCellSize,
+            m_d_linkedCell );
 
-    // Setting the number of particles in the simulation
-    GrainsParameters<T>::m_numComponents = numTotalParticles;
-    m_components = new ComponentManagerCPU<T>();
+        GrainsParameters<T>::m_numCells = d_numCells;
+        cout << shiftString6 << "LinkedCell with "
+             << GrainsParameters<T>::m_numCells <<
+             " cells is created on device." << endl;
+    // }
+    
+
+
+
+    // -------------------------------------------------------------------------
+    // Setting the component managers
+    GrainsParameters<T>::m_numComponents = numEachRigidBody.back();
+    m_components = new ComponentManagerCPU<T>( numEachRigidBody, 
+                                               0,
+                                               GrainsParameters<T>::m_numCells );
     if ( GrainsParameters<T>::m_isGPU )
         m_d_components = new ComponentManagerGPU<T>( *m_components );
-    // else
-    //     m_components = new ComponentManagerCPU<T>();
 
-//     // Link obstacles with the linked cell grid
-//     m_collision->Link( m_allcomponents.getObstacles() );
-//   }
+    
+
+
+    // -------------------------------------------------------------------------
+    // Contact force models
+    DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
+    // TODO: what if multiple models for different materials
+    if ( contacts )
+    {
+        DOMNode* contact = ReaderXML::getNode( contacts, "ContactForceModel" );
+        DOMNode* hodc = ReaderXML::getNode( contact, "HODC" );
+        cout << shiftString6 << "Reading new contact force models ..." << endl;
+
+        m_contactForce = ( HODCContactForceModel<T>** ) 
+                         malloc( sizeof( HODCContactForceModel<T>* ) );
+        *m_contactForce = new HODCContactForceModel<T>( hodc );
+        cout << shiftString6 << "Reading contact force models completed!" << endl;
+        if ( GrainsParameters<T>::m_isGPU )
+        {
+            cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
+                                   sizeof( HODCContactForceModel<T>* ) ) );
+            createContactForceOnDevice( hodc, m_d_contactForce );
+        }
+
+    }
+    // TODO
+    // string check_matA, check_matB;
+    // bool contactForceModels_ok =
+    // 	ContactBuilderFactory::checkContactForceModelsExist( check_matA,
+	// 	check_matB );
+    // if ( !contactForceModels_ok )
+    // {
+    //   if ( m_rank == 0 )
+    //     cout << GrainsExec::m_shift6 << "No contact force model defined for "
+	// 	"materials : " << check_matA << " & " << check_matB << endl;
+    //   grainsAbort();
+    // }
+
 }
 
 

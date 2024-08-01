@@ -1,5 +1,6 @@
 #include "Torce.hh"
 #include "Vector3.hh"
+#include "VectorMath.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -102,6 +103,20 @@ __HOSTDEVICE__
 void Torce<T>::addForce( Vector3<T> const& f )
 {
     m_force += f;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Adds a force to the torce with accounting for the additional torque
+template <typename T>
+__HOSTDEVICE__
+void Torce<T>::addForce( Vector3<T> const& f,
+                         Vector3<T> const& p )
+{
+    m_force += f;
+    m_torque += ( p ^ f );
 }
 
 

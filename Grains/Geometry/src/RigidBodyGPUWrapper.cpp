@@ -22,6 +22,7 @@ __GLOBAL__
 void createRigidBodyKernel( RigidBody<T, U>** rb, 
                             unsigned int index,
                             T crustThickness,
+                            T density,
                             ConvexType convexType,
                             Arguments... args )
 {
@@ -60,7 +61,7 @@ void createRigidBodyKernel( RigidBody<T, U>** rb,
         printf( "Convex is not created! Aborting Grains!\n" );
     }
 
-    rb[index] = new RigidBody<T, U>( convex, crustThickness );
+    rb[index] = new RigidBody<T, U>( convex, crustThickness, density );
 }
 
 
@@ -84,19 +85,24 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
         Convex<T>* convex = h_rb[index]->getConvex();
         ConvexType cvxType = convex->getConvexType();
         T ct = h_rb[index]->getCrustThickness();
+        // We also need the density to calculate the mass of the rigid body.
+        // However, it is not available here. So, we manually compute it:
+        T density = h_rb[index]->getMass() / h_rb[index]->getVolume();
 
         if ( cvxType == SPHERE )
         {
             Sphere<T>* c = dynamic_cast<Sphere<T>*>( convex );
             T r = c->getRadius();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, SPHERE, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+                                             SPHERE, 
                                              r );
         }
         else if ( cvxType == BOX )
         {
             Box<T>* c = dynamic_cast<Box<T>*>( convex );
             Vector3<T> L = c->getExtent();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, BOX, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+                                             BOX, 
                                              L[X], L[Y], L[Z] );
         }
         else if ( cvxType == CYLINDER )
@@ -104,7 +110,8 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             Cylinder<T>* c = dynamic_cast<Cylinder<T>*>( convex );
             T r = c->getRadius();
             T h = c->getHeight();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, CYLINDER,
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+                                             CYLINDER,
                                              r, h );
         }
         else if ( cvxType == CONE )
@@ -112,7 +119,8 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             Cone<T>* c = dynamic_cast<Cone<T>*>( convex );
             T r = c->getRadius();
             T h = c->getHeight();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, CONE, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+                                             CONE, 
                                              r, h );
         }
         else if ( cvxType == SUPERQUADRIC )
@@ -120,14 +128,16 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             Superquadric<T>* c = dynamic_cast<Superquadric<T>*>( convex );
             Vector3<T> L = c->getExtent();
             Vector3<T> N = c->getExponent();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, SUPERQUADRIC, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+                                             SUPERQUADRIC, 
                                              L[X], L[Y], L[Z], N[X], N[Y] );
         }
         else if ( cvxType == RECTANGLE )
         {
             Rectangle<T>* c = dynamic_cast<Rectangle<T>*>( convex );
             Vector3<T> L = c->getExtent();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, RECTANGLE, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+                                             RECTANGLE, 
                                              L[X], L[Y] );
         }
         else

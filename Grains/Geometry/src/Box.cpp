@@ -128,8 +128,8 @@ T Box<T>::computeVolume() const
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__
-bool Box<T>::computeInertia( T* inertia, 
-                             T* inertia_1 ) const
+void Box<T>::computeInertia( T (&inertia)[6], 
+                             T (&inertia_1)[6] ) const
 {
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
     inertia[0] = T( 8 ) * m_extent[X] * m_extent[Y] * m_extent[Z]
@@ -143,8 +143,6 @@ bool Box<T>::computeInertia( T* inertia,
     inertia_1[0] = T( 1 ) / inertia[0];
     inertia_1[3] = T( 1 ) / inertia[3];
     inertia_1[5] = T( 1 ) / inertia[5];
-
-    return ( true );
 }
 
 

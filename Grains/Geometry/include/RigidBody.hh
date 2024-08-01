@@ -10,7 +10,11 @@
 // =============================================================================
 /** @brief The class RigidBody.
 
-    Rigid bodies comprising their shapes and physical attributes.
+    Rigid bodies comprising their shapes and physical attributes. The precision
+    is managed by two typenames "T" and "U". "T" corresponds to the precision of
+    the rigid body, and "U" represents the precision of the bounding volume
+    encapsulating the rigid body. We explicitly instantiate three classes out of
+    this template; (T, U) = (double, double), (double, float), (float, float).
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
@@ -23,8 +27,9 @@ class RigidBody
         Convex<T>* m_convex; /**< Convex shape */
         T m_crustThickness; /**< Rigid body's crust thickness */
         T m_volume; /**< Rigid body's volume */
-        T* m_inertia; /**< Rigid body's inertia */
-        T* m_inertia_1; /**< Rigid body's inversed inertia */
+        T m_mass; /**< Rigid body's mass */
+        T m_inertia[6]; /**< Rigid body's inertia */
+        T m_inertia_1[6]; /**< Rigid body's inversed inertia */
         BoundingBox<U>* m_boundingBox; /** Bounding box of the convex body **/
         U m_circumscribedRadius; /**< Circumscribed radius */
         //@}
@@ -41,7 +46,9 @@ class RigidBody
         @param convex convex
         @param ct crust thickness of the rigid body */
         __HOSTDEVICE__
-        RigidBody( Convex<T>* convex, T ct );
+        RigidBody( Convex<T>* convex, 
+                   T ct, 
+                   T density );
 
         /** @brief Constructor with an XML input
         @param convex convex
@@ -74,13 +81,19 @@ class RigidBody
         __HOSTDEVICE__ 
         T getVolume() const;
 
-        /** @brief Gets the rigid body's inertia */
+        /** @brief Gets the rigid body's mass */
         __HOSTDEVICE__ 
-        T* getInertia() const;
+        T getMass() const;
 
-        /** @brief Gets the inverse of rigid body's inertia */
+        /** @brief Gets the rigid body's inertia
+        @param inertia the destination for inertia */
         __HOSTDEVICE__ 
-        T* getInertia_1() const;
+        void getInertia( T (&inertia)[6] ) const;
+
+        /** @brief Gets the inverse of rigid body's inertia
+        @param inertia_1 the destination for the inverse inertia */
+        __HOSTDEVICE__ 
+        void getInertia_1( T (&inertia_1)[6] ) const;
 
         /** @brief Gets the rigid body's bounding box */
         __HOSTDEVICE__ 

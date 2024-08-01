@@ -20,6 +20,8 @@ class ComponentManagerGPU : public ComponentManager<T>
         /** @name Parameters */
         //@{
         Transform3<T>* m_transform; /**< array of components transformation */
+        Kinematics<T>* m_kinematics; /**< array of components kinematics */
+        Torce<T>* m_torce; /**< array of components torce */
         // Mat3d* orientation; /**< array of components orientation */
         // Vec3d* position; /**< array of components position */
         // Vec3d* force; /**< array of components force */
