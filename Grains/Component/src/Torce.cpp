@@ -8,6 +8,8 @@
 template <typename T>
 __HOSTDEVICE__
 Torce<T>::Torce()
+: m_torque( zeroVector3T )
+, m_force( zeroVector3T )
 {}
 
 

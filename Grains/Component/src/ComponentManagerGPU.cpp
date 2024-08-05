@@ -9,7 +9,7 @@
 #include "ComponentManagerGPU.hh"
 #include "ComponentManagerGPU_Kernels.hh"
 #include "GrainsParameters.hh"
-#include "LinkedCell_Kernels.hh"
+#include "LinkedCellGPUWrapper.hh"
 #include "LinkedCell.hh"
 
 
@@ -23,22 +23,26 @@ template <typename T>
 ComponentManagerGPU<T>::ComponentManagerGPU()
 {
     // Allocating memory on host
-    cudaErrCheck( cudaMalloc( (void**)&m_transform,
-                              numComponents * sizeof( Transform3<T> ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
-                              numComponents * numComponents * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_rigidBodyId,
                               numComponents * sizeof( unsigned int ) ) );
+    cudaErrCheck( cudaMalloc( (void**)&m_transform,
+                              numComponents * sizeof( Transform3<T> ) ) );
+    cudaErrCheck( cudaMalloc( (void**)&m_kinematics,
+                              numComponents * sizeof( Kinematics<T> ) ) );
+    cudaErrCheck( cudaMalloc( (void**)&m_torce,
+                              numComponents * sizeof( Torce<T> ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_componentId,
-                              numComponents * sizeof( unsigned int ) ) );
+                              numComponents * sizeof( int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_componentCellHash,
-                              numComponents * sizeof( unsigned int ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_neighborsCount,
                               numComponents * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_cellHashStart,
                               ( numCells + 1 ) * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_cellHashEnd,
                               ( numCells + 1 ) * sizeof( unsigned int ) ) );
+    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
+    //                           numComponents * numComponents * sizeof( unsigned int ) ) );
+    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsCount,
+    //                           numComponents * sizeof( unsigned int ) ) );
 
         // // Randomize array on host
         // for( int i = 0; i < numComponents; i++ )
@@ -63,29 +67,33 @@ template <typename T>
 ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManagerCPU<T> const& cm )
 {
     // Allocating memory on host
-    cudaErrCheck( cudaMalloc( (void**)&m_transform,
-                              numComponents * sizeof( Transform3<T> ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
-                              numComponents * numComponents * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_rigidBodyId,
                               numComponents * sizeof( unsigned int ) ) );
+    cudaErrCheck( cudaMalloc( (void**)&m_transform,
+                              numComponents * sizeof( Transform3<T> ) ) );
+    cudaErrCheck( cudaMalloc( (void**)&m_kinematics,
+                              numComponents * sizeof( Kinematics<T> ) ) );
+    cudaErrCheck( cudaMalloc( (void**)&m_torce,
+                              numComponents * sizeof( Torce<T> ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_componentId,
-                              numComponents * sizeof( unsigned int ) ) );
+                              numComponents * sizeof( int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_componentCellHash,
-                              numComponents * sizeof( unsigned int ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_neighborsCount,
                               numComponents * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_cellHashStart,
                               ( numCells + 1 ) * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_cellHashEnd,
                               ( numCells + 1 ) * sizeof( unsigned int ) ) );
+    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
+    //                           numComponents * numComponents * sizeof( unsigned int ) ) );
+    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsCount,
+    //                           numComponents * sizeof( unsigned int ) ) );
 
 
     // Copying the arrays from host to device
-    setTransform( cm.getTransform().data() );
-    // setNeighborsId( cm.getNeighborsId().data() );
     setRigidBodyId( cm.getRigidBodyId().data() );
+    setTransform( cm.getTransform().data() );
     setComponentId( cm.getComponentId().data() );
+    // setNeighborsId( cm.getNeighborsId().data() );
     // setNeighborsCount( cm.getNeighborsCount().data() );
 }
 
@@ -97,46 +105,16 @@ ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManagerCPU<T> const& cm )
 template <typename T>
 ComponentManagerGPU<T>::~ComponentManagerGPU()
 {
-    cudaFree( m_transform );
-    cudaFree( m_neighborsId );
     cudaFree( m_rigidBodyId );
+    cudaFree( m_transform );
+    cudaFree( m_kinematics );
+    cudaFree( m_torce );
     cudaFree( m_componentId );
     cudaFree( m_componentCellHash );
-    cudaFree( m_neighborsCount );
     cudaFree( m_cellHashStart );
     cudaFree( m_cellHashEnd );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets components transformation
-template <typename T>
-Transform3<T>* ComponentManagerGPU<T>::getTransform() const
-{
-    Transform3<T>* h_transform = new Transform3<T>[numComponents];
-    cudaErrCheck( cudaMemcpy( h_transform,
-                              m_transform,
-                              numComponents * sizeof( Transform3<T> ), 
-                              cudaMemcpyDeviceToHost ) );
-    return( h_transform );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets the array of components neighbor Id
-template <typename T>
-unsigned int* ComponentManagerGPU<T>::getNeighborsId() const
-{
-    unsigned int* h_neighborsId = new unsigned int[numComponents];
-    cudaErrCheck( cudaMemcpy( h_neighborsId,
-                              m_neighborsId,
-                              numComponents * numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyDeviceToHost ) );
-    return( h_neighborsId );
+    // cudaFree( m_neighborsCount );
+    // cudaFree( m_neighborsId );
 }
 
 
@@ -159,14 +137,30 @@ unsigned int* ComponentManagerGPU<T>::getRigidBodyId() const
 
 
 // -----------------------------------------------------------------------------
+// Gets components transformation
+template <typename T>
+Transform3<T>* ComponentManagerGPU<T>::getTransform() const
+{
+    Transform3<T>* h_transform = new Transform3<T>[numComponents];
+    cudaErrCheck( cudaMemcpy( h_transform,
+                              m_transform,
+                              numComponents * sizeof( Transform3<T> ), 
+                              cudaMemcpyDeviceToHost ) );
+    return( h_transform );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Gets the array of component Ids
 template <typename T>
-unsigned int* ComponentManagerGPU<T>::getComponentId() const
+int* ComponentManagerGPU<T>::getComponentId() const
 {
-    unsigned int* h_componentId = new unsigned int[numComponents];
+    int* h_componentId = new int[numComponents];
     cudaErrCheck( cudaMemcpy( h_componentId,
                               m_componentId,
-                              numComponents * sizeof( unsigned int ), 
+                              numComponents * sizeof( int ), 
                               cudaMemcpyDeviceToHost ) );
     return( h_componentId );
 }
@@ -191,32 +185,14 @@ unsigned int* ComponentManagerGPU<T>::getComponentCellHash() const
 
 
 // -----------------------------------------------------------------------------
-// Gets the array of components neighbor count
+// Sets the array of components rigid body Id
 template <typename T>
-unsigned int* ComponentManagerGPU<T>::getNeighborsCount() const
+void ComponentManagerGPU<T>::setRigidBodyId( unsigned int const* id )
 {
-    unsigned int* h_neighborsCount = new unsigned int[numComponents];
-    cudaErrCheck( cudaMemcpy( h_neighborsCount,
-                              m_neighborsCount,
+    cudaErrCheck( cudaMemcpy( m_rigidBodyId,
+                              id,
                               numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyDeviceToHost ) );
-    return( h_neighborsCount );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets the array of cells hash start
-template <typename T>
-unsigned int* ComponentManagerGPU<T>::getCellHashStart() const
-{
-    unsigned int* h_cellHashStart = new unsigned int[numCells + 1];
-    cudaErrCheck( cudaMemcpy( h_cellHashStart,
-                              m_cellHashStart,
-                              ( numCells + 1 ) * sizeof( unsigned int ), 
-                              cudaMemcpyDeviceToHost ) );
-    return( h_cellHashStart );
+                              cudaMemcpyHostToDevice ) );
 }
 
 
@@ -237,83 +213,13 @@ void ComponentManagerGPU<T>::setTransform( Transform3<T> const* tr )
 
 
 // -----------------------------------------------------------------------------
-// Sets the array of components neighbor Id
-template <typename T>
-void ComponentManagerGPU<T>::setNeighborsId( unsigned int const* id )
-{
-    cudaErrCheck( cudaMemcpy( m_neighborsId,
-                              id,
-                              numComponents * numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyHostToDevice ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Sets the array of components rigid body Id
-template <typename T>
-void ComponentManagerGPU<T>::setRigidBodyId( unsigned int const* id )
-{
-    cudaErrCheck( cudaMemcpy( m_rigidBodyId,
-                              id,
-                              numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyHostToDevice ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Sets the array of component Ids
 template <typename T>
-void ComponentManagerGPU<T>::setComponentId( unsigned int const* id )
+void ComponentManagerGPU<T>::setComponentId( int const* id )
 {
     cudaErrCheck( cudaMemcpy( m_componentId,
                               id,
                               numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyHostToDevice ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Sets the array of components cell hash
-template <typename T>
-void ComponentManagerGPU<T>::setComponentCellHash( unsigned int const* hash )
-{
-    cudaErrCheck( cudaMemcpy( m_componentCellHash,
-                              hash,
-                              numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyHostToDevice ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Sets the array of components neighbor count
-template <typename T>
-void ComponentManagerGPU<T>::setNeighborsCount( unsigned int const* count )
-{
-    cudaErrCheck( cudaMemcpy( m_neighborsCount,
-                              count,
-                              numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyHostToDevice ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Sets the array of cells hash start
-template <typename T>
-void ComponentManagerGPU<T>::setCellHashStart( unsigned int const* id )
-{
-    cudaErrCheck( cudaMemcpy( m_cellHashStart,
-                              id,
-                              ( numCells + 1 ) * sizeof( unsigned int ), 
                               cudaMemcpyHostToDevice ) );
 }
 
@@ -342,7 +248,7 @@ void ComponentManagerGPU<T>::updateLinkedCellList( LinkedCell<T> const* const* L
     thrust::sort_by_key (
       thrust::device_ptr<unsigned int>( m_componentCellHash ),
       thrust::device_ptr<unsigned int>( m_componentCellHash + numComponents ),
-      thrust::device_ptr<unsigned int>( m_componentId ) );
+      thrust::device_ptr<int>( m_componentId ) );
     
     // Third - reseting the cellStart array anf finding the start location of 
     // each hash
@@ -364,7 +270,8 @@ void ComponentManagerGPU<T>::updateLinkedCellList( LinkedCell<T> const* const* L
 // TODO: thread safety flag and MaxOccupancy
 template <typename T>
 void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T, T> const* const* rb, 
+                                              RigidBody<T, T> const* const* RB, 
+                                              HODCContactForceModel<T> const* const* CF,
                                               int* result )
 {
     unsigned int numThreads = 256;
@@ -394,7 +301,7 @@ void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
     thrust::sort_by_key (
       thrust::device_ptr<unsigned int>( m_componentCellHash ),
       thrust::device_ptr<unsigned int>( m_componentCellHash + numComponents ),
-      thrust::device_ptr<unsigned int>( m_componentId ) );
+      thrust::device_ptr<int>( m_componentId ) );
     
     // Third - reseting the cellStart array and finding the start location of 
     // each hash
@@ -410,12 +317,15 @@ void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
 
     collisionDetectionLinkedCell<<< numBlocks, numThreads >>> 
                                                           ( LC,
+                                                            RB,
+                                                            CF,
+                                                            m_rigidBodyId,
+                                                            m_transform,
+                                                            m_torce,
                                                             m_componentId,
                                                             m_componentCellHash,
                                                             m_cellHashStart,
                                                             m_cellHashEnd,
-                                                            rb,
-                                                            m_transform,
                                                             numComponents,
                                                             result );
 }

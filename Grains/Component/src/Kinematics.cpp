@@ -8,6 +8,8 @@
 template <typename T>
 __HOSTDEVICE__
 Kinematics<T>::Kinematics()
+: m_translationalVelocity( zeroVector3T )
+, m_angularVelocity( zeroVector3T )
 {}
 
 

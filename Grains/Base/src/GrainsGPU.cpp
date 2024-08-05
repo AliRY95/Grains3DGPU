@@ -63,12 +63,14 @@ void GrainsGPU<T>::simulate()
     // cout << tr[0].getOrigin() << endl;
     Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
                                               Grains<T>::m_rigidBodyList,
+                                              Grains<T>::m_contactForce,
                                               h_collision );
     auto h_end = chrono::high_resolution_clock::now();
     // Collision detection on device
     auto d_start = chrono::high_resolution_clock::now();
     Grains<T>::m_d_components->detectCollision( Grains<T>::m_d_linkedCell, 
                                                 Grains<T>::m_d_rigidBodyList,
+                                                Grains<T>::m_d_contactForce,
                                                 d_collision );
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();

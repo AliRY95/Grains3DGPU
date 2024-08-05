@@ -7,6 +7,7 @@
 #include "Transform3.hh"
 #include "RigidBody.hh"
 #include "LinkedCell.hh"
+#include "HODCContactForceModel.hh"
 
 
 // =============================================================================
@@ -61,12 +62,15 @@ a thread-per-particle policy
 template <typename T, typename U>
 __GLOBAL__ 
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
-                                   unsigned int* m_compId,
+                                   RigidBody<T, U> const* const* RB,
+                                   HODCContactForceModel<T> const* const* CF,
+                                   unsigned int* m_rigidBodyId,
+                                   Transform3<T> const* tr3d,
+                                   Torce<T>* m_torce,
+                                   int* m_compId,
                                    unsigned int* m_componentCellHash,
                                    unsigned int* m_cellHashStart,
                                    unsigned int* m_cellHashEnd,
-                                   RigidBody<T, U> const* const* a,
-                                   Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result );
 //@}

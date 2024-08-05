@@ -322,31 +322,10 @@ void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 // Detects collision between particles
 template <typename T>
 void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T, T> const* const* rb, 
+                                              RigidBody<T, T> const* const* RB,
+                                              HODCContactForceModel<T> const* const* CF,
                                               int* result )
 {
-    // // for ( int i = 0; i < numComponents; i++ )
-    // // {
-    // //     const RigidBody& AA = *( rb[m_rigidBodyId[i]] );
-    // //     const Transform3d& trA = m_transform[i];
-    // //     for ( int j = 0; j < numComponents; j++ ) // or start from j = i?
-    // //         result[i] += intersectRigidBodies( AA, AA, trA, m_transform[j] );
-    // // }
-
-    
-    // // RigidBody const& AA = **rb;
-    // // for ( int i = 0; i < N; i++ )
-    // // {
-    // //     Transform3d trA = tr3d[i];
-    // //     Transform3d trB2A;
-    // //     for ( int j = 0; j < N; j++ ) // or start from j = i?
-    // //     {
-    // //         trB2A = tr3d[j];
-    // //         trB2A.relativeToTransform( trA );
-    // //         result[i] = intersectRigidBodies( AA, AA, trB2A );
-    // //     }
-    // // }
-
     // updating links between components and linked cell
     updateLinks( LC );
     
@@ -356,8 +335,9 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
         // Parameters of the primary particle
         unsigned int const compId = m_componentId[ pId ];
         unsigned int const cellHash = m_componentCellHash[ pId ];
-        RigidBody<T, T> const& rbA = *( rb[ m_rigidBodyId[ compId ] ] );
+        RigidBody<T, T> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
         Transform3<T> const& trA = m_transform[ compId ];
+        // Torce<T>& m_torce[ compId ];
         for ( int k = -1; k < 2; k++ ) {
         for ( int j = -1; j < 2; j++ ) { 
         for ( int i = -1; i < 2; i++ ) {
@@ -372,21 +352,25 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                 if ( secondaryId == compId )
                     continue;
                 RigidBody<T, T> const& rbB = 
-                                        *( rb[ m_rigidBodyId[ secondaryId ] ] );
+                                        *( RB[ m_rigidBodyId[ secondaryId ] ] );
                 Transform3<T> const& trB = m_transform[ secondaryId ];
                 // result[compId] += intersectRigidBodies( rigidBodyA,
                 //                                     rigidBodyA,
                 //                                     transformA, 
                 //                                     transformB );
                 ContactInfo<T> ci = closestPointsRigidBodies( rbA,
-                                                            rbB,
-                                                            trA, 
-                                                            trB );
-                // if( ci.getOverlapDistance() < T( 0 ) )
-                //     cout << compId << " " << secondaryId << " " <<
-                //     ci.getOverlapDistance() << endl;
+                                                              rbB,
+                                                              trA, 
+                                                              trB );
+                if ( ci.getOverlapDistance() < T( 0 ) )
+                    (*CF)->computeForces( ci, 
+                                          zeroVector3T,
+                                          zeroVector3T,
+                                          rbA.getMass(),
+                                          rbB.getMass(),
+                                          m_torce[ compId ] );
                 result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
-                }
+            }
         } } }
     }
 }
