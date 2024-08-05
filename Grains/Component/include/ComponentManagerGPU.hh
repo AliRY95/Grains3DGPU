@@ -19,20 +19,12 @@ class ComponentManagerGPU : public ComponentManager<T>
     protected:
         /** @name Parameters */
         //@{
+        unsigned int* m_rigidBodyId; /**< array of components rigid body Id */
         Transform3<T>* m_transform; /**< array of components transformation */
         Kinematics<T>* m_kinematics; /**< array of components kinematics */
         Torce<T>* m_torce; /**< array of components torce */
-        // Mat3d* orientation; /**< array of components orientation */
-        // Vec3d* position; /**< array of components position */
-        // Vec3d* force; /**< array of components force */
-        // Vec3d* torque; /**< array of components torque */
-        // Vec3d* translationalVelocity; /**< array of components velocity */
-        // Vec3d* angularVelocity; /**< array of components angular velocity */
-        unsigned int* m_neighborsId; /**< array of components neighbor Id */ 
-        unsigned int* m_rigidBodyId; /**< array of components rigid body Id */
-        unsigned int* m_componentId; /**< array of component Ids */
+        int* m_componentId; /**< array of component Ids */
         unsigned int* m_componentCellHash; /**< array of components cell hash */
-        unsigned int* m_neighborsCount; /**< array of components neighbor count */
         unsigned int* m_cellHashStart; /**< array of cells hash start */
         unsigned int* m_cellHashEnd; /**< array of cells hash start */
         // bool* isActive; /**< array of components activity in the simulation */
@@ -59,51 +51,30 @@ class ComponentManagerGPU : public ComponentManager<T>
 
         /** @name Get methods */
         //@{
-        /** @brief Gets components transformation */
-        Transform3<T>* getTransform() const;
-
-        /** @brief Gets the array of components neighbor Id */
-        unsigned int* getNeighborsId() const;
-
         /** @brief Gets the array of components rigid body Id */
         unsigned int* getRigidBodyId() const;
 
+        /** @brief Gets components transformation */
+        Transform3<T>* getTransform() const;
+
         /** @brief Gets the array of component Ids */
-        unsigned int* getComponentId() const;
+        int* getComponentId() const;
 
         /** @brief Gets the array of components cell hash */
         unsigned int* getComponentCellHash() const;
-
-        /** @brief Gets the array of components neighbor count */
-        unsigned int* getNeighborsCount() const;
-
-        /** @brief Gets the array of cells hash start */
-        unsigned int* getCellHashStart() const;
         //@}
 
 
         /** @name Set methods */
         //@{
+        /** @brief Sets the array of components rigid body Id */
+        void setRigidBodyId( unsigned int const* id );
+        
         /** @brief Sets components transformation */
         void setTransform( Transform3<T> const* tr );
 
-        /** @brief Sets the array of components neighbor Id */
-        void setNeighborsId( unsigned int const* id );
-
-        /** @brief Sets the array of components rigid body Id */
-        void setRigidBodyId( unsigned int const* id );
-
         /** @brief Sets the array of component Ids */
-        void setComponentId( unsigned int const* id );
-
-        /** @brief Sets the array of components cell hash */
-        void setComponentCellHash( unsigned int const* hash );
-
-        /** @brief Sets the array of components neighbor count */
-        void setNeighborsCount( unsigned int const* count );
-
-        /** @brief Sets the array of cells hash start */
-        void setCellHashStart( unsigned int const* id );
+        void setComponentId( int const* id );
         //@}
         
 
@@ -120,7 +91,8 @@ class ComponentManagerGPU : public ComponentManager<T>
         /** @brief Detects collision between particles */
         // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
-                              RigidBody<T, T> const* const* rb, 
+                              RigidBody<T, T> const* const* RB, 
+                              HODCContactForceModel<T> const* const* CF,
                               int* results );
 
         // /** @brief Computes impact forces */

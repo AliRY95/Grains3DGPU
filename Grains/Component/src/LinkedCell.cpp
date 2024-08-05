@@ -1,5 +1,5 @@
 #include "LinkedCell.hh"
-#include "LinkedCell_Kernels.hh"
+#include "LinkedCellGPUWrapper.hh"
 #include "Transform3.hh"
 #include "VectorMath.hh"
 

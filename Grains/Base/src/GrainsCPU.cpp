@@ -54,6 +54,7 @@ void GrainsCPU<T>::simulate()
     auto h_start = chrono::high_resolution_clock::now();
     Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
                                              Grains<T>::m_rigidBodyList,
+                                             Grains<T>::m_contactForce,
                                              h_collision );
     auto h_end = chrono::high_resolution_clock::now();
 

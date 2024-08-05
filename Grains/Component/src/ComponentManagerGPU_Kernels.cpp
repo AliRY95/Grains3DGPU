@@ -137,12 +137,15 @@ void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
 template <typename T, typename U>
 __GLOBAL__ 
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
-                                   unsigned int* m_compId,
+                                   RigidBody<T, U> const* const* RB,
+                                   HODCContactForceModel<T> const* const* CF,
+                                   unsigned int* m_rigidBodyId,
+                                   Transform3<T> const* tr3d,
+                                   Torce<T>* m_torce,
+                                   int* m_compId,
                                    unsigned int* m_componentCellHash,
                                    unsigned int* m_cellHashStart,
                                    unsigned int* m_cellHashEnd,
-                                   RigidBody<T, U> const* const* a,
-                                   Transform3<T> const* tr3d,
                                    int numComponents,
                                    int* result )
 {
@@ -153,45 +156,45 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
     
     unsigned int const compId = m_compId[ tid ];
     unsigned int const cellHash = m_componentCellHash[ tid ];
-    RigidBody<T, U> const& rigidBodyA = **a; // TODO: FIX to *( a[ m_rigidBodyId[ compId ] ] )?
-    Transform3<T> const& transformA = tr3d[ compId ];
+    RigidBody<T, U> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
+    Transform3<T> const& trA = tr3d[ compId ];
 
-    for ( int k = -1; k < 2; k++ ) 
-    {
-        for ( int j = -1; j < 2; j++ ) 
+    for ( int k = -1; k < 2; k++ ) {
+    for ( int j = -1; j < 2; j++ ) {
+    for ( int i = -1; i < 2; i++ ) {
+        int neighboringCellHash =
+        (*LC)->computeNeighboringCellLinearHash( cellHash, i, j, k );
+        int startId = m_cellHashStart[ neighboringCellHash ];
+        int endId = m_cellHashEnd[ neighboringCellHash ];
+        for ( int id = startId; id < endId; id++ )
         {
-            for ( int i = -1; i < 2; i++ ) 
-            {
-                int neighboringCellHash =
-                (*LC)->computeNeighboringCellLinearHash( cellHash, i, j, k );
-                int startId = m_cellHashStart[ neighboringCellHash ];
-                int endId = m_cellHashEnd[ neighboringCellHash ];
-                for ( int id = startId; id < endId; id++ )
-                {
-                    // TODO:
-                    // RigidBody const& rigidBodyB = 8( a[ m_rigidBodyId[ compId ] ] ); ???
-                    int secondaryId = m_compId[ id ];
-                    // To skip the self-collision
-                    if ( secondaryId == compId )
-                        continue;
-                    Transform3<T> const& transformB = tr3d[ secondaryId ];
-                    // result[compId] += intersectRigidBodies( rigidBodyA,
-                    //                                      rigidBodyA,
-                    //                                      transformA, 
-                    //                                      transformB );
-                    ContactInfo<T> ci = closestPointsRigidBodies( rigidBodyA,
-                                                                  rigidBodyA,
-                                                                  transformA, 
-                                                                  transformB );
-                    result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
-                    // Vector3<T> relVelocityAtContact = 
-                    // m_kinematics[compId].getVelocityAtPoint( ci.getContactPoint() ) -
-                    // m_kinematics[secondaryId].getVelocityAtPoint( ci.getContactPoint() );
-                    // Vector3<T> relAngVelocity = 
-                }
-            }
+            int secondaryId = m_compId[ id ];
+            // To skip the self-collision
+            if ( secondaryId == compId )
+                continue;
+            RigidBody<T, U> const& rbB = *( RB[ m_rigidBodyId[ secondaryId ] ] );
+            Transform3<T> const& trB = tr3d[ secondaryId ];
+            // result[compId] += intersectRigidBodies( rigidBodyA,
+            //                                      rigidBodyA,
+            //                                      transformA, 
+            //                                      transformB );
+            ContactInfo<T> ci = closestPointsRigidBodies( rbA,
+                                                          rbB,
+                                                          trA, 
+                                                          trB );
+            result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
+            // Vector3<T> relVelocityAtContact = 
+            // m_kinematics[compId].getVelocityAtPoint( ci.getContactPoint() ) -
+            // m_kinematics[secondaryId].getVelocityAtPoint( ci.getContactPoint() );
+            // Vector3<T> relAngVelocity = 
+            (*CF)->computeForces( ci, 
+                                  zeroVector3T,
+                                  zeroVector3T,
+                                  rbA.getMass(),
+                                  rbB.getMass(),
+                                  m_torce[ compId ] );
         }
-    }
+    } } }
 }
 
 
@@ -209,12 +212,15 @@ void collisionDetectionN2( RigidBody<T, U> const* const* a,                    \
 template                                                                       \
 __GLOBAL__                                                                     \
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,             \
-                                   unsigned int* m_compId,                     \
+                                   RigidBody<T, U> const* const* RB,           \
+                                   HODCContactForceModel<T> const* const* CF,  \
+                                   unsigned int* m_rigidBodyId,                \
+                                   Transform3<T> const* tr3d,                  \
+                                   Torce<T>* m_torce,                          \
+                                   int* m_compId,                              \
                                    unsigned int* m_componentCellHash,          \
                                    unsigned int* m_cellHashStart,              \
                                    unsigned int* m_cellHashEnd,                \
-                                   RigidBody<T, U> const* const* a,            \
-                                   Transform3<T> const* tr3d,                  \
                                    int numComponents,                          \
                                    int* result );                              
 X( float, float )
