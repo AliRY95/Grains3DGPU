@@ -254,6 +254,34 @@ void Transform3<T>::composeLeftByRotation( Transform3<T> const& t )
 
 
 // -----------------------------------------------------------------------------
+// Composition on the left by a rotation described by a quaternion: 
+// this = rot( quaternion ) o this ( this first followed by rot( quaternion ) )
+template <typename T>
+__HOSTDEVICE__
+void Transform3<T>::composeLeftByRotation( Quaternion<T> const& q ) 
+{
+    Matrix3<T> const& mm = m_basis; 
+    T qx = q[X], qy = q[Y], qz = q[Z], qw = q[W];
+    T px, py, pz, pw;
+  
+    // We compute below the matrix product M_rot(q).basis where
+    // M_rot(q) is the rotation matrix corresponding to the quaternion q
+    for ( int i = 0; i < 3; ++i )
+    {
+        px = qy *  mm[Z][i] - qz * mm[Y][i] + qw * mm[X][i];
+        py = qz *  mm[X][i] - qx * mm[Z][i] + qw * mm[Y][i];    
+        pz = qx *  mm[Y][i] - qy * mm[X][i] + qw * mm[Z][i]; 
+        pw = - qx * mm[X][i] - qy * mm[Y][i] - qz * mm[Z][i];
+        m_basis[X][i] = qy * pz - qz * py - pw * qx + qw * px;
+        m_basis[Y][i] = qz * px - qx * pz - pw * qy + qw * py;          
+        m_basis[Z][i] = qx * py - qy * px - pw * qz + qw * pz;    
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Composition on the left by a translation:
 // this = trans(vector) o this (this first followed by trans(vector))
 template <typename T>

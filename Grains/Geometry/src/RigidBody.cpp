@@ -202,6 +202,48 @@ U RigidBody<T, U>::getCircumscribedRadius() const
 
 
 // -----------------------------------------------------------------------------
+// // Computes the acceleration of the rigid body given a torce
+// template <typename T, typename U>
+// __HOSTDEVICE__
+// Kinematics<T> RigidBody<T, U>::computeAcceleration( Torce<T> const& t ) const
+// {
+//     Kinematics<T> acceleration;
+
+//     // Translational momentum
+//     acceleration.setTranslationalVelocity( t.getForce() / m_mass );
+
+
+//     // Rotation quaternion conjugate
+//     Quaternion<T> pConjugate = m_QuaternionRotation.Conjugate(); 
+
+//     // Write torque in body-fixed coordinates system
+//     work = pConjugate.multToVector3( *( t.getTorque() ), 
+//                                      m_QuaternionRotation );
+
+//     // Compute I^-1.(T + I.w ^ w) in body-fixed coordinates system 
+//     vTmp[0] = m_inertia_1[0] * work[0] + 
+//               m_inertia_1[1] * work[1] + 
+//               m_inertia_1[2] * work[2];
+//     vTmp[1] = m_inertia_1[1] * work[0] +
+//               m_inertia_1[3] * work[1] +
+//               m_inertia_1[4] * work[2];
+//     vTmp[2] = m_inertia_1[2] * work[0] + 
+//               m_inertia_1[4] * work[1] +
+//               m_inertia_1[5] * work[2];
+  
+//     // Write I^-1.(T + I.w ^ w) in space-fixed coordinates system
+//     work = m_QuaternionRotation.multToVector3( vTmp, pConjugue );
+
+//     // Compute m_dOmegadt
+//     acceleration.setAngularVelocity( work );
+
+//     return( acceleration );
+// }
+
+
+
+
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class RigidBody<float, float>;
 template class RigidBody<double, float>;

@@ -64,7 +64,7 @@ class Kinematics
         /** @name Set methods */
         //@{
         /** @brief Sets the translational velocity of the kinematics
-        @param u translation velocity */
+        @param u translational velocity */
         __HOSTDEVICE__
         void setTranslationalVelocity( Vector3<T> const& u );
 
@@ -77,6 +77,16 @@ class Kinematics
 
         /** @name Methods */
         //@{
+        /** @brief Adds a velocity to the translational velocity
+        @param u the velocity */
+        __HOSTDEVICE__
+        void addTranslationalVelocity( Vector3<T> const& u );
+
+        /** @brief Adds a angular velocity to the angular velocity
+        @param omega the angular velocity */
+        __HOSTDEVICE__
+        void addAngularVelocity( Vector3<T> const& omega );
+
         /** @brief Returns the total velocity U + om x R given R 
         @param R arm vector */
         __HOSTDEVICE__
