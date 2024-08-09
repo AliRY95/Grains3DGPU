@@ -118,14 +118,19 @@ __HOSTDEVICE__
 T Superquadric<T>::computeVolume() const
 {
 #ifdef __CUDA_ARCH__
-    // TODO: beta function for GPU
+    T const C = T( 2 ) / T( 3 ) * m_a * m_b * m_c;
+    T const eps1 = T( 2 ) / m_n1;
+    T const eps2 = T( 2 ) / m_n2;
+
+    return ( C * eps1 * eps2 * grainsBeta( eps1, T( 0.5 ) * eps1 ) * 
+                               grainsBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) );
 #else
     T const C = T( 2 ) / T( 3 ) * m_a * m_b * m_c;
     T const eps1 = T( 2 ) / m_n1;
     T const eps2 = T( 2 ) / m_n2;
 
-    return ( C * eps1 * eps2 * std::beta( eps1, 0.5 * eps1 ) * 
-                               std::beta( 0.5 * eps2, 0.5 * eps2 ) );
+    return ( C * eps1 * eps2 * std::beta( eps1, T( 0.5 ) * eps1 ) * 
+                               std::beta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) );
 #endif                            
 }
 
@@ -139,7 +144,12 @@ __HOSTDEVICE__
 float Superquadric<float>::computeVolume() const
 {
 #ifdef __CUDA_ARCH__
-    // TODO: beta function for GPU
+    float const C = 2.f / 3.f * m_a * m_b * m_c;
+    float const eps1 = 2.f / m_n1;
+    float const eps2 = 2.f / m_n2;
+
+    return ( C * eps1 * eps2 * grainsBetaf( eps1, 0.5f * eps1 ) * 
+                               grainsBetaf( 0.5f * eps2, 0.5f * eps2 ) );
 #else
     float const C = 2.f / 3.f * m_a * m_b * m_c;
     float const eps1 = 2.f / m_n1;

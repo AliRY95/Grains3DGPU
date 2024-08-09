@@ -12,13 +12,6 @@
 
     @author A.Yazdani - 2023 - Construction */
 // =============================================================================
-// Forward declaration
-// template <typename T> class Vector3;
-// template <typename T> std::ostream& operator << ( std::ostream &fileOut, 
-//                                                   Vector3<T> const& v );
-// template <typename T> std::istream& operator >> ( std::istream &fileIn, 
-//                                                   Vector3<T>& v );
-// =============================================================================
 template <typename T>
 class Vector3
 {
@@ -153,23 +146,6 @@ class Vector3
         __HOSTDEVICE__
         operator Vector3<float> () const;
         //@}
-
-        // /** @name I/O methods */
-        // //@{
-        // /** @brief Input operator
-        // @param fileIn input stream
-        // @param v vector */
-        // __HOST__
-        // std::istream& operator >> ( std::istream& fileIn, 
-        //                                 Vector3<T>& v );
-
-        // /** @brief Output operator
-        // @param fileOut output stream
-        // @param v vector */
-        // __HOST__
-        // std::ostream& operator << ( std::ostream& fileOut, 
-        //                                 Vector3<T> const& v );
-        // //@}
 };
 
 
@@ -180,15 +156,13 @@ class Vector3
 @param fileIn input stream
 @param v vector */
 template <typename T>
-__HOST__
 std::istream& operator >> ( std::istream& fileIn, 
                             Vector3<T>& v );
 
 /** @brief Output operator
 @param fileOut output stream
-@param g vector */
+@param v vector */
 template <typename T>
-__HOST__
 std::ostream& operator << ( std::ostream& fileOut, 
                             Vector3<T> const& v );
 //@}

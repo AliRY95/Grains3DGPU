@@ -5,6 +5,8 @@
 #include "BoundingBox.hh"
 #include "Convex.hh"
 #include "ReaderXML.hh"
+#include "Torce.hh"
+#include "Kinematics.hh"
 
 
 // =============================================================================
@@ -135,7 +137,17 @@ class RigidBody
         // /** @brief Sets the rigid body's circumscribed radius
         // @param r circumscribed radius */
         // __HOSTDEVICE__ void setCircumscribedRadius( float r );
-        //@}        
+        //@}
+
+
+        // /**@name Methods */
+        // //@{
+        // /** @brief Computes the acceleration of the rigid body as a kinematics
+        // object after imposing a torce (Torque + Force). 
+        // @param t imposed torce */
+        // __HOSTDEVICE__
+        // Kinematics<T> computeAcceleration( Torce<T> const& t ) const;
+        //@}    
 };
 
 

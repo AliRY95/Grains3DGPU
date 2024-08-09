@@ -87,6 +87,30 @@ void Kinematics<T>::setAngularVelocity( Vector3<T> const& omega )
 
 
 // -----------------------------------------------------------------------------
+// Adds a velocity to the translational velocity of the kinematics
+template <typename T>
+__HOSTDEVICE__
+void Kinematics<T>::addTranslationalVelocity( Vector3<T> const& u )
+{
+    m_translationalVelocity += u;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Adds a angular velocity to the angular velocity of the kinematics
+template <typename T>
+__HOSTDEVICE__
+void Kinematics<T>::addAngularVelocity( Vector3<T> const& omega )
+{
+    m_angularVelocity += omega;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Returns the total velocity U + om x R given R 
 template <typename T>
 __HOSTDEVICE__

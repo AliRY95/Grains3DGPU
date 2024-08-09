@@ -347,10 +347,9 @@ Vector3<double>::operator Vector3<float> () const
 
 
 
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Output operator
 template <typename T>
-__HOST__
 std::ostream& operator << ( std::ostream& fileOut, 
                             Vector3<T> const& v )
 {
@@ -361,10 +360,9 @@ std::ostream& operator << ( std::ostream& fileOut,
 
 
 
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Input operator
 template <typename T>
-__HOST__
 std::istream& operator >> ( std::istream& fileIn, 
                             Vector3<T>& v )
 {

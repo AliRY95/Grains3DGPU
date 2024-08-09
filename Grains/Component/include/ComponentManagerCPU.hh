@@ -58,13 +58,35 @@ class ComponentManagerCPU : public ComponentManager<T>
         ComponentManagerCPU();
 
         /** @brief Constructor with the number of particles, obstacles, and
-        cells. Particles are assumed to have the same shape (rigid body ID). 
+        cells. Particles are assumed to have the same shape (rigid body ID = 0). 
+        Transformations are all identity, kinematics and torce are set to zero.
+        It is not checked whether the particles are intersecting. 
+        This constructor must be used only when we want to later modify the 
+        transformations, otherwise having all particles at the origin is not a 
+        physical configuration. */
+        ComponentManagerCPU( unsigned int nParticles,
+                             unsigned int nObstacles,
+                             unsigned int nCells );
+
+        /** @brief Constructor given the number of each rigid body, number of 
+        obstacles, and number of cells. rigidBodyId is set according to the
+        number of each rigid body.
         Transformations are randomly chosen in the global domain taken from 
         GrainsParameters, while kinematics and torce are set to zero.
         It is not checked whether the particles are intersecting. */
         ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
                              unsigned int nObstacles,
                              unsigned int nCells );
+
+        // /** @brief Constructor given the number of each rigid body, number of 
+        // obstacles, number of cells, initial positions and velocities as vectors. 
+        // Orientations are identity, and kinematics set to zero.
+        // It is not checked whether the particles are intersecting. */
+        // ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
+        //                      unsigned int nObstacles,
+        //                      unsigned int nCells,
+        //                      std::vector<Vector3<T>> pos,
+        //                      std::vector<Vector3<T>> vel );
 
         /** @brief Destructor */
         ~ComponentManagerCPU();
@@ -149,8 +171,9 @@ class ComponentManagerCPU : public ComponentManager<T>
                               HODCContactForceModel<T> const* const* CF,
                               int* result );
 
-        // /** @brief Updates the position and velocities of particles */
-        // void updateParticles();
+        /** @brief Updates the position and velocities of particles */
+        void moveParticles( FirstOrderExplicit<T> const* const* TI,
+                            RigidBody<T, T> const* const* RB );
         //@}
 };
 

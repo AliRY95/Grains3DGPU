@@ -3,6 +3,7 @@
 
 
 #include "Matrix3.hh"
+#include "Quaternion.hh"
 
 
 // =============================================================================
@@ -55,7 +56,8 @@ class Transform3
         Transform3( Transform3<T> const& t );
 
         /** @brief Destructor */
-        __HOSTDEVICE__ ~Transform3();
+        __HOSTDEVICE__ 
+        ~Transform3();
         //@}
 
 
@@ -140,7 +142,14 @@ class Transform3
         is indeed a rotation
         @param t the other transformation describing a rotation */
         __HOSTDEVICE__
-        void composeLeftByRotation( Transform3<T> const& t );  
+        void composeLeftByRotation( Transform3<T> const& t );
+
+        /** @brief Composition on the left by a rotation described by a 
+        quaternion: this = rot( quaternion ) o this ( this first followed by 
+        rot( quaternion ) )
+        @param q quaternion describing the rotation */
+        __HOSTDEVICE__
+        void composeLeftByRotation( Quaternion<T> const& q );
 
         /** @brief Composition on the left by a translation:
         this = trans(vector) o this (this first followed by trans(vector))
