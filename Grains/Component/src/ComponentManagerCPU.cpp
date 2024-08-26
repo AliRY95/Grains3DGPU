@@ -6,16 +6,12 @@
 #include "ComponentManagerCPU.hh"
 #include "ComponentManager.hh"
 #include "GrainsParameters.hh"
-#include "LinkedCell.hh"
 #include "CollisionDetection.hh"
-#include "VectorMath.hh"
-#include "FirstOrderExplicit.hh"
 #include "Quaternion.hh"
+#include "VectorMath.hh"
 #include "QuaternionMath.hh"
 
 
-#define numComponents (GrainsParameters<T>::m_numComponents)
-#define numCells (GrainsParameters<T>::m_numCells)
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
@@ -77,7 +73,7 @@ ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
     {
         m_rigidBodyId.push_back( 0 );
         m_transform.push_back( Transform3<T>() );
-        m_kinematics.push_back( Kinematics<T>() );
+        m_velocity.push_back( Kinematics<T>() );
         m_torce.push_back( Torce<T>() );
         m_componentId.push_back( i );
         m_componentCellHash.push_back( 0 );
@@ -142,7 +138,7 @@ ComponentManagerCPU<T>::ComponentManagerCPU(
                                   locationZ( generator ) ) );
         m_transform.push_back( tr );
         
-        m_kinematics.push_back( Kinematics<T>() );
+        m_velocity.push_back( Kinematics<T>() );
 
         m_torce.push_back( Torce<T>() );
 
@@ -235,11 +231,11 @@ std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
 
 
 // -----------------------------------------------------------------------------
-// Gets components kinematics
+// Gets components velocities
 template <typename T>
-std::vector<Kinematics<T>> ComponentManagerCPU<T>::getKinematics() const
+std::vector<Kinematics<T>> ComponentManagerCPU<T>::getVelocity() const
 {
-    return( m_kinematics );
+    return( m_velocity );
 }
 
 
@@ -292,9 +288,9 @@ void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& t )
 // -----------------------------------------------------------------------------
 // Sets the array of components neighbor Id
 template <typename T>
-void ComponentManagerCPU<T>::setKinematics( std::vector<Kinematics<T>> const& k )
+void ComponentManagerCPU<T>::setVelocity( std::vector<Kinematics<T>> const& v )
 {
-    m_kinematics = k;
+    m_velocity = v;
 }
 
 
@@ -351,7 +347,7 @@ void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
             m_cellHashStart.at( hash ) = i;
         if ( i > 0 )
             m_cellHashEnd[ m_componentCellHash[ i - 1 ] ] = i;
-        if ( i == numComponents - 1 )
+        if ( i == m_nParticles - 1 )
             m_cellHashEnd[ hash ] = i + 1;
     }
 }
@@ -378,6 +374,7 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
         unsigned int const cellHash = m_componentCellHash[ pId ];
         RigidBody<T, T> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
         Transform3<T> const& trA = m_transform[ compId ];
+        T massA = rbA.getMass();
         // Torce<T>& m_torce[ compId ];
         for ( int k = -1; k < 2; k++ ) {
         for ( int j = -1; j < 2; j++ ) { 
@@ -407,12 +404,14 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                     (*CF)->computeForces( ci, 
                                           zeroVector3T,
                                           zeroVector3T,
-                                          rbA.getMass(),
+                                          massA,
                                           rbB.getMass(),
                                           m_torce[ compId ] );
                 result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
             }
         } } }
+        // Adding the gravitational force to the torce
+        m_torce[compId].addForce( massA * GrainsParameters<T>::m_gravity );
     }
 }
 
@@ -420,9 +419,9 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
 
 
 // -----------------------------------------------------------------------------
-// Detects collision between particles
+// Moves particles in the simulation
 template <typename T>
-void ComponentManagerCPU<T>::moveParticles( FirstOrderExplicit<T> const* const* TI,
+void ComponentManagerCPU<T>::moveParticles( TimeIntegrator<T> const* const* TI,
                                             RigidBody<T, T> const* const* RB )
 {
     // #pragma omp parallel for
@@ -430,62 +429,42 @@ void ComponentManagerCPU<T>::moveParticles( FirstOrderExplicit<T> const* const* 
     {
         // Parameters of the particle
         RigidBody<T, T> const& rb = *( RB[ m_rigidBodyId[ pId ] ] );
-        Transform3<T>& tr = m_transform[ pId ];
-        // ---------------------------------------------------------------------
-        // Computing the accelerations
-        Vector3<T> transAcc( m_torce[ pId ].getForce() / rb.getMass() );
-        // Angular momentum
-        // Inverse inertia tensor
-        T invInertia[6];
-        rb.getInertia_1( invInertia );
-        Vector3<T> angAcc, angAccTemp;
-        // Quaternion and eotation quaternion conjugate
-        Quaternion<T> qRot;
-        qRot.setQuaternion( tr.getBasis() );
-        Quaternion<T> qRotCon = qRot.conjugate(); 
-        // Write torque in body-fixed coordinates system
-        angAcc = qRotCon.multToVector3( m_torce[ pId ].getTorque() * qRot );
-        // Compute I^-1.(T + I.w ^ w) in body-fixed coordinates system 
-        angAccTemp[0] = invInertia[0] * angAcc[0] + 
-                        invInertia[1] * angAcc[1] + 
-                        invInertia[2] * angAcc[2];
-        angAccTemp[1] = invInertia[1] * angAcc[0] +
-                        invInertia[3] * angAcc[1] +
-                        invInertia[4] * angAcc[2];
-        angAccTemp[2] = invInertia[2] * angAcc[0] + 
-                        invInertia[4] * angAcc[1] +
-                        invInertia[5] * angAcc[2];
-  
-        // Write I^-1.(T + I.w ^ w) in space-fixed coordinates system
-        angAcc = qRot.multToVector3( angAccTemp * qRotCon );
-        // ---------------------------------------------------------------------
+        Transform3<T> tr = m_transform[ pId ];
 
-
-        // Time integration
+        // First, we compute quaternion of orientation
+        Quaternion<T> qRot( tr.getBasis() );
+        // Next, we compute accelerations and reset torces
+        Kinematics<T> const& acceleration = rb.computeAcceleration( 
+                                                                m_torce[ pId ], 
+                                                                qRot );
+        m_torce[ pId ].reset();
+        // Finally, we move particles using the given time integration
         Vector3<T> transMove, avgAngVel;
-        (*TI)->Move( transAcc, angAcc, m_kinematics[ pId ],
-                     transMove, avgAngVel );
+        (*TI)->Move( acceleration, 
+                     m_velocity[ pId ],
+                     transMove, 
+                     avgAngVel );
         
         // Translational motion
         m_transform[ pId ].composeLeftByTranslation( transMove );
         
-        // Angular motion 
+        // Angular motion
+        Quaternion<T> qRotChange;
         T nOmega = norm( avgAngVel );
         if ( nOmega > LOWEPS ) 
         {
-            T c = cos( nOmega * 0.001 / 2. );
-            T s = sin( nOmega * 0.001 / 2. );
-            Vector3<T> t;
-            t = ( s / nOmega ) * avgAngVel;
-            qRotCon.setQuaternion( t, c );
+            T c = cos( nOmega * GrainsParameters<T>::m_dt / T( 2 ) );
+            T s = sin( nOmega * GrainsParameters<T>::m_dt / T( 2 ) );
+            Vector3<T> t( ( s / nOmega ) * avgAngVel );
+            qRotChange.setQuaternion( t, c );
         } 
         else 
-            qRotCon.setQuaternion( T( 0 ), T( 0 ), T( 0 ), T( 1 ) );
+            qRotChange.setQuaternion( T( 0 ), T( 0 ), T( 0 ), T( 1 ) );
         
-        qRot = qRotCon * qRot;
-        m_transform[ pId ].composeLeftByRotation( T( 0.5 ) * ( m_kinematics[ pId ].getAngularVelocity() * qRot ) );
-
-        
+        qRot = qRotChange * qRot;
+        // TODO
+        // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
+        m_transform[ pId ].composeLeftByRotation( qRotChange );
     }
 }
 

@@ -12,6 +12,18 @@ FirstOrderExplicit<T>::FirstOrderExplicit()
 
 
 // -----------------------------------------------------------------------------
+// Constructor with the time step
+template <typename T>
+__HOSTDEVICE__
+FirstOrderExplicit<T>::FirstOrderExplicit( T dt )
+{
+	TimeIntegrator<T>::m_dt = dt;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__
@@ -21,23 +33,49 @@ FirstOrderExplicit<T>::~FirstOrderExplicit()
 
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Returns the time integrator type
+template <typename T>
+__HOSTDEVICE__
+TimeIntegratorType FirstOrderExplicit<T>::getTimeIntegratorType() const
+{
+	return( FIRSTORDEREXPLICIT );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Creates and returns a clone of the time integrator
+template <typename T>
+__HOSTDEVICE__
+TimeIntegrator<T>* FirstOrderExplicit<T>::clone() const
+{
+	return( new FirstOrderExplicit<T>( TimeIntegrator<T>::m_dt ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Computes the new velocity and position at time t+dt
 template <typename T>
 __HOSTDEVICE__
-void FirstOrderExplicit<T>::Move( Vector3<T> const& transAcc,
-								  Vector3<T> const& AngAcc,
-                                  Kinematics<T>& kin,
+void FirstOrderExplicit<T>::Move( Kinematics<T> const& acceleration,
+								  Kinematics<T>& velocity,                                  
 								  Vector3<T>& transMotion,
 								  Vector3<T>& avgAngVel ) const
 {
+	T dt = TimeIntegrator<T>::m_dt;
 	// Translational velocity and motion
-	transMotion = m_dt * kin.getTranslationalVelocity();
-	kin.addTranslationalVelocity( m_dt * transAcc );
+	transMotion = dt * velocity.getTranslationalComponent();
+	velocity.addToTranslationalComponent( 
+							dt * acceleration.getTranslationalComponent() );
 
 	// Angular velocity and motion
-	avgAngVel = kin.getAngularVelocity();
-	kin.addAngularVelocity( m_dt * AngAcc );
+	avgAngVel = velocity.getAngularComponent();
+	velocity.addToAngularComponent( 
+							dt * acceleration.getAngularComponent() );
 }
 
 

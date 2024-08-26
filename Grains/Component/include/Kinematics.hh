@@ -8,10 +8,9 @@
 // =============================================================================
 /** @brief The class Kinematics.
 
-    Manages the kinematics of components.
+    Manages the kinematics (velocities or accelerations) of components.
 
-    @author G.FERRER - Institut Francais du Petrole - 2000 - Creation 
-    @author A.WACHS - 2019 - Major cleaning & refactoring */
+    @author A.YAZDANI - 2024 - Construction */
 // ============================================================================
 template <typename T>
 class Kinematics
@@ -19,14 +18,8 @@ class Kinematics
     protected:
         /** @name Parameters */
         //@{
-        Vector3<T> m_translationalVelocity; /**< Translational velocity */
-        Vector3<T> m_angularVelocity; /**< Angular velocity */  
-        // Vector3 m_dUdt; /**< Translational velocity variation dU/dt */
-        // Vector3 m_dOmegadt; /**< Angular velocity variation dom/dt */
-        // Vector3 m_translationalDisplacementOverDt; /**< Translational displacement
-        // over dt */
-        // Vector3 m_averageAngularVelocityOverDt; /**< average angular velocity over 
-        // dt */
+        Vector3<T> m_translational; /**< Translational component */
+        Vector3<T> m_angular; /**< Angular component */  
         //@}
     
     public:
@@ -36,12 +29,12 @@ class Kinematics
         __HOSTDEVICE__
         Kinematics();
 
-        /** @brief Constructor with a u and a omega as input parameters
-        @param u translational velocity
-        @param omega angular velocity */
+        /** @brief Constructor with two vectors as input parameters
+        @param translational translational components
+        @param angular angular component */
         __HOSTDEVICE__
-        Kinematics( Vector3<T> const& u, 
-                    Vector3<T> const& omega );
+        Kinematics( Vector3<T> const& translational,
+                    Vector3<T> const& angular );
 
         /** @brief Destructor */
         __HOSTDEVICE__
@@ -51,41 +44,41 @@ class Kinematics
 
         /** @name Get methods */
         //@{
-        /** @brief Gets translational velocity of the kinematics */
+        /** @brief Gets the translational component of the kinematics */
         __HOSTDEVICE__
-        Vector3<T> getTranslationalVelocity() const;
+        Vector3<T> getTranslationalComponent() const;
         
-        /** @brief Gets angular velocity of the kinematics */
+        /** @brief Gets the angular component of the kinematics */
         __HOSTDEVICE__
-        Vector3<T> getAngularVelocity() const;
+        Vector3<T> getAngularComponent() const;
         //@}
     
 
         /** @name Set methods */
         //@{
-        /** @brief Sets the translational velocity of the kinematics
-        @param u translational velocity */
+        /** @brief Sets the translational component of the kinematics
+        @param translational translational component */
         __HOSTDEVICE__
-        void setTranslationalVelocity( Vector3<T> const& u );
+        void setTranslationalComponent( Vector3<T> const& translational );
 
-        /** @brief Sets the angular velocity of the kinematics
-        @param omega angular velocity */
+        /** @brief Sets the angular component of the kinematics
+        @param angular angular component */
         __HOSTDEVICE__
-        void setAngularVelocity( Vector3<T> const& omega );
+        void setAngularComponent( Vector3<T> const& angular );
         //@}
 
 
         /** @name Methods */
         //@{
-        /** @brief Adds a velocity to the translational velocity
-        @param u the velocity */
+        /** @brief Adds a vector to the translational component
+        @param translational vector to add to the translational component */
         __HOSTDEVICE__
-        void addTranslationalVelocity( Vector3<T> const& u );
+        void addToTranslationalComponent( Vector3<T> const& translational );
 
         /** @brief Adds a angular velocity to the angular velocity
-        @param omega the angular velocity */
+        @param angular vector to add to the angular component */
         __HOSTDEVICE__
-        void addAngularVelocity( Vector3<T> const& omega );
+        void addToAngularComponent( Vector3<T> const& angular );
 
         /** @brief Returns the total velocity U + om x R given R 
         @param R arm vector */

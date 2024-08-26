@@ -1,5 +1,5 @@
-#ifndef _GJK_HH_
-#define _GJK_HH_
+#ifndef _GJK_JH_HH_
+#define _GJK_JH_HH_
 
 
 #include "Transform3.hh"
@@ -57,13 +57,13 @@ B
 @param nbIter number of iterations of GJK for convergence */
 template <typename T>
 __HOSTDEVICE__
-T closestPointsGJK( Convex<T> const& a, 
-                    Convex<T> const& b, 
-                    Transform3<T> const& a2w,
-                    Transform3<T> const& b2w, 
-                    Vector3<T>& pa,
-                    Vector3<T>& pb,
-                    int& nbIter );
+T computeClosestPoints_GJK_JH( Convex<T> const& a, 
+                               Convex<T> const& b, 
+                               Transform3<T> const& a2w,
+                               Transform3<T> const& b2w, 
+                               Vector3<T>& pa,
+                               Vector3<T>& pb,
+                               int& nbIter );
 //@}
 
 

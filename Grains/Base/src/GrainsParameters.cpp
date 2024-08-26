@@ -25,7 +25,7 @@ template <typename T> unsigned int GrainsParameters<T>::m_numComponents = 0;
 template <typename T> unsigned int GrainsParameters<T>::m_numCells = 0;
 
 /* Physical */
-template <typename T> Vector3<T> GrainsParameters<T>::m_gravity = zeroVector3T;
+template <typename T> Vector3<T> GrainsParameters<T>::m_gravity = Vector3<T>( 0, 0, -10 );
 
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;

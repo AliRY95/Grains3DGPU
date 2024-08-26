@@ -87,6 +87,19 @@ void Torce<T>::setForce( Vector3<T> const& f )
 
 
 // -----------------------------------------------------------------------------
+// Resets the torce
+template <typename T>
+__HOSTDEVICE__
+void Torce<T>::reset()
+{
+    m_torque.reset();
+    m_force.reset();
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Adds a force to the torce
 template <typename T>
 __HOSTDEVICE__

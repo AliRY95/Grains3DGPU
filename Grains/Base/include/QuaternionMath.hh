@@ -92,13 +92,13 @@ static INLINE Quaternion<T> operator * ( Quaternion<T> const& q1,
 
 // ----------------------------------------------------------------------------
 /** @brief double product on the right of a quaternion by a vector [ 0, v ],
-i.e., [ 0, v ] x q
+i.e., q x [ 0, v ]
 @param v the vector
 @param q the quaternion */
 template <typename T>
 __HOSTDEVICE__
-static INLINE Quaternion<T> operator * ( Vector3<T> const& v,
-                                         Quaternion<T> const& q )
+static INLINE Quaternion<T> operator * ( Quaternion<T> const& q,
+                                         Vector3<T> const& v )
 {
     T w_q = q.getScalar();
     Vector3<T> v_q = q.getVector();
@@ -112,13 +112,13 @@ static INLINE Quaternion<T> operator * ( Vector3<T> const& v,
 
 // ----------------------------------------------------------------------------
 /** @brief double product on the left of a quaternion by a vector [ 0, v ], 
-i.e., q x [ 0, v ]
+i.e., [ 0, v ] x q
 @param q the quaternion
 @param v the vector */
 template <typename T>
 __HOSTDEVICE__
-static INLINE Quaternion<T> operator * ( Quaternion<T> const& q,
-                                         Vector3<T> const& v )
+static INLINE Quaternion<T> operator * ( Vector3<T> const& v,
+                                         Quaternion<T> const& q )
 {
     return ( q.multLeftVec( v ) );
 }

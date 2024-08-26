@@ -4,10 +4,11 @@
 
 #include "GrainsParameters.hh"
 #include "RigidBody.hh"
-#include "HODCContactForceModel.hh"
 #include "ComponentManager.hh"
 #include "ComponentManagerCPU.hh"
 #include "ComponentManagerGPU.hh"
+#include "HODCContactForceModel.hh"
+#include "TimeIntegrator.hh"
 #include "ReaderXML.hh"
 
 
@@ -59,10 +60,14 @@ class Grains
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
         HODCContactForceModel<T>** m_d_contactForce;
-        /** \brief Time integration. We use a pointer because the linkedCell is 
-        directly instantiated on device in the case that we
+         /** \brief Linked cell for broad-phase. We use a pointer because
+        the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
-        // TimeIntegration<T>* m_timeIntegration;
+        TimeIntegrator<T>** m_timeIntegrator;
+        /** \brief Linked cell for broad-phase. We use a pointer because
+        the linkedCell is directly instantiated on device in the case that we
+        run Grains on GPU. */
+        TimeIntegrator<T>** m_d_timeIntegrator;
         //@}
 
 

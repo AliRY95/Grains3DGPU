@@ -1,11 +1,9 @@
 #include "Grains.hh"
-#include "VectorMath.hh"
-#include "ComponentManagerCPU.hh"
-#include "ComponentManagerGPU.hh"
-#include "RigidBody.hh"
 #include "RigidBodyGPUWrapper.hh"
 #include "LinkedCellGPUWrapper.hh"
 #include "HODCContactForceModelGPUWrapper.hh"
+#include "TimeIntegratorBuilderFactory.hh"
+#include "VectorMath.hh"
 
 
 /* ========================================================================== */
@@ -216,19 +214,22 @@ void Grains<T>::Construction( DOMElement* rootElement )
     {
         DOMNode* contact = ReaderXML::getNode( contacts, "ContactForceModel" );
         DOMNode* hodc = ReaderXML::getNode( contact, "HODC" );
-        cout << shiftString6 << "Reading new contact force models ..." << endl;
+        cout << shiftString6 
+             << "Reading the contact force model ..." 
+             << endl;
 
         m_contactForce = ( HODCContactForceModel<T>** ) 
                          malloc( sizeof( HODCContactForceModel<T>* ) );
         *m_contactForce = new HODCContactForceModel<T>( hodc );
-        cout << shiftString6 << "Reading contact force models completed!" << endl;
+        cout << shiftString6 
+             << "Reading the contact force model completed!" 
+             << endl;
         if ( GrainsParameters<T>::m_isGPU )
         {
             cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
                                    sizeof( HODCContactForceModel<T>* ) ) );
             createContactForceOnDevice( hodc, m_d_contactForce );
         }
-
     }
     // TODO
     // string check_matA, check_matB;
@@ -243,6 +244,45 @@ void Grains<T>::Construction( DOMElement* rootElement )
     //   grainsAbort();
     // }
 
+
+
+
+    // -------------------------------------------------------------------------
+    // Temporal setting and time integration
+    DOMNode* tempSetting = ReaderXML::getNode( root, "TemporalSetting" );
+    if ( tempSetting )
+    {
+        DOMNode* nTime = ReaderXML::getNode( tempSetting, "TimeInterval" );
+        T tStart = ReaderXML::getNodeAttr_Double( nTime, "Start" );
+        T tEnd = ReaderXML::getNodeAttr_Double( nTime, "End" );
+        T tStep = ReaderXML::getNodeAttr_Double( nTime, "dt" );
+        GrainsParameters<T>::m_tStart = tStart;
+        GrainsParameters<T>::m_tEnd = tEnd;
+        GrainsParameters<T>::m_dt = tStep;
+        DOMNode* nTI = ReaderXML::getNode( tempSetting, "TimeIntegration" );
+        if ( nTI )
+        {
+            cout << shiftString6 
+                 << "Reading the time integration model ..." 
+                 << endl;
+            m_timeIntegrator = ( TimeIntegrator<T>** ) 
+                                malloc( sizeof( TimeIntegrator<T>* ) );
+            *m_timeIntegrator = TimeIntegratorBuilderFactory<T>::create( nTI, 
+                                                                        tStep );
+            if ( GrainsParameters<T>::m_isGPU )
+            {
+                cudaErrCheck( cudaMalloc( (void**)&m_d_timeIntegrator,
+                                          sizeof( TimeIntegrator<T>* ) ) );
+                TimeIntegratorBuilderFactory<T>::createOnDevice( 
+                                                        nTI,
+                                                        tStep, 
+                                                        m_d_timeIntegrator );
+            }
+            cout << shiftString6 
+                 << "Reading the time integration model completed!" 
+                 << endl;
+        }
+    }
 }
 
 

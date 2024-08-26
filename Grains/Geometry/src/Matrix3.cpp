@@ -300,6 +300,44 @@ Matrix3<T>& Matrix3<T>::operator - ()
 
 
 // -----------------------------------------------------------------------------
+// Output operator
+template <typename T>
+__HOST__
+std::ostream& operator << ( std::ostream& fileOut, 
+                            Matrix3<T> const& m )
+{
+    fileOut << m[X] << std::endl << m[Y] << std::endl << m[Z];
+    return ( fileOut );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Input operator
+template <typename T>
+__HOST__
+std::istream& operator >> ( std::istream& fileIn, 
+                            Matrix3<T>& m )
+{
+    fileIn >> m[X] >> m[Y] >> m[Z];
+    return ( fileIn );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Matrix3<float>;
 template class Matrix3<double>;
+
+#define X( T ) \
+template std::ostream& operator << <T>( std::ostream& fileOut,                 \
+                                        Matrix3<T> const& m );                 \
+                                                                               \
+template std::istream& operator >> <T>( std::istream& fileIn,                  \
+                                        Matrix3<T>& m );
+X( float )
+X( double )
+#undef X

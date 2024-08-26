@@ -62,6 +62,11 @@ class Quaternion
 					T z, 
 					T d );
 
+		/** @brief Constructor with a rotation matrix 		
+		@param rot rotation matrix */
+		__HOSTDEVICE__
+		Quaternion( Matrix3<T> const& rot );
+
 		/** @brief Copy constructor
 		@param q copied Quaternion object */
 		__HOSTDEVICE__

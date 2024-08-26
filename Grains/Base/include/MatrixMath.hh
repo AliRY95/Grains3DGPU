@@ -3,8 +3,8 @@
 
 
 #include "Vector3.hh"
-#include "VectorMath.hh"
 #include "Matrix3.hh"
+#include "VectorMath.hh"
 
 
 // =============================================================================

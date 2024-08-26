@@ -87,6 +87,10 @@ class Vector3
         @param tol the required tolerance to determine if a component is zero */
         __HOSTDEVICE__
         void round( T tol = EPSILON1 );
+
+        /** @brief set all components to zero */
+        __HOSTDEVICE__
+        void reset();
         //@}
 
 
@@ -156,6 +160,7 @@ class Vector3
 @param fileIn input stream
 @param v vector */
 template <typename T>
+__HOST__
 std::istream& operator >> ( std::istream& fileIn, 
                             Vector3<T>& v );
 
@@ -163,6 +168,7 @@ std::istream& operator >> ( std::istream& fileIn,
 @param fileOut output stream
 @param v vector */
 template <typename T>
+__HOST__
 std::ostream& operator << ( std::ostream& fileOut, 
                             Vector3<T> const& v );
 //@}

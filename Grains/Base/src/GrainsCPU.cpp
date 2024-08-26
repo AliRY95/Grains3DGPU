@@ -52,10 +52,23 @@ void GrainsCPU<T>::simulate()
 
     // Collision detection on host
     auto h_start = chrono::high_resolution_clock::now();
-    Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
-                                             Grains<T>::m_rigidBodyList,
-                                             Grains<T>::m_contactForce,
-                                             h_collision );
+    for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
+          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
+    {
+        std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
+        std::vector<Transform3<T>> tr = Grains<T>::m_components->getTransform();
+        std::cout << tr[0].getOrigin() << endl;
+        Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
+                                                  Grains<T>::m_rigidBodyList,
+                                                  Grains<T>::m_contactForce,
+                                                  h_collision ); 
+        Grains<T>::m_components->moveParticles( Grains<T>::m_timeIntegrator,
+                                                Grains<T>::m_rigidBodyList );
+
+
+
+    }
     auto h_end = chrono::high_resolution_clock::now();
 
 

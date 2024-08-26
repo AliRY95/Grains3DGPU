@@ -145,6 +145,26 @@ class Matrix3
 };
 
 
+/** @name External Methods - I/O methods */
+//@{
+/** @brief Input operator
+@param fileIn input stream
+@param v vector */
+template <typename T>
+__HOST__
+std::istream& operator >> ( std::istream& fileIn, 
+                            Matrix3<T>& m );
+
+/** @brief Output operator
+@param fileOut output stream
+@param v vector */
+template <typename T>
+__HOST__
+std::ostream& operator << ( std::ostream& fileOut, 
+                            Matrix3<T> const& m );
+//@}
+
+
 typedef Matrix3<float> Mat3F;
 typedef Matrix3<double> Mat3D;
 

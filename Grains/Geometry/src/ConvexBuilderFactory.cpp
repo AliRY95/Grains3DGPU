@@ -1,12 +1,11 @@
 #include "ConvexBuilderFactory.hh"
+#include "Convex.hh"
 #include "Sphere.hh"
 #include "Box.hh"
 #include "Cylinder.hh"
 #include "Cone.hh"
 #include "Superquadric.hh"
 #include "Rectangle.hh"
-#include "Convex.hh"
-#include "GrainsParameters.hh"  
 
 
 // -----------------------------------------------------------------------------
@@ -33,7 +32,7 @@ Convex<T>* ConvexBuilderFactory<T>::create( DOMNode* root )
     else
     {
         cout << "Invalid convex type: " << type.c_str() << endl;
-        exit(1);
+        exit( 1 );
     }
 
     return ( convex ); // returns the host-side pointer to convex object
