@@ -4,9 +4,10 @@
 
 #include "BoundingBox.hh"
 #include "Convex.hh"
+#include "Kinematics.hh"
+#include "Quaternion.hh"
 #include "ReaderXML.hh"
 #include "Torce.hh"
-#include "Kinematics.hh"
 
 
 // =============================================================================
@@ -140,13 +141,15 @@ class RigidBody
         //@}
 
 
-        // /**@name Methods */
-        // //@{
-        // /** @brief Computes the acceleration of the rigid body as a kinematics
-        // object after imposing a torce (Torque + Force). 
-        // @param t imposed torce */
-        // __HOSTDEVICE__
-        // Kinematics<T> computeAcceleration( Torce<T> const& t ) const;
+        /**@name Methods */
+        //@{
+        /** @brief Computes the acceleration of the rigid body as a kinematics
+        object after imposing a torce (Torque + Force). 
+        @param t imposed torce
+        @param q quaternion of rotation */
+        __HOSTDEVICE__
+        Kinematics<T> computeAcceleration( Torce<T> const& t,
+                                           Quaternion<T> const& q ) const;
         //@}    
 };
 

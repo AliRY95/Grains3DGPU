@@ -71,18 +71,24 @@ class Torce
 
         /**@name Methods */
         //@{
+        /** @brief Resets the torce */
+        __HOSTDEVICE__
+        void reset();
+
         /** @brief Adds a torque to the torce
-        @param t the added torque */
+        @param t added torque */
         __HOSTDEVICE__
         void addTorque( Vector3<T> const& t );
 
         /** @brief Adds a force to the torce
-        @param f the added force */
+        @param f added force */
         __HOSTDEVICE__
         void addForce( Vector3<T> const& f );
 
-        /** @brief Adds a force to the torce
-        @param f the added force */
+        /** @brief Adds a force to the torce with accounting for the additional 
+        torque
+        @param f added force
+        @param p point of application */
         __HOSTDEVICE__
         void addForce( Vector3<T> const& f,
                        Vector3<T> const& p );

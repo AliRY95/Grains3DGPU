@@ -28,10 +28,10 @@ class ComponentManagerCPU : public ComponentManager<T>
         std::vector<unsigned int> m_rigidBodyId; 
         /** \brief components transformation */
         std::vector<Transform3<T>> m_transform; 
-        /** \brief array of components kinematics */
-        std::vector<Kinematics<T>> m_kinematics; 
+        /** \brief array of components velocities */
+        std::vector<Kinematics<T>> m_velocity;
         /** \brief array of components torce */
-        std::vector<Torce<T>> m_torce; 
+        std::vector<Torce<T>> m_torce;
         /** \brief components Id with positive values for particles and negative
         values for obstacles. */
         std::vector<int> m_componentId; 
@@ -59,7 +59,7 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @brief Constructor with the number of particles, obstacles, and
         cells. Particles are assumed to have the same shape (rigid body ID = 0). 
-        Transformations are all identity, kinematics and torce are set to zero.
+        Transformations are all identity, velocities and torce are set to zero.
         It is not checked whether the particles are intersecting. 
         This constructor must be used only when we want to later modify the 
         transformations, otherwise having all particles at the origin is not a 
@@ -72,7 +72,7 @@ class ComponentManagerCPU : public ComponentManager<T>
         obstacles, and number of cells. rigidBodyId is set according to the
         number of each rigid body.
         Transformations are randomly chosen in the global domain taken from 
-        GrainsParameters, while kinematics and torce are set to zero.
+        GrainsParameters, while velocities and torce are set to zero.
         It is not checked whether the particles are intersecting. */
         ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
                              unsigned int nObstacles,
@@ -80,7 +80,7 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         // /** @brief Constructor given the number of each rigid body, number of 
         // obstacles, number of cells, initial positions and velocities as vectors. 
-        // Orientations are identity, and kinematics set to zero.
+        // Orientations are identity, and velocities set to zero.
         // It is not checked whether the particles are intersecting. */
         // ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
         //                      unsigned int nObstacles,
@@ -110,8 +110,8 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @brief Gets components transformation */
         std::vector<Transform3<T>> getTransform() const;
 
-        /** @brief Gets components kinematics */
-        std::vector<Kinematics<T>> getKinematics() const;
+        /** @brief Gets components velocities */
+        std::vector<Kinematics<T>> getVelocity() const;
 
         /** @brief Gets components torce */
         std::vector<Torce<T>> getTorce() const;
@@ -135,8 +135,8 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @brief Sets components transformation */
         void setTransform( std::vector<Transform3<T>> const& t );
 
-        /** @brief Sets components kinematics */
-        void setKinematics( std::vector<Kinematics<T>> const& k );
+        /** @brief Sets components velocities */
+        void setVelocity( std::vector<Kinematics<T>> const& v );
 
         /** @brief Sets components torce */
         void setTorce( std::vector<Torce<T>> const& t );
@@ -172,7 +172,7 @@ class ComponentManagerCPU : public ComponentManager<T>
                               int* result );
 
         /** @brief Updates the position and velocities of particles */
-        void moveParticles( FirstOrderExplicit<T> const* const* TI,
+        void moveParticles( TimeIntegrator<T> const* const* TI,
                             RigidBody<T, T> const* const* RB );
         //@}
 };

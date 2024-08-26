@@ -2,8 +2,8 @@
 #define _CONVEXBUILDERFACTORY_HH_
 
 
-#include "ReaderXML.hh"
 #include "Convex.hh"
+#include "ReaderXML.hh"
 
 
 // =============================================================================
@@ -45,14 +45,12 @@ class ConvexBuilderFactory
         //@{
         /** @brief Construct a convex with an XML node as an input parameter
         @param root XML node */
-        __HOST__
         static Convex<T>* create( DOMNode *root );
 
         /** @brief Construct a convex with a type and a input stream as input 
         parameters
         @param type convex type
         @param fileIn input stream */
-        __HOST__
         static Convex<T>* create( string& type, 
                                   std::istream& fileIn );
         //@}

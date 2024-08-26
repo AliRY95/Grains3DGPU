@@ -36,13 +36,13 @@
 
 
 	<Particles>
-		<Particle Number="164288" Density="1163.66">
+		<Particle Number="12288" Density="1163.66">
 			<Material>matP</Material>
 			<AngularPosition Type="Identity"></AngularPosition>
-				<!-- <Sphere Radius="0.05"/> -->
-				<!-- <Superquadric a="0.02" b="0.02" c="0.04" n1="8" n2="8"/> -->
+				<!-- <Box LX="0.04" LY="0.04" LZ="0.08"/> -->
+				<!-- <Sphere Radius="0.02"/> -->
 			<Convex CrustThickness="1.e-4">
-				<Box LX="0.04" LY="0.04" LZ="0.08"/>
+				<Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/>
 			</Convex>
 		</Particle>
 	</Particles>

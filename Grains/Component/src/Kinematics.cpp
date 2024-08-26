@@ -8,21 +8,21 @@
 template <typename T>
 __HOSTDEVICE__
 Kinematics<T>::Kinematics()
-: m_translationalVelocity( zeroVector3T )
-, m_angularVelocity( zeroVector3T )
+: m_translational( zeroVector3T )
+, m_angular( zeroVector3T )
 {}
 
 
 
 
 // -----------------------------------------------------------------------------
-// Constructor with a u and a omega as input parameters
+// Constructor with two vectors as input parameters
 template <typename T>
 __HOSTDEVICE__
-Kinematics<T>::Kinematics( Vector3<T> const& u, 
-                           Vector3<T> const& omega )
-: m_translationalVelocity( u )
-, m_angularVelocity( omega )
+Kinematics<T>::Kinematics( Vector3<T> const& translational, 
+                           Vector3<T> const& angular )
+: m_translational( translational )
+, m_angular( angular )
 {}
 
 
@@ -39,72 +39,73 @@ Kinematics<T>::~Kinematics()
 
 
 // -----------------------------------------------------------------------------
-// Gets translational velocity of the kinematics
+// Gets the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__
-Vector3<T> Kinematics<T>::getTranslationalVelocity() const
+Vector3<T> Kinematics<T>::getTranslationalComponent() const
 {
-    return ( m_translationalVelocity );
+    return ( m_translational );
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Gets angular velocity of the kinematics
+// Gets the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__
-Vector3<T> Kinematics<T>::getAngularVelocity() const
+Vector3<T> Kinematics<T>::getAngularComponent() const
 {
-    return ( m_angularVelocity );
+    return ( m_angular );
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Sets the translational velocity of the kinematics
+// Sets the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__
-void Kinematics<T>::setTranslationalVelocity( Vector3<T> const& u )
+void Kinematics<T>::setTranslationalComponent( Vector3<T> const& translational )
 {
-    m_translationalVelocity = u;
+    m_translational = translational;
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Sets the angular velocity of the kinematics
+// Sets the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__
-void Kinematics<T>::setAngularVelocity( Vector3<T> const& omega )
+void Kinematics<T>::setAngularComponent( Vector3<T> const& angular )
 {
-    m_angularVelocity = omega;
+    m_angular = angular;
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Adds a velocity to the translational velocity of the kinematics
+// Adds a vector to the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__
-void Kinematics<T>::addTranslationalVelocity( Vector3<T> const& u )
+void Kinematics<T>::addToTranslationalComponent( 
+                                            Vector3<T> const& translational )
 {
-    m_translationalVelocity += u;
+    m_translational += translational;
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Adds a angular velocity to the angular velocity of the kinematics
+// Adds a vector to the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__
-void Kinematics<T>::addAngularVelocity( Vector3<T> const& omega )
+void Kinematics<T>::addToAngularComponent( Vector3<T> const& omega )
 {
-    m_angularVelocity += omega;
+    m_angular += omega;
 }
 
 
@@ -116,7 +117,7 @@ template <typename T>
 __HOSTDEVICE__
 Vector3<T> Kinematics<T>::Velocity( Vector3<T> const& R ) const
 {
-    return ( m_translationalVelocity + ( m_angularVelocity ^ R ) );
+    return ( m_translational + ( m_angular ^ R ) );
 }
 
 

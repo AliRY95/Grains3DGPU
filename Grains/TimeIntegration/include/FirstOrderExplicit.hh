@@ -2,9 +2,7 @@
 #define _FIRSTORDEREXPLICIT_HH_
 
 
-#include "Torce.hh"
-#include "Transform3.hh"
-#include "Kinematics.hh"
+#include "TimeIntegrator.hh"
 
 
 // =============================================================================
@@ -16,42 +14,49 @@
     @author A.Yazdani - 2024 - Construction */
 // ============================================================================
 template <typename T>
-class FirstOrderExplicit
+class FirstOrderExplicit : public TimeIntegrator<T>
 {
-	protected:
-        /** @name Parameters */
-        //@{
-        T m_dt; /**< time step */
-        //@}
-
-
     public:
         /**@name Contructors & Destructor */
         //@{
-        /** @brief Destructor */
-        __HOSTDEVICE__
-        ~FirstOrderExplicit();
-      
         /** @brief Default constructor */
         __HOSTDEVICE__
         FirstOrderExplicit();
+
+        /** @brief Constructor with the time step */
+        __HOSTDEVICE__
+        FirstOrderExplicit( T dt );
+
+        /** @brief Destructor */
+        __HOSTDEVICE__
+        ~FirstOrderExplicit();
+        //@}
+
+
+        /** @name Get methods */
+        //@{
+        /** @brief Returns the time integrator type */
+        __HOSTDEVICE__
+        TimeIntegratorType getTimeIntegratorType() const final;
         //@}
 
 
         /** @name Methods */
         //@{
+        /** @brief Creates and returns a clone of the time integrator */
+		__HOSTDEVICE__
+		TimeIntegrator<T>* clone() const final;
+
         /** @brief Computes the new velocity and position at time t+dt
-        @param torce torce acting on the component
-        @param mass mass of the component
-		@param inertia inertia tensor of the component
-		@param tr transformation of the component
-        @param kin kinematics of the component */
+		@param acceleration acceleration
+		@param velocity velocity 
+		@param transMotion translation motion
+		@param avgAngVel average angular velocity in interval [t,t+dt] */
         __HOSTDEVICE__
-        void Move( Vector3<T> const& transAcc,
-								  Vector3<T> const& AngAcc,
-                                  Kinematics<T>& kin,
-								  Vector3<T>& transMotion,
-								  Vector3<T>& avgAngVel ) const;
+        void Move( Kinematics<T> const& acceleration,
+                   Kinematics<T>& velocity,
+                   Vector3<T>& transMotion,
+                   Vector3<T>& avgAngVel ) const final;
         //@}
 };
 

@@ -178,6 +178,18 @@ void Vector3<T>::round( T tol )
 
 
 // -----------------------------------------------------------------------------
+// Sets components to zero
+template <typename T>
+__HOSTDEVICE__
+void Vector3<T>::reset()
+{
+    m_comp[X] = m_comp[Y] = m_comp[Z] = T( 0 );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Rounds components to +-tol - specialized for floats
 template <>
 __HOSTDEVICE__
@@ -350,6 +362,7 @@ Vector3<double>::operator Vector3<float> () const
 // -----------------------------------------------------------------------------
 // Output operator
 template <typename T>
+__HOST__
 std::ostream& operator << ( std::ostream& fileOut, 
                             Vector3<T> const& v )
 {
@@ -363,6 +376,7 @@ std::ostream& operator << ( std::ostream& fileOut,
 // -----------------------------------------------------------------------------
 // Input operator
 template <typename T>
+__HOST__
 std::istream& operator >> ( std::istream& fileIn, 
                             Vector3<T>& v )
 {

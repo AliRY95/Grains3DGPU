@@ -1,5 +1,5 @@
-#include "MatrixMath.hh"
 #include "Transform3.hh"
+#include "MatrixMath.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ void Transform3<T>::setBasis( T aX,
 
 // -----------------------------------------------------------------------------
 // Sets the matrix part of the transformation with specified rotations around 
-// each principal axis - single precision
+// each principal axis - specialized for floats
 template<>
 __HOSTDEVICE__
 void Transform3<float>::setBasis( float aX, 
@@ -268,9 +268,9 @@ void Transform3<T>::composeLeftByRotation( Quaternion<T> const& q )
     // M_rot(q) is the rotation matrix corresponding to the quaternion q
     for ( int i = 0; i < 3; ++i )
     {
-        px = qy *  mm[Z][i] - qz * mm[Y][i] + qw * mm[X][i];
-        py = qz *  mm[X][i] - qx * mm[Z][i] + qw * mm[Y][i];    
-        pz = qx *  mm[Y][i] - qy * mm[X][i] + qw * mm[Z][i]; 
+        px = qy * mm[Z][i] - qz * mm[Y][i] + qw * mm[X][i];
+        py = qz * mm[X][i] - qx * mm[Z][i] + qw * mm[Y][i];    
+        pz = qx * mm[Y][i] - qy * mm[X][i] + qw * mm[Z][i]; 
         pw = - qx * mm[X][i] - qy * mm[Y][i] - qz * mm[Z][i];
         m_basis[X][i] = qy * pz - qz * py - pw * qx + qw * px;
         m_basis[Y][i] = qz * px - qx * pz - pw * qy + qw * py;          
@@ -386,6 +386,55 @@ Transform3<double>::operator Transform3<float> () const
 
 
 // -----------------------------------------------------------------------------
+// Output operator
+template <typename T>
+__HOST__
+std::ostream& operator << ( std::ostream& fileOut, 
+                            Transform3<T> const& t )
+{
+    fileOut << "Position: " << std::endl;
+    fileOut << t.getOrigin() << std::endl;
+    fileOut << "Orientation: " << std::endl;
+    fileOut << t.getBasis();
+    return ( fileOut );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Input operator
+template <typename T>
+__HOST__
+std::istream& operator >> ( std::istream& fileIn, 
+                            Transform3<T>& t )
+{
+    Vector3<T> v;
+    Matrix3<T> m;
+
+    fileIn >> v;
+    fileIn >> m;
+
+    t.setOrigin( v );
+    t.setBasis( m );
+    
+    return ( fileIn );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Transform3<float>;
 template class Transform3<double>;
+
+#define X( T ) \
+template std::ostream& operator << <T>( std::ostream& fileOut,                 \
+                                        Transform3<T> const& t );              \
+                                                                               \
+template std::istream& operator >> <T>( std::istream& fileIn,                  \
+                                        Transform3<T>& t );
+X( float )
+X( double )
+#undef X

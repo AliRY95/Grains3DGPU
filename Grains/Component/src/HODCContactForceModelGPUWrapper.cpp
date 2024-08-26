@@ -5,7 +5,7 @@
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
-// GPU kernel to construct the linked cell on device.
+// GPU kernel to construct the contact force object on device.
 template <typename T>
 __GLOBAL__ 
 void createContactForceOnDeviceKernel( T stiff,

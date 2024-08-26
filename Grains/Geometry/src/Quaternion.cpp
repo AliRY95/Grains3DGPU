@@ -60,6 +60,18 @@ Quaternion<T>::Quaternion( T x,
 
 
 // -----------------------------------------------------------------------------
+// Constructor with a rotation matrix
+template <typename T>
+__HOSTDEVICE__
+Quaternion<T>::Quaternion( Matrix3<T> const& rot )
+{
+	this->setQuaternion( rot );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
 __HOSTDEVICE__
@@ -216,7 +228,66 @@ void Quaternion<T>::setQuaternion( Matrix3<T> const& rot )
 		m_vqt[Z] = T( 0.5 ) * den;
     }
     else
-		printf( "Warning: case not covered in Quaternion::setQuaternion\n" );
+		printf( "Warning: case not covered in Quaternion::setQuaternion( Matrix rot )!\n" );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets the quaternion with a rotation matrix - specialized for floats
+template <>
+__HOSTDEVICE__
+void Quaternion<float>::setQuaternion( Matrix3<float> const& rot )
+{
+	float den = 0.f;
+
+    // Case rotYY > - rotZZ, rotXX > - rotYY and rotXX > - rotZZ
+    if ( rot[Y][Y] > - rot[Z][Z] && 
+		 rot[X][X] > - rot[Y][Y] && 
+		 rot[X][X] > - rot[Z][Z] )
+    {
+		den = powf( 1.f + rot[X][X] + rot[Y][Y] + rot[Z][Z], 0.5f );
+		m_w = 0.5f * den;
+		m_vqt[X] = 0.5f * ( rot[Z][Y] - rot[Y][Z] ) / den;
+		m_vqt[Y] = 0.5f * ( rot[X][Z] - rot[Z][X] ) / den;
+		m_vqt[Z] = 0.5f * ( rot[Y][X] - rot[X][Y] ) / den;
+    }
+    // Case rotYY < - rotZZ, rotXX > rotYY and rotXX > rotZZ
+    else if ( rot[Y][Y] < - rot[Z][Z] && 
+			  rot[X][X] > rot[Y][Y] && 
+			  rot[X][X] > rot[Z][Z] )
+    {
+		den = powf( 1.f + rot[X][X] - rot[Y][Y] - rot[Z][Z], 0.5f );
+		m_w = 0.5f * ( rot[Z][Y] - rot[Y][Z] ) / den;
+		m_vqt[X] = 0.5f * den;
+		m_vqt[Y] = 0.5f * ( rot[X][Y] + rot[Y][X] ) / den;
+		m_vqt[Z] = 0.5f * ( rot[Z][X] + rot[X][Z] ) / den;
+    }
+    // Case rotYY > rotZZ, rotXX < rotYY and rotXX < - rotZZ
+    else if ( rot[Y][Y] > rot[Z][Z] && 
+			  rot[X][X] < rot[Y][Y] && 
+			  rot[X][X] < - rot[Z][Z] )
+    {
+		den = powf( 1.f - rot[X][X] + rot[Y][Y] - rot[Z][Z], 0.5f );
+		m_w = 0.5f * ( rot[X][Z] - rot[Z][X] ) / den;
+		m_vqt[X] = 0.5f * ( rot[X][Y] + rot[Y][X] ) / den;
+		m_vqt[Y] = 0.5f * den;
+		m_vqt[Z] = 0.5f * ( rot[Y][Z] + rot[Z][Y] ) / den;
+    }
+    // Case rotYY < rotZZ, rotXX < - rotYY and rotXX < rotZZ
+    else if ( rot[Y][Y] < rot[Z][Z] && 
+			  rot[X][X] < - rot[Y][Y] && 
+			  rot[X][X] < rot[Z][Z] )
+    {
+		den = powf( 1.f - rot[X][X] - rot[Y][Y] + rot[Z][Z], 0.5f );
+		m_w = 0.5f * ( rot[Y][X] - rot[X][Y] ) / den;
+		m_vqt[X] = 0.5f * ( rot[Z][X] + rot[X][Z] ) / den;
+		m_vqt[Y] = 0.5f * ( rot[Y][Z] + rot[Z][Y] ) / den;
+		m_vqt[Z] = 0.5f * den;
+    }
+    else
+		printf( "Warning: case not covered in Quaternion::setQuaternion( Matrix rot )!\n" );
 }
 
 
@@ -415,6 +486,21 @@ Quaternion<T>& Quaternion<T>::operator *= ( T d )
 
 
 
+// // -----------------------------------------------------------------------------
+// // Unitary operator *= by another quaternion
+// template <typename T>
+// __HOSTDEVICE__
+// Quaternion<T>& Quaternion<T>::operator *= ( Quaternion<T> const& q )
+// {
+//     T temp = ( m_w * q.m_w ) - ( m_vqt * q.m_vqt );
+//     m_vqt = ( m_vqt ^ q.m_vqt ) + ( m_w * q.m_vqt ) + ( q.m_w * m_vqt );
+// 	m_w = temp;
+// 	return ( *this );
+// }
+
+
+
+
 // -----------------------------------------------------------------------------
 // ith-component accessor: (0,1,2) for the vector components and 3 forthe scalar
 template <typename T>
@@ -499,7 +585,7 @@ template <typename T>
 std::ostream& operator << ( std::ostream& fileOut, 
 							Quaternion<T> const& q )
 {
-	fileOut << q.getScalar() << '\t' << q.getVector();
+	fileOut << q.getScalar() << "\t" << q.getVector();
 	return ( fileOut );
 }
 
@@ -512,9 +598,12 @@ template <typename T>
 std::istream& operator >> ( std::istream& fileIn, 
 							Quaternion<T>& q )
 {
-	// TODO 
-  fileIn >> q[W] >> q[X] >> q[Y] >> q[Z];
-  return ( fileIn );
+	Vector3<T> vec;
+	T scalar;
+	fileIn >> scalar >> vec;
+	q.setScalar( scalar );
+	q.setVector( vec );
+	return ( fileIn );
 }
 
 
