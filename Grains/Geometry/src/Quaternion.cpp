@@ -486,21 +486,6 @@ Quaternion<T>& Quaternion<T>::operator *= ( T d )
 
 
 
-// // -----------------------------------------------------------------------------
-// // Unitary operator *= by another quaternion
-// template <typename T>
-// __HOSTDEVICE__
-// Quaternion<T>& Quaternion<T>::operator *= ( Quaternion<T> const& q )
-// {
-//     T temp = ( m_w * q.m_w ) - ( m_vqt * q.m_vqt );
-//     m_vqt = ( m_vqt ^ q.m_vqt ) + ( m_w * q.m_vqt ) + ( q.m_w * m_vqt );
-// 	m_w = temp;
-// 	return ( *this );
-// }
-
-
-
-
 // -----------------------------------------------------------------------------
 // ith-component accessor: (0,1,2) for the vector components and 3 forthe scalar
 template <typename T>

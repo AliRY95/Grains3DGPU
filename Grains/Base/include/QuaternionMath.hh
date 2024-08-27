@@ -3,6 +3,7 @@
 
 
 #include "Quaternion.hh"
+#include "VectorMath.hh"
 
 
 // =============================================================================
@@ -16,6 +17,48 @@
 // =============================================================================
 /** @name Quaternion math functions and operators */
 //@{
+/** @brief Returns the norm of the quaternion
+@param q the quaternion */
+template <typename T>
+__HOSTDEVICE__
+static INLINE T norm( Quaternion<T> const& q )
+{
+    if constexpr ( std::is_same_v<T, float> )
+        return( sqrtf( norm2( q.getVector ) + q.getScalar() * q.getScalar() ) );
+    else
+        return( sqrt( norm2( q.getVector ) + q.getScalar() * q.getScalar() ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+/** @brief Returns the norm squared of the quaternion
+@param q the quaternion */
+template <typename T>
+__HOSTDEVICE__
+static INLINE T norm2( Quaternion<T> const& q )
+{
+    return( norm2( q.getVector ) + q.getScalar() * q.getScalar() );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+/** @brief Returns the inverse of the quaternion
+@param q the quaternion */
+template <typename T>
+__HOSTDEVICE__
+static INLINE Quaternion<T> inverse( Quaternion<T> const& q )
+{
+    return ( ( T( 1 ) / norm( q ) ) * conjugate( q ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 /** @brief Sum of 2 quaternions, i.e., q1 + q2
 @param q1 1st quaternion 
 @param q2 2nd quaternion */
@@ -100,10 +143,8 @@ __HOSTDEVICE__
 static INLINE Quaternion<T> operator * ( Quaternion<T> const& q,
                                          Vector3<T> const& v )
 {
-    T w_q = q.getScalar();
-    Vector3<T> v_q = q.getVector();
-    T tmp = - v_q * v;
-    Vector3<T> vtmp = ( v_q ^ v ) + ( w_q * v );
+    T tmp = - q.getVector() * v;
+    Vector3<T> vtmp( ( q.getVector() ^ v ) + ( q.getScalar() * v ) );
     return ( Quaternion<T>( vtmp, tmp ) );
 }
 
@@ -120,7 +161,9 @@ __HOSTDEVICE__
 static INLINE Quaternion<T> operator * ( Vector3<T> const& v,
                                          Quaternion<T> const& q )
 {
-    return ( q.multLeftVec( v ) );
+    T tmp = -v * q.getVector();
+	Vector3<T> vtmp( ( v ^ q.getVector() ) + ( q.getScalar() * v ) );
+	return ( Quaternion<T>( vtmp, tmp ) );
 }
 //@}
 
