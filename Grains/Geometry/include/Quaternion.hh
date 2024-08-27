@@ -166,16 +166,16 @@ class Quaternion
 		/** @brief Multiplies the quaternion on the right by another quaternion 
 		rhs, i.e., performs this x rhs, and return the vectorial part of 
 		this x rhs
-		@param rhs the other quaternion */
+		@param q the other quaternion */
 		__HOSTDEVICE__
-		Vector3<T> multToVector3( Quaternion<T> const& rhs ) const;
+		Vector3<T> multToVector3( Quaternion<T> const& q ) const;
 
 		/** @brief Multiplies the quaternion on the right by the conjugate of
 		another quaternion rhs, i.e., perform this x rhs^t, and return the
 		vectorial part of this x rhs^t
-		@param rhs the other quaternion */
+		@param q the other quaternion */
 		__HOSTDEVICE__
-		Vector3<T> multConjugateToVector3( Quaternion<T> const& rhs ) const;
+		Vector3<T> multConjugateToVector3( Quaternion<T> const& q ) const;
 		
 		/** @brief Rotates a vector using the quaternion *this
 		@param v The vector to be rotated */
@@ -187,14 +187,14 @@ class Quaternion
 		/**@name Operators */
 		//@{
 		/** @brief Operator +=
-		@param rhs the other quaternion */
+		@param q the other quaternion */
 		__HOSTDEVICE__
-		Quaternion<T>& operator += ( Quaternion<T> const& rhs );
+		Quaternion<T>& operator += ( Quaternion<T> const& q );
 
 		/** @brief Operator -=
-		@param rhs the other quaternion */
+		@param q the other quaternion */
 		__HOSTDEVICE__
-		Quaternion<T>& operator -= ( Quaternion<T> const& rhs );
+		Quaternion<T>& operator -= ( Quaternion<T> const& q );
 
 		/** @brief Unitary operator *= by a scalar
 		@param d multiplication factor */
@@ -213,9 +213,9 @@ class Quaternion
 		T& operator [] ( size_t i );
 
 		/** @brief Assign operator to another Quaternion object
-		@param rhs the other Quaternion object */
+		@param q the other Quaternion object */
 		__HOSTDEVICE__
-		Quaternion<T>& operator = ( Quaternion<T> const& rhs );
+		Quaternion<T>& operator = ( Quaternion<T> const& q );
 		
 		/** @brief Unitary operator -. Return a quaternion with negative 
 		elements */
@@ -223,14 +223,14 @@ class Quaternion
 		Quaternion<T> operator - ();
 
 		/** @brief Comparison operator
-		@param rhs the other quaternion */
+		@param q the other quaternion */
 		__HOSTDEVICE__
-		bool operator == ( Quaternion<T> const& rhs );
+		bool operator == ( Quaternion<T> const& q );
 
 		/** @brief Difference operator
-		@param rhs the other quaternion */
+		@param q the other quaternion */
 		__HOSTDEVICE__
-		bool operator != ( Quaternion<T> const& rhs );
+		bool operator != ( Quaternion<T> const& q );
 		//@}
 };
 

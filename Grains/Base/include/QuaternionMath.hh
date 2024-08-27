@@ -46,6 +46,19 @@ static INLINE T norm2( Quaternion<T> const& q )
 
 
 // -----------------------------------------------------------------------------
+/** @brief Returns the conjugate of the quaternion
+@param q the quaternion */
+template <typename T>
+__HOSTDEVICE__
+static INLINE Quaternion<T> conjugate( Quaternion<T> const& q )
+{
+    return ( Quaternion<T>( -q.getVector(), q.getScalar ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 /** @brief Returns the inverse of the quaternion
 @param q the quaternion */
 template <typename T>
@@ -126,7 +139,7 @@ static INLINE Quaternion<T> operator * ( Quaternion<T> const& q1,
     T w2 = q2.getScalar();
     Vector3<T> v2 = q2.getVector();
     T tmp = ( w1 * w2 ) - ( v1 * v2 );
-    Vector3<T> vtmp = ( v1 ^ v2 ) + ( w1 * v2 ) + ( w2 * v1 );
+    Vector3<T> vtmp( ( v1 ^ v2 ) + ( w1 * v2 ) + ( w2 * v1 ) );
     return ( Quaternion<T>( vtmp, tmp ) );
 }
 
