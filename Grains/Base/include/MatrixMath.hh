@@ -135,7 +135,7 @@ __HOSTDEVICE__
 static INLINE Vector3<T> operator * ( Vector3<T> const& v,
                                       Matrix3<T> const& m )
 {
-    Matrix3<T> tr = transpose( m );
+    Matrix3<T> tr( transpose( m ) );
     return ( Vector3<T>( tr[X] * v, tr[Y] * v, tr[Z] * v ) );
 }
 

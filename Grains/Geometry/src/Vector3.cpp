@@ -169,9 +169,9 @@ template <typename T>
 __HOSTDEVICE__
 void Vector3<T>::round( T tol )
 {
-    m_comp[X] = fabs( m_comp[X] ) < tol ? 0. : m_comp[X];
-    m_comp[Y] = fabs( m_comp[Y] ) < tol ? 0. : m_comp[Y];
-    m_comp[Z] = fabs( m_comp[Z] ) < tol ? 0. : m_comp[Z];
+    m_comp[X] = fabs( m_comp[X] ) < tol ? T( 0 ) : m_comp[X];
+    m_comp[Y] = fabs( m_comp[Y] ) < tol ? T( 0 ) : m_comp[Y];
+    m_comp[Z] = fabs( m_comp[Z] ) < tol ? T( 0 ) : m_comp[Z];
 }
 
 

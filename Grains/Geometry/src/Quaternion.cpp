@@ -403,10 +403,10 @@ Quaternion<T> Quaternion<T>::multLeftVec( Vector3<T> const& lhs ) const
 // i.e., perform this x rhs, and return the vectorial part of this x rhs
 template <typename T>
 __HOSTDEVICE__
-Vector3<T> Quaternion<T>::multToVector3( Quaternion<T> const& rhs ) const
+Vector3<T> Quaternion<T>::multToVector3( Quaternion<T> const& q ) const
 {
-	Vector3<T> vtmp = ( m_vqt ^ rhs.m_vqt ) + ( m_w * rhs.m_vqt )
-											+ ( rhs.m_w * m_vqt );
+	Vector3<T> vtmp
+		( ( m_vqt ^ q.m_vqt ) + ( m_w * q.m_vqt ) + ( q.m_w * m_vqt ) );
 	return ( vtmp );
 }
 
@@ -419,11 +419,10 @@ Vector3<T> Quaternion<T>::multToVector3( Quaternion<T> const& rhs ) const
 // this x rhs^t
 template <typename T>
 __HOSTDEVICE__
-Vector3<T> Quaternion<T>::multConjugateToVector3( Quaternion<T> const& rhs ) 
-																		const
+Vector3<T> Quaternion<T>::multConjugateToVector3( Quaternion<T> const& q ) const
 {
-	Vector3<T> vtmp = - ( m_vqt ^ rhs.m_vqt ) - ( m_w * rhs.m_vqt )
-											  + ( rhs.m_w * m_vqt );
+	Vector3<T> vtmp
+		( - ( m_vqt ^ q.m_vqt ) - ( m_w * q.m_vqt ) + ( q.m_w * m_vqt ) );
 	return ( vtmp );
 }
 
@@ -448,10 +447,10 @@ Vector3<T> Quaternion<T>::rotateVector( Vector3<T> const& v ) const
 // Operator +=
 template <typename T>
 __HOSTDEVICE__
-Quaternion<T>& Quaternion<T>::operator += ( Quaternion<T> const& rhs )
+Quaternion<T>& Quaternion<T>::operator += ( Quaternion<T> const& q )
 {
-	m_w += rhs.m_w;
-	m_vqt += rhs.m_vqt;
+	m_w += q.m_w;
+	m_vqt += q.m_vqt;
 	return ( *this );
 }
 
@@ -462,10 +461,10 @@ Quaternion<T>& Quaternion<T>::operator += ( Quaternion<T> const& rhs )
 // Operator -=
 template <typename T>
 __HOSTDEVICE__
-Quaternion<T>& Quaternion<T>::operator -= ( Quaternion<T> const& rhs )
+Quaternion<T>& Quaternion<T>::operator -= ( Quaternion<T> const& q )
 {
-	m_w -= rhs.m_w;
-	m_vqt -= rhs.m_vqt;
+	m_w -= q.m_w;
+	m_vqt -= q.m_vqt;
 	return ( *this );
 }
 
@@ -515,10 +514,10 @@ T& Quaternion<T>::operator [] ( size_t i )
 // Equal operator to another quaternion
 template <typename T>
 __HOSTDEVICE__
-Quaternion<T>& Quaternion<T>::operator = ( Quaternion<T> const& rhs )
+Quaternion<T>& Quaternion<T>::operator = ( Quaternion<T> const& q )
 {
-	m_w = rhs.m_w;
-	m_vqt = rhs.m_vqt;
+	m_w = q.m_w;
+	m_vqt = q.m_vqt;
 	return ( *this );
 }
 
@@ -541,12 +540,12 @@ Quaternion<T> Quaternion<T>::operator - ()
 // Comparison operator
 template <typename T>
 __HOSTDEVICE__
-bool Quaternion<T>::operator == ( Quaternion<T> const& rhs )
+bool Quaternion<T>::operator == ( Quaternion<T> const& q )
 {
-	return ( m_w == rhs.m_w && 
-			 m_vqt[0] == rhs.m_vqt[0] && 
-			 m_vqt[1] == rhs.m_vqt[1] && 
-			 m_vqt[2] == rhs.m_vqt[2] );
+	return ( m_w == q.m_w && 
+			 m_vqt[0] == q.m_vqt[0] && 
+			 m_vqt[1] == q.m_vqt[1] && 
+			 m_vqt[2] == q.m_vqt[2] );
 }
 
 
@@ -556,9 +555,9 @@ bool Quaternion<T>::operator == ( Quaternion<T> const& rhs )
 // Difference operator
 template <typename T>
 __HOSTDEVICE__
-bool Quaternion<T>::operator != ( Quaternion<T> const& rhs )
+bool Quaternion<T>::operator != ( Quaternion<T> const& q )
 {
-	return ( ! ( *this == rhs ) );
+	return ( ! ( *this == q ) );
 }
 
 

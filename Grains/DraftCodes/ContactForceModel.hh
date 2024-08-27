@@ -1,77 +1,86 @@
-#ifndef _CONTACTFORCEMODEL_HH_
-#define _CONTACTFORCEMODEL_HH_
+#ifndef _TIMEINTEGRATOR_HH_
+#define _TIMEINTEGRATOR_HH_
 
 
-#include "Basic.hh"
-#include "Vector3.hh"
-#include "ContactInfo.hh"
+#include "Torce.hh"
+#include "Transform3.hh"
+#include "Kinematics.hh"
 
 
-// =============================================================================
-/** The class ContactForceModel.
-
-    Contact force model involving a normal Hookean spring, a normal Dashpot and
-    a tangential Coulomb friction (HO-D-C) to compute the force and torque 
-    induced by the contact between two rigid components.
-
-    @author A.Yazdani - 2024 - Construction */
-// =============================================================================
-template <typename T>
-class ContactForceModel
-{
-    protected:
-        /** @name Parameters */
-        //@{
-        T stiff; /**< stiffness coefficient */  
-        T en; /**< restitution coefficient */ 
-        T muet; /**< tangential damping coefficient */
-        T muec; /**< Coulomb friction coefficient */
-        T k_m_s; /**< rolling friction coefficient */
-        //@}
-
-    public:
-        /** @name Constructors */
-        //@{
-        /** @brief Constructor with contact parameters as inputs
-        @param stiff stiffness coefficient
-        @param en restitution coefficient
-        @param muet tangential damping coefficient
-        @param muec Coulomb friction coefficient
-        @param k_m_s rolling friction coefficient */
-        __HOSTDEVICE__
-        ContactForceModel( T stiff,
-                           T en,
-                           T muet,
-                           T muec,
-                           T k_m_s );
-
-        /** @brief Destructor */
-        __HOSTDEVICE__ 
-        ~ContactForceModel();
-        //@}
-
-
-        /** @name Methods */
-        //@{
-        /** @brief Performs forces & torques computation
-        @param p0_ first Component (Particle)
-        @param p1_ second Component (Particle ou Obstacle)
-        @param contactInfos geometric contact features
-        @param delFN normal force
-        @param delFT tangential force
-        @param delM torque */
-        void performForcesCalculus( Component* p0_,  Component* p1_,
-        PointContact const& contactInfos,
-        Vector3& delFN, Vector3& delFT, Vector3& delM );
-
-        /** @brief Computes forces & torques 
-        @param p1 first component
-        @param p2 second component
-        @param contactInfo geometric contact features */
-        bool computeForces( Component* p1, Component* p1_,
-        ContactInfo const& contactInfo );
-        //@}
+// Convex types
+enum TimeIntegratorType {
+    FIRSTORDEREXPLICIT,
+    SECONDORDEREXPLICIT
 };
 
+
+// =============================================================================
+/** @brief The class TimeIntegrator.
+
+    Numerical scheme for the time integration of the Newton's law and the
+    kinematic equations. 
+
+    @author A.WACHS - Institut Francais du Petrole - 2011 - Creation 
+    @author A.WACHS - 2019 - Major cleaning & refactoring
+    @author A.YAZDANI - 2024 - Major cleaning for porting to GPU */
+// =============================================================================
+template <typename T>
+class TimeIntegrator
+{
+	protected:
+        /** @name Parameters */
+        //@{
+        T m_dt; /**< time step */
+        //@}
+
+
+		/**@name Contructors */
+        //@{
+        /** @brief Default constructor (forbidden except in derived classes) */
+        __HOSTDEVICE__ 
+        TimeIntegrator();
+
+		/** @brief Copy constructor
+        @param ti TimeIntegrator object to be copied */
+        __HOSTDEVICE__
+        TimeIntegrator( TimeIntegrator<T> const& ti );
+        //@}
+
+
+	public:
+		/**@name Contructors */
+		//@{
+		/** @brief Destructor */
+		__HOSTDEVICE__
+		virtual ~TimeIntegrator();
+		//@}
+
+
+		/** @name Get methods */
+        //@{
+        /** @brief Returns the time integrator type */
+        __HOSTDEVICE__
+        virtual TimeIntegratorType getTimeIntegratorType() const = 0;
+        //@}
+
+
+		/** @name Methods */
+		//@{
+		/** @brief Creates and returns a clone of the time integrator */
+		__HOSTDEVICE__
+		virtual TimeIntegrator<T>* clone() const = 0;
+
+		/** @brief Computes the new velocity and position at time t+dt
+		@param acceleration acceleration
+		@param velocity velocity 
+		@param transMotion translation motion
+		@param avgAngVel average angular velocity in interval [t,t+dt] */
+		__HOSTDEVICE__    
+		virtual void Move( Kinematics<T> const& acceleration,
+						   Kinematics<T>& velocity,
+						   Vector3<T>& transMotion,
+						   Vector3<T>& avgAngVel ) const = 0;
+		//@}
+};
 
 #endif
