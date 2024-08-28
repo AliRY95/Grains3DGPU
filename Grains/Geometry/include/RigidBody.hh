@@ -6,8 +6,8 @@
 #include "Convex.hh"
 #include "Kinematics.hh"
 #include "Quaternion.hh"
-#include "ReaderXML.hh"
 #include "Torce.hh"
+#include "ReaderXML.hh"
 
 
 // =============================================================================
@@ -29,6 +29,7 @@ class RigidBody
         //@{
         Convex<T>* m_convex; /**< Convex shape */
         T m_crustThickness; /**< Rigid body's crust thickness */
+        unsigned int m_material; /**< Rigid body's material ID */
         T m_volume; /**< Rigid body's volume */
         T m_mass; /**< Rigid body's mass */
         T m_inertia[6]; /**< Rigid body's inertia */
@@ -45,17 +46,20 @@ class RigidBody
         __HOSTDEVICE__
         RigidBody();
 
-        /** @brief Constructor with a convex and the crust thickness
+        /** @brief Constructor with a convex, crust thickness, material, and 
+        density
         @param convex convex
-        @param ct crust thickness of the rigid body */
+        @param ct crust thickness of the rigid body 
+        @param material material ID
+        @param density density */
         __HOSTDEVICE__
         RigidBody( Convex<T>* convex, 
-                   T ct, 
+                   T ct,
+                   unsigned int material,
                    T density );
 
         /** @brief Constructor with an XML input
-        @param convex convex
-        @param ct crust thickness of the rigid body */
+        @param root XML input */
         __HOST__
         RigidBody( DOMNode* root );
 
@@ -79,6 +83,10 @@ class RigidBody
         /** @brief Gets the rigid body's crust thickness */
         __HOSTDEVICE__ 
         T getCrustThickness() const;
+
+        /** @brief Gets the rigid body's material ID */
+        __HOSTDEVICE__ 
+        unsigned int getMaterial() const;
         
         /** @brief Gets the rigid body's volume */
         __HOSTDEVICE__ 

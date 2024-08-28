@@ -29,8 +29,7 @@
 	</TemporalSetting>
 
 	<Particles>
-		<Particle Number="1" Density="1163.66">
-			<Material>matP</Material>
+		<Particle Number="1" Density="1163.66" Material="matP">
 			<AngularPosition Type="Identity"></AngularPosition>
 				<!-- <Sphere Radius="0.05"/> -->
 				<!-- <Box LX="0.04" LY="0.04" LZ="0.08"/> -->

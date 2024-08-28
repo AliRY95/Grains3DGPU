@@ -16,11 +16,12 @@ class GrainsParameters
     public:
         /** @name Parameters */
         //@{
-        /* Space */
+        /* Spatial */
         static Vector3<T> m_origin; /**< global domain origin */
         static Vector3<T> m_dimension; /**< global domain dimension */
+        static bool m_isPeriodic; /**< is simulation periodic? */
 
-        /* Time */
+        /* Temporal */
         static T m_tStart; /**< initial simulation time */  
         static T m_tEnd; /**< end simulation time */  
         static T m_dt; /**< simulation time step */
@@ -31,13 +32,14 @@ class GrainsParameters
                                                   simulation */
         static unsigned int m_numCells; /**< number of cells in simulation */
 
-        /* Physical */
-        static Vector3<T> m_gravity; /**< gravity vector */
+        /* Simulation */
+        /** \brief Gravity vector */
+        static Vector3<T> m_gravity;
+        /** \brief Map from material name to an unsigned int ID */
+        static std::unordered_map<std::string, unsigned int> m_materialMap;
         
-        /* Booleans */
-        static bool m_isPeriodic; /**< is simulation periodic? */
+        /* GPU */
         static bool m_isGPU; /**< is simulation on GPU? */
-        
         //@}
 };
 
