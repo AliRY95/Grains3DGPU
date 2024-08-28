@@ -9,53 +9,49 @@
 // =============================================================================
 /** @brief The class ContactForceModelBuilderFactory.
 
-    Creates the numerical scheme for the time integration of the Newton's law 
-    and the kinematic equations. 
+	Creates the contact force model for each pair of materials.
 
-    @author A.WACHS - Institut Francais du Petrole - 2011 - Creation 
-    @author A.WACHS - 2021 - Major cleaning & refactoring
-    @author A.YAZDANI - 2024 - Major cleaning for porting to GPU */
+    @author A.YAZDANI - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class TimeIntegratorBuilderFactory
+class ContactForceModelBuilderFactory
 {
 	private:
 		/**@name Contructors & Destructor */
 		//@{
 		/** @brief Default constructor (forbidden) */
-		TimeIntegratorBuilderFactory();
+		__HOST__
+		ContactForceModelBuilderFactory();
 
 		/** @brief Destructor (forbidden) */
-		~TimeIntegratorBuilderFactory();
+		__HOST__
+		~ContactForceModelBuilderFactory();
 		//@}
 
 
 	public:
 		/**@name Methods */
 		//@{
-		/** @brief Creates and returns the time integration scheme */
-
-		static TimeIntegrator<T>* create( DOMNode* root,
-										  T dt );
+		/** @brief Creates and returns the contact force model */
+		__HOST__
+		static ContactForceModel<T>* create( DOMNode* root );
 		
-		/** @brief TimeIntegrator objects must be instantiated on device, if we 
-		want to use them on device. Copying from host is not supported due to 
+		/** @brief ContactForceModel objects must be instantiated on device, if 
+		we want to use them on device. Copying from host is not supported due to 
 		runtime polymorphism for this class.
-		This function constructs a TimeIntegrator object in a given device 
+		This function constructs a ContactForceModel object in a given device 
 		memory from an XML node.
 		It calls a deivce kernel that is implemented in the source file.
 		@param root XML node
-		@param dt time step
-		@param d_TI double pointer to a device memory to construct the object */
+		@param d_CF double pointer to a device memory to construct the object */
 		static void createOnDevice( DOMNode* root,
-									T dt,
-									TimeIntegrator<T>** d_TI );
+									TimeIntegrator<T>** d_CF );
 		//@}
 };
 
 
-typedef TimeIntegratorBuilderFactory<float> TimeIntegratorBuilderFactoryF;
-typedef TimeIntegratorBuilderFactory<double> TimeIntegratorBuilderFactoryD;
+typedef ContactForceModelBuilderFactory<float> ContactForceModelBuilderFactoryF;
+typedef ContactForceModelBuilderFactory<double> ContactForceModelBuilderFactoryD;
 
 
 #endif
