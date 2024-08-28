@@ -7,7 +7,7 @@
 #include "Kinematics.hh"
 
 
-// Convex types
+// TimeIntegrator types
 enum TimeIntegratorType {
     FIRSTORDEREXPLICIT,
     SECONDORDEREXPLICIT

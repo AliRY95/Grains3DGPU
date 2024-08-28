@@ -26,8 +26,12 @@ HODCContactForceModel<T>::HODCContactForceModel( DOMNode* root )
     m_muec = T( ReaderXML::getNodeValue_Double( parameter ) ); 
 
     parameter = ReaderXML::getNode( root, "en" );
-    m_en = T( ReaderXML::getNodeValue_Double( parameter ) ); 
-    m_muen = T( log( m_en ) / sqrt( PI * PI + log( m_en ) * log( m_en ) ) ); 
+    m_en = T( ReaderXML::getNodeValue_Double( parameter ) );
+    if constexpr ( std::is_same_v<T, float> )
+        m_muen = logf( m_en ) 
+            / sqrtf( float( PI ) * float( PI ) + logf( m_en ) * logf( m_en ) );
+    else
+        m_muen = log( m_en ) / sqrt( PI * PI + log( m_en ) * log( m_en ) );
 
     parameter = ReaderXML::getNode( root, "mut" );
     m_muet = T( ReaderXML::getNodeValue_Double( parameter ) ); 
@@ -54,7 +58,11 @@ HODCContactForceModel<T>::HODCContactForceModel( T stiff,
 , m_muec( muec )
 , m_kms( kms )                                     
 {
-    m_muen = log( m_en ) / sqrt( PI * PI + log( m_en ) * log( m_en ) ); 
+    if constexpr ( std::is_same_v<T, float> )
+        m_muen = logf( m_en ) 
+            / sqrtf( float( PI ) * float( PI ) + logf( m_en ) * logf( m_en ) );
+    else
+        m_muen = log( m_en ) / sqrt( PI * PI + log( m_en ) * log( m_en ) );
 }
 
 
@@ -71,12 +79,12 @@ HODCContactForceModel<T>::~HODCContactForceModel()
 
 
 // -----------------------------------------------------------------------------
-// Gets the total torque of the torce
+// Destructor
 template <typename T>
 __HOSTDEVICE__
-Vector3<T> Torce<T>::getTorque() const
+ContactForceModelType HODCContactForceModel<T>::getContactForceModelType() const
 {
-    return ( m_torque );
+    return( HODC );
 }
 
 

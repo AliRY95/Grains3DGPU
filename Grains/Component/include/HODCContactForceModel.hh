@@ -2,10 +2,8 @@
 #define _HODCCONTACTFORCEMODEL_HH_
 
 
+#include "ContactForceModel.hh"
 #include "ReaderXML.hh"
-#include "ContactInfo.hh"
-#include "Torce.hh"
-#include "Vector3.hh"
 
 
 // =============================================================================
@@ -18,7 +16,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class HODCContactForceModel
+class HODCContactForceModel : public ContactForceModel<T>
 {
     private:
         /**@name Parameter */
@@ -62,16 +60,25 @@ class HODCContactForceModel
         //@}
 
 
-        /**@name Methods */
+        /** @name Get methods */
         //@{
+        /** @brief Returns the ContactForceModel type */
+        __HOSTDEVICE__
+        ContactForceModelType getContactForceModelType() const final;
+        //@}
+
+
+        /**@name Methods */
+        //@{        
         /** @brief Returns a torce based on the contact information
         @param contactInfos geometric contact features
         @param relVelocityAtContact relative velocity at the contact point
         @param relAngVelocity relative angular velocity
         @param m1 mass of the first component (Particle)
         @param m2 mass of the second component (Particle ou Obstacle)
-        @param torce computed force and torque */
-        // @param nbContact number of contact points for composite particles */
+        @param delFN normal force
+        @param delFT tangential force
+        @param delM torque */
         __HOSTDEVICE__
         void performForcesCalculus( ContactInfo<T> const& contactInfos,
                                     Vector3<T> const& relVelocityAtContact,
@@ -96,7 +103,7 @@ class HODCContactForceModel
                             Vector3<T> const& relAngVelocity,
                             T m1,
                             T m2, 
-                            Torce<T>& torce ) const;
+                            Torce<T>& torce ) const final;
         //@}
 };
 
