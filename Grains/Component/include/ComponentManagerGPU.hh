@@ -92,7 +92,7 @@ class ComponentManagerGPU : public ComponentManager<T>
         // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
                               RigidBody<T, T> const* const* RB, 
-                              HODCContactForceModel<T> const* const* CF,
+                              ContactForceModel<T> const* const* CF,
                               int* results );
 
         // /** @brief Computes impact forces */

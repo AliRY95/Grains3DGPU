@@ -138,7 +138,7 @@ template <typename T, typename U>
 __GLOBAL__ 
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                    RigidBody<T, U> const* const* RB,
-                                   HODCContactForceModel<T> const* const* CF,
+                                   ContactForceModel<T> const* const* CF,
                                    unsigned int* m_rigidBodyId,
                                    Transform3<T> const* tr3d,
                                    Torce<T>* m_torce,
@@ -213,7 +213,7 @@ template                                                                       \
 __GLOBAL__                                                                     \
 void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,             \
                                    RigidBody<T, U> const* const* RB,           \
-                                   HODCContactForceModel<T> const* const* CF,  \
+                                   ContactForceModel<T> const* const* CF,      \
                                    unsigned int* m_rigidBodyId,                \
                                    Transform3<T> const* tr3d,                  \
                                    Torce<T>* m_torce,                          \

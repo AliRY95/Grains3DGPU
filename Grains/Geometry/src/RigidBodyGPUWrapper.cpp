@@ -22,6 +22,7 @@ __GLOBAL__
 void createRigidBodyKernel( RigidBody<T, U>** rb, 
                             unsigned int index,
                             T crustThickness,
+                            unsigned int material,
                             T density,
                             ConvexType convexType,
                             Arguments... args )
@@ -61,7 +62,10 @@ void createRigidBodyKernel( RigidBody<T, U>** rb,
         printf( "Convex is not created! Aborting Grains!\n" );
     }
 
-    rb[index] = new RigidBody<T, U>( convex, crustThickness, density );
+    rb[index] = new RigidBody<T, U>( convex, 
+                                     crustThickness, 
+                                     material, 
+                                     density );
 }
 
 
@@ -85,6 +89,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
         Convex<T>* convex = h_rb[index]->getConvex();
         ConvexType cvxType = convex->getConvexType();
         T ct = h_rb[index]->getCrustThickness();
+        unsigned int material = h_rb[index]->getMaterial();
         // We also need the density to calculate the mass of the rigid body.
         // However, it is not available here. So, we manually compute it:
         T density = h_rb[index]->getMass() / h_rb[index]->getVolume();
@@ -93,7 +98,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
         {
             Sphere<T>* c = dynamic_cast<Sphere<T>*>( convex );
             T r = c->getRadius();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, material, density, 
                                              SPHERE, 
                                              r );
         }
@@ -101,7 +106,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
         {
             Box<T>* c = dynamic_cast<Box<T>*>( convex );
             Vector3<T> L = c->getExtent();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, material, density, 
                                              BOX, 
                                              L[X], L[Y], L[Z] );
         }
@@ -110,7 +115,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             Cylinder<T>* c = dynamic_cast<Cylinder<T>*>( convex );
             T r = c->getRadius();
             T h = c->getHeight();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, material, density, 
                                              CYLINDER,
                                              r, h );
         }
@@ -119,7 +124,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             Cone<T>* c = dynamic_cast<Cone<T>*>( convex );
             T r = c->getRadius();
             T h = c->getHeight();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, material, density, 
                                              CONE, 
                                              r, h );
         }
@@ -128,7 +133,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             Superquadric<T>* c = dynamic_cast<Superquadric<T>*>( convex );
             Vector3<T> L = c->getExtent();
             Vector3<T> N = c->getExponent();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, material, density, 
                                              SUPERQUADRIC, 
                                              L[X], L[Y], L[Z], N[X], N[Y] );
         }
@@ -136,7 +141,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
         {
             Rectangle<T>* c = dynamic_cast<Rectangle<T>*>( convex );
             Vector3<T> L = c->getExtent();
-            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, density, 
+            createRigidBodyKernel<<<1, 1>>>( d_rb, index, ct, material, density, 
                                              RECTANGLE, 
                                              L[X], L[Y] );
         }
@@ -147,6 +152,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             exit( 1 );
         }
     }
+    cudaDeviceSynchronize();
 }
 
 

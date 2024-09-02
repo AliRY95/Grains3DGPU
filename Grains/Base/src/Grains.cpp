@@ -1,7 +1,7 @@
 #include "Grains.hh"
 #include "RigidBodyGPUWrapper.hh"
 #include "LinkedCellGPUWrapper.hh"
-#include "HODCContactForceModelGPUWrapper.hh"
+#include "ContactForceModelBuilderFactory.hh"
 #include "TimeIntegratorBuilderFactory.hh"
 #include "VectorMath.hh"
 
@@ -195,7 +195,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
 
     // -------------------------------------------------------------------------
-    // Setting the component managers
+    // Setting up the component managers
     GrainsParameters<T>::m_numComponents = numEachRigidBody.back();
     m_components = new ComponentManagerCPU<T>( numEachRigidBody, 
                                                0,
@@ -208,29 +208,29 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Contact force models
-    DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
-    // TODO: what if multiple models for different materials
-    if ( contacts )
-    {
-        DOMNode* contact = ReaderXML::getNode( contacts, "ContactForceModel" );
-        DOMNode* hodc = ReaderXML::getNode( contact, "HODC" );
-        cout << shiftString6 
-             << "Reading the contact force model ..." 
-             << endl;
+    // DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
+    // // TODO: what if multiple models for different materials
+    // if ( contacts )
+    // {
+    //     DOMNode* contact = ReaderXML::getNode( contacts, "ContactForceModel" );
+    //     DOMNode* hodc = ReaderXML::getNode( contact, "HODC" );
+    //     cout << shiftString6 
+    //          << "Reading the contact force model ..." 
+    //          << endl;
 
-        m_contactForce = ( HODCContactForceModel<T>** ) 
-                         malloc( sizeof( HODCContactForceModel<T>* ) );
-        *m_contactForce = new HODCContactForceModel<T>( hodc );
-        cout << shiftString6 
-             << "Reading the contact force model completed!" 
-             << endl;
-        if ( GrainsParameters<T>::m_isGPU )
-        {
-            cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
-                                   sizeof( HODCContactForceModel<T>* ) ) );
-            createContactForceOnDevice( hodc, m_d_contactForce );
-        }
-    }
+    //     m_contactForce = ( HODCContactForceModel<T>** ) 
+    //                      malloc( sizeof( HODCContactForceModel<T>* ) );
+    //     *m_contactForce = new HODCContactForceModel<T>( hodc );
+    //     cout << shiftString6 
+    //          << "Reading the contact force model completed!" 
+    //          << endl;
+    //     if ( GrainsParameters<T>::m_isGPU )
+    //     {
+    //         cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
+    //                                sizeof( HODCContactForceModel<T>* ) ) );
+    //         createContactForceOnDevice( hodc, m_d_contactForce );
+    //     }
+    // }
     // TODO
     // string check_matA, check_matB;
     // bool contactForceModels_ok =
@@ -243,6 +243,29 @@ void Grains<T>::Construction( DOMElement* rootElement )
 	// 	"materials : " << check_matA << " & " << check_matB << endl;
     //   grainsAbort();
     // }
+    DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
+    if ( contacts )
+    {
+        cout << shiftString6 
+             << "Reading the contact force model ..." 
+             << endl;
+        unsigned int numContactPairs = 
+            GrainsParameters<T>::m_materialMap.size() * 
+            ( GrainsParameters<T>::m_materialMap.size() - 1 ) / 2;
+        m_contactForce = ContactForceModelBuilderFactory<T>::create( rootElement );
+        if ( GrainsParameters<T>::m_isGPU )
+        {
+            cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
+                        numContactPairs * sizeof( ContactForceModel<T>* ) ) );
+            ContactForceModelBuilderFactory<T>::
+            ContactForceModelCopyHostToDevice( m_contactForce,
+                                               m_d_contactForce, 
+                                               numContactPairs );
+        }
+        cout << shiftString6 
+             << "Reading the contact force model completed!" 
+             << endl;
+    }
 
 
 

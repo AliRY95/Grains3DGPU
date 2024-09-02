@@ -79,12 +79,32 @@ HODCContactForceModel<T>::~HODCContactForceModel()
 
 
 // -----------------------------------------------------------------------------
-// Destructor
+// Gets the ContactForceModel type
 template <typename T>
 __HOSTDEVICE__
 ContactForceModelType HODCContactForceModel<T>::getContactForceModelType() const
 {
     return( HODC );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets the parameters of the HODC contact force model
+template <typename T>
+__HOSTDEVICE__
+void HODCContactForceModel<T>::getContactForceModelParameters( T& stiff,
+                                                               T& en, 
+                                                               T& muet, 
+                                                               T& muec, 
+                                                               T& kms ) const
+{
+    stiff = m_stiff;
+    en = m_en;
+    muet = m_muet;
+    muec = m_muec;
+    kms = m_kms;
 }
 
 

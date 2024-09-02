@@ -62,9 +62,22 @@ class HODCContactForceModel : public ContactForceModel<T>
 
         /** @name Get methods */
         //@{
-        /** @brief Returns the ContactForceModel type */
+        /** @brief Gets the ContactForceModel type */
         __HOSTDEVICE__
         ContactForceModelType getContactForceModelType() const final;
+
+        /** @brief Gets the parameters of the HODC contact force model
+        @param stiff coefficient of elasticity
+        @param en coefficient of restitution
+        @param muet coefficient of tangential friction
+        @param muec coefficient of Coulomb friction
+        @param kms coefficient of rolling friction */
+        __HOSTDEVICE__
+        void getContactForceModelParameters( T& stiff,
+                                             T& en, 
+                                             T& muet, 
+                                             T& muec, 
+                                             T& kms ) const;
         //@}
 
 

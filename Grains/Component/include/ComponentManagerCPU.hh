@@ -168,7 +168,7 @@ class ComponentManagerCPU : public ComponentManager<T>
         // template <typename U>
         void detectCollision( LinkedCell<T> const* const* LC,
                               RigidBody<T, T> const* const* RB,
-                              HODCContactForceModel<T> const* const* CF,
+                              ContactForceModel<T> const* const* CF,
                               int* result );
 
         /** @brief Updates the position and velocities of particles */

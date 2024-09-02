@@ -271,7 +271,7 @@ void ComponentManagerGPU<T>::updateLinkedCellList( LinkedCell<T> const* const* L
 template <typename T>
 void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                                               RigidBody<T, T> const* const* RB, 
-                                              HODCContactForceModel<T> const* const* CF,
+                                              ContactForceModel<T> const* const* CF,
                                               int* result )
 {
     unsigned int numThreads = 256;

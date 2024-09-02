@@ -47,6 +47,7 @@ class TimeIntegratorBuilderFactory
 		@param root XML node
 		@param dt time step
 		@param d_TI double pointer to a device memory to construct the object */
+		__HOST__
 		static void createOnDevice( DOMNode* root,
 									T dt,
 									TimeIntegrator<T>** d_TI );

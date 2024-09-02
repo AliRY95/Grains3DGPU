@@ -8,7 +8,8 @@
 #include "LinkedCell.hh"
 #include "Kinematics.hh"
 #include "Torce.hh"
-#include "HODCContactForceModel.hh"
+#include "ContactForceModel.hh"
+#include "ContactForceModelBuilderFactory.hh"
 #include "TimeIntegrator.hh"
 
 
@@ -96,7 +97,7 @@ class ComponentManager
         // template <typename U>
         virtual void detectCollision( LinkedCell<T> const* const* LC,
                                       RigidBody<T, T> const* const* rb, 
-                                      HODCContactForceModel<T> const* const* CF,
+                                      ContactForceModel<T> const* const* CF,
                                       int* result ) = 0;
 
         // /** @brief Computes impact forces */

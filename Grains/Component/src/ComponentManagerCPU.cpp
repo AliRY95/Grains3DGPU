@@ -360,7 +360,7 @@ void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 template <typename T>
 void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                                               RigidBody<T, T> const* const* RB,
-                                              HODCContactForceModel<T> const* const* CF,
+                                              ContactForceModel<T> const* const* CF,
                                               int* result )
 {
     // updating links between components and linked cell
@@ -375,6 +375,7 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
         RigidBody<T, T> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
         Transform3<T> const& trA = m_transform[ compId ];
         T massA = rbA.getMass();
+        unsigned int matA = rbA.getMaterial();
         // Torce<T>& m_torce[ compId ];
         for ( int k = -1; k < 2; k++ ) {
         for ( int j = -1; j < 2; j++ ) { 
@@ -401,12 +402,18 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                                                               trA, 
                                                               trB );
                 if ( ci.getOverlapDistance() < T( 0 ) )
-                    (*CF)->computeForces( ci, 
-                                          zeroVector3T,
-                                          zeroVector3T,
-                                          massA,
-                                          rbB.getMass(),
-                                          m_torce[ compId ] );
+                {
+                    unsigned int contactForceID = 
+                    ContactForceModelBuilderFactory<T>::computeHash( matA, 
+                                                            rbB.getMaterial(),
+                                                            GrainsParameters<T>::m_materialMap.size() );
+                    CF[contactForceID]->computeForces( ci, 
+                                                       zeroVector3T,
+                                                       zeroVector3T,
+                                                       massA,
+                                                       rbB.getMass(),
+                                                       m_torce[ compId ] );
+                }
                 result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
             }
         } } }
