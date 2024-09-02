@@ -55,11 +55,11 @@ class Grains
         /** \brief Linked cell for broad-phase. We use a pointer because
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
-        HODCContactForceModel<T>** m_contactForce;
+        ContactForceModel<T>** m_contactForce;
         /** \brief Linked cell for broad-phase. We use a pointer because
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
-        HODCContactForceModel<T>** m_d_contactForce;
+        ContactForceModel<T>** m_d_contactForce;
          /** \brief Linked cell for broad-phase. We use a pointer because
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */

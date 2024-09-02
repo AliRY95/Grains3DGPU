@@ -152,6 +152,7 @@ void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
             exit( 1 );
         }
     }
+    cudaDeviceSynchronize();
 }
 
 

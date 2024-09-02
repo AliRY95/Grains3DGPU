@@ -57,9 +57,9 @@ class ContactForceModel
 
 		/** @name Methods */
 		//@{
-		/** @brief Creates and returns a clone of the object */
-		__HOSTDEVICE__
-		virtual ContactForceModel<T>* clone() const = 0;
+		// /** @brief Creates and returns a clone of the object */
+		// __HOSTDEVICE__
+		// virtual ContactForceModel<T>* clone() const = 0;
 
 		/** @brief Returns a torce based on the contact information
         @param contactInfos geometric contact features

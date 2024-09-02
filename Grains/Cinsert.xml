@@ -8,7 +8,8 @@
 
 
 	<ContactForceModels>
-		<ContactForceModel>			
+		<ContactForceModel>
+			<Material materialA="matP" materialB="matP"/>			
 			<HODC>
 				<stiff>0</stiff>
 				<en>0</en>
