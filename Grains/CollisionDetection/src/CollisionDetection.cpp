@@ -187,12 +187,18 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
         
         if ( preCollision )
         {
+            // TODO
+            Transform3<T> a2wCrust( a2w );
+            a2wCrust.composeWithScaling( rbA.getScalingVector() );
+            Transform3<T> b2wCrust( b2w );
+            b2wCrust.composeWithScaling( rbB.getScalingVector() );
+            //
             Vector3<T> ptA, ptB;
             int nbIterGJK = 0;
             T distance = computeClosestPoints_GJK_SV( *convexA, 
                                                       *convexB,
-                                                      a2w,
-                                                      b2w,
+                                                      a2wCrust,
+                                                      b2wCrust,
                                                       ptA,
                                                       ptB,
                                                       nbIterGJK );

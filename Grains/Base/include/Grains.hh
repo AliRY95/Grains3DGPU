@@ -104,6 +104,11 @@ class Grains
         obstacles, domain decomposition 
         @param rootElement XML root */
         void Construction( DOMElement* rootElement );
+
+        /** @brief Construction of the simulation: linked cell, particles &
+        obstacles, domain decomposition 
+        @param rootElement XML root */
+        void Forces( DOMElement* rootElement );
         //@}
 };
 

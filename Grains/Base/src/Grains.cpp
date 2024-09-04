@@ -42,7 +42,7 @@ void Grains<T>::initialize( DOMElement* rootElement )
 
     /* */
     Construction( rootElement );
-    // Forces( rootElement );
+    Forces( rootElement );
     // AdditionalFeatures( rootElement );
 }
 
@@ -208,41 +208,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Contact force models
-    // DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
-    // // TODO: what if multiple models for different materials
-    // if ( contacts )
-    // {
-    //     DOMNode* contact = ReaderXML::getNode( contacts, "ContactForceModel" );
-    //     DOMNode* hodc = ReaderXML::getNode( contact, "HODC" );
-    //     cout << shiftString6 
-    //          << "Reading the contact force model ..." 
-    //          << endl;
-
-    //     m_contactForce = ( HODCContactForceModel<T>** ) 
-    //                      malloc( sizeof( HODCContactForceModel<T>* ) );
-    //     *m_contactForce = new HODCContactForceModel<T>( hodc );
-    //     cout << shiftString6 
-    //          << "Reading the contact force model completed!" 
-    //          << endl;
-    //     if ( GrainsParameters<T>::m_isGPU )
-    //     {
-    //         cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
-    //                                sizeof( HODCContactForceModel<T>* ) ) );
-    //         createContactForceOnDevice( hodc, m_d_contactForce );
-    //     }
-    // }
-    // TODO
-    // string check_matA, check_matB;
-    // bool contactForceModels_ok =
-    // 	ContactBuilderFactory::checkContactForceModelsExist( check_matA,
-	// 	check_matB );
-    // if ( !contactForceModels_ok )
-    // {
-    //   if ( m_rank == 0 )
-    //     cout << GrainsExec::m_shift6 << "No contact force model defined for "
-	// 	"materials : " << check_matA << " & " << check_matB << endl;
-    //   grainsAbort();
-    // }
     DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
     if ( contacts )
     {
@@ -304,6 +269,47 @@ void Grains<T>::Construction( DOMElement* rootElement )
             cout << shiftString6 
                  << "Reading the time integration model completed!" 
                  << endl;
+        }
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// External force definition
+template <typename T>
+void Grains<T>::Forces( DOMElement* rootElement )
+{
+    assert( rootElement != NULL );
+    DOMNode* root = ReaderXML::getNode( rootElement, "Forces" );
+
+    // Output message
+    cout << shiftString6 << "Forces" << endl;
+
+
+    // Read the forces
+    if ( root )
+    {
+        // Gravity
+        DOMNode* nGravity = ReaderXML::getNode( root, "Gravity" );
+        if( nGravity )
+        {
+            GrainsParameters<T>::m_gravity[X] = 
+                T( ReaderXML::getNodeAttr_Double( nGravity, "GX" ) );
+            GrainsParameters<T>::m_gravity[Y] = 
+                T( ReaderXML::getNodeAttr_Double( nGravity, "GY" ) );
+            GrainsParameters<T>::m_gravity[Z] = 
+                T( ReaderXML::getNodeAttr_Double( nGravity, "GZ" ) );
+            cout << shiftString9 
+                    << "Gravity = " 
+                    << GrainsParameters<T>::m_gravity 
+                    << endl;
+        }
+        else
+        {
+            cout << shiftString6 << "Gravity is mandatory!" << endl;
+            exit( 1 );
         }
     }
 }

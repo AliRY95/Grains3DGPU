@@ -29,13 +29,20 @@ RigidBody<T, U>::RigidBody( Convex<T>* convex,
 , m_crustThickness( ct )
 , m_material( material )
 {
+    // Scaling vector
+    Vector3<T> boundingBox = m_convex->computeBoundingBox();
+    m_scaling[X] = ( boundingBox[X] - m_crustThickness ) / boundingBox[X];
+    m_scaling[Y] = ( boundingBox[Y] - m_crustThickness ) / boundingBox[Y];
+    m_scaling[Z] = ( boundingBox[Z] - m_crustThickness ) / boundingBox[Z];
+    // Volume and mass
     m_volume = m_convex->computeVolume();
     m_mass = density * m_volume;
+    // Storing inertia and inverse of it
     m_convex->computeInertia( m_inertia, m_inertia_1 );
+    // Last, bounding volume and circumscribed radius
     // We cast type T to U just in case they are different.
     // It happens only at the start when the rigid body is created.
-    m_boundingBox = new 
-                    BoundingBox( Vector3<U>( m_convex->computeBoundingBox() ) );
+    m_boundingBox = new BoundingBox( Vector3<U>( boundingBox ) );
     m_circumscribedRadius = U( m_convex->computeCircumscribedRadius() );
 }
 
@@ -50,10 +57,15 @@ RigidBody<T, U>::RigidBody( DOMNode* root )
 {
     // Convex
     DOMNode* shape = ReaderXML::getNode( root, "Convex" );
-    // Crust thickenss
     m_convex = ConvexBuilderFactory<T>::create( shape );
+    // Crust thickenss
     m_crustThickness = 
                 T( ReaderXML::getNodeAttr_Double( shape, "CrustThickness" ) );
+    // Scaling vector
+    Vector3<T> boundingBox = m_convex->computeBoundingBox();
+    m_scaling[X] = ( boundingBox[X] - m_crustThickness ) / boundingBox[X];
+    m_scaling[Y] = ( boundingBox[Y] - m_crustThickness ) / boundingBox[Y];
+    m_scaling[Z] = ( boundingBox[Z] - m_crustThickness ) / boundingBox[Z];
     // Material
     std::string material = ReaderXML::getNodeAttr_String( root, "Material" );
     // checking if the material name is already defined.
@@ -77,8 +89,7 @@ RigidBody<T, U>::RigidBody( DOMNode* root )
     // Last, bounding volume and circumscribed radius
     // We cast type T to U just in case they are different.
     // It happens only at the start when the rigid body is created.
-    m_boundingBox = new 
-                    BoundingBox( Vector3<U>( m_convex->computeBoundingBox() ) );
+    m_boundingBox = new BoundingBox( Vector3<U>( boundingBox ) );
     m_circumscribedRadius = U( m_convex->computeCircumscribedRadius() );
 }
 
@@ -92,6 +103,7 @@ __HOSTDEVICE__
 RigidBody<T, U>::RigidBody( RigidBody<T, U> const& rb )
 : m_convex( NULL )
 , m_crustThickness( rb.m_crustThickness )
+, m_scaling( rb.m_scaling )
 , m_material( rb.m_material )
 , m_volume( rb.m_volume )
 , m_mass( rb.m_mass )
@@ -126,7 +138,7 @@ RigidBody<T, U>::~RigidBody()
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's convex
+// Gets the rigid body's convex
 template <typename T, typename U>
 __HOSTDEVICE__
 Convex<T>* RigidBody<T, U>::getConvex() const
@@ -138,7 +150,7 @@ Convex<T>* RigidBody<T, U>::getConvex() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's crust thickness
+// Gets the rigid body's crust thickness
 template <typename T, typename U>
 __HOSTDEVICE__
 T RigidBody<T, U>::getCrustThickness() const
@@ -150,7 +162,19 @@ T RigidBody<T, U>::getCrustThickness() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's material ID
+// Gets the scaling vector related to crust thickness
+template <typename T, typename U>
+__HOSTDEVICE__
+Vector3<T> RigidBody<T, U>::getScalingVector() const
+{
+    return ( m_scaling );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets the rigid body's material ID
 template <typename T, typename U>
 __HOSTDEVICE__
 unsigned int RigidBody<T, U>::getMaterial() const
@@ -162,7 +186,7 @@ unsigned int RigidBody<T, U>::getMaterial() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's volume
+// Gets the rigid body's volume
 template <typename T, typename U>
 __HOSTDEVICE__
 T RigidBody<T, U>::getVolume() const
@@ -174,7 +198,7 @@ T RigidBody<T, U>::getVolume() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's volume
+// Gets the rigid body's volume
 template <typename T, typename U>
 __HOSTDEVICE__
 T RigidBody<T, U>::getMass() const
@@ -186,7 +210,7 @@ T RigidBody<T, U>::getMass() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's inertia
+// Gets the rigid body's inertia
 template <typename T, typename U>
 __HOSTDEVICE__
 void RigidBody<T, U>::getInertia( T (&inertia)[6] ) const
@@ -199,7 +223,7 @@ void RigidBody<T, U>::getInertia( T (&inertia)[6] ) const
 
 
 // -----------------------------------------------------------------------------
-// Returns the inverse of rigid body's inertia
+// Gets the inverse of rigid body's inertia
 template <typename T, typename U>
 __HOSTDEVICE__
 void RigidBody<T, U>::getInertia_1( T (&inertia_1)[6] ) const
@@ -212,7 +236,7 @@ void RigidBody<T, U>::getInertia_1( T (&inertia_1)[6] ) const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's bounding box
+// Gets the rigid body's bounding box
 template <typename T, typename U>
 __HOSTDEVICE__
 BoundingBox<U>* RigidBody<T, U>::getBoundingBox() const
@@ -224,7 +248,7 @@ BoundingBox<U>* RigidBody<T, U>::getBoundingBox() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the rigid body's circumscribed radius
+// Gets the rigid body's circumscribed radius
 template <typename T, typename U>
 __HOSTDEVICE__
 U RigidBody<T, U>::getCircumscribedRadius() const

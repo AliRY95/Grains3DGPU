@@ -127,13 +127,9 @@ class Transform3
         //@{
         /** @brief Composition with a scaling transformation: 
         this = this o scaling
-        @param x scaling factor in x
-        @param y scaling factor in y
-        @param z scaling factor in z */
+        @param v diagonal entries of the scaling matrix */
         __HOSTDEVICE__
-        void composeWithScaling( T x,
-                                 T y,
-                                 T z );  
+        void composeWithScaling( Vector3<T> const& v );
 
         /** @brief Composition on the left by a rotation described by a 
         transform:

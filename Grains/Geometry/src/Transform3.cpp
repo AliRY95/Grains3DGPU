@@ -226,13 +226,18 @@ void Transform3<T>::setToTransformsComposition( Transform3<T> const& t1,
 // Composition with a scaling transformation: this = this o scaling
 template <typename T>
 __HOSTDEVICE__
-void Transform3<T>::composeWithScaling( T x,
-                                        T y,
-                                        T z )
+void Transform3<T>::composeWithScaling( Vector3<T> const& v )
 {
-    m_basis *= Matrix3<T>( x, T( 0 ), T( 0 ),
-                           T( 0 ), y, T( 0 ),
-                           T( 0 ), T( 0 ), z );
+    T x = v[X], y = v[Y], z = v[Z];
+    m_basis[X][X] *= x;
+    m_basis[X][Y] *= y;
+    m_basis[X][Z] *= z;
+    m_basis[Y][X] *= x;
+    m_basis[Y][Y] *= y;
+    m_basis[Y][Z] *= z;
+    m_basis[Z][X] *= x;
+    m_basis[Z][Y] *= y;
+    m_basis[Z][Z] *= z;
 } 
 
 
