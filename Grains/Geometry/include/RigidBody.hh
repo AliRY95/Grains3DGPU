@@ -29,6 +29,7 @@ class RigidBody
         //@{
         Convex<T>* m_convex; /**< Convex shape */
         T m_crustThickness; /**< Rigid body's crust thickness */
+        Vector3<T> m_scaling; /**< Scaling vector related to crust thickness */
         unsigned int m_material; /**< Rigid body's material ID */
         T m_volume; /**< Rigid body's volume */
         T m_mass; /**< Rigid body's mass */
@@ -83,6 +84,10 @@ class RigidBody
         /** @brief Gets the rigid body's crust thickness */
         __HOSTDEVICE__ 
         T getCrustThickness() const;
+
+        /** @brief Gets the scaling vector related to crust thickness */
+        __HOSTDEVICE__ 
+        Vector3<T> getScalingVector() const;
 
         /** @brief Gets the rigid body's material ID */
         __HOSTDEVICE__ 
