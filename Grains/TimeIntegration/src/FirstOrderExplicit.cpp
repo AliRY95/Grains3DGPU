@@ -64,7 +64,7 @@ __HOSTDEVICE__
 void FirstOrderExplicit<T>::Move( Kinematics<T> const& acceleration,
 								  Kinematics<T>& velocity,                                  
 								  Vector3<T>& transMotion,
-								  Vector3<T>& avgAngVel ) const
+								  Quaternion<T>& rotMotion ) const
 {
 	T dt = TimeIntegrator<T>::m_dt;
 	// Translational velocity and motion
@@ -73,7 +73,7 @@ void FirstOrderExplicit<T>::Move( Kinematics<T> const& acceleration,
 							dt * acceleration.getTranslationalComponent() );
 
 	// Angular velocity and motion
-	avgAngVel = velocity.getAngularComponent();
+	rotMotion = this->computeQuaternionChange( velocity.getAngularComponent() );
 	velocity.addToAngularComponent( 
 							dt * acceleration.getAngularComponent() );
 }

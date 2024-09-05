@@ -441,44 +441,28 @@ void ComponentManagerCPU<T>::moveParticles( TimeIntegrator<T> const* const* TI,
     // #pragma omp parallel for
     for ( int pId = 0; pId < m_nParticles; pId++ )
     {
-        // Parameters of the particle
-        RigidBody<T, T> const& rb = *( RB[ m_rigidBodyId[ pId ] ] );
-        Transform3<T> tr = m_transform[ pId ];
+        // Rigid body
+        RigidBody<T, T> const* rb = RB[ m_rigidBodyId[ pId ] ];
 
         // First, we compute quaternion of orientation
-        Quaternion<T> qRot( tr.getBasis() );
+        Quaternion<T> qRot( m_transform[ pId ].getBasis() );
         // Next, we compute accelerations and reset torces
-        Kinematics<T> const& acceleration = rb.computeAcceleration( 
+        Kinematics<T> const& acceleration = rb->computeAcceleration( 
                                                                 m_torce[ pId ], 
                                                                 qRot );
         m_torce[ pId ].reset();
         // Finally, we move particles using the given time integration
-        Vector3<T> transMove, avgAngVel;
+        Vector3<T> transMove;
+        Quaternion<T> rotMotion;
         (*TI)->Move( acceleration, 
                      m_velocity[ pId ],
                      transMove, 
-                     avgAngVel );
+                     rotMotion );
         
-        // Translational motion
-        m_transform[ pId ].composeLeftByTranslation( transMove );
-        
-        // Angular motion
-        Quaternion<T> qRotChange;
-        T nOmega = norm( avgAngVel );
-        if ( nOmega > LOWEPS<T> ) 
-        {
-            T c = cos( nOmega * GrainsParameters<T>::m_dt / T( 2 ) );
-            T s = sin( nOmega * GrainsParameters<T>::m_dt / T( 2 ) );
-            Vector3<T> t( ( s / nOmega ) * avgAngVel );
-            qRotChange.setQuaternion( t, c );
-        } 
-        else 
-            qRotChange.setQuaternion( T( 0 ), T( 0 ), T( 0 ), T( 1 ) );
-        
-        qRot = qRotChange * qRot;
+        // qRot = qRotChange * qRot;
         // TODO
         // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
-        m_transform[ pId ].composeLeftByRotation( qRotChange );
+        m_transform[ pId ].updateTransform( transMove, rotMotion );
     }
 }
 

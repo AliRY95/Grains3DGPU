@@ -319,6 +319,20 @@ void Transform3<T>::relativeToTransform( Transform3<T> const& t )
 
 
 // -----------------------------------------------------------------------------
+// Updates the transformation with a displacement and a rotation
+template <typename T>
+__HOSTDEVICE__
+void Transform3<T>::updateTransform( Vector3<T> const& transMotion,
+                                     Quaternion<T> const& rotMotion ) 
+{
+    this->composeLeftByTranslation( transMotion );
+    this->composeLeftByRotation( rotMotion );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Returns the result of applying the transformation to the input vector
 template <typename T>
 __HOSTDEVICE__

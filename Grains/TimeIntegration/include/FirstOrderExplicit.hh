@@ -50,13 +50,13 @@ class FirstOrderExplicit : public TimeIntegrator<T>
         /** @brief Computes the new velocity and position at time t+dt
 		@param acceleration acceleration
 		@param velocity velocity 
-		@param transMotion translation motion
-		@param avgAngVel average angular velocity in interval [t,t+dt] */
+		@param transMotion translational motion over dt
+		@param rotMotion rotational motion over dt */
         __HOSTDEVICE__
         void Move( Kinematics<T> const& acceleration,
                    Kinematics<T>& velocity,
                    Vector3<T>& transMotion,
-                   Vector3<T>& avgAngVel ) const final;
+                   Quaternion<T>& rotMotion ) const final;
         //@}
 };
 
