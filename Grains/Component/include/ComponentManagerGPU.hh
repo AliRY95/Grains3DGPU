@@ -95,8 +95,8 @@ class ComponentManagerGPU : public ComponentManager<T>
                               ContactForceModel<T> const* const* CF,
                               int* results );
 
-        // /** @brief Computes impact forces */
-        // void computeForces();
+        /** @brief Computes impact forces */
+        void computeForces();
 
         // /** @brief Updates the position and velocities of particles */
         // void updateParticles();

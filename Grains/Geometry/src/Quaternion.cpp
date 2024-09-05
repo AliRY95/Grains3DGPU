@@ -235,65 +235,6 @@ void Quaternion<T>::setQuaternion( Matrix3<T> const& rot )
 
 
 // -----------------------------------------------------------------------------
-// Sets the quaternion with a rotation matrix - specialized for floats
-template <>
-__HOSTDEVICE__
-void Quaternion<float>::setQuaternion( Matrix3<float> const& rot )
-{
-	float den = 0.f;
-
-    // Case rotYY > - rotZZ, rotXX > - rotYY and rotXX > - rotZZ
-    if ( rot[Y][Y] > - rot[Z][Z] && 
-		 rot[X][X] > - rot[Y][Y] && 
-		 rot[X][X] > - rot[Z][Z] )
-    {
-		den = powf( 1.f + rot[X][X] + rot[Y][Y] + rot[Z][Z], 0.5f );
-		m_w = 0.5f * den;
-		m_vqt[X] = 0.5f * ( rot[Z][Y] - rot[Y][Z] ) / den;
-		m_vqt[Y] = 0.5f * ( rot[X][Z] - rot[Z][X] ) / den;
-		m_vqt[Z] = 0.5f * ( rot[Y][X] - rot[X][Y] ) / den;
-    }
-    // Case rotYY < - rotZZ, rotXX > rotYY and rotXX > rotZZ
-    else if ( rot[Y][Y] < - rot[Z][Z] && 
-			  rot[X][X] > rot[Y][Y] && 
-			  rot[X][X] > rot[Z][Z] )
-    {
-		den = powf( 1.f + rot[X][X] - rot[Y][Y] - rot[Z][Z], 0.5f );
-		m_w = 0.5f * ( rot[Z][Y] - rot[Y][Z] ) / den;
-		m_vqt[X] = 0.5f * den;
-		m_vqt[Y] = 0.5f * ( rot[X][Y] + rot[Y][X] ) / den;
-		m_vqt[Z] = 0.5f * ( rot[Z][X] + rot[X][Z] ) / den;
-    }
-    // Case rotYY > rotZZ, rotXX < rotYY and rotXX < - rotZZ
-    else if ( rot[Y][Y] > rot[Z][Z] && 
-			  rot[X][X] < rot[Y][Y] && 
-			  rot[X][X] < - rot[Z][Z] )
-    {
-		den = powf( 1.f - rot[X][X] + rot[Y][Y] - rot[Z][Z], 0.5f );
-		m_w = 0.5f * ( rot[X][Z] - rot[Z][X] ) / den;
-		m_vqt[X] = 0.5f * ( rot[X][Y] + rot[Y][X] ) / den;
-		m_vqt[Y] = 0.5f * den;
-		m_vqt[Z] = 0.5f * ( rot[Y][Z] + rot[Z][Y] ) / den;
-    }
-    // Case rotYY < rotZZ, rotXX < - rotYY and rotXX < rotZZ
-    else if ( rot[Y][Y] < rot[Z][Z] && 
-			  rot[X][X] < - rot[Y][Y] && 
-			  rot[X][X] < rot[Z][Z] )
-    {
-		den = powf( 1.f - rot[X][X] - rot[Y][Y] + rot[Z][Z], 0.5f );
-		m_w = 0.5f * ( rot[Y][X] - rot[X][Y] ) / den;
-		m_vqt[X] = 0.5f * ( rot[Z][X] + rot[X][Z] ) / den;
-		m_vqt[Y] = 0.5f * ( rot[Y][Z] + rot[Z][Y] ) / den;
-		m_vqt[Z] = 0.5f * den;
-    }
-    else
-		printf( "Warning: case not covered in Quaternion::setQuaternion( Matrix rot )!\n" );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Build a unit quaternion representing the rotation from u to v. 
 // The input vectors need not be normalised. */
 // TODO: if the input vectors aren't normalized, normalize them and warn the

@@ -104,7 +104,7 @@ template <typename T>
 __HOSTDEVICE__
 T Sphere<T>::computeVolume() const
 {
-    return ( T( 4 ) * M_PI * m_radius * m_radius * m_radius / T ( 3 ) );
+    return ( T( 4 ) * PI<T> * m_radius * m_radius * m_radius / T ( 3 ) );
 }
 
 
@@ -119,7 +119,7 @@ void Sphere<T>::computeInertia( T (&inertia)[6],
 {
     T r5 = m_radius * m_radius * m_radius * m_radius * m_radius;
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
-    inertia[5] = inertia[3] = inertia[0] = T( 8 ) * T( M_PI ) / T( 15 ) * r5;
+    inertia[5] = inertia[3] = inertia[0] = T( 8 ) * PI<T> / T( 15 ) * r5;
 
     inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
     inertia_1[5] = inertia_1[3] = inertia_1[0] = T( 1 ) / inertia[0];
@@ -225,7 +225,7 @@ std::list<Vector3<T>> Sphere<T>::writePoints_PARAVIEW(
                                         Vector3<T> const* translation ) const
 {
     std::list<Vector3<T>> ParaviewPoints;
-    T angle = T( PI ) / ( T( 2 ) * visuNodeNbPerQar ) ;
+    T angle = PI<T> / ( T( 2 ) * visuNodeNbPerQar ) ;
     T angleZ = T( 0 ), local_radius = T( 0 );
     int k, i, ptsPerlevel =  4 * visuNodeNbPerQar;
     Vector3<T> pp, pptrans;
@@ -233,7 +233,7 @@ std::list<Vector3<T>> Sphere<T>::writePoints_PARAVIEW(
     // Regular points on the surface
     for ( k = 0; k < 2 * visuNodeNbPerQar - 1 ; ++k ) 
     {  
-        angleZ = -PI / T( 2 ) + ( k + 1 ) * angle;
+        angleZ = - PI<T> / T( 2 ) + ( k + 1 ) * angle;
         local_radius = m_radius * cos( angleZ );
         pp[Z] = m_radius * sin( angleZ );
         for ( i = 0; i < ptsPerlevel ; ++i )

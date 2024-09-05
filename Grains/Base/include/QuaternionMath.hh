@@ -23,10 +23,7 @@ template <typename T>
 __HOSTDEVICE__
 static INLINE T norm( Quaternion<T> const& q )
 {
-    if constexpr ( std::is_same_v<T, float> )
-        return( sqrtf( norm2( q.getVector ) + q.getScalar() * q.getScalar() ) );
-    else
-        return( sqrt( norm2( q.getVector ) + q.getScalar() * q.getScalar() ) );
+    return( sqrt( norm2( q.getVector ) + q.getScalar() * q.getScalar() ) );
 }
 
 

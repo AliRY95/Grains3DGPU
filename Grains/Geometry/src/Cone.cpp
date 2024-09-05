@@ -112,7 +112,7 @@ template <typename T>
 __HOSTDEVICE__
 T Cone<T>::computeVolume() const
 {
-    return ( T( 4 ) * m_quarterHeight * T( PI ) * m_bottomRadius * 
+    return ( T( 4 ) * m_quarterHeight * PI<T> * m_bottomRadius * 
                                                     m_bottomRadius / T( 3 ) );
 }
 
@@ -127,7 +127,7 @@ void Cone<T>::computeInertia( T (&inertia)[6],
                               T (&inertia_1)[6] ) const
 {
     T r2 = m_bottomRadius * m_bottomRadius;
-    T c = T( .2 ) * T( PI ) * m_quarterHeight * r2;
+    T c = T( .2 ) * PI<T> * m_quarterHeight * r2;
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
     inertia[0] = inertia[5] =
                         c * ( T( 4 ) * m_quarterHeight * m_quarterHeight + r2 );
@@ -149,21 +149,7 @@ T Cone<T>::computeCircumscribedRadius() const
 {
     return ( max( sqrt( m_bottomRadius * m_bottomRadius + 
                         m_quarterHeight * m_quarterHeight ),
-                  T( 3 ) * m_quarterHeight ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Returns the circumscribed radius of the cone - specialized for floats
-template <>
-__HOSTDEVICE__
-float Cone<float>::computeCircumscribedRadius() const
-{
-    return ( max( sqrtf( m_bottomRadius * m_bottomRadius + 
-                         m_quarterHeight * m_quarterHeight ),
-                  3.f * m_quarterHeight ) );
+                        T( 3 ) * m_quarterHeight ) );
 }
 
 
@@ -185,8 +171,8 @@ Vector3<T> Cone<T>::computeBoundingBox() const
 
 
 // -----------------------------------------------------------------------------
-// Superquadric support function, returns the support point P, i.e. the point on
-// the surface of the cone that satisfies max(P.v)
+// Cone support function, returns the support point P, i.e. the point on the
+// surface of the cone that satisfies max(P.v)
 template <typename T>
 __HOSTDEVICE__
 Vector3<T> Cone<T>::support( Vector3<T> const& v ) const
@@ -196,9 +182,9 @@ Vector3<T> Cone<T>::support( Vector3<T> const& v ) const
                              T( 3 ) * m_quarterHeight, 
                              T( 0 ) ) );
     else
-    {
+    {   
         T s = sqrt( v[X] * v[X] + v[Z] * v[Z] );
-        if ( s > EPSILON1 ) 
+        if ( s > EPS<T> ) 
         {
             T d = m_bottomRadius / s;  
             return ( Vector3<T>( v[X] * d,
@@ -209,37 +195,6 @@ Vector3<T> Cone<T>::support( Vector3<T> const& v ) const
             return ( Vector3<T>( T( 0 ), 
                                  - m_quarterHeight, 
                                  T( 0 ) ) );
-    }
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Superquadric support function, returns the support point P, i.e. the point on
-// the surface of the cone that satisfies max(P.v) - specialized for floats
-template <>
-__HOSTDEVICE__
-Vector3<float> Cone<float>::support( Vector3<float> const& v ) const
-{
-    if ( v[Y] > norm( v ) * m_sinAngle ) 
-        return ( Vector3<float>( 0.f, 
-                                 3.f * m_quarterHeight, 
-                                 0.f ) );
-    else
-    {
-        float s = sqrtf( v[X] * v[X] + v[Z] * v[Z] );
-        if ( s > EPSILON1 ) 
-        {
-            float d = m_bottomRadius / s;  
-            return ( Vector3<float>( v[X] * d,
-                                     - m_quarterHeight, 
-                                     v[Z] * d ) );
-        } 
-        else
-            return ( Vector3<float>( 0.f, 
-                                     - m_quarterHeight, 
-                                     0.f ) );
     }
 }
 
@@ -309,7 +264,7 @@ std::list<Vector3<T>> Cone<T>::writePoints_PARAVIEW(
 {
     list<Vector3<T>> ParaviewPoints;
     Vector3<T> pp, p;
-    T dtheta = T( 2 ) * T( PI ) / visuNodeNbOnPer;
+    T dtheta = TWO_PI<T> / visuNodeNbOnPer;
 
     // Disk rim
     p[Y] = - m_quarterHeight;

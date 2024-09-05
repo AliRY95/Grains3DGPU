@@ -58,7 +58,11 @@ void GrainsCPU<T>::simulate()
     {
         std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
         std::vector<Transform3<T>> tr = Grains<T>::m_components->getTransform();
-        std::cout << tr[0].getOrigin() << endl;
+        std::cout << "Positions are: "
+                  << tr[0].getOrigin() 
+                  << ", and "
+                  << tr[1].getOrigin() 
+                  << endl;
         Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
                                                   Grains<T>::m_rigidBodyList,
                                                   Grains<T>::m_contactForce,

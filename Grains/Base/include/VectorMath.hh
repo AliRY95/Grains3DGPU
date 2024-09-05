@@ -22,14 +22,9 @@ template <typename T>
 __HOSTDEVICE__
 static INLINE T norm( Vector3<T> const& v )
 {
-    if constexpr ( std::is_same_v<T, float> )
-        return ( sqrtf( v[X] * v[X] + 
-                        v[Y] * v[Y] + 
-                        v[Z] * v[Z] ) );
-    else
-        return ( sqrt( v[X] * v[X] + 
-                       v[Y] * v[Y] + 
-                       v[Z] * v[Z] ) );
+    return ( sqrt( v[X] * v[X] + 
+                   v[Y] * v[Y] + 
+                   v[Z] * v[Z] ) );
 }
 
 
@@ -55,16 +50,11 @@ static INLINE T norm2( Vector3<T> const& v )
 @param v the vector */
 template <typename T>
 __HOSTDEVICE__
-static INLINE bool isApproxZero( Vector3<T> const& v )
+static INLINE bool isApproxZero( Vector3<T> const& v, T tol = HIGHEPS<T> )
 {
-    if constexpr ( std::is_same_v<T, float> )
-        return ( fabsf( v[X] ) < EPSILON2 && 
-                 fabsf( v[Y] ) < EPSILON2 &&
-                 fabsf( v[Z] ) < EPSILON2 );
-    else
-        return ( fabs( v[X] ) < EPSILON2 && 
-                 fabs( v[Y] ) < EPSILON2 &&
-                 fabs( v[Z] ) < EPSILON2 );
+    return ( fabs( v[X] ) < tol && 
+             fabs( v[Y] ) < tol &&
+             fabs( v[Z] ) < tol );
 }
 
 

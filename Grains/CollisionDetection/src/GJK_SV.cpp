@@ -792,7 +792,7 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
             if ( acceleration )
             {
                 // if d == v
-                if ( norm( dVec - vVec ) < LOWEPS )
+                if ( norm( dVec - vVec ) < LOWEPS<T> )
                     break;
                 // otherwise turn off the acceleration
                 else
@@ -821,7 +821,7 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
 
     } while ( ( s.nvrtx != 4 ) && 
               ( numIterations != maxNumIterations ) && 
-              ( dist > LOWEPS ) );
+              ( dist > HIGHEPS<T> ) );
     /* Outputs: witness points and nbIter */
     // It is not the best way to return the witness points.
     // It seems to be inconsistent with the way that it has been done in the

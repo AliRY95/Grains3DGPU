@@ -13,8 +13,8 @@
 		<ContactForceModel>
 			<Material materialA="matP" materialB="matP"/>			
 			<HODC>
-				<stiff>0.8</stiff>
-				<en>0.3</en>
+				<stiff>0.0</stiff>
+				<en>1.0</en>
 				<ks>0</ks>
 				<mut>0</mut>
 				<muc>0</muc>
@@ -25,17 +25,17 @@
 
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="0.4" dt="1.e-5"/>
+		<TimeInterval Start="0." End="4.85857864376" dt="1.e-5"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 
 	<Particles>
-		<Particle Number="1" Density="1163.66" Material="matP">
+		<Particle Number="2" Density="1163.66" Material="matP">
 			<AngularPosition Type="Identity"></AngularPosition>
-				<!-- <Sphere Radius="0.05"/> -->
+				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
 				<!-- <Box LX="0.04" LY="0.04" LZ="0.08"/> -->
 			<Convex CrustThickness="1.e-4">
-				<Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/>
+				<Sphere Radius="0.01"/>
 			</Convex>
 		</Particle>
 	</Particles>
@@ -304,7 +304,7 @@
 </Construction>
 
 <Forces>
-	<Gravity GX="0.0" GY="0.0" GZ="-9.81"/>
+	<Gravity GX="0.0" GY="0.0" GZ="0.0"/>
 </Forces>
 
 <Simulation>

@@ -37,7 +37,7 @@ unsigned int GrainsParameters<T>::m_numCells = 0;
 
 /* Physical */
 template <typename T> 
-Vector3<T> GrainsParameters<T>::m_gravity = Vector3<T>( 0, 0, 0 );
+Vector3<T> GrainsParameters<T>::m_gravity = zeroVector3T;
 template <typename T> 
 std::unordered_map<std::string, unsigned int> GrainsParameters<T>::m_materialMap;
 

@@ -58,7 +58,8 @@ static INLINE Matrix3<T> inverse( Matrix3<T> const& m )
                    m[Y][Z] * m[Z][X] - m[Y][X] * m[Z][Z],
                    m[Y][X] * m[Z][Y] - m[Y][Y] * m[Z][X] );
     T d = m[X] * co;
-    // assert( !eqz( d ) ); EPSILON = 1.e-10
+    if ( fabs( d ) < HIGHEPS<T> )
+        printf( "Matrix is not inversible!\n" );
     T s = T( 1 ) / d;
     return ( Matrix3<T>( co[X] * s,
                          ( m[X][Z] * m[Z][Y] - m[X][Y] * m[Z][Z] ) * s,

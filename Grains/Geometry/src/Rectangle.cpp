@@ -146,18 +146,6 @@ T Rectangle<T>::computeCircumscribedRadius() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the circumscribed radius of the rectangle
-template <>
-__HOSTDEVICE__
-float Rectangle<float>::computeCircumscribedRadius() const
-{
-    return ( sqrtf( m_LX * m_LX + m_LY * m_LY ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Returns the bounding box to the rectangle
 template <typename T>
 __HOSTDEVICE__

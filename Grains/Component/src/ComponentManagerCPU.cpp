@@ -149,6 +149,13 @@ ComponentManagerCPU<T>::ComponentManagerCPU(
         m_componentCellHash.push_back( 0 );
     }
 
+
+
+    m_transform[0].setOrigin( Vector3<T>( -0.25, -0.25, 0.5 ) );
+    m_transform[1].setOrigin( Vector3<T>( 0.25, 0.25, 0.5 ) );
+    m_velocity[0].setTranslationalComponent( Vector3<T>( 1e-1, 1e-1, 0 ) );
+    m_velocity[1].setTranslationalComponent( Vector3<T>( -1e-1, -1e-1, 0 ) );
+
     // Initialzing the vectors for obstacles
 
 
@@ -458,7 +465,7 @@ void ComponentManagerCPU<T>::moveParticles( TimeIntegrator<T> const* const* TI,
         // Angular motion
         Quaternion<T> qRotChange;
         T nOmega = norm( avgAngVel );
-        if ( nOmega > LOWEPS ) 
+        if ( nOmega > LOWEPS<T> ) 
         {
             T c = cos( nOmega * GrainsParameters<T>::m_dt / T( 2 ) );
             T s = sin( nOmega * GrainsParameters<T>::m_dt / T( 2 ) );

@@ -27,11 +27,7 @@ HODCContactForceModel<T>::HODCContactForceModel( DOMNode* root )
 
     parameter = ReaderXML::getNode( root, "en" );
     m_en = T( ReaderXML::getNodeValue_Double( parameter ) );
-    if constexpr ( std::is_same_v<T, float> )
-        m_muen = logf( m_en ) 
-            / sqrtf( float( PI ) * float( PI ) + logf( m_en ) * logf( m_en ) );
-    else
-        m_muen = log( m_en ) / sqrt( PI * PI + log( m_en ) * log( m_en ) );
+    m_muen = log( m_en ) / sqrt( PI<T> * PI<T> + log( m_en ) * log( m_en ) );
 
     parameter = ReaderXML::getNode( root, "mut" );
     m_muet = T( ReaderXML::getNodeValue_Double( parameter ) ); 
@@ -58,11 +54,7 @@ HODCContactForceModel<T>::HODCContactForceModel( T stiff,
 , m_muec( muec )
 , m_kms( kms )                                     
 {
-    if constexpr ( std::is_same_v<T, float> )
-        m_muen = logf( m_en ) 
-            / sqrtf( float( PI ) * float( PI ) + logf( m_en ) * logf( m_en ) );
-    else
-        m_muen = log( m_en ) / sqrt( PI * PI + log( m_en ) * log( m_en ) );
+    m_muen = log( m_en ) / sqrt( PI<T> * PI<T> + log( m_en ) * log( m_en ) );
 }
 
 
@@ -142,7 +134,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
     // Unit tangential vector along relative velocity at contact point 
     T normv_t = norm( v_t );
     Vector3<T> tangent = zeroVector3T;
-    if ( normv_t > EPSILON1 )
+    if ( normv_t > EPS<T> )
         tangent = v_t / normv_t;
   
     // Normal dissipative force  
@@ -178,7 +170,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
         delM = - m_kms * normFN * T( 0.001 ) * wn;
         
         // Classical rolling resistance moment
-        if ( normwt > EPSILON1 )
+        if ( normwt > EPS<T> )
             delM -= m_kms * normFN * wt;    
     }
 }
