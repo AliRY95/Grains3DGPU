@@ -2,8 +2,9 @@
 #define _TIMEINTEGRATOR_HH_
 
 
-#include "Torce.hh"
 #include "Transform3.hh"
+#include "Quaternion.hh"
+#include "Torce.hh"
 #include "Kinematics.hh"
 
 
@@ -20,9 +21,7 @@ enum TimeIntegratorType {
     Numerical scheme for the time integration of the Newton's law and the
     kinematic equations. 
 
-    @author A.WACHS - Institut Francais du Petrole - 2011 - Creation 
-    @author A.WACHS - 2019 - Major cleaning & refactoring
-    @author A.YAZDANI - 2024 - Major cleaning for porting to GPU */
+    @author A.YAZDANI - 2024 - Construction */
 // =============================================================================
 template <typename T>
 class TimeIntegrator
@@ -70,16 +69,22 @@ class TimeIntegrator
 		__HOSTDEVICE__
 		virtual TimeIntegrator<T>* clone() const = 0;
 
+		/** @brief Computes the quaternion change over the time step given an
+		average for the angular velocity over the time step
+		@param v average of the angular velocity over the time step */
+		__HOSTDEVICE__
+		Quaternion<T> computeQuaternionChange( Vector3<T> const& v ) const;
+
 		/** @brief Computes the new velocity and position at time t+dt
 		@param acceleration acceleration
 		@param velocity velocity 
-		@param transMotion translation motion
-		@param avgAngVel average angular velocity in interval [t,t+dt] */
+		@param transMotion translational motion over dt
+		@param rotMotion rotational motion over dt */
 		__HOSTDEVICE__    
 		virtual void Move( Kinematics<T> const& acceleration,
 						   Kinematics<T>& velocity,
 						   Vector3<T>& transMotion,
-						   Vector3<T>& avgAngVel ) const = 0;
+						   Quaternion<T>& rotMotion ) const = 0;
 		//@}
 };
 

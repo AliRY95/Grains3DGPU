@@ -170,6 +170,14 @@ class Transform3
         @param t the other affine transformation */
         __HOSTDEVICE__
         void relativeToTransform( Transform3<T> const& t );
+
+        /** @brief Updates the transformation with a given displacement (vector)
+        and a given rotation (quaternion)
+        @param transMotion displacement vector
+        @param rotMotion rotation quaternion */
+        __HOSTDEVICE__
+        void updateTransform( Vector3<T> const& transMotion,
+                              Quaternion<T> const& rotMotion );
         //@}
 
 
