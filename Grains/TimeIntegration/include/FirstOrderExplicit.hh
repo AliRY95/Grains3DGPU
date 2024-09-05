@@ -47,7 +47,7 @@ class FirstOrderExplicit : public TimeIntegrator<T>
 		__HOSTDEVICE__
 		TimeIntegrator<T>* clone() const final;
 
-        /** @brief Computes the new velocity and position at time t+dt
+        /** @brief Computes the new velocity and transformation change over dt
 		@param acceleration acceleration
 		@param velocity velocity 
 		@param transMotion translational motion over dt

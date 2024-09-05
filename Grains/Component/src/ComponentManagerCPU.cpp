@@ -452,17 +452,17 @@ void ComponentManagerCPU<T>::moveParticles( TimeIntegrator<T> const* const* TI,
                                                                 qRot );
         m_torce[ pId ].reset();
         // Finally, we move particles using the given time integration
-        Vector3<T> transMove;
+        Vector3<T> transMotion;
         Quaternion<T> rotMotion;
         (*TI)->Move( acceleration, 
                      m_velocity[ pId ],
-                     transMove, 
+                     transMotion, 
                      rotMotion );
         
-        // qRot = qRotChange * qRot;
         // TODO
+        // qRot = qRotChange * qRot;
         // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
-        m_transform[ pId ].updateTransform( transMove, rotMotion );
+        m_transform[ pId ].updateTransform( transMotion, rotMotion );
     }
 }
 

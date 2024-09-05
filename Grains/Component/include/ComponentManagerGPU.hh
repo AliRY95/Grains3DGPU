@@ -19,14 +19,31 @@ class ComponentManagerGPU : public ComponentManager<T>
     protected:
         /** @name Parameters */
         //@{
-        unsigned int* m_rigidBodyId; /**< array of components rigid body Id */
-        Transform3<T>* m_transform; /**< array of components transformation */
-        Kinematics<T>* m_kinematics; /**< array of components kinematics */
-        Torce<T>* m_torce; /**< array of components torce */
-        int* m_componentId; /**< array of component Ids */
-        unsigned int* m_componentCellHash; /**< array of components cell hash */
-        unsigned int* m_cellHashStart; /**< array of cells hash start */
-        unsigned int* m_cellHashEnd; /**< array of cells hash start */
+        /** \brief number of particles in manager */
+        unsigned int m_nParticles;
+        /** \brief number of obstacles in manager */
+        unsigned int m_nObstacles;
+        /** \brief number of cells in manager */
+        unsigned int m_nCells;
+        /** \brief components rigid body Id */
+        unsigned int* m_rigidBodyId; 
+        /** \brief components transformation */
+        <Transform3<T>* m_transform; 
+        /** \brief array of components velocities */
+        Kinematics<T>* m_velocity;
+        /** \brief array of components torce */
+        Torce<T>* m_torce;
+        /** \brief components Id with positive values for particles and negative
+        values for obstacles. */
+        int* m_componentId; 
+        /** \brief components cell hash */
+        unsigned int* m_componentCellHash; 
+        /** \brief cells hash start */
+        unsigned int* m_cellHashStart; 
+        /** \brief cells hash end */
+        unsigned int* m_cellHashEnd; 
+
+
         // bool* isActive; /**< array of components activity in the simulation */
         // bool* isObstacle; /**< array of components flag for being obstacle */
         // unsigned int m_numComponents; /**< number of components */
