@@ -7,7 +7,7 @@
 #include "Transform3.hh"
 #include "RigidBody.hh"
 #include "LinkedCell.hh"
-#include "HODCContactForceModel.hh"
+#include "ContactForceModel.hh"
 
 
 // =============================================================================

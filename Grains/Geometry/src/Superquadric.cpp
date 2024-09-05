@@ -117,47 +117,22 @@ template <typename T>
 __HOSTDEVICE__
 T Superquadric<T>::computeVolume() const
 {
-#ifdef __CUDA_ARCH__
     T const C = T( 2 ) / T( 3 ) * m_a * m_b * m_c;
     T const eps1 = T( 2 ) / m_n1;
     T const eps2 = T( 2 ) / m_n2;
 
-    return ( C * eps1 * eps2 * grainsBeta( eps1, T( 0.5 ) * eps1 ) * 
-                               grainsBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) );
-#else
-    T const C = T( 2 ) / T( 3 ) * m_a * m_b * m_c;
-    T const eps1 = T( 2 ) / m_n1;
-    T const eps2 = T( 2 ) / m_n2;
-
-    return ( C * eps1 * eps2 * std::beta( eps1, T( 0.5 ) * eps1 ) * 
-                               std::beta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) );
-#endif                            
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Returns the volume of the Superquadric - specialized for floats
-template <>
-__HOSTDEVICE__
-float Superquadric<float>::computeVolume() const
-{
+    /* Rest of the computation needs the famous Beta function. the Beta function
+    implementation is not in the cuda math lib.
+    Hence, we use macro. */
 #ifdef __CUDA_ARCH__
-    float const C = 2.f / 3.f * m_a * m_b * m_c;
-    float const eps1 = 2.f / m_n1;
-    float const eps2 = 2.f / m_n2;
-
-    return ( C * eps1 * eps2 * grainsBetaf( eps1, 0.5f * eps1 ) * 
-                               grainsBetaf( 0.5f * eps2, 0.5f * eps2 ) );
+#define myBeta( a, b ) grainsBeta( a, b )
 #else
-    float const C = 2.f / 3.f * m_a * m_b * m_c;
-    float const eps1 = 2.f / m_n1;
-    float const eps2 = 2.f / m_n2;
+#define myBeta( a, b ) std::beta( a, b )
+#endif
 
-    return ( C * eps1 * eps2 * std::betaf( eps1, 0.5f * eps1 ) * 
-                               std::betaf( 0.5f * eps2, 0.5f * eps2 ) );
-#endif                            
+    return ( C * eps1 * eps2 * myBeta( eps1, T( 0.5 ) * eps1 ) * 
+                               myBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) );
+#undef myBeta        
 }
 
 
@@ -170,16 +145,25 @@ __HOSTDEVICE__
 void Superquadric<T>::computeInertia( T (&inertia)[6], 
                                       T (&inertia_1)[6] ) const
 {
-#ifdef __CUDA_ARCH__
     T const eps1 = T( 2 ) / m_n1;
     T const eps2 = T( 2 ) / m_n2;
     T const C = T( 0.4 ) * m_a * m_b * m_c * eps1 * eps2 ;
 
-    T const prod1 = grainsBeta( T( 1.5 ) * eps2, T( 0.5 ) * eps2 ) * 
-                    grainsBeta( T( 2 ) * eps1, T( 0.5 ) * eps1 );
+    /* Rest of the computation needs the famous Beta function. the Beta function
+    implementation is not in the cuda math lib.
+    Hence, we use macro. */
+#ifdef __CUDA_ARCH__
+#define myBeta( a, b ) grainsBeta( a, b )
+#else
+#define myBeta( a, b ) std::beta( a, b )
+#endif
+
+    // Back to the actual computation
+    T const prod1 = myBeta( T( 1.5 ) * eps2, T( 0.5 ) * eps2 ) * 
+                    myBeta( T( 2 ) * eps1, T( 0.5 ) * eps1 );
     T const prod2 = m_c * m_c * 
-                    grainsBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) * 
-                    grainsBeta( T( 1.5 ) * eps1, eps1 );
+                    myBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) * 
+                    myBeta( T( 1.5 ) * eps1, eps1 );
 
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
     inertia[0] = C * ( m_b * m_b * prod1 + prod2 );
@@ -190,81 +174,8 @@ void Superquadric<T>::computeInertia( T (&inertia)[6],
     inertia_1[0] = T( 1 ) / inertia[0];
     inertia_1[3] = T( 1 ) / inertia[3];
     inertia_1[5] = T( 1 ) / inertia[5];
-#else
-    T const eps1 = T( 2 ) / m_n1;
-    T const eps2 = T( 2 ) / m_n2;
-    T const C = T( 0.4 ) * m_a * m_b * m_c * eps1 * eps2 ;
-
-    T const prod1 = std::beta( T( 1.5 ) * eps2, T( 0.5 ) * eps2 ) * 
-                    std::beta( T( 2 ) * eps1, T( 0.5 ) * eps1 );
-    T const prod2 = m_c * m_c * 
-                    std::beta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) * 
-                    std::beta( T( 1.5 ) * eps1, eps1 );
-
-    inertia[1] = inertia[2] = inertia[4] = T( 0 );
-    inertia[0] = C * ( m_b * m_b * prod1 + prod2 );
-    inertia[3] = C * ( m_a * m_a * prod1  + prod2 );
-    inertia[5] = C * ( m_a * m_a + m_b * m_b ) * prod1;
-
-    inertia_1[1] = inertia_1[2] = inertia_1[4] = T( 0 );
-    inertia_1[0] = T( 1 ) / inertia[0];
-    inertia_1[3] = T( 1 ) / inertia[3];
-    inertia_1[5] = T( 1 ) / inertia[5];
-#endif
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Computes the inertia tensor and the inverse of the inertia tensor -
-// specialized for floats
-template <>
-__HOSTDEVICE__
-void Superquadric<float>::computeInertia( float (&inertia)[6], 
-                                          float (&inertia_1)[6] ) const
-{
-#ifdef __CUDA_ARCH__
-    float const eps1 = 2.f / m_n1;
-    float const eps2 = 2.f / m_n2;
-    float const C = 0.4f * m_a * m_b * m_c * eps1 * eps2 ;
-
-    float const prod1 = grainsBetaf( 1.5f * eps2, 0.5f * eps2 ) * 
-                        grainsBetaf( 2.f * eps1, 0.5f * eps1 );
-    float const prod2 = m_c * m_c * 
-                        grainsBetaf( 0.5f * eps2, 0.5f * eps2 ) * 
-                        grainsBetaf( 1.5f * eps1, eps1 );
-
-    inertia[1] = inertia[2] = inertia[4] = 0.f;
-    inertia[0] = C * ( m_b * m_b * prod1 + prod2 );
-    inertia[3] = C * ( m_a * m_a * prod1  + prod2 );
-    inertia[5] = C * ( m_a * m_a + m_b * m_b ) * prod1;
-
-    inertia_1[1] = inertia_1[2] = inertia_1[4] = 0.f;
-    inertia_1[0] = 1.f / inertia[0];
-    inertia_1[3] = 1.f / inertia[3];
-    inertia_1[5] = 1.f / inertia[5];
-#else
-    float const eps1 = 2.f / m_n1;
-    float const eps2 = 2.f / m_n2;
-    float const C = 0.4f * m_a * m_b * m_c * eps1 * eps2 ;
-
-    float const prod1 = std::betaf( 1.5f * eps2, 0.5f * eps2 ) * 
-                        std::betaf( 2.f * eps1, 0.5f * eps1 );
-    float const prod2 = m_c * m_c * 
-                        std::betaf( 0.5f * eps2, 0.5f * eps2 ) * 
-                        std::betaf( 1.5f * eps1, eps1 );
-
-    inertia[1] = inertia[2] = inertia[4] = 0.f;
-    inertia[0] = C * ( m_b * m_b * prod1 + prod2 );
-    inertia[3] = C * ( m_a * m_a * prod1  + prod2 );
-    inertia[5] = C * ( m_a * m_a + m_b * m_b ) * prod1;
-
-    inertia_1[1] = inertia_1[2] = inertia_1[4] = 0.f;
-    inertia_1[0] = 1.f / inertia[0];
-    inertia_1[3] = 1.f / inertia[3];
-    inertia_1[5] = 1.f / inertia[5];
-#endif
+    
+#undef myBeta 
 }
 
 
@@ -306,48 +217,6 @@ T Superquadric<T>::computeCircumscribedRadius() const
         return ( sqrt( m_a * xt * m_a * xt + 
                        alpha * m_b * xt * alpha * m_b * xt +
                        beta * m_c * xt * beta * m_c * xt ) );
-    }
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Returns the circumscribed radius of the Superquadric - specialized for floats
-template <>
-__HOSTDEVICE__
-float Superquadric<float>::computeCircumscribedRadius() const
-{
-    if ( ( m_n1 == 2.f ) && ( m_n2 == 2.f ) )
-        return ( max( m_a, max( m_b, m_c ) ) );
-    else if ( m_n1 == 2.f )
-    {
-        float const alpha = pow( m_b / m_a, 2.f / ( m_n2 - 2.f ) );
-        float const xt = 1.f / powf( 1.f + powf( alpha, m_n2 ), 1.f / m_n2 );
-        return ( max( m_c, 
-        sqrtf( m_a * xt * m_a * xt + alpha * m_b * xt * alpha * m_b * xt ) ) );
-    }
-    else if ( m_n2 == 2.f )
-    {
-        float const m = max( m_a, m_b );
-        float const beta = powf( m_c * m_c / ( m * m ), 1.f / ( m_n1 - 2.f ) );
-        float const xt = 1.f / powf( 1.f + powf( beta, m_n1 ), 1.f / m_n1 );
-        return ( sqrtf( m * xt * m * xt + beta * m_c * xt * beta * m_c * xt ) );
-    }
-    else
-    {
-        float const alpha = powf( m_b / m_a, 2.f / ( m_n2 - 2.f ) );
-        float const gamma = powf( 1.f + powf( alpha, m_n2 ), 
-                                  m_n1 / m_n2 - 1.f );
-        float const beta = powf( gamma * m_c * m_c / ( m_a * m_a ), 
-                                 1.f / (m_n1 - 2.f ) );
-        float const xt = 1.f / 
-                         powf( powf( 1.f + powf( alpha, m_n2 ), m_n1 / m_n2 )
-                         + powf( beta, m_n1 ), 1.f / m_n1 );
-
-        return ( sqrtf( m_a * xt * m_a * xt + 
-                        alpha * m_b * xt * alpha * m_b * xt +
-                        beta * m_c * xt * beta * m_c * xt ) );
     }
 }
 
@@ -420,58 +289,6 @@ Vector3<T> Superquadric<T>::support( Vector3<T> const& v ) const
 
 
 // -----------------------------------------------------------------------------
-// Superquadric support function, returns the support point P, i.e. the point on
-// the surface of the Superquadric that satisfies max(P.v) - specialized for
-// floats
-template <>
-__HOSTDEVICE__
-Vector3<float> Superquadric<float>::support( Vector3<float> const& v ) const
-{
-    float const abvx = fabsf( v[X] );
-    float const abvy = fabsf( v[Y] );
-    float const abvz = fabsf( v[Z] );
-    float const signx = sgn( v[X] );
-    float const signy = sgn( v[Y] );
-    float const signz = sgn( v[Z] );
-
-    Vec3F sup;
-
-    if ( abvx == 0.f )
-    {
-        if ( abvy == 0.f )
-            return ( Vector3<float>( 0.f, 0.f, signz * m_c ) );
-        else
-        {
-            float const alpha = powf( m_c / m_b * abvz / abvy, 
-                                                    1. / ( m_n1 - 1. ) );
-            float const yt = 1.f / powf( 1.f + powf( alpha, m_n1 ), 
-                                            1.f / m_n1);
-            return ( Vector3<float>( 0.f, 
-                                     signy * m_b * yt, 
-                                     signz * alpha * m_c * yt ) );
-        }
-    }
-    else
-    {
-        float const alpha = powf( m_b / m_a * abvy / abvx, 
-                                    1.f / ( m_n2 - 1.f ) );
-        float const temp = 1.f + powf( alpha, m_n2 );
-        float const gamma = powf( temp, 
-                            ( m_n1 - m_n2 ) / ( m_n2 * ( m_n1 - 1.f ) ) );
-        float const beta = gamma * powf( m_c / m_a * abvz / abvx, 
-                                            1.f / ( m_n1 - 1.f ) );
-        float const xt = 1.f / powf( powf( temp, m_n1 / m_n2 ) +
-                                        powf( beta, m_n1 ) , 1.f / m_n1 );
-        return ( Vector3<float>( signx * m_a * xt, 
-                                 signy * alpha * m_b * xt, 
-                                 signz * beta * m_c * xt ) );
-    }
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__
@@ -537,8 +354,8 @@ std::list<Vector3<T>> Superquadric<T>::writePoints_PARAVIEW(
     T const eps1 = T( 2 ) / m_n1 ;
     T const eps2 = T( 2 ) / m_n2 ;
     std::list<Vector3<T>> ParaviewPoints;
-    T const dtheta = T( PI ) / visuNodeNbOnPer;
-    T const dphi = T( 2 ) * T( PI ) / visuNodeNbOnPer;
+    T const dtheta = PI<T> / visuNodeNbOnPer;
+    T const dphi = TWO_PI<T> / visuNodeNbOnPer;
     Vector3<T> pp, pptrans;
 
     pp[X] = pp[Y] = T( 0 );

@@ -16,24 +16,11 @@
 a given tolerance
 @param x the number
 @param tol the tolerance */
+template <typename T>
 __HOSTDEVICE__
-static INLINE bool eqz( double x, double tol )
+static INLINE bool eqz( T x, T tol )
 { 
     return ( fabs(x) <= tol );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-/** @brief Returns whether a float number is approximately 0 with respect to
-a given tolerance
-@param x the number
-@param tol the tolerance */
-__HOSTDEVICE__
-static INLINE bool eqz( float x, float tol )
-{ 
-    return ( fabsf(x) <= tol );
 }
 
 
@@ -80,7 +67,7 @@ template <typename T>
 __HOSTDEVICE__
 static INLINE T rads( T x )
 { 
-    return ( x * RADS_PER_DEG ); 
+    return ( x * RADS_PER_DEG<T> ); 
 }
 
 
@@ -93,7 +80,7 @@ template <typename T>
 __HOSTDEVICE__
 static INLINE T degs( T x ) 
 { 
-    return ( x * DEGS_PER_RAD );
+    return ( x * DEGS_PER_RAD<T> );
 }
 
 
@@ -117,24 +104,11 @@ static INLINE int sgn( T x )
 The reason we implement this is that beta functions are not supported on device
 code.
 @param x the number */
+template <typename T>
 __HOSTDEVICE__
-static INLINE double grainsBeta( double x, double y )
+static INLINE T grainsBeta( T x, T y )
 { 
     return ( tgamma( x ) * tgamma( y ) / tgamma( x + y ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-/** @brief Returns the beta function of 2 floats using the gamma function. 
-The reason we implement this is that beta functions are not supported on device
-code.
-@param x the number */
-__HOSTDEVICE__
-static INLINE float grainsBetaf( float x, float y )
-{ 
-    return ( tgammaf( x ) * tgammaf( y ) / tgammaf( x + y ) );
 }
 
 

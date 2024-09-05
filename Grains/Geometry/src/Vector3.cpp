@@ -108,20 +108,6 @@ T Vector3<T>::norm() const
 
 
 // -----------------------------------------------------------------------------
-// Returns the norm of the vector - specialized for floats
-template <>
-__HOSTDEVICE__
-float Vector3<float>::norm() const
-{
-    return ( sqrtf( m_comp[X] * m_comp[X] + 
-                    m_comp[Y] * m_comp[Y] + 
-                    m_comp[Z] * m_comp[Z] ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Returns the norm squared of the vector
 template <typename T>
 __HOSTDEVICE__
@@ -139,25 +125,12 @@ T Vector3<T>::norm2() const
 // Determines if the vector is approximately zero or not
 template <typename T>
 __HOSTDEVICE__
-bool Vector3<T>::isApproxZero() const
+bool Vector3<T>::isApproxZero( T tol ) const
 {
-    return ( fabs( m_comp[X] ) < EPSILON2 && 
-             fabs( m_comp[Y] ) < EPSILON2 &&
-             fabs( m_comp[Z] ) < EPSILON2 );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Determines if the vector is approximately zero - specialized for floats
-template <>
-__HOSTDEVICE__
-bool Vector3<float>::isApproxZero() const
-{
-    return ( fabsf( m_comp[X] ) < EPSILON2 && 
-             fabsf( m_comp[Y] ) < EPSILON2 &&
-             fabsf( m_comp[Z] ) < EPSILON2 );
+    return ( fabs( m_comp[X] ) < tol && 
+             fabs( m_comp[Y] ) < tol &&
+             fabs( m_comp[Z] ) < tol );
+    
 }
 
 
@@ -184,20 +157,6 @@ __HOSTDEVICE__
 void Vector3<T>::reset()
 {
     m_comp[X] = m_comp[Y] = m_comp[Z] = T( 0 );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Rounds components to +-tol - specialized for floats
-template <>
-__HOSTDEVICE__
-void Vector3<float>::round( float tol )
-{
-    m_comp[X] = fabsf( m_comp[X] ) < tol ? 0. : m_comp[X];
-    m_comp[Y] = fabsf( m_comp[Y] ) < tol ? 0. : m_comp[Y];
-    m_comp[Z] = fabsf( m_comp[Z] ) < tol ? 0. : m_comp[Z];
 }
 
 

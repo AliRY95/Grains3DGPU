@@ -78,15 +78,15 @@ class Vector3
         __HOSTDEVICE__
         T norm2() const;
 
-        /** @brief Returns whether the vector norm is less than EPSILON2
-        where EPSILON2 is defined in Basic.hh */
+        /** @brief Returns whether the vector norm is less than a given tol
+        @param tol tolerance -- HIGHEPS defined in Basic.hh is the default */
         __HOSTDEVICE__
-        bool isApproxZero() const;
+        bool isApproxZero( T tol = HIGHEPS<T> ) const;
 
         /** @brief Rounds components to +-tol
-        @param tol the required tolerance to determine if a component is zero */
+        @param tol tolerance -- EPS defined in Basic.hh is the default */
         __HOSTDEVICE__
-        void round( T tol = EPSILON1 );
+        void round( T tol = EPS<T> );
 
         /** @brief set all components to zero */
         __HOSTDEVICE__

@@ -112,21 +112,6 @@ Matrix3<T> Matrix3<T>::absolute() const
 
 
 // -----------------------------------------------------------------------------
-// Returns a matrix with positive components - specialized for floats
-template <>
-__HOSTDEVICE__
-Matrix3<float> Matrix3<float>::absolute() const
-{
-    return ( Matrix3<float>(
-        fabsf( m_comp[X][X] ), fabsf( m_comp[X][Y] ), fabsf( m_comp[X][Z] ),
-        fabsf( m_comp[Y][X] ), fabsf( m_comp[Y][Y] ), fabsf( m_comp[Y][Z] ),
-        fabsf( m_comp[Z][X] ), fabsf( m_comp[Z][Y] ), fabsf( m_comp[Z][Z] ) ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Returns the determinant of the matrix
 template <typename T>
 __HOSTDEVICE__
@@ -152,7 +137,8 @@ Matrix3<T> Matrix3<T>::inverse() const
                    m_comp[Y][Z] * m_comp[Z][X] - m_comp[Y][X] * m_comp[Z][Z],
                    m_comp[Y][X] * m_comp[Z][Y] - m_comp[Y][Y] * m_comp[Z][X] );
     T d = (*this)[X] * co;
-    // assert( !eqz( d ) ); EPSILON = 1.e-10
+    if ( fabs( d ) < HIGHEPS<T> )
+        printf( "Matrix is not inversible!\n" );
     T s = T( 1 ) / d;
     return ( Matrix3<T>( 
     co[X] * s,

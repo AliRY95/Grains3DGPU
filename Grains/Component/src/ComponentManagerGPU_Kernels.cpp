@@ -5,6 +5,8 @@
 #include "CollisionDetection.hh"
 #include "LinkedCell.hh"
 #include "LinkedCellGPUWrapper.hh"
+#include "ContactForceModelBuilderFactory.hh"
+#include "GrainsParameters.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -81,7 +83,7 @@ void sortComponentsAndFindCellStart( unsigned int const* componentCellHash,
 
 // -----------------------------------------------------------------------------
 // N-squared collision detection kernel using a thread-per-particle policy
-// TODO: CLEAN
+// TODO: REMOVE LATER
 template <typename T, typename U>
 __GLOBAL__ 
 void collisionDetectionN2( RigidBody<T, U> const* const* a,
@@ -107,7 +109,7 @@ void collisionDetectionN2( RigidBody<T, U> const* const* a,
 
 // -----------------------------------------------------------------------------
 // N-squared collision detection kernel with relative transformation
-// TODO: CLEAN
+// TODO: REMOVE LATER
 template <typename T, typename U>
 __GLOBAL__ 
 void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
@@ -158,6 +160,8 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
     unsigned int const cellHash = m_componentCellHash[ tid ];
     RigidBody<T, U> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
     Transform3<T> const& trA = tr3d[ compId ];
+    T massA = rbA.getMass();
+    unsigned int matA = rbA.getMaterial();
 
     for ( int k = -1; k < 2; k++ ) {
     for ( int j = -1; j < 2; j++ ) {
@@ -182,19 +186,28 @@ void collisionDetectionLinkedCell( LinkedCell<T> const* const* LC,
                                                           rbB,
                                                           trA, 
                                                           trB );
+            if ( ci.getOverlapDistance() < T( 0 ) )
+            {
+                unsigned int contactForceID = 0;
+                // ContactForceModelBuilderFactory<T>::computeHash( matA, 
+                //                                         rbB.getMaterial(),
+                //                                         GrainsParameters<T>::m_materialMap.size() );
+                CF[contactForceID]->computeForces( ci, 
+                                                    zeroVector3T,
+                                                    zeroVector3T,
+                                                    massA,
+                                                    rbB.getMass(),
+                                                    m_torce[ compId ] );
+            }
             result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
             // Vector3<T> relVelocityAtContact = 
             // m_kinematics[compId].getVelocityAtPoint( ci.getContactPoint() ) -
             // m_kinematics[secondaryId].getVelocityAtPoint( ci.getContactPoint() );
             // Vector3<T> relAngVelocity = 
-            (*CF)->computeForces( ci, 
-                                  zeroVector3T,
-                                  zeroVector3T,
-                                  rbA.getMass(),
-                                  rbB.getMass(),
-                                  m_torce[ compId ] );
         }
     } } }
+    // Adding the gravitational force to the torce
+    // m_torce[compId].addForce( massA * GrainsParameters<T>::m_gravity );
 }
 
 

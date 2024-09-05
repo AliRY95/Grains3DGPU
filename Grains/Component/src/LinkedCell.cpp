@@ -25,7 +25,7 @@ LinkedCell<T>::LinkedCell( Vector3<T> const& min,
 , m_maxCorner( max )
 , m_cellExtent( extent )
 {
-    Vector3<T> numCellsPerDir( EPSILON1, EPSILON1, EPSILON1 );
+    Vector3<T> numCellsPerDir( EPS<T>, EPS<T>, EPS<T> );
     numCellsPerDir += m_maxCorner - m_minCorner;
     numCellsPerDir /= m_cellExtent;
     // Not performant sensitive as it is called only once in the beggining.
@@ -71,23 +71,6 @@ uint3 LinkedCell<T>::computeCellId( Vector3<T> const& p ) const
     cellId.x = floor( ( p[X] - m_minCorner[X] ) / m_cellExtent );
     cellId.y = floor( ( p[Y] - m_minCorner[Y] ) / m_cellExtent );
     cellId.z = floor( ( p[Z] - m_minCorner[Z] ) / m_cellExtent );
-    return ( cellId );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Returns the 3d Id of the cell which the point belongs to - specialized for 
-// floats
-template <>
-__HOSTDEVICE__
-uint3 LinkedCell<float>::computeCellId( Vector3<float> const& p ) const
-{
-    uint3 cellId;
-    cellId.x = floorf( ( p[X] - m_minCorner[X] ) / m_cellExtent );
-    cellId.y = floorf( ( p[Y] - m_minCorner[Y] ) / m_cellExtent );
-    cellId.z = floorf( ( p[Z] - m_minCorner[Z] ) / m_cellExtent );
     return ( cellId );
 }
 

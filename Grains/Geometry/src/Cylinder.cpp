@@ -108,7 +108,7 @@ template <typename T>
 __HOSTDEVICE__
 T Cylinder<T>::computeVolume() const
 {
-    return ( T( 2 ) * m_halfHeight * T( PI ) * m_radius * m_radius );
+    return ( TWO_PI<T> * m_halfHeight * m_radius * m_radius );
 }
 
 
@@ -122,7 +122,7 @@ void Cylinder<T>::computeInertia( T (&inertia)[6],
                                   T (&inertia_1)[6] ) const
 {
     T r2 = m_radius * m_radius;
-    T c = T( .5 ) * T( PI ) * m_halfHeight * r2;
+    T c = T( .5 ) * PI<T> * m_halfHeight * r2;
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
     inertia[0] = inertia[5] = 
                     c * ( T( 4 ) * m_halfHeight * m_halfHeight / T( 3 ) + r2 );
@@ -142,19 +142,8 @@ template <typename T>
 __HOSTDEVICE__
 T Cylinder<T>::computeCircumscribedRadius() const
 {
+    
     return ( sqrt( m_radius * m_radius + m_halfHeight * m_halfHeight ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Returns the circumscribed radius of the cylinder - specialized for floats
-template <>
-__HOSTDEVICE__
-float Cylinder<float>::computeCircumscribedRadius() const
-{
-    return ( sqrtf( m_radius * m_radius + m_halfHeight * m_halfHeight ) );
 }
 
 
@@ -182,7 +171,7 @@ __HOSTDEVICE__
 Vector3<T> Cylinder<T>::support( Vector3<T> const& v ) const
 {
     T s = sqrt( v[X] * v[X] + v[Z] * v[Z] );
-    if ( s > EPSILON1 )
+    if ( s > EPS<T> )
     {
         T d = m_radius / s;
         return ( Vector3<T>( v[X] * d,
@@ -193,30 +182,6 @@ Vector3<T> Cylinder<T>::support( Vector3<T> const& v ) const
       return ( Vector3<T>( T( 0 ), 
                            v[Y] < T( 0 ) ? - m_halfHeight : m_halfHeight, 
                            T( 0 ) ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Cylinder support function, returns the support point P, i.e. the point on
-// the surface of the Cylinder that satisfies max(P.v) - specialized for floats
-template <>
-__HOSTDEVICE__
-Vector3<float> Cylinder<float>::support( Vector3<float> const& v ) const
-{
-    float s = sqrtf( v[X] * v[X] + v[Z] * v[Z] );
-    if ( s > EPSILON1 )
-    {
-        float d = m_radius / s;
-        return ( Vector3<float>( v[X] * d,
-                                 v[Y] < 0.f ? - m_halfHeight : m_halfHeight,
-                                 v[Z] * d ) );
-    }
-    else
-      return ( Vector3<float>( 0.f, 
-                               v[Y] < 0.f ? - m_halfHeight : m_halfHeight, 
-                               0.f ) );
 }
 
 
@@ -283,7 +248,7 @@ std::list<Vector3<T>> Cylinder<T>::writePoints_PARAVIEW(
 {
     list<Vector3<T>> ParaviewPoints;
     Vector3<T> pp, p;
-    T dtheta = T( 2 ) * T( PI ) / visuNodeNbOnPer;
+    T dtheta = TWO_PI<T> / visuNodeNbOnPer;
 
     // Lower disk rim
     p[Y] = - m_halfHeight;

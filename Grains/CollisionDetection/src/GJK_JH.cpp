@@ -78,7 +78,7 @@ static INLINE bool valid( unsigned int const s,
         {
             if ( s & bit )
             {
-                if ( det[s][i] <= EPSILON1 )
+                if ( det[s][i] <= EPS<T> )
                     return ( false );
             }
             else if ( det[s|bit][i] > T( 0 ) )
@@ -152,7 +152,7 @@ static INLINE bool proper( unsigned int const s,
                            T const det[16][4] )
 {
     for ( unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1 )
-        if ( ( s & bit ) && det[s][i] <= EPSILON1 )
+        if ( ( s & bit ) && det[s][i] <= EPS<T> )
             return ( false );
     return ( true );
 }
@@ -281,7 +281,7 @@ bool intersectGJK( Convex<T> const& a,
         w = a2w( a.support( ( -v ) * a2w.getBasis() ) ) -
             b2w( b.support(    v   * b2w.getBasis() ) );
         prod = v * w;
-        if( prod > T( 0 ) || fabs( prod ) < EPSILON2 )
+        if( prod > T( 0 ) || fabs( prod ) < HIGHEPS<T> )
             return ( false );
         if ( degenerate( all_bits, y, w ) )
             return ( false );      
@@ -327,7 +327,7 @@ bool intersectGJK( Convex<T> const& a,
         }
         w = a.support( -v ) - b2a( b.support( v * b2a.getBasis() ) );
         prod = v * w;
-        if( prod > T( 0 ) || fabs( prod ) < EPSILON2 )
+        if( prod > T( 0 ) || fabs( prod ) < HIGHEPS<T> )
             return ( false );
         if ( degenerate( all_bits, y, w ) )
             return ( false );      
@@ -372,7 +372,7 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
     T mu = 0;
     unsigned int num_iterations = 0;
 
-    while ( bits < 15 && dist > EPSILON2 && num_iterations < 1000 )
+    while ( bits < 15 && dist > HIGHEPS<T> && num_iterations < 1000 )
     {
         last = 0;
         last_bit = 1;
@@ -385,7 +385,7 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
         q[last] = b.support( v * b2w.getBasis() );
         w = a2w( p[last] ) - b2w( q[last] );
         set_max( mu, v * w / dist );
-        if ( dist - mu <= dist * EPSILON1 )
+        if ( dist - mu <= dist * EPS<T> )
             break;
         if ( degenerate( all_bits, y, w ) )
             break;
