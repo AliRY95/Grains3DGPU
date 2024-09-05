@@ -100,15 +100,22 @@ static INLINE int sgn( T x )
 
 
 // -----------------------------------------------------------------------------
-/** @brief Returns the beta function of 2 doubles using the gamma function. 
+/** @brief Returns the beta function of 2 real numbers using the gamma function,
+if compiling with NVCC, otherwise it is just a wrapper to the beta function
+implemented in std.
 The reason we implement this is that beta functions are not supported on device
 code.
-@param x the number */
+@param x the first real number
+@param y the second real number */
 template <typename T>
 __HOSTDEVICE__
 static INLINE T grainsBeta( T x, T y )
-{ 
+{
+#ifdef __CUDA_ARCH__
     return ( tgamma( x ) * tgamma( y ) / tgamma( x + y ) );
+#else
+    return ( std::beta( x, y ) );
+#endif
 }
 
 

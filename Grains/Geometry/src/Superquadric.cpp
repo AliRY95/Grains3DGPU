@@ -121,18 +121,9 @@ T Superquadric<T>::computeVolume() const
     T const eps1 = T( 2 ) / m_n1;
     T const eps2 = T( 2 ) / m_n2;
 
-    /* Rest of the computation needs the famous Beta function. the Beta function
-    implementation is not in the cuda math lib.
-    Hence, we use macro. */
-#ifdef __CUDA_ARCH__
-#define myBeta( a, b ) grainsBeta( a, b )
-#else
-#define myBeta( a, b ) std::beta( a, b )
-#endif
-
-    return ( C * eps1 * eps2 * myBeta( eps1, T( 0.5 ) * eps1 ) * 
-                               myBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) );
-#undef myBeta        
+    /* Refer to MiscMath.hh for info about grainsBeta( x, y ). */
+    return ( C * eps1 * eps2 * grainsBeta( eps1, T( 0.5 ) * eps1 ) * 
+                               grainsBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) );
 }
 
 
@@ -149,21 +140,12 @@ void Superquadric<T>::computeInertia( T (&inertia)[6],
     T const eps2 = T( 2 ) / m_n2;
     T const C = T( 0.4 ) * m_a * m_b * m_c * eps1 * eps2 ;
 
-    /* Rest of the computation needs the famous Beta function. the Beta function
-    implementation is not in the cuda math lib.
-    Hence, we use macro. */
-#ifdef __CUDA_ARCH__
-#define myBeta( a, b ) grainsBeta( a, b )
-#else
-#define myBeta( a, b ) std::beta( a, b )
-#endif
-
-    // Back to the actual computation
-    T const prod1 = myBeta( T( 1.5 ) * eps2, T( 0.5 ) * eps2 ) * 
-                    myBeta( T( 2 ) * eps1, T( 0.5 ) * eps1 );
+    /* Refer to MiscMath.hh for info about grainsBeta( x, y ). */
+    T const prod1 = grainsBeta( T( 1.5 ) * eps2, T( 0.5 ) * eps2 ) * 
+                    grainsBeta( T( 2 ) * eps1, T( 0.5 ) * eps1 );
     T const prod2 = m_c * m_c * 
-                    myBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) * 
-                    myBeta( T( 1.5 ) * eps1, eps1 );
+                    grainsBeta( T( 0.5 ) * eps2, T( 0.5 ) * eps2 ) * 
+                    grainsBeta( T( 1.5 ) * eps1, eps1 );
 
     inertia[1] = inertia[2] = inertia[4] = T( 0 );
     inertia[0] = C * ( m_b * m_b * prod1 + prod2 );
@@ -174,8 +156,6 @@ void Superquadric<T>::computeInertia( T (&inertia)[6],
     inertia_1[0] = T( 1 ) / inertia[0];
     inertia_1[3] = T( 1 ) / inertia[3];
     inertia_1[5] = T( 1 ) / inertia[5];
-    
-#undef myBeta 
 }
 
 
