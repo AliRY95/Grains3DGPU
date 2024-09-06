@@ -326,31 +326,17 @@ template <typename T>
 void ComponentManagerGPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
                                              RigidBody<T, T> const* const* RB )
 {
-    // for ( int pId = 0; pId < m_nParticles; pId++ )
-    // {
-    //     // Rigid body
-    //     RigidBody<T, T> const* rb = RB[ m_rigidBodyId[ pId ] ];
+    unsigned int numThreads = 256;
+    unsigned int numBlocks = ( m_nParticles + numThreads - 1 ) / numThreads;
 
-    //     // First, we compute quaternion of orientation
-    //     Quaternion<T> qRot( m_transform[ pId ].getBasis() );
-    //     // Next, we compute accelerations and reset torces
-    //     Kinematics<T> const& acceleration = rb->computeAcceleration( 
-    //                                                             m_torce[ pId ], 
-    //                                                             qRot );
-    //     m_torce[ pId ].reset();
-    //     // Finally, we move particles using the given time integration
-    //     Vector3<T> transMotion;
-    //     Quaternion<T> rotMotion;
-    //     (*TI)->Move( acceleration, 
-    //                  m_velocity[ pId ],
-    //                  transMotion, 
-    //                  rotMotion );
-    //     // and update the transformation of the component
-    //     m_transform[ pId ].updateTransform( transMotion, rotMotion );
-    //     // TODO
-    //     // qRot = qRotChange * qRot;
-    //     // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
-    // }
+    moveComponents_kernel<<< numBlocks, numThreads >>> (
+                                        RB,
+                                        TI,
+                                        m_rigidBodyId,
+                                        m_transform,
+                                        m_velocity,
+                                        m_torce,
+                                        m_nParticles );
 }
 
 

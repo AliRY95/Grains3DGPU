@@ -43,7 +43,6 @@ template <typename T>
 void GrainsGPU<T>::simulate()
 {
     unsigned int N = GrainsParameters<T>::m_numComponents;
-    cout << GrainsParameters<T>::m_numComponents << " " << GrainsParameters<T>::m_numCells << endl;
     int* h_collision = new int[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )
@@ -58,25 +57,51 @@ void GrainsGPU<T>::simulate()
                               cudaMemcpyHostToDevice ) );
 
     // Collision detection on host
+     // Collision detection on host
     auto h_start = chrono::high_resolution_clock::now();
-    // ComponentManagerCPU<T>* mmm = static_cast<ComponentManagerCPU<T>*>(Grains<T>::m_components);
-    // std::vector<Transform3<T>> tr = mmm->getTransform();
-    // cout << tr[0].getOrigin() << endl;
-    Grains<T>::m_components->detectCollisionAndComputeForces( 
-                                                Grains<T>::m_linkedCell, 
-                                                Grains<T>::m_rigidBodyList,
-                                                Grains<T>::m_contactForce,
-                                                h_collision );
+    for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
+          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
+    {
+        Grains<T>::m_components->detectCollisionAndComputeForces( 
+                                                  Grains<T>::m_linkedCell, 
+                                                  Grains<T>::m_rigidBodyList,
+                                                  Grains<T>::m_contactForce,
+                                                  h_collision ); 
+        Grains<T>::m_components->moveComponents( Grains<T>::m_timeIntegrator,
+                                                 Grains<T>::m_rigidBodyList );
+    }
     auto h_end = chrono::high_resolution_clock::now();
+    std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
+    std::vector<Transform3<T>> h_tr = Grains<T>::m_components->getTransform();
+    std::cout << "Positions are: "
+                << h_tr[0].getOrigin() 
+                // << ", and "
+                // << h_tr[1].getOrigin() 
+                << endl;
     // Collision detection on device
     auto d_start = chrono::high_resolution_clock::now();
-    Grains<T>::m_d_components->detectCollisionAndComputeForces( 
+    for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
+          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
+    {
+        Grains<T>::m_d_components->detectCollisionAndComputeForces( 
                                                 Grains<T>::m_d_linkedCell, 
                                                 Grains<T>::m_d_rigidBodyList,
                                                 Grains<T>::m_d_contactForce,
                                                 d_collision );
+        Grains<T>::m_d_components->moveComponents( Grains<T>::m_d_timeIntegrator,
+                                                   Grains<T>::m_d_rigidBodyList );
+    }
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();
+    std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
+    std::vector<Transform3<T>> d_tr = Grains<T>::m_d_components->getTransform();
+    std::cout << "Positions are: "
+                << d_tr[0].getOrigin() 
+                // << ", and "
+                // << d_tr[1].getOrigin() 
+                << endl;
 
 
 

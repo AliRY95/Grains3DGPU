@@ -92,7 +92,7 @@ void detectCollisionAndComputeForces_kernel(
                                    RigidBody<T, U> const* const* RB,
                                    ContactForceModel<T> const* const* CF,
                                    unsigned int* m_rigidBodyId,
-                                   Transform3<T> const* tr3d,
+                                   Transform3<T> const* m_transform,
                                    Torce<T>* m_torce,
                                    int* m_compId,
                                    unsigned int* m_componentCellHash,
@@ -109,7 +109,7 @@ void detectCollisionAndComputeForces_kernel(
     unsigned int const compId = m_compId[ tid ];
     unsigned int const cellHash = m_componentCellHash[ tid ];
     RigidBody<T, U> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
-    Transform3<T> const& trA = tr3d[ compId ];
+    Transform3<T> const& trA = m_transform[ compId ];
     T massA = rbA.getMass();
     unsigned int matA = rbA.getMaterial();
 
@@ -127,7 +127,7 @@ void detectCollisionAndComputeForces_kernel(
             if ( secondaryId == compId )
                 continue;
             RigidBody<T, U> const& rbB = *( RB[ m_rigidBodyId[ secondaryId ] ] );
-            Transform3<T> const& trB = tr3d[ secondaryId ];
+            Transform3<T> const& trB = m_transform[ secondaryId ];
             // result[compId] += intersectRigidBodies( rigidBodyA,
             //                                      rigidBodyA,
             //                                      transformA, 
@@ -164,6 +164,51 @@ void detectCollisionAndComputeForces_kernel(
 
 
 // -----------------------------------------------------------------------------
+// LinkedCell collision detection kernel 
+// TODO: CLEAN -- A LOT OF THINGS
+template <typename T, typename U>
+__GLOBAL__ 
+void moveComponents_kernel( RigidBody<T, U> const* const* RB,
+                            TimeIntegrator<T> const* const* TI,
+                            unsigned int* m_rigidBodyId,
+                            Transform3<T>* m_transform,
+                            Kinematics<T>* m_velocity,
+                            Torce<T>* m_torce,
+                            int numComponents )
+{
+    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if ( tid >= numComponents )
+        return;
+    
+    // Rigid body
+    RigidBody<T, U> const* rb = RB[ m_rigidBodyId[ tid ] ];
+
+    // First, we compute quaternion of orientation
+    Quaternion<T> qRot( m_transform[ tid ].getBasis() );
+    // Next, we compute accelerations and reset torces
+    Kinematics<T> const& acceleration = rb->computeAcceleration( 
+                                                            m_torce[ tid ], 
+                                                            qRot );
+    m_torce[ tid ].reset();
+    // Finally, we move particles using the given time integration
+    Vector3<T> transMotion;
+    Quaternion<T> rotMotion;
+    (*TI)->Move( acceleration, 
+                 m_velocity[ tid ],
+                 transMotion, 
+                 rotMotion );
+    // and update the transformation of the component
+    m_transform[ tid ].updateTransform( transMotion, rotMotion );
+    // TODO
+    // qRot = qRotChange * qRot;
+    // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 #define X( T, U )                                                              \
 template                                                                       \
@@ -173,14 +218,24 @@ void detectCollisionAndComputeForces_kernel(                                   \
                                    RigidBody<T, U> const* const* RB,           \
                                    ContactForceModel<T> const* const* CF,      \
                                    unsigned int* m_rigidBodyId,                \
-                                   Transform3<T> const* tr3d,                  \
+                                   Transform3<T> const* m_transform,           \
                                    Torce<T>* m_torce,                          \
                                    int* m_compId,                              \
                                    unsigned int* m_componentCellHash,          \
                                    unsigned int* m_cellHashStart,              \
                                    unsigned int* m_cellHashEnd,                \
                                    int numComponents,                          \
-                                   int* result );                              
+                                   int* result );                              \
+                                                                               \
+template                                                                       \
+__GLOBAL__                                                                     \
+void moveComponents_kernel( RigidBody<T, U> const* const* RB,                  \
+                            TimeIntegrator<T> const* const* TI,                \
+                            unsigned int* m_rigidBodyId,                       \
+                            Transform3<T>* m_transform,                        \
+                            Kinematics<T>* m_velocity,                         \
+                            Torce<T>* m_torce,                                 \
+                            int numComponents );    
 X( float, float )
 X( double, float )
 X( double, double )
