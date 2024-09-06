@@ -56,13 +56,6 @@ void GrainsCPU<T>::simulate()
           GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
-        std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
-        std::vector<Transform3<T>> tr = Grains<T>::m_components->getTransform();
-        std::cout << "Positions are: "
-                  << tr[0].getOrigin() 
-                  << ", and "
-                  << tr[1].getOrigin() 
-                  << endl;
         Grains<T>::m_components->detectCollisionAndComputeForces( 
                                                   Grains<T>::m_linkedCell, 
                                                   Grains<T>::m_rigidBodyList,
@@ -70,12 +63,15 @@ void GrainsCPU<T>::simulate()
                                                   h_collision ); 
         Grains<T>::m_components->moveComponents( Grains<T>::m_timeIntegrator,
                                                  Grains<T>::m_rigidBodyList );
-
-
-
     }
     auto h_end = chrono::high_resolution_clock::now();
-
+    std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
+    std::vector<Transform3<T>> tr = Grains<T>::m_components->getTransform();
+    std::cout << "Positions are: "
+                << tr[0].getOrigin() 
+                // << ", and "
+                // << tr[1].getOrigin() 
+                << endl;
 
 
 

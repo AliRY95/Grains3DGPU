@@ -7,19 +7,19 @@
 	<BoundingVolume Type="OBB"/>
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="4.85857864376" dt="1.e-5"/>
+		<TimeInterval Start="0." End="0.1" dt="1.e-5"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 	
 	<ContactForceModels>
 		<ContactForceModel>
-			<Material materialA="matP" materialB="matP"/>
+			<Material materialA="matP" materialB="matP"/>			
 			<HODC>
-				<stiff>1.2e+08</stiff>
-				<en>0.85</en>
+				<stiff>0.0</stiff>
+				<en>1.0</en>
 				<ks>0</ks>
-				<mut>1e+06</mut>
-				<muc>0.5</muc>
+				<mut>0</mut>
+				<muc>0</muc>
 				<kms>0</kms>
 			</HODC>
 		</ContactForceModel>
@@ -27,7 +27,7 @@
 
 
 	<Particles>
-		<Particle Number="20000" Density="1163.66" Material="matP">
+		<Particle Number="1000" Density="1163.66" Material="matP">
 			<AngularPosition Type="Identity"></AngularPosition>
 				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
 				<!-- <Sphere Radius="0.01"/> -->
@@ -301,12 +301,10 @@
 </Construction>
 
 <Forces>
-	<Gravity GX="0.0" GY="0.0" GZ="-9.81"/>
+	<Gravity GX="0.0" GY="0.0" GZ="0.0"/>
 </Forces>
 
 <Simulation>
-	<TimeInterval Start="0." End="1.5"/>
-	<TimeStep dt="3e-06"/>
 	<RestartFile Name="Grains/Init/insert" WritingMode="Hybrid"/>
 	<TimeSave Start="0." End="1.5" Every="0.006"/>
 	<CollisionalRelativeVelocity value="1.5"/>

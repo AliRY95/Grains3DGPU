@@ -8,6 +8,7 @@
 #include "RigidBody.hh"
 #include "LinkedCell.hh"
 #include "ContactForceModel.hh"
+#include "TimeIntegrator.hh"
 
 
 // =============================================================================
@@ -37,9 +38,9 @@ void sortComponentsAndFindCellStart_kernel(
                                         unsigned int* cellStart,
                                         unsigned int* cellEnd );
 
-/** @brief Returns the collisions for all given components using LinkedCell and
-a thread-per-particle policy
-@param fix later */
+/** @brief Computes the collision forces for all given components using 
+LinkedCell and a thread-per-particle policy
+@param TODO */
 template <typename T, typename U>
 __GLOBAL__ 
 void detectCollisionAndComputeForces_kernel( 
@@ -47,7 +48,7 @@ void detectCollisionAndComputeForces_kernel(
                                         RigidBody<T, U> const* const* RB,
                                         ContactForceModel<T> const* const* CF,
                                         unsigned int* m_rigidBodyId,
-                                        Transform3<T> const* tr3d,
+                                        Transform3<T> const* m_transform,
                                         Torce<T>* m_torce,
                                         int* m_compId,
                                         unsigned int* m_componentCellHash,
@@ -55,6 +56,18 @@ void detectCollisionAndComputeForces_kernel(
                                         unsigned int* m_cellHashEnd,
                                         int numComponents,
                                         int* result );
+
+/** @brief Updates components transformation and velocities
+@param TODO */
+template <typename T, typename U>
+__GLOBAL__ 
+void moveComponents_kernel( RigidBody<T, U> const* const* RB,
+                            TimeIntegrator<T> const* const* TI,
+                            unsigned int* m_rigidBodyId,
+                            Transform3<T>* m_transform,
+                            Kinematics<T>* m_velocity,
+                            Torce<T>* m_torce,
+                            int numComponents );
 //@}
 
 
