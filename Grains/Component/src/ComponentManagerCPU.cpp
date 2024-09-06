@@ -4,12 +4,11 @@
 #include <omp.h>
 
 #include "ComponentManagerCPU.hh"
-#include "ComponentManager.hh"
-#include "GrainsParameters.hh"
-#include "CollisionDetection.hh"
 #include "Quaternion.hh"
 #include "VectorMath.hh"
 #include "QuaternionMath.hh"
+
+#include "GrainsParameters.hh"
 
 
 /* ========================================================================== */

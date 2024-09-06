@@ -96,28 +96,28 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @name Get methods */
         //@{
         /** @brief Gets the number of particles in manager */
-        unsigned int getNumberOfParticles() const;
+        unsigned int getNumberOfParticles() const final;
 
         /** @brief Gets the number of obstacles in manager */
-        unsigned int getNumberOfObstacles() const;
+        unsigned int getNumberOfObstacles() const final;
 
         /** @brief Gets the number of cells in manager */
-        unsigned int getNumberOfCells() const;
+        unsigned int getNumberOfCells() const final;
 
         /** @brief Gets components rigid body Id */
-        std::vector<unsigned int> getRigidBodyId() const;
+        std::vector<unsigned int> getRigidBodyId() const final;
 
         /** @brief Gets components transformation */
-        std::vector<Transform3<T>> getTransform() const;
+        std::vector<Transform3<T>> getTransform() const final;
 
         /** @brief Gets components velocities */
-        std::vector<Kinematics<T>> getVelocity() const;
+        std::vector<Kinematics<T>> getVelocity() const final;
 
         /** @brief Gets components torce */
-        std::vector<Torce<T>> getTorce() const;
+        std::vector<Torce<T>> getTorce() const final;
 
         /** @brief Gets the array of component Ids */
-        std::vector<int> getComponentId() const;
+        std::vector<int> getComponentId() const final;
 
         // /** @brief Gets the array of components neighbor Id */
         // std::vector<unsigned int> getNeighborsId() const;
@@ -130,19 +130,19 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @name Set methods */
         //@{
         /** @brief Sets the array of components rigid body Id */
-        void setRigidBodyId( std::vector<unsigned int> const& id );
+        void setRigidBodyId( std::vector<unsigned int> const& id ) final;
 
         /** @brief Sets components transformation */
-        void setTransform( std::vector<Transform3<T>> const& t );
+        void setTransform( std::vector<Transform3<T>> const& t ) final;
 
         /** @brief Sets components velocities */
-        void setVelocity( std::vector<Kinematics<T>> const& v );
+        void setVelocity( std::vector<Kinematics<T>> const& v ) final;
 
         /** @brief Sets components torce */
-        void setTorce( std::vector<Torce<T>> const& t );
+        void setTorce( std::vector<Torce<T>> const& t ) final;
 
         /** @brief Sets the array of component Ids */
-        void setComponentId( std::vector<int> const& id );
+        void setComponentId( std::vector<int> const& id ) final;
 
         // /** @brief Sets the array of components neighbor Id */
         // void setNeighborsId( std::vector<unsigned int> const& id );
