@@ -201,7 +201,12 @@ void Grains<T>::Construction( DOMElement* rootElement )
                                                0,
                                                GrainsParameters<T>::m_numCells );
     if ( GrainsParameters<T>::m_isGPU )
-        m_d_components = new ComponentManagerGPU<T>( *m_components );
+    {
+        m_d_components = new ComponentManagerGPU<T>( GrainsParameters<T>::m_numComponents,
+                                                     0,
+                                                     GrainsParameters<T>::m_numCells );
+        m_d_components->copyFromHost( m_components );
+    }
 
     
 
@@ -214,9 +219,9 @@ void Grains<T>::Construction( DOMElement* rootElement )
         cout << shiftString6 
              << "Reading the contact force model ..." 
              << endl;
-        unsigned int numContactPairs = 
-            GrainsParameters<T>::m_materialMap.size() * 
-            ( GrainsParameters<T>::m_materialMap.size() - 1 ) / 2;
+        unsigned int numContactPairs = 1;
+            // GrainsParameters<T>::m_materialMap.size() * 
+            // ( GrainsParameters<T>::m_materialMap.size() - 1 ) / 2;
         m_contactForce = ContactForceModelBuilderFactory<T>::create( rootElement );
         if ( GrainsParameters<T>::m_isGPU )
         {

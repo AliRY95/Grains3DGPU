@@ -160,20 +160,22 @@ class ComponentManagerCPU : public ComponentManager<T>
         // /** @brief Creates a neighbor list */
         // void createNeighborList();
 
-        /** @brief updates links between components and linked cell */
+        /** @brief Updates links between components and linked cell */
         // template <typename U>
-        void updateLinks( LinkedCell<T> const* const* LC );
+        void updateLinks( LinkedCell<T> const* const* LC ) final;
         
-        /** @brief Detects collision between components */
+        /** @brief Detects collision between components and computes forces */
         // template <typename U>
-        void detectCollision( LinkedCell<T> const* const* LC,
-                              RigidBody<T, T> const* const* RB,
-                              ContactForceModel<T> const* const* CF,
-                              int* result );
+        // TODO: @param
+        void detectCollisionAndComputeForces( 
+                                        LinkedCell<T> const* const* LC,
+                                        RigidBody<T, T> const* const* RB,
+                                        ContactForceModel<T> const* const* CF,
+                                        int* result ) final;
 
-        /** @brief Updates the position and velocities of particles */
-        void moveParticles( TimeIntegrator<T> const* const* TI,
-                            RigidBody<T, T> const* const* RB );
+        /** @brief Updates the position and velocities of components */
+        void moveComponents( TimeIntegrator<T> const* const* TI,
+                             RigidBody<T, T> const* const* RB ) final;
         //@}
 };
 

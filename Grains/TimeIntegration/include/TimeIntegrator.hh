@@ -75,7 +75,7 @@ class TimeIntegrator
 		__HOSTDEVICE__
 		Quaternion<T> computeQuaternionChange( Vector3<T> const& v ) const;
 
-		/** @brief Computes the new velocity and position at time t+dt
+		/** @brief Computes the new velocity and transformation change over dt
 		@param acceleration acceleration
 		@param velocity velocity 
 		@param transMotion translational motion over dt

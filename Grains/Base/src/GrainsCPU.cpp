@@ -63,12 +63,13 @@ void GrainsCPU<T>::simulate()
                   << ", and "
                   << tr[1].getOrigin() 
                   << endl;
-        Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
+        Grains<T>::m_components->detectCollisionAndComputeForces( 
+                                                  Grains<T>::m_linkedCell, 
                                                   Grains<T>::m_rigidBodyList,
                                                   Grains<T>::m_contactForce,
                                                   h_collision ); 
-        Grains<T>::m_components->moveParticles( Grains<T>::m_timeIntegrator,
-                                                Grains<T>::m_rigidBodyList );
+        Grains<T>::m_components->moveComponents( Grains<T>::m_timeIntegrator,
+                                                 Grains<T>::m_rigidBodyList );
 
 
 

@@ -58,9 +58,8 @@ ComponentManagerCPU<T>::ComponentManagerCPU()
 
 
 // -----------------------------------------------------------------------------
-// Constructor with the number of particles, randomly positioned in the 
-// computational domain
-// TODO: Cases with multiple RigidBodies
+// Constructor with the number of particles, number of obstacles, and number of
+// cells with all other data members at zero.
 template <typename T>
 ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
                                              unsigned int nObstacles,
@@ -96,9 +95,8 @@ ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
 
 
 // -----------------------------------------------------------------------------
-// Constructor with the number of particles, randomly positioned in the 
-// computational domain
-// TODO: Cases with multiple RigidBodies
+// Constructor with the number of each rigid body, number of obstacles, and 
+// number of cells. Components are randomly positioned.
 template <typename T>
 ComponentManagerCPU<T>::ComponentManagerCPU( 
                                     std::vector<unsigned int> numEachRigidBody,
@@ -116,7 +114,7 @@ ComponentManagerCPU<T>::ComponentManagerCPU(
                                         GrainsParameters<T>::m_dimension[Y] );
     std::uniform_real_distribution<T> locationZ( T( 0 ), 
                                         GrainsParameters<T>::m_dimension[Z] );
-    std::uniform_real_distribution<T> angle( T( 0 ), T( 2 * M_PI ) );
+    std::uniform_real_distribution<T> angle( T( 0 ), TWO_PI<T> );
 
     // Initialzing the vectors for particles
     unsigned int rb_counter = 0;
@@ -293,7 +291,7 @@ void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& t )
 
 
 // -----------------------------------------------------------------------------
-// Sets the array of components neighbor Id
+// Sets components velocity
 template <typename T>
 void ComponentManagerCPU<T>::setVelocity( std::vector<Kinematics<T>> const& v )
 {
@@ -304,7 +302,7 @@ void ComponentManagerCPU<T>::setVelocity( std::vector<Kinematics<T>> const& v )
 
 
 // -----------------------------------------------------------------------------
-// Sets the array of components cell hash
+// Sets components torce
 template <typename T>
 void ComponentManagerCPU<T>::setTorce( std::vector<Torce<T>> const& t )
 {
@@ -326,7 +324,7 @@ void ComponentManagerCPU<T>::setComponentId( std::vector<int> const& id )
 
 
 // -----------------------------------------------------------------------------
-// Updates linked cell information in manager
+// Updates links between components and linked cell
 template <typename T>
 void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 {
@@ -365,10 +363,11 @@ void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 // -----------------------------------------------------------------------------
 // Detects collision between particles
 template <typename T>
-void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T, T> const* const* RB,
-                                              ContactForceModel<T> const* const* CF,
-                                              int* result )
+void ComponentManagerCPU<T>::detectCollisionAndComputeForces( 
+                                        LinkedCell<T> const* const* LC,
+                                        RigidBody<T, T> const* const* RB,
+                                        ContactForceModel<T> const* const* CF,
+                                        int* result )
 {
     // updating links between components and linked cell
     updateLinks( LC );
@@ -433,10 +432,10 @@ void ComponentManagerCPU<T>::detectCollision( LinkedCell<T> const* const* LC,
 
 
 // -----------------------------------------------------------------------------
-// Moves particles in the simulation
+// Moves components in the simulation
 template <typename T>
-void ComponentManagerCPU<T>::moveParticles( TimeIntegrator<T> const* const* TI,
-                                            RigidBody<T, T> const* const* RB )
+void ComponentManagerCPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
+                                             RigidBody<T, T> const* const* RB )
 {
     // #pragma omp parallel for
     for ( int pId = 0; pId < m_nParticles; pId++ )
@@ -452,17 +451,17 @@ void ComponentManagerCPU<T>::moveParticles( TimeIntegrator<T> const* const* TI,
                                                                 qRot );
         m_torce[ pId ].reset();
         // Finally, we move particles using the given time integration
-        Vector3<T> transMove;
+        Vector3<T> transMotion;
         Quaternion<T> rotMotion;
         (*TI)->Move( acceleration, 
                      m_velocity[ pId ],
-                     transMove, 
+                     transMotion, 
                      rotMotion );
-        
-        // qRot = qRotChange * qRot;
+        // and update the transformation of the component
+        m_transform[ pId ].updateTransform( transMotion, rotMotion );
         // TODO
+        // qRot = qRotChange * qRot;
         // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
-        m_transform[ pId ].updateTransform( transMove, rotMotion );
     }
 }
 

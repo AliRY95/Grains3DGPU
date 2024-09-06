@@ -58,7 +58,7 @@ TimeIntegrator<T>* FirstOrderExplicit<T>::clone() const
 
 
 // -----------------------------------------------------------------------------
-// Computes the new velocity and position at time t+dt
+// Computes the new velocity and transformation change over dt
 template <typename T>
 __HOSTDEVICE__
 void FirstOrderExplicit<T>::Move( Kinematics<T> const& acceleration,
