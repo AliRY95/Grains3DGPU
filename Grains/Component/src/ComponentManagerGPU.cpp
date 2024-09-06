@@ -5,10 +5,8 @@
 #include "thrust/iterator/zip_iterator.h"
 #include "thrust/sort.h"
 
-// #include "ComponentManager.hh"
 #include "ComponentManagerGPU.hh"
 #include "ComponentManagerGPU_Kernels.hh"
-#include "GrainsParameters.hh"
 #include "LinkedCellGPUWrapper.hh"
 
 
@@ -244,22 +242,6 @@ void ComponentManagerGPU<T>::setComponentId( std::vector<int> const& id )
                               id.data(),
                               m_nParticles * sizeof( unsigned int ), 
                               cudaMemcpyHostToDevice ) );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Copies data from a host side object
-template <typename T>
-void ComponentManagerGPU<T>::copyFromHost( ComponentManagerCPU<T> const* cm )
-{
-    // Copying the arrays from host to device
-    setRigidBodyId( cm->getRigidBodyId() );
-    setTransform( cm->getTransform() );
-    setVelocity( cm->getVelocity() );
-    setTorce( cm->getTorce() );
-    setComponentId( cm->getComponentId() );
 }
 
 

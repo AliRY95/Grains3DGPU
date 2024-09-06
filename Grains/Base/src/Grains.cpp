@@ -205,7 +205,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
         m_d_components = new ComponentManagerGPU<T>( GrainsParameters<T>::m_numComponents,
                                                      0,
                                                      GrainsParameters<T>::m_numCells );
-        m_d_components->copyFromHost( m_components );
+        m_d_components->copy( m_components );
     }
 
     

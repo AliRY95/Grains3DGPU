@@ -39,11 +39,11 @@ class Grains
         /** \brief Manager of the components in the simulation on the host mem. 
         We use a pointer here as we want to use runtime polymorphism for
         switching between ComponentManagerCPU and ComponentManagerGPU. */
-        ComponentManagerCPU<T>* m_components;
+        ComponentManager<T>* m_components;
         /** \brief Manager of the components in the simulation on the device 
         memory. We use a pointer here as we want to use runtime polymorphism for
         switching between ComponentManagerCPU and ComponentManagerGPU. */
-        ComponentManagerGPU<T>* m_d_components;
+        ComponentManager<T>* m_d_components;
         /** \brief Linked cell for broad-phase. We use a pointer because
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
