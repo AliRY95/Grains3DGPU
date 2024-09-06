@@ -1,4 +1,4 @@
-#include <curand.h>
+// #include <curand.h>
 #include <cooperative_groups.h>
 #include "thrust/device_ptr.h"
 #include "thrust/for_each.h"
@@ -10,91 +10,37 @@
 #include "ComponentManagerGPU_Kernels.hh"
 #include "GrainsParameters.hh"
 #include "LinkedCellGPUWrapper.hh"
-#include "LinkedCell.hh"
-
-
-#define numComponents (GrainsParameters<T>::m_numComponents)
-#define numCells (GrainsParameters<T>::m_numCells)
-// -----------------------------------------------------------------------------
-// Constructor with the number of particles randomly positioned in the 
-// computational domain
-// TODO: Use curand to generate random arrays on device
-template <typename T>
-ComponentManagerGPU<T>::ComponentManagerGPU()
-{
-    // Allocating memory on host
-    cudaErrCheck( cudaMalloc( (void**)&m_rigidBodyId,
-                              numComponents * sizeof( unsigned int ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_transform,
-                              numComponents * sizeof( Transform3<T> ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_kinematics,
-                              numComponents * sizeof( Kinematics<T> ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_torce,
-                              numComponents * sizeof( Torce<T> ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_componentId,
-                              numComponents * sizeof( int ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_componentCellHash,
-                              numComponents * sizeof( unsigned int ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_cellHashStart,
-                              ( numCells + 1 ) * sizeof( unsigned int ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_cellHashEnd,
-                              ( numCells + 1 ) * sizeof( unsigned int ) ) );
-    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
-    //                           numComponents * numComponents * sizeof( unsigned int ) ) );
-    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsCount,
-    //                           numComponents * sizeof( unsigned int ) ) );
-
-        // // Randomize array on host
-        // for( int i = 0; i < numComponents; i++ )
-        // {
-        //     double aX = angle( generator );
-        //     double aY = angle( generator );
-        //     double aZ = angle( generator );
-        //     tr[i].setBasis( aX, aY, aZ );
-        //     tr[i].setOrigin( Vec3d( location( generator ),
-        //                             location( generator ),
-        //                             location( generator ) ) );
-        // }
-}
-
-
 
 
 // -----------------------------------------------------------------------------
-// Constructor with the number of particles randomly positioned in the 
-// computational domain
+// Constructor with the number of particles, number of obstacles, and number of
+// cells. We only allocate memory in the constructor. Filling out the data
+// members must be done separately.
 template <typename T>
-ComponentManagerGPU<T>::ComponentManagerGPU( ComponentManagerCPU<T> const& cm )
+ComponentManagerGPU<T>::ComponentManagerGPU( unsigned int nParticles,
+                                             unsigned int nObstacles,
+                                             unsigned int nCells )
+: m_nParticles( nParticles )
+, m_nObstacles( nObstacles )
+, m_nCells( nCells )
 {
     // Allocating memory on host
     cudaErrCheck( cudaMalloc( (void**)&m_rigidBodyId,
-                              numComponents * sizeof( unsigned int ) ) );
+                              m_nParticles * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_transform,
-                              numComponents * sizeof( Transform3<T> ) ) );
-    cudaErrCheck( cudaMalloc( (void**)&m_kinematics,
-                              numComponents * sizeof( Kinematics<T> ) ) );
+                              m_nParticles * sizeof( Transform3<T> ) ) );
+    cudaErrCheck( cudaMalloc( (void**)&m_velocity,
+                              m_nParticles * sizeof( Kinematics<T> ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_torce,
-                              numComponents * sizeof( Torce<T> ) ) );
+                              m_nParticles * sizeof( Torce<T> ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_componentId,
-                              numComponents * sizeof( int ) ) );
+                              m_nParticles * sizeof( int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_componentCellHash,
-                              numComponents * sizeof( unsigned int ) ) );
+                              m_nParticles * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_cellHashStart,
-                              ( numCells + 1 ) * sizeof( unsigned int ) ) );
+                              ( m_nCells + 1 ) * sizeof( unsigned int ) ) );
     cudaErrCheck( cudaMalloc( (void**)&m_cellHashEnd,
-                              ( numCells + 1 ) * sizeof( unsigned int ) ) );
-    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsId,
-    //                           numComponents * numComponents * sizeof( unsigned int ) ) );
-    // cudaErrCheck( cudaMalloc( (void**)&m_neighborsCount,
-    //                           numComponents * sizeof( unsigned int ) ) );
-
-
-    // Copying the arrays from host to device
-    setRigidBodyId( cm.getRigidBodyId().data() );
-    setTransform( cm.getTransform().data() );
-    setComponentId( cm.getComponentId().data() );
-    // setNeighborsId( cm.getNeighborsId().data() );
-    // setNeighborsCount( cm.getNeighborsCount().data() );
+                              ( m_nCells + 1 ) * sizeof( unsigned int ) ) );
 }
 
 
@@ -107,7 +53,7 @@ ComponentManagerGPU<T>::~ComponentManagerGPU()
 {
     cudaFree( m_rigidBodyId );
     cudaFree( m_transform );
-    cudaFree( m_kinematics );
+    cudaFree( m_velocity );
     cudaFree( m_torce );
     cudaFree( m_componentId );
     cudaFree( m_componentCellHash );
@@ -121,14 +67,47 @@ ComponentManagerGPU<T>::~ComponentManagerGPU()
 
 
 // -----------------------------------------------------------------------------
+// Gets the number of particles in manager
+template <typename T>
+unsigned int ComponentManagerGPU<T>::getNumberOfParticles() const
+{
+    return( m_nParticles );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets the number of obstacles in manager
+template <typename T>
+unsigned int ComponentManagerGPU<T>::getNumberOfObstacles() const
+{
+    return( m_nObstacles );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets the number of cells in manager
+template <typename T>
+unsigned int ComponentManagerGPU<T>::getNumberOfCells() const
+{
+    return( m_nCells );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Gets the array of components rigid body Id
 template <typename T>
-unsigned int* ComponentManagerGPU<T>::getRigidBodyId() const
+std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyId() const
 {
-    unsigned int* h_rigidBodyId = new unsigned int[numComponents];
-    cudaErrCheck( cudaMemcpy( h_rigidBodyId,
+    std::vector<unsigned int> h_rigidBodyId( m_nParticles );
+    cudaErrCheck( cudaMemcpy( h_rigidBodyId.data(),
                               m_rigidBodyId,
-                              numComponents * sizeof( unsigned int ), 
+                              m_nParticles * sizeof( unsigned int ), 
                               cudaMemcpyDeviceToHost ) );
     return( h_rigidBodyId );
 }
@@ -139,12 +118,12 @@ unsigned int* ComponentManagerGPU<T>::getRigidBodyId() const
 // -----------------------------------------------------------------------------
 // Gets components transformation
 template <typename T>
-Transform3<T>* ComponentManagerGPU<T>::getTransform() const
+std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransform() const
 {
-    Transform3<T>* h_transform = new Transform3<T>[numComponents];
-    cudaErrCheck( cudaMemcpy( h_transform,
+    std::vector<Transform3<T>> h_transform( m_nParticles );
+    cudaErrCheck( cudaMemcpy( h_transform.data(),
                               m_transform,
-                              numComponents * sizeof( Transform3<T> ), 
+                              m_nParticles * sizeof( Transform3<T> ), 
                               cudaMemcpyDeviceToHost ) );
     return( h_transform );
 }
@@ -153,14 +132,46 @@ Transform3<T>* ComponentManagerGPU<T>::getTransform() const
 
 
 // -----------------------------------------------------------------------------
+// Gets components velocities
+template <typename T>
+std::vector<Kinematics<T>> ComponentManagerGPU<T>::getVelocity() const
+{
+    std::vector<Kinematics<T>> h_velocity( m_nParticles );
+    cudaErrCheck( cudaMemcpy( h_velocity.data(),
+                              m_velocity,
+                              m_nParticles * sizeof( Kinematics<T> ), 
+                              cudaMemcpyDeviceToHost ) );
+    return( h_velocity );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets components torce
+template <typename T>
+std::vector<Torce<T>> ComponentManagerGPU<T>::getTorce() const
+{
+    std::vector<Torce<T>> h_torce( m_nParticles );
+    cudaErrCheck( cudaMemcpy( h_torce.data(),
+                              m_torce,
+                              m_nParticles * sizeof( Torce<T> ), 
+                              cudaMemcpyDeviceToHost ) );
+    return( h_torce );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Gets the array of component Ids
 template <typename T>
-int* ComponentManagerGPU<T>::getComponentId() const
+std::vector<int> ComponentManagerGPU<T>::getComponentId() const
 {
-    int* h_componentId = new int[numComponents];
-    cudaErrCheck( cudaMemcpy( h_componentId,
+    std::vector<int> h_componentId( m_nParticles );
+    cudaErrCheck( cudaMemcpy( h_componentId.data(),
                               m_componentId,
-                              numComponents * sizeof( int ), 
+                              m_nParticles * sizeof( int ), 
                               cudaMemcpyDeviceToHost ) );
     return( h_componentId );
 }
@@ -169,29 +180,13 @@ int* ComponentManagerGPU<T>::getComponentId() const
 
 
 // -----------------------------------------------------------------------------
-// Gets the array of components cell hash
-template <typename T>
-unsigned int* ComponentManagerGPU<T>::getComponentCellHash() const
-{
-    unsigned int* h_componentCellHash = new unsigned int[numComponents];
-    cudaErrCheck( cudaMemcpy( h_componentCellHash,
-                              m_componentCellHash,
-                              numComponents * sizeof( unsigned int ), 
-                              cudaMemcpyDeviceToHost ) );
-    return( h_componentCellHash );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Sets the array of components rigid body Id
 template <typename T>
-void ComponentManagerGPU<T>::setRigidBodyId( unsigned int const* id )
+void ComponentManagerGPU<T>::setRigidBodyId( std::vector<unsigned int> const& id )
 {
     cudaErrCheck( cudaMemcpy( m_rigidBodyId,
-                              id,
-                              numComponents * sizeof( unsigned int ), 
+                              id.data(),
+                              m_nParticles * sizeof( unsigned int ), 
                               cudaMemcpyHostToDevice ) );
 }
 
@@ -201,11 +196,39 @@ void ComponentManagerGPU<T>::setRigidBodyId( unsigned int const* id )
 // -----------------------------------------------------------------------------
 // Sets components transformation
 template <typename T>
-void ComponentManagerGPU<T>::setTransform( Transform3<T> const* tr )
+void ComponentManagerGPU<T>::setTransform( std::vector<Transform3<T>> const& t )
 {
     cudaErrCheck( cudaMemcpy( m_transform,
-                              tr,
-                              numComponents * sizeof( Transform3<T> ), 
+                              t.data(),
+                              m_nParticles * sizeof( Transform3<T> ), 
+                              cudaMemcpyHostToDevice ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets components velocity
+template <typename T>
+void ComponentManagerGPU<T>::setVelocity( std::vector<Kinematics<T>> const& v )
+{
+    cudaErrCheck( cudaMemcpy( m_velocity,
+                              v.data(),
+                              m_nParticles * sizeof( Kinematics<T> ), 
+                              cudaMemcpyHostToDevice ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets components torce
+template <typename T>
+void ComponentManagerGPU<T>::setTorce( std::vector<Torce<T>> const& t )
+{
+    cudaErrCheck( cudaMemcpy( m_torce,
+                              t.data(),
+                              m_nParticles * sizeof( Torce<T> ), 
                               cudaMemcpyHostToDevice ) );
 }
 
@@ -215,11 +238,11 @@ void ComponentManagerGPU<T>::setTransform( Transform3<T> const* tr )
 // -----------------------------------------------------------------------------
 // Sets the array of component Ids
 template <typename T>
-void ComponentManagerGPU<T>::setComponentId( int const* id )
+void ComponentManagerGPU<T>::setComponentId( std::vector<int> const& id )
 {
     cudaErrCheck( cudaMemcpy( m_componentId,
-                              id,
-                              numComponents * sizeof( unsigned int ), 
+                              id.data(),
+                              m_nParticles * sizeof( unsigned int ), 
                               cudaMemcpyHostToDevice ) );
 }
 
@@ -227,37 +250,55 @@ void ComponentManagerGPU<T>::setComponentId( int const* id )
 
 
 // -----------------------------------------------------------------------------
-// Updates the linked cell list according to the linked cell provided
+// Copies data from a host side object
 template <typename T>
-void ComponentManagerGPU<T>::updateLinkedCellList( LinkedCell<T> const* const* LC )
+void ComponentManagerGPU<T>::copyFromHost( ComponentManagerCPU<T> const* cm )
 {
-    // First - finding the cell hash for each particle
-    // LC->computeLinearLinkedCellHashGPU( m_transform, 
-    //                                        numComponents,
-    //                                        m_componentCellHash );
+    // Copying the arrays from host to device
+    setRigidBodyId( cm->getRigidBodyId() );
+    setTransform( cm->getTransform() );
+    setVelocity( cm->getVelocity() );
+    setTorce( cm->getTorce() );
+    setComponentId( cm->getComponentId() );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Updates links between components and linked cell
+template <typename T>
+void ComponentManagerGPU<T>::updateLinks( LinkedCell<T> const* const* LC )
+{
+    // Kernel launch parameters
     unsigned int numThreads = 256;
-    unsigned int numBlocks = ( numComponents + numThreads - 1 ) / numThreads;
+    unsigned int numBlocks = ( m_nParticles + numThreads - 1 ) / numThreads;
     unsigned int sMemSize = sizeof( unsigned int ) * ( numThreads + 1 );
+
+    // Zeroing out the arrays
+    zeroOutArray_kernel<<< numBlocks, numThreads >>>( m_cellHashStart,
+                                                      m_nCells + 1 );
+    zeroOutArray_kernel<<< numBlocks, numThreads >>>( m_cellHashEnd,
+                                                      m_nCells + 1 );
+
+    // First - finding the cell hash for each particle
     computeLinearLinkedCellHashGPU_kernel<<< numBlocks, numThreads >>>
                                                         ( LC,
                                                           m_transform, 
-                                                          numComponents,
+                                                          m_nParticles,
                                                           m_componentCellHash );
     
     // Second - sorting the particle ids according to the cell hash
     thrust::sort_by_key (
       thrust::device_ptr<unsigned int>( m_componentCellHash ),
-      thrust::device_ptr<unsigned int>( m_componentCellHash + numComponents ),
+      thrust::device_ptr<unsigned int>( m_componentCellHash + m_nParticles ),
       thrust::device_ptr<int>( m_componentId ) );
     
-    // Third - reseting the cellStart array anf finding the start location of 
+    // Third - reseting the cellStart array and finding the start location of 
     // each hash
-    // TODO: RESET m_cellHashStartEnd
-    // unsigned int numThreads = 256;
-    // unsigned int numBlocks = ( numComponents + numThreads - 1 ) / numThreads;
-    sortComponentsAndFindCellStart<<< numBlocks, numThreads, sMemSize >>> 
+    sortComponentsAndFindCellStart_kernel<<< numBlocks, numThreads, sMemSize >>> 
                                                         ( m_componentCellHash,
-                                                          numComponents,
+                                                          m_nParticles,
                                                           m_cellHashStart,
                                                           m_cellHashEnd );
 }
@@ -269,53 +310,17 @@ void ComponentManagerGPU<T>::updateLinkedCellList( LinkedCell<T> const* const* L
 // Detects collision between particles
 // TODO: thread safety flag and MaxOccupancy
 template <typename T>
-void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
-                                              RigidBody<T, T> const* const* RB, 
-                                              ContactForceModel<T> const* const* CF,
-                                              int* result )
+void ComponentManagerGPU<T>::detectCollisionAndComputeForces( 
+                                        LinkedCell<T> const* const* LC,
+                                        RigidBody<T, T> const* const* RB, 
+                                        ContactForceModel<T> const* const* CF,
+                                        int* result )
 {
     unsigned int numThreads = 256;
-    unsigned int numBlocks = ( numComponents + numThreads - 1 ) / numThreads;
-    // collisionDetectionN2<<< numBlocks, numThreads >>> ( rb,
-    //                                                     m_transform,
-    //                                                     numComponents,
-    //                                                     result );
+    unsigned int numBlocks = ( m_nParticles + numThreads - 1 ) / numThreads;
     
-    
-    // updateLinkedCellList( LC );
-    zeroOutArray<<< numBlocks, numThreads >>>( m_cellHashStart,
-                                               numCells + 1 );
-    zeroOutArray<<< numBlocks, numThreads >>>( m_cellHashEnd,
-                                               numCells + 1 );
-    unsigned int sMemSize = sizeof( unsigned int ) * ( numThreads + 1 );
-    // LC->computeLinearLinkedCellHashGPU( m_transform,
-    //                                     numComponents,
-    //                                     m_componentCellHash );
-    computeLinearLinkedCellHashGPU_kernel<<< numBlocks, numThreads >>>
-                                                        ( LC,
-                                                          m_transform, 
-                                                          numComponents,
-                                                          m_componentCellHash );
-    
-    // Second - sorting the particle ids according to the cell hash
-    thrust::sort_by_key (
-      thrust::device_ptr<unsigned int>( m_componentCellHash ),
-      thrust::device_ptr<unsigned int>( m_componentCellHash + numComponents ),
-      thrust::device_ptr<int>( m_componentId ) );
-    
-    // Third - reseting the cellStart array and finding the start location of 
-    // each hash
-    // TODO: RESET m_cellHashStartEnd
-    // unsigned int numThreads = 256;
-    // unsigned int numBlocks = ( numComponents + numThreads - 1 ) / numThreads;
-    sortComponentsAndFindCellStart<<< numBlocks, numThreads, sMemSize >>> 
-                                                        ( m_componentCellHash,
-                                                          numComponents,
-                                                          m_cellHashStart,
-                                                          m_cellHashEnd );
-
-
-    collisionDetectionLinkedCell<<< numBlocks, numThreads >>> 
+    updateLinks( LC );
+    detectCollisionAndComputeForces_kernel<<< numBlocks, numThreads >>> 
                                                           ( LC,
                                                             RB,
                                                             CF,
@@ -326,8 +331,44 @@ void ComponentManagerGPU<T>::detectCollision( LinkedCell<T> const* const* LC,
                                                             m_componentCellHash,
                                                             m_cellHashStart,
                                                             m_cellHashEnd,
-                                                            numComponents,
+                                                            m_nParticles,
                                                             result );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Moves components in the simulation
+template <typename T>
+void ComponentManagerGPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
+                                             RigidBody<T, T> const* const* RB )
+{
+    // for ( int pId = 0; pId < m_nParticles; pId++ )
+    // {
+    //     // Rigid body
+    //     RigidBody<T, T> const* rb = RB[ m_rigidBodyId[ pId ] ];
+
+    //     // First, we compute quaternion of orientation
+    //     Quaternion<T> qRot( m_transform[ pId ].getBasis() );
+    //     // Next, we compute accelerations and reset torces
+    //     Kinematics<T> const& acceleration = rb->computeAcceleration( 
+    //                                                             m_torce[ pId ], 
+    //                                                             qRot );
+    //     m_torce[ pId ].reset();
+    //     // Finally, we move particles using the given time integration
+    //     Vector3<T> transMotion;
+    //     Quaternion<T> rotMotion;
+    //     (*TI)->Move( acceleration, 
+    //                  m_velocity[ pId ],
+    //                  transMotion, 
+    //                  rotMotion );
+    //     // and update the transformation of the component
+    //     m_transform[ pId ].updateTransform( transMotion, rotMotion );
+    //     // TODO
+    //     // qRot = qRotChange * qRot;
+    //     // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
+    // }
 }
 
 

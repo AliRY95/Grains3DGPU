@@ -35,56 +35,6 @@ class ComponentManager
         //@}
 
 
-        // /** @name Get methods */
-        // //@{
-        // /** @brief Gets components transformation */
-        // virtual Transform3<T>* getTransform() const = 0;
-
-        // /** @brief Gets the array of components neighbor Id */
-        // virtual unsigned int* getNeighborsId() const = 0;
-
-        // /** @brief Gets the array of components rigid body Id */
-        // virtual unsigned int* getRigidBodyId() const = 0;
-
-        // /** @brief Gets the array of component Ids */
-        // virtual unsigned int* getComponentId() const = 0;
-
-        // /** @brief Gets the array of components cell hash */
-        // virtual unsigned int* getComponentCellHash() const = 0;
-
-        // /** @brief Gets the array of components neighbor count */
-        // virtual unsigned int* getNeighborsCount() const = 0;
-
-        // /** @brief Gets the array of cells hash start */
-        // virtual unsigned int* getCellHashStart() const = 0;
-        // //@}
-
-
-        // /** @name Set methods */
-        // //@{
-        // /** @brief Sets components transformation */
-        // virtual void setTransform( Transform3<T> const* tr ) = 0;
-
-        // /** @brief Sets the array of components neighbor Id */
-        // virtual void setNeighborsId( unsigned int const* id ) = 0;
-
-        // /** @brief Sets the array of components rigid body Id */
-        // virtual void setRigidBodyId( unsigned int const* id ) = 0;
-
-        // /** @brief Sets the array of component Ids */
-        // virtual void setComponentId( unsigned int const* id ) = 0;
-
-        // /** @brief Sets the array of components cell hash */
-        // virtual void setComponentCellHash( unsigned int const* hash ) = 0;
-        
-        // /** @brief Sets the array of components neighbor count */
-        // virtual void setNeighborsCount( unsigned int const* count ) = 0;
-
-        // /** @brief Sets the array of cells hash start */
-        // virtual void setCellHashStart( unsigned int const* id ) = 0;
-        // //@}
-
-
         /** @name Methods */
         //@{
         // /** @brief Sorts particles based on a Z-curve */
@@ -93,18 +43,24 @@ class ComponentManager
         // /** @brief Creates a neighbor list */
         // void createNeighborList();
 
-        /** @brief Detects collision between particles */
+        /** @brief Updates links between components and linked cell */
         // template <typename U>
-        virtual void detectCollision( LinkedCell<T> const* const* LC,
-                                      RigidBody<T, T> const* const* rb, 
-                                      ContactForceModel<T> const* const* CF,
-                                      int* result ) = 0;
+        // TODO: @param
+        virtual void updateLinks( LinkedCell<T> const* const* LC ) = 0;
 
-        // /** @brief Computes impact forces */
-        // void computeForces();
+        /** @brief Detects collision between components and computes forces */
+        // template <typename U>
+        // TODO: @param
+        virtual void detectCollisionAndComputeForces( 
+                                        LinkedCell<T> const* const* LC,
+                                        RigidBody<T, T> const* const* RB, 
+                                        ContactForceModel<T> const* const* CF,
+                                        int* result ) = 0;
 
-        // /** @brief Updates the position and velocities of particles */
-        // void updateParticles();
+        /** @brief Updates the position and velocities of components */
+        // TODO: @param
+        virtual void moveComponents( TimeIntegrator<T> const* const* TI,
+                                     RigidBody<T, T> const* const* RB ) = 0;
         //@}
 };
 

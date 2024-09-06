@@ -12,7 +12,7 @@
 // -----------------------------------------------------------------------------
 // Zeros out the array
 __GLOBAL__ 
-void zeroOutArray_kernel( unsigned int* array,
+void zeroOutArray( unsigned int* array,
                    unsigned int numElements )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -77,6 +77,58 @@ void sortComponentsAndFindCellStart_kernel(
 
     // sortedPos[index] = pos;
     // sortedVel[index] = vel;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// N-squared collision detection kernel using a thread-per-particle policy
+// TODO: REMOVE LATER
+template <typename T, typename U>
+__GLOBAL__ 
+void collisionDetectionN2( RigidBody<T, U> const* const* a,
+                           Transform3<T> const* tr3d,
+                           int numComponents,
+                           int* result )
+{
+    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+    RigidBody<T, U> const& AA = **a;
+    Transform3<T> const& trA = tr3d[tid];
+    ContactInfo<T> ci;
+    for ( int j = 0; j < numComponents; j++ )
+    {
+        // result[tid] += intersectRigidBodies( AA, AA, trA, tr3d[j] );
+        ci = closestPointsRigidBodies( AA, AA, trA, tr3d[j] );
+        result[j] += ( ci.getOverlapDistance() < 0. );
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// N-squared collision detection kernel with relative transformation
+// TODO: REMOVE LATER
+template <typename T, typename U>
+__GLOBAL__ 
+void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
+                                   Transform3<T> const* tr3d,
+                                   int numComponents,
+                                   int* result )
+{
+    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+    RigidBody<T, U> const& AA = **a;
+    Transform3<T> const& trA = tr3d[tid];
+    Transform3<T> trB2A;
+    for ( int j = 0; j < numComponents; j++ )
+    {
+        trB2A = tr3d[j];
+        trB2A.relativeToTransform( trA );
+        result[tid] += intersectRigidBodies( AA, AA, trB2A );
+    }
 }
 
 
@@ -166,6 +218,12 @@ void detectCollisionAndComputeForces_kernel(
 // -----------------------------------------------------------------------------
 // Explicit instantiation
 #define X( T, U )                                                              \
+template                                                                       \
+__GLOBAL__                                                                     \
+void collisionDetectionN2( RigidBody<T, U> const* const* a,                    \
+                           Transform3<T> const* tr3d,                          \
+                           int numComponents,                                  \
+                           int* result );                                      \
 template                                                                       \
 __GLOBAL__                                                                     \
 void detectCollisionAndComputeForces_kernel(                                   \

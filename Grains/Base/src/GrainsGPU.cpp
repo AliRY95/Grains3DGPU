@@ -43,6 +43,7 @@ template <typename T>
 void GrainsGPU<T>::simulate()
 {
     unsigned int N = GrainsParameters<T>::m_numComponents;
+    cout << GrainsParameters<T>::m_numComponents << " " << GrainsParameters<T>::m_numCells << endl;
     int* h_collision = new int[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )
@@ -61,14 +62,16 @@ void GrainsGPU<T>::simulate()
     // ComponentManagerCPU<T>* mmm = static_cast<ComponentManagerCPU<T>*>(Grains<T>::m_components);
     // std::vector<Transform3<T>> tr = mmm->getTransform();
     // cout << tr[0].getOrigin() << endl;
-    Grains<T>::m_components->detectCollision( Grains<T>::m_linkedCell, 
-                                              Grains<T>::m_rigidBodyList,
-                                              Grains<T>::m_contactForce,
-                                              h_collision );
+    Grains<T>::m_components->detectCollisionAndComputeForces( 
+                                                Grains<T>::m_linkedCell, 
+                                                Grains<T>::m_rigidBodyList,
+                                                Grains<T>::m_contactForce,
+                                                h_collision );
     auto h_end = chrono::high_resolution_clock::now();
     // Collision detection on device
     auto d_start = chrono::high_resolution_clock::now();
-    Grains<T>::m_d_components->detectCollision( Grains<T>::m_d_linkedCell, 
+    Grains<T>::m_d_components->detectCollisionAndComputeForces( 
+                                                Grains<T>::m_d_linkedCell, 
                                                 Grains<T>::m_d_rigidBodyList,
                                                 Grains<T>::m_d_contactForce,
                                                 d_collision );
