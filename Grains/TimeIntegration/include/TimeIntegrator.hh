@@ -33,7 +33,7 @@ class TimeIntegrator
         //@}
 
 
-		/**@name Contructors */
+		/** @name Contructors */
         //@{
         /** @brief Default constructor (forbidden except in derived classes) */
         __HOSTDEVICE__ 
@@ -47,7 +47,7 @@ class TimeIntegrator
 
 
 	public:
-		/**@name Contructors */
+		/** @name Contructors */
 		//@{
 		/** @brief Destructor */
 		__HOSTDEVICE__

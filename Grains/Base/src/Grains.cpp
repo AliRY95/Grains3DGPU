@@ -94,6 +94,8 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Particles
+    // Another place to mention that particles must be read first, then 
+    // obstacles. See ContactForceModelBuilderFactory.hh
     DOMNode* particles = ReaderXML::getNode( root, "Particles" );
     DOMNodeList* allParticles = ReaderXML::getNodes( rootElement, "Particle" );
     // Number of unique shapes (rigid bodies) in the simulation

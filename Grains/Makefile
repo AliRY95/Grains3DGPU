@@ -33,6 +33,11 @@ INCDIRXML := XML/include
 INCDIR += $(INCDIRXML)
 ALLINC += $(wildcard $(INCDIRXML)/*.hh)
 
+SRCDIRPP := PostProcessing/src
+INCDIRPP := PostProcessing/include
+INCDIR += $(INCDIRPP)
+ALLINC += $(wildcard $(INCDIRPP)/*.hh)
+
 
 # Source files per package
 # _WP_ means "with path"
@@ -54,6 +59,9 @@ SRCFILESTIME := $(subst $(SRCDIRTIME)/,,$(SRCFILES_WP_TIME))
 SRCFILES_WP_XML := $(wildcard $(SRCDIRXML)/*.cpp)
 SRCFILESXML := $(subst $(SRCDIRXML)/,,$(SRCFILES_WP_XML))
 
+SRCFILES_WP_PP := $(wildcard $(SRCDIRPP)/*.cpp)
+SRCFILESPP := $(subst $(SRCDIRPP)/,,$(SRCFILES_WP_PP))
+
 
 # Target directories
 OBJDIR := obj
@@ -68,13 +76,14 @@ OBJS_COLLISION := $(SRCFILESCOLLISION:%.cpp=$(OBJDIR)/%.o)
 OBJS_GEOMETRY := $(SRCFILESGEOMETRY:%.cpp=$(OBJDIR)/%.o)
 OBJS_TIME := $(SRCFILESTIME:%.cpp=$(OBJDIR)/%.o)
 OBJS_XML := $(SRCFILESXML:%.cpp=$(OBJDIR)/%.o)
+OBJS_PP := $(SRCFILESPP:%.cpp=$(OBJDIR)/%.o)
 
 
 # Defining VPATH for automatic search of source files in the 
 # different source directories 
 # This enables to have a single rule/target for all source files in 
 # various directories and all objects in a single directory
-VPATH := $(SRCDIRBASE):$(SRCDIRCOMPONENT):$(SRCDIRCOLLISION):$(SRCDIRGEOMETRY):$(SRCDIRTIME):$(SRCDIRXML)
+VPATH := $(SRCDIRBASE):$(SRCDIRCOMPONENT):$(SRCDIRCOLLISION):$(SRCDIRGEOMETRY):$(SRCDIRTIME):$(SRCDIRXML):$(SRCDIRPP)
 
 
 # Compiler
@@ -89,10 +98,10 @@ LINKFLAGS := $(GRAINS_GPU_LINKER_FLAGS) $(GRAINS_Z_FLAGS) $(GRAINS_XERCES_FLAGS)
 
 all : grains
 
-grains : MESS CPINC BASE COMPONENT COLLISION GEOMETRY TIME XML
+grains : MESS CPINC BASE COMPONENT COLLISION GEOMETRY TIME XML PP
 		$(GRAINS_GPU_COMPILER) $(LINKFLAGS) -o $(LIBDIR)/grains \
 		$(OBJS_XML) $(OBJS_TIME) $(OBJS_GEOMETRY) $(OBJS_COMPONENT) \
-		$(OBJS_COLLISION) $(OBJS_BASE)
+		$(OBJS_COLLISION) $(OBJS_BASE) $(OBJS_PP)
 	@echo 'Compilation is complete'
 
 MESS   :
@@ -129,6 +138,10 @@ XML    : $(OBJS_XML)
 	@echo '*** Package XML compiled'
 	@echo
 
+PP     : $(OBJS_PP)
+	@echo '*** Package PostProcessing compiled'
+	@echo
+
 $(OBJDIR)/%.o : %.cpp
 	@echo 'Compiling '$<
 	$(GRAINS_GPU_COMPILER) $(COMPFLAGS) -D_XML $< -o $@
@@ -142,7 +155,7 @@ depend:
 	touch ./Maketmp
 	makedepend -f ./Maketmp $(DEPEND) $(SRCFILES_WP_BASE) \
 	$(SRCFILES_WP_COMPONENTS) $(SRCFILES_WP_COLLISION) $(SRCFILES_WP_GEOMETRY) \
-	$(SRCFILES_WP_TIME) $(SRCFILES_WP_XML)
+	$(SRCFILES_WP_TIME) $(SRCFILES_WP_XML) $(SRCFILES_WP_PP)
 	rm -f ./Maketmp ./Maketmp.bak
 
 # CLEAN
