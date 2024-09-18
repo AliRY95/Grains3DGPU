@@ -1,6 +1,8 @@
 #include "GrainsParameters.hh"
 
 
+// -----------------------------------------------------------------------------
+// Static variables
 /* GPU */
 template <typename T> 
 bool GrainsParameters<T>::m_isGPU = false;
@@ -43,19 +45,6 @@ std::unordered_map<std::string, unsigned int> GrainsParameters<T>::m_materialMap
 
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;
-
-// // -----------------------------------------------------------------------------
-// // Default constructor
-// ComponentManager::ComponentManager()
-// {}
-
-
-
-
-// // -----------------------------------------------------------------------------
-// // Destructor
-// ComponentManager::~ComponentManager()
-// {}
 
 
 
