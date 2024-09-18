@@ -35,6 +35,7 @@ class PostProcessingWriter
 		PostProcessingWriter();
 		//@}
 
+
 	public:
 		/** @name Constructors */
 		//@{
@@ -60,7 +61,7 @@ class PostProcessingWriter
 		/** @brief Writes data */
 		__HOST__
 		virtual void PostProcessing( 
-								std::vector<RigidBody<T, T>> const* rb,
+								RigidBody<T, T> const* const* rb,
 								std::vector<unsigned int> const* rigidBodyID,
 								std::vector<Transform3<T>> const* t,
 								std::vector<Kinematics<T>> const* k,

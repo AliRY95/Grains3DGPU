@@ -23,7 +23,7 @@
 
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="4.5" dt="1.e-5"/>
+		<TimeInterval Start="0." End="0.001" dt="1.e-4"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 
@@ -327,10 +327,10 @@
 		<InitialVelocity Mode="Zero">
 		</InitialVelocity>
 	</ParticleInsertion>
+			<!-- <Paraview RootName="insert" Directory="Grains/Init" WritingMode="Binary"/> -->
 	<PostProcessing>
 		<Writers>
-			<Paraview RootName="insert" Directory="Grains/Init" WritingMode="Binary"/>
-			<RawData Name="Grains/Init/insert"/>
+			<RawData Name="./Results"/>
 		</Writers>
 	</PostProcessing>
 </Simulation>

@@ -40,7 +40,7 @@ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter( DOMNode* dn )
 	m_filerootname = ReaderXML::getNodeAttr_String( dn, "Name" );
 	cout << shiftString9 << "Type = RawData" << endl;
 	cout << shiftString12 << "Output file name = " 
-		   << m_filerootname << endl;
+		 << m_filerootname << endl;
 }
 
 
@@ -90,7 +90,7 @@ void RawDataPostProcessingWriter<T>::PostProcessing_start()
 template <typename T>
 __HOST__
 void RawDataPostProcessingWriter<T>::PostProcessing( 
-								std::vector<RigidBody<T, T>> const* rb,
+								RigidBody<T, T> const* const* rb,
 								std::vector<unsigned int> const* rigidBodyID,
 								std::vector<Transform3<T>> const* t,
 								std::vector<Kinematics<T>> const* k,
@@ -152,7 +152,7 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
         // m_coordination_number << " " << pp->getCoordinationNumber();
 	
 		// Particle type
-		type = rb->at( rigidBodyID->at( i ) ).getConvex()->getConvexType();
+		type = rb[ rigidBodyID->at( i ) ]->getConvex()->getConvexType();
 		// m_particle_class << type << " " ;	 
 	}      
     

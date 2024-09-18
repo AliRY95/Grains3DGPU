@@ -9,6 +9,7 @@
 #include "ComponentManagerGPU.hh"
 #include "HODCContactForceModel.hh"
 #include "TimeIntegrator.hh"
+#include "PostProcessingWriter.hh"
 #include "ReaderXML.hh"
 
 
@@ -68,6 +69,10 @@ class Grains
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
         TimeIntegrator<T>** m_d_timeIntegrator;
+        /** \brief Linked cell for broad-phase. We use a pointer because
+        the linkedCell is directly instantiated on device in the case that we
+        run Grains on GPU. */
+        PostProcessingWriter<T>* m_postProcessor;
         //@}
 
 
@@ -105,10 +110,14 @@ class Grains
         @param rootElement XML root */
         void Construction( DOMElement* rootElement );
 
-        /** @brief Construction of the simulation: linked cell, particles &
-        obstacles, domain decomposition 
+        /** @brief External force definition
         @param rootElement XML root */
         void Forces( DOMElement* rootElement );
+
+        /** @brief Additional features of the simulation: insertion, 
+        post-processing
+        @param rootElement XML root */
+        void AdditionalFeatures( DOMElement* rootElement );
         //@}
 };
 

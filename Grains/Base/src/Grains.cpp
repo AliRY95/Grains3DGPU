@@ -3,6 +3,7 @@
 #include "LinkedCellGPUWrapper.hh"
 #include "ContactForceModelBuilderFactory.hh"
 #include "TimeIntegratorBuilderFactory.hh"
+#include "PostProcessingWriterBuilderFactory.hh"
 #include "VectorMath.hh"
 
 
@@ -43,7 +44,7 @@ void Grains<T>::initialize( DOMElement* rootElement )
     /* */
     Construction( rootElement );
     Forces( rootElement );
-    // AdditionalFeatures( rootElement );
+    AdditionalFeatures( rootElement );
 }
 
 
@@ -62,7 +63,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
     DOMNode* root = ReaderXML::getNode( rootElement, "Construction" );
     if ( !root )
     {
-        cout << shiftString0 << "Construction section cannot be found!" << endl;
+        cout << shiftString0 << "Construction node is mandatory!" << endl;
         exit( 1 );
     }
 
@@ -319,6 +320,67 @@ void Grains<T>::Forces( DOMElement* rootElement )
             exit( 1 );
         }
     }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Additional features of the simulation: insertion, post-processing
+template <typename T>
+void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
+{
+    // -------------------------------------------------------------------------
+    // Checking if Construction node is available
+    assert( rootElement != NULL );
+    DOMNode* root = ReaderXML::getNode( rootElement, "Simulation" );
+    if ( !root )
+    {
+        cout << shiftString3 << "Simulation node is mandatory!" << endl;
+        exit( 1 );
+    }
+
+    // Output message
+    cout << shiftString9 << "Simulation" << endl;
+
+
+
+
+    // -------------------------------------------------------------------------
+    // Post-processing writers
+    DOMNode* nPostProcessing = ReaderXML::getNode( root, "PostProcessing" );
+    if ( nPostProcessing )
+    {
+        cout << shiftString6 << "Post-processing" << endl;
+
+        // Post-processing writers
+        DOMNode* nWriters = ReaderXML::getNode( nPostProcessing, "Writers" );
+        if ( nWriters )
+        {
+            cout << shiftString6 
+                 << "Reading the post processing writers ..." 
+                 << endl;
+            DOMNodeList* allPPW = ReaderXML::getNodes( nWriters );
+            for ( XMLSize_t i = 0; i < allPPW->getLength(); i++ )
+            {
+                DOMNode* nPPW = allPPW->item( i );
+                PostProcessingWriter<T>* ppw =
+                m_postProcessor = PostProcessingWriterBuilderFactory<T>::create( nPPW );
+                if ( !ppw )
+                {
+                    cout << shiftString6 
+                         << "Unknown postprocessing writer in node <Writers>"
+                         << endl;
+                    exit( 1 );
+                }
+            }
+            cout << shiftString6 
+                 << "Reading the post processing writers completed!" 
+                 << endl;
+        }
+    }
+    else
+        cout << shiftString6 << "No postprocessing writer!" << endl;
 }
 
 

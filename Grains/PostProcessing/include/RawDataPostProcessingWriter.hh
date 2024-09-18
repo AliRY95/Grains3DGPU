@@ -15,7 +15,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class RawDataPostProcessingWriter : PostProcessingWriter<T>
+class RawDataPostProcessingWriter : public PostProcessingWriter<T>
 {
 	private:
 		/**@name Parameters */
@@ -53,13 +53,16 @@ class RawDataPostProcessingWriter : PostProcessingWriter<T>
 		/** @name Constructors */
 		//@{
 		/** @brief Default constructor */
+		__HOST__
 		RawDataPostProcessingWriter();
 
 		/** @brief Constructor with XML node
 		@param dn XML node */
+		__HOST__
 		RawDataPostProcessingWriter( DOMNode* dn );
 
 		/** @brief Destructor */
+		__HOST__
 		~RawDataPostProcessingWriter();
 		//@}
 
@@ -79,7 +82,7 @@ class RawDataPostProcessingWriter : PostProcessingWriter<T>
 
 		/** @brief Writes data TODO:PARAMS*/
 		__HOST__
-		void PostProcessing( std::vector<RigidBody<T, T>> const* rb,
+		void PostProcessing( RigidBody<T, T> const* const* rb,
 							 std::vector<unsigned int> const* rigidBodyID,
 							 std::vector<Transform3<T>> const* t,
 							 std::vector<Kinematics<T>> const* k,
