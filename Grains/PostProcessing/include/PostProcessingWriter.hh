@@ -2,9 +2,11 @@
 #define _POSTPROCESSINGWRITER_HH_
 
 
+#include "Basic.hh"
 #include "RigidBody.hh"
 #include "Transform3.hh"
 #include "Kinematics.hh"
+#include "GrainsMisc.hh"
 #include "ReaderXML.hh"
 
 
@@ -22,7 +24,7 @@ enum PostProcessingWriterType {
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-template <typedef T>
+template <typename T>
 class PostProcessingWriter
 {
 	protected:
@@ -33,13 +35,10 @@ class PostProcessingWriter
 		PostProcessingWriter();
 		//@}
 
+
 	public:
 		/** @name Constructors */
 		//@{
-		/** @brief Constructor with an XML node */
-		__HOST__
-		virtual PostProcessingWriter( DOMNode* dn ) = 0;
-
 		/** @brief Destructor */
 		__HOST__
 		virtual ~PostProcessingWriter();
@@ -49,7 +48,7 @@ class PostProcessingWriter
 		/** @name Get methods */
 		//@{
 		__HOST__
-		virtual PostProcessingWriterType getPostProcessingWriterType() = 0;
+		virtual PostProcessingWriterType getPostProcessingWriterType() const = 0;
 		//@}
 
 
@@ -61,10 +60,12 @@ class PostProcessingWriter
 
 		/** @brief Writes data */
 		__HOST__
-		virtual void PostProcessing( std::vector<RigidBody<T, T>> const* rb,
-									 std::vector<unsigined int> const* RigidBodyID,
-									 std::vector<Transform3<T>> const* t,
-									 std::vector<Kinematics<T>> const* k ) = 0;
+		virtual void PostProcessing( 
+								RigidBody<T, T> const* const* rb,
+								std::vector<unsigned int> const* rigidBodyID,
+								std::vector<Transform3<T>> const* t,
+								std::vector<Kinematics<T>> const* k,
+								T currentTime ) = 0;
 
 		/** @brief Finalizes writing data */
 		__HOST__

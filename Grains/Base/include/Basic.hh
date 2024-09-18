@@ -14,6 +14,7 @@
 #include <new>
 #include <chrono>
 #include <string>
+#include <ios>
 
 #include <cuda.h>
 #include <cuda_runtime.h>
