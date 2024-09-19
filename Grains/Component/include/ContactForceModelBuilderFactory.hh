@@ -46,14 +46,16 @@
 		- The hash is computed by summing the IDs of two materials, with the 
 		  following table serving as an example:
 				p0(0)  p1(1)  p2(2)  o0(3)  o1(4)
-			p0    0      1      2      3      4
-			p1    -      5      6      7      8
-			p2    -      -      9     10     11
+			p0    0      1      3      6      9
+			p1    -      2      4      7     10
+			p2    -      -      5      8     11
 			o0    -      -      -      -      -
 			o1    -      -      -      -      -
 		  Here, `pX` represents particles, and `oX` represents obstacles. 
 		  Particle-particle and particle-obstacle interactions are supported, 
 		  while obstacle-obstacle interactions are ignored by the hash function.
+		  We use a triangular hashing strategy here, and an offset to take care
+		  of obstacles.
 
 	4. Constraints:
 		- **Obstacles Must Be Numbered Last:** 
@@ -75,6 +77,17 @@
 template <typename T>
 class ContactForceModelBuilderFactory
 {
+	protected:
+		/**@name Parameters */
+		//@{
+		/** @brief Number of particles as managed memory, so it is accessible
+		from both host and device */
+		static unsigned int *m_numParticleMaterials;
+		/** @brief Number of contact pairs */
+		static unsigned int *m_numContactPairs;
+		//@}
+
+
 	private:
 		/**@name Contructors & Destructor */
 		//@{
@@ -91,20 +104,24 @@ class ContactForceModelBuilderFactory
 	public:
 		/**@name Methods */
 		//@{
+		/** @brief Sets the number of different materials used for particles.
+		@param num number of different particle materials */
+		__HOST__
+		static void setNumberOfParticleMaterials( unsigned int num );
+		
 		/** @brief Creates and returns the contact force model given an XML node 
 		@param root XML node */
 		__HOST__
 		static ContactForceModel<T>** create( DOMElement* root );
 
+
 		/** @brief Hash function to map a pair of material IDs x and y to a 
 		single ID to access the contact force model between them
 		@param x 1st material ID
-		@param y 2nd material ID
-		@param numComponents total number of components (part. + obst.) */
+		@param y 2nd material ID */
 		__HOSTDEVICE__
 		static unsigned int computeHash( unsigned int x,
-										 unsigned int y,
-										 unsigned int numComponents );
+										 unsigned int y );
 		
 		/** @brief ContactForceModel objects must be instantiated on device, if 
 		we want to use them on device. Copying from host is not supported due to 

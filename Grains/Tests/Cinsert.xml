@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE Grains3D SYSTEM "/home/alireza/Desktop/Work/Codes/GrainsGPU/Main/dtd/Grains3D.dtd">
 <Grains3D Type="Standard" Precision="Double">
 
 <Construction>
@@ -30,7 +28,7 @@
 	</TemporalSetting>
 
 	<Particles>
-		<Particle Number="1" Density="1163.66" Material="matP">
+		<Particle Number="10" Density="1163.66" Material="matP">
 			<AngularPosition Type="Identity"></AngularPosition>
 				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
 				<!-- <Box LX="0.04" LY="0.04" LZ="0.08"/> -->
@@ -332,10 +330,9 @@
 			<!-- <Paraview RootName="insert" Directory="Grains/Init" WritingMode="Binary"/> -->
 	<PostProcessing>
 		<Writers>
-			<RawData Name="Results"/>
+			<RawData Name="./Results"/>
 		</Writers>
 	</PostProcessing>
 </Simulation>
 
 </Grains3D>
-

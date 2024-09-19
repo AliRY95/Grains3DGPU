@@ -149,6 +149,15 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
         cout << shiftString6 << "Reading particle types completed!" << endl;
     }
+    // Now that the particles are completely constructed, we can set the number
+    // of different particle materials. This value is required for the function
+    // computeHash in ContactForceModelBuilderFactory.
+    // As we have not yet read the obstacles, the size of materialMap gives the
+    // total number of different particle materials.
+    // THIS IS ANOTHER REASON TO READ PARTICLES FIRST!
+    // It's not the most elegant design, but it isn't important at this point.
+    GrainsParameters<T>::m_numParticleMaterials = 
+                                    GrainsParameters<T>::m_materialMap.size();
 
 
 
