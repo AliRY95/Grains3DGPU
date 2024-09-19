@@ -149,15 +149,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
         cout << shiftString6 << "Reading particle types completed!" << endl;
     }
-    // Now that the particles are completely constructed, we can set the number
-    // of different particle materials. This value is required for the function
-    // computeHash in ContactForceModelBuilderFactory.
-    // As we have not yet read the obstacles, the size of materialMap gives the
-    // total number of different particle materials.
-    // THIS IS ANOTHER REASON TO READ PARTICLES FIRST!
-    // It's not the most elegant design, but it isn't important at this point.
-    GrainsParameters<T>::m_numParticleMaterials = 
-                                    GrainsParameters<T>::m_materialMap.size();
 
 
 
@@ -225,6 +216,12 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Contact force models
+    // Calculating the proper array size for the contact force array
+    // We might need to redute it by removing the obstacle-obstacle pairs,
+    // but it should be fine by now
+    unsigned int numMaterials = GrainsParameters<T>::m_materialMap.size();
+    GrainsParameters<T>::m_numContactPairs = 
+                                        numMaterials * ( numMaterials - 1 ) / 2;
     DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
     if ( contacts )
     {
@@ -241,8 +238,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
                         numContactPairs * sizeof( ContactForceModel<T>* ) ) );
             ContactForceModelBuilderFactory<T>::
             ContactForceModelCopyHostToDevice( m_contactForce,
-                                               m_d_contactForce, 
-                                               numContactPairs );
+                                               m_d_contactForce );
         }
         cout << shiftString6 
              << "Reading the contact force model completed!" 

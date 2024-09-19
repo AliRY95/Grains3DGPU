@@ -40,6 +40,16 @@
 		  particle-obstacle interactions are supported.
 
 	3. Hashing Strategy:
+		- We use a triangular indexing approach hash = l * ( l + 1 ) / 2 + s,
+		  where l is the larger index and s is the smaller one. Visualization:
+		  		p0(0)  p1(1)  p2(2)  o0(3)  o1(4)
+			p0    0      1      3      6     10
+			p1    -      2      4      7     11
+			p2    -      -      5      8     12
+			o0    -      -      -      9     13
+			o1    -      -      -      -     14
+		  Apparently, indices 9, 13, and 14 will never be accessed, but is fine
+		  for now. The better way to exclude obst-obst pairs is shown below.
 		- Material IDs are assigned such that particle IDs are listed before 
 		  obstacle IDs. This ensures that obstacle-obstacle interactions are not
 		  considered in the hash, as they are not relevant.
@@ -54,7 +64,7 @@
 		  Here, `pX` represents particles, and `oX` represents obstacles. 
 		  Particle-particle and particle-obstacle interactions are supported, 
 		  while obstacle-obstacle interactions are ignored by the hash function.
-		  We use a triangular hashing strategy here, and an offset to take care
+		  We use a triangular hashing strategy here, and an OFFSET to take care
 		  of obstacles.
 
 	4. Constraints:
@@ -77,17 +87,6 @@
 template <typename T>
 class ContactForceModelBuilderFactory
 {
-	protected:
-		/**@name Parameters */
-		//@{
-		/** @brief Number of particles as managed memory, so it is accessible
-		from both host and device */
-		static unsigned int *m_numParticleMaterials;
-		/** @brief Number of contact pairs */
-		static unsigned int *m_numContactPairs;
-		//@}
-
-
 	private:
 		/**@name Contructors & Destructor */
 		//@{
@@ -103,12 +102,7 @@ class ContactForceModelBuilderFactory
 
 	public:
 		/**@name Methods */
-		//@{
-		/** @brief Sets the number of different materials used for particles.
-		@param num number of different particle materials */
-		__HOST__
-		static void setNumberOfParticleMaterials( unsigned int num );
-		
+		//@{	
 		/** @brief Creates and returns the contact force model given an XML node 
 		@param root XML node */
 		__HOST__
@@ -134,8 +128,7 @@ class ContactForceModelBuilderFactory
 		__HOST__
 		static void ContactForceModelCopyHostToDevice( 
 												ContactForceModel<T>** h_CF,
-												ContactForceModel<T>** d_CF,
-												unsigned int numContactPairs );
+												ContactForceModel<T>** d_CF );
 		//@}
 };
 

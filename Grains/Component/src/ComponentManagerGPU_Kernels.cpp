@@ -138,10 +138,9 @@ void detectCollisionAndComputeForces_kernel(
                                                           trB );
             if ( ci.getOverlapDistance() < T( 0 ) )
             {
-                unsigned int contactForceID = 0;
-                // ContactForceModelBuilderFactory<T>::computeHash( matA, 
-                //                                         rbB.getMaterial(),
-                //                                         GrainsParameters<T>::m_materialMap.size() );
+                unsigned int contactForceID = 
+                ContactForceModelBuilderFactory<T>::computeHash( matA, 
+                                                        rbB.getMaterial() );
                 CF[contactForceID]->computeForces( ci, 
                                                     zeroVector3T,
                                                     zeroVector3T,

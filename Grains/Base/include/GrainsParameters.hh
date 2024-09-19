@@ -35,10 +35,12 @@ class GrainsParameters
         /* Simulation */
         /** \brief Gravity vector */
         static Vector3<T> m_gravity;
+
+        /* Material */
         /** \brief Map from material name to an unsigned int ID */
         static std::unordered_map<std::string, unsigned int> m_materialMap;
-        /** \brief Number of different particle materials */
-        static unsigned int m_numParticleMaterials;
+        /** \brief Number of different possible contact pairs (incl. obs-obs) */
+        static unsigned int m_numContactPairs;
 
         /* GPU */
         static bool m_isGPU; /**< is simulation on GPU? */
