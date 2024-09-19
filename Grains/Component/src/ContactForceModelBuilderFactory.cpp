@@ -36,22 +36,47 @@ void createContactForceModelKernel( ContactForceModel<T>** CF,
 /* ========================================================================== */
 /*                            High-Level Methods                              */
 /* ========================================================================== */
+// Sets the number of particle materials to num
+template <typename T>
+__HOST__
+void ContactForceModelBuilderFactory<T>::setNumberOfMaterials( 
+															unsigned int numPM,
+															unsigned int numCP )
+{
+	cudaErrCheck( cudaMallocManaged( (void**) &m_numParticleMaterials, 
+									 sizeof( unsigned int ) ) );
+	*m_numParticleMaterials = numPM;
+	cudaErrCheck( cudaMallocManaged( (void**) &m_numContactPairs, 
+									 sizeof( unsigned int ) ) );
+	*m_numContactPairs = numCP;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Creates and returns the contact force model
 template <typename T>
 __HOST__
 ContactForceModel<T>** ContactForceModelBuilderFactory<T>::create( 
 															DOMElement* root )
 {
-	// number of materials stored after reading the particles and obstacles in
-	// the XML file
-	unsigned int numMaterials = GrainsParameters<T>::m_materialMap.size();
+	// number of particle materials
+	unsigned int numParticleMaterials = 
+									GrainsParameters<T>::m_numParticleMaterials;
+	setNumberOfParticleMaterials( GrainsParameters<T>::m_numParticleMaterials );
+	// number of obstacle materials = NO. materials - NO. particle materials
+	unsigned int numObstacleMaterials =
+									GrainsParameters<T>::m_materialMap.size() -
+									numParticleMaterials;
+	// Total number of possible contact pairs
+	// Each pair of particles + each pair of particles and obstacles
 	unsigned int numContactPairs = 
-            GrainsParameters<T>::m_materialMap.size() * 
-            ( GrainsParameters<T>::m_materialMap.size() - 1 ) / 2;
+					numParticleMaterials * ( numParticleMaterials - 1 ) / 2 +
+					numParticleMaterials * numObstacleMaterials;
 
 
 	ContactForceModel<T>** CF = new ContactForceModel<T>*[numContactPairs];
-
 	DOMNodeList* allContacts = ReaderXML::getNodes( root, "ContactForceModel" );
 	for ( XMLSize_t i = 0; i < allContacts->getLength(); i++ ) 
 	{
@@ -63,7 +88,7 @@ ContactForceModel<T>** ContactForceModelBuilderFactory<T>::create(
 		std::string matB = ReaderXML::getNodeAttr_String( material, "materialB" );
 		unsigned int matA_id = GrainsParameters<T>::m_materialMap[ matA ];
 		unsigned int matB_id = GrainsParameters<T>::m_materialMap[ matB ];
-		unsigned int index = computeHash( matA_id, matB_id, numMaterials );
+		unsigned int index = computeHash( matA_id, matB_id );
 		// TODO:
 		DOMNode* contactType = ReaderXML::getNode( contact, "HODC" );
 		CF[index] = new HODCContactForceModel<T>( contactType );
@@ -77,27 +102,33 @@ ContactForceModel<T>** ContactForceModelBuilderFactory<T>::create(
 
 // -----------------------------------------------------------------------------
 // Hash function to map a pair of material IDs x and y to a single ID to access
-// the contact force model between them.
+// the proper contact force model between them.
 // In general, we have an array of ContactForceModel objects. The main purpose
 // of this function is to know which element of this array should be accessed,
 // given the material ID of two rigidBodies.
+// We use a triangular indexing strategy with an offset to take care of contact
+// with obstacles.
+// We DO NOT CHECK the inputs. We TRUST the user on this. However, inproper 
+// inputs would persumably crash the code.
 template <typename T>
 __HOSTDEVICE__
 unsigned int ContactForceModelBuilderFactory<T>::computeHash( unsigned int x,
-															  unsigned int y,
-															  unsigned int N )
+															  unsigned int y )
 {
-	if ( x < N && y < N )
-	{
-		unsigned int small = min( x, y );
-		unsigned int large = max( x, y );
-		return ( ( N - 1 ) * small + large );
-	}
+	unsigned int numPM = *m_numParticleMaterials;
+	unsigned int s = min( x, y ); // smaller one
+	unsigned int l = max( x, y ); // larger one
+	if ( l < numPM )
+		return ( l * ( l + 1 ) / 2 + s );
+	// offset if contact between a part and obst
+	else if ( l >= numPM ) 
+		return ( numPM * (numPM + 1) / 2 + s + ( l - numPM ) * numPM );
 	else
 	{
 		printf( "Wrong inputs in" );
 		printf( "ContactForceModelBuilderFactory<T>::computeHash\n" );
-		return( 0 );
+		printf( "Contact between two obstacles is not handled!\n" );
+		return ( 0 );
 	}
 }
 

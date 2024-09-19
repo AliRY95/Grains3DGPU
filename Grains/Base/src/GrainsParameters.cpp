@@ -42,6 +42,8 @@ template <typename T>
 Vector3<T> GrainsParameters<T>::m_gravity = zeroVector3T;
 template <typename T> 
 std::unordered_map<std::string, unsigned int> GrainsParameters<T>::m_materialMap;
+template <typename T> 
+unsigned int GrainsParameters<T>::m_numParticleMaterials = 0;
 
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;

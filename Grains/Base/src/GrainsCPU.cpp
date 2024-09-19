@@ -74,7 +74,6 @@ void GrainsCPU<T>::simulate()
                                                     &t,
                                                     &k,
                                                     GrainsParameters<T>::m_time );
-
     }
     auto h_end = chrono::high_resolution_clock::now();
     Grains<T>::m_postProcessor->PostProcessing_end();
