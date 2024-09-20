@@ -8,18 +8,18 @@ export GRAINS_ROOT=${GRAINS_HOME}/Grains
 # CPU
 export GRAINS_CPP_COMPILER=g++
 export GRAINS_CPP_COMPILER_DIST="GNU"
-export GRAINS_CPP_COMPILER_VERSION="11.3.0"
+export GRAINS_CPP_COMPILER_VERSION="13.2.0"
 # End CPU
 
 
 # GPU
 export GRAINS_GPU_COMPILER=nvcc
 export GRAINS_GPU_COMPILER_DIST="CUDA"
-export GRAINS_GPU_COMPILER_VERSION="12.4.0"
-export GRAINS_GPU_COMPILER_ROOT=/opt/nvidia/hpc_sdk/Linux_x86_64/23.3/compilers
+export GRAINS_GPU_COMPILER_VERSION="12.6.0"
+export GRAINS_GPU_COMPILER_ROOT=/usr/local/cuda-12.6
 export GRAINS_GPU_COMPILER_INCDIR="${GRAINS_GPU_COMPILER_ROOT}/include"
 export GRAINS_GPU_COMPILER_BINDIR="${GRAINS_GPU_COMPILER_ROOT}/bin"
-export GRAINS_GPU_COMPILER_LIBDIR="${GRAINS_GPU_COMPILER_ROOT}/lib"
+export GRAINS_GPU_COMPILER_LIBDIR="${GRAINS_GPU_COMPILER_ROOT}/lib64"
 # End GPU
 
 
@@ -50,7 +50,7 @@ echo -e '\033[31mXERCES_ROOT\033[0m =' $GRAINS_XERCES_ROOT
 
 
 # Compilers
-export GRAINS_CPP_COMPILER_FLAGS="-m64 -O3 -fPIC -std=c++11 \
+export GRAINS_CPP_COMPILER_FLAGS="-m64 -O3 -fPIC -std=c++20 \
     -Wno-ctor-dtor-privacy \
     -Wall -Wextra -Wconversion -Wshadow -Wpedantic -Wwrite-strings \
     -fmax-errors=8 \
@@ -59,8 +59,8 @@ export GRAINS_CPP_LINKER_FLAGS="${GRAINS_CPP_COMPILER_FLAGS} -shared"
 ###########
 export GRAINS_GPU_COMPILER="${GRAINS_GPU_COMPILER_BINDIR}/${GRAINS_GPU_COMPILER}"
 export GRAINS_GPU_LINKER="${GRAINS_GPU_COMPILER_BINDIR}/${GRAINS_GPU_COMPILER}"
-export GRAINS_GPU_COMPILER_FLAGS="-t=0 -O3 -x cu -m64 -dlto -dc \
-    -std=c++17 -arch=sm_75 \
+export GRAINS_GPU_COMPILER_FLAGS="-t=8 -O3 -x cu -m64 -dlto -dc \
+    -std=c++20 -arch=sm_75 \
     -cudart static -cudadevrt static \
     -maxrregcount=128 -use_fast_math -extra-device-vectorization -restrict \
     -Xcompiler "-rdynamic,-fPIC,-fopenmp" \

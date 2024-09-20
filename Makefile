@@ -42,7 +42,7 @@ createdepend:
 # --------------------------
 cleanxerces:
 	cd $(XERCES_SOURCE) ; make clean ; cd ../../..
-	cd $(XERCES_DIR) ; $(RM) lib$(GRAINS_BITS_EXT)-$(GRAINS_SERCOMPIL_ENV)-$(GRAINS_SERCOMPIL_VERSION) ; cd ..
+	cd $(XERCES_DIR) ; $(RM) ${GRAINS_XERCES_LIBDIR} ; cd ..
 	@echo 'XERCES cleaned'
 
 cleandtd:
