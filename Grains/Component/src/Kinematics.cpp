@@ -115,7 +115,7 @@ void Kinematics<T>::addToAngularComponent( Vector3<T> const& omega )
 // Returns the total velocity U + om x R given R 
 template <typename T>
 __HOSTDEVICE__
-Vector3<T> Kinematics<T>::Velocity( Vector3<T> const& R ) const
+Vector3<T> Kinematics<T>::kinematicsAtPoint( Vector3<T> const& R ) const
 {
     return ( m_translational + ( m_angular ^ R ) );
 }

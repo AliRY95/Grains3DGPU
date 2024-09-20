@@ -308,6 +308,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeForces(
                                                             CF,
                                                             m_rigidBodyId,
                                                             m_transform,
+                                                            m_velocity,
                                                             m_torce,
                                                             m_componentId,
                                                             m_componentCellHash,

@@ -40,10 +40,12 @@ unsigned int GrainsParameters<T>::m_numCells = 0;
 /* Physical */
 template <typename T> 
 Vector3<T> GrainsParameters<T>::m_gravity = zeroVector3T;
+
+/* Material */
 template <typename T> 
 std::unordered_map<std::string, unsigned int> GrainsParameters<T>::m_materialMap;
 template <typename T> 
-unsigned int GrainsParameters<T>::m_numParticleMaterials = 0;
+unsigned int GrainsParameters<T>::m_numContactPairs = 0;
 
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;

@@ -73,12 +73,6 @@ void GrainsGPU<T>::simulate()
     }
     auto h_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
-    std::vector<Transform3<T>> h_tr = Grains<T>::m_components->getTransform();
-    std::cout << "Positions are: "
-                << h_tr[0].getOrigin() 
-                // << ", and "
-                // << h_tr[1].getOrigin() 
-                << endl;
     // Collision detection on device
     auto d_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
@@ -96,12 +90,6 @@ void GrainsGPU<T>::simulate()
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
-    std::vector<Transform3<T>> d_tr = Grains<T>::m_d_components->getTransform();
-    std::cout << "Positions are: "
-                << d_tr[0].getOrigin() 
-                // << ", and "
-                // << d_tr[1].getOrigin() 
-                << endl;
 
 
 

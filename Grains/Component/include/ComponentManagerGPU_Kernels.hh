@@ -49,6 +49,7 @@ void detectCollisionAndComputeForces_kernel(
                                         ContactForceModel<T> const* const* CF,
                                         unsigned int* m_rigidBodyId,
                                         Transform3<T> const* m_transform,
+                                        Kinematics<T> const* m_velocity,
                                         Torce<T>* m_torce,
                                         int* m_compId,
                                         unsigned int* m_componentCellHash,

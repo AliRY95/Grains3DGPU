@@ -28,12 +28,12 @@
 	</TemporalSetting>
 
 	<Particles>
-		<Particle Number="10" Density="1163.66" Material="matP">
+		<Particle Number="1000" Density="1163.66" Material="matP">
 			<AngularPosition Type="Identity"></AngularPosition>
 				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
-				<!-- <Box LX="0.04" LY="0.04" LZ="0.08"/> -->
+				<!-- <Sphere Radius="0.01"/> -->
 			<Convex CrustThickness="1.e-4">
-				<Sphere Radius="0.01"/>
+				<Box LX="0.04" LY="0.04" LZ="0.08"/>
 			</Convex>
 		</Particle>
 	</Particles>
