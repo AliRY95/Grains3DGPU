@@ -43,7 +43,7 @@ LinkedCell and a thread-per-particle policy
 @param TODO */
 template <typename T, typename U>
 __GLOBAL__ 
-void detectCollisionAndComputeForces_kernel( 
+void detectCollisionAndComputeContactForces_kernel( 
                                         LinkedCell<T> const* const* LC,
                                         RigidBody<T, U> const* const* RB,
                                         ContactForceModel<T> const* const* CF,
@@ -56,6 +56,7 @@ void detectCollisionAndComputeForces_kernel(
                                         unsigned int* m_cellHashStart,
                                         unsigned int* m_cellHashEnd,
                                         int numComponents,
+                                        T gx, T gy, T gz,
                                         int* result );
 
 /** @brief Updates components transformation and velocities

@@ -8,8 +8,6 @@
 #include "VectorMath.hh"
 #include "QuaternionMath.hh"
 
-#include "GrainsParameters.hh"
-
 
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
@@ -373,7 +371,7 @@ void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 // -----------------------------------------------------------------------------
 // Detects collision between particles
 template <typename T>
-void ComponentManagerCPU<T>::detectCollisionAndComputeForces( 
+void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces( 
                                         LinkedCell<T> const* const* LC,
                                         RigidBody<T, T> const* const* RB,
                                         ContactForceModel<T> const* const* CF,

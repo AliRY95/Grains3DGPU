@@ -42,7 +42,7 @@ a thread-per-particle policy
 @param fix later */
 template <typename T, typename U>
 __GLOBAL__ 
-void detectCollisionAndComputeForces_kernel( 
+void detectCollisionAndComputeContactForces_kernel( 
                                         LinkedCell<T> const* const* LC,
                                         RigidBody<T, U> const* const* RB,
                                         ContactForceModel<T> const* const* CF,

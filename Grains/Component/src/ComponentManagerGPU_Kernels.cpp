@@ -87,7 +87,7 @@ void sortComponentsAndFindCellStart_kernel(
 // LinkedCell collision detection kernel 
 template <typename T, typename U>
 __GLOBAL__ 
-void detectCollisionAndComputeForces_kernel( 
+void detectCollisionAndComputeContactForces_kernel( 
                                    LinkedCell<T> const* const* LC,
                                    RigidBody<T, U> const* const* RB,
                                    ContactForceModel<T> const* const* CF,
@@ -100,6 +100,7 @@ void detectCollisionAndComputeForces_kernel(
                                    unsigned int* m_cellHashStart,
                                    unsigned int* m_cellHashEnd,
                                    int numComponents,
+                                   T gx, T gy, T gz,
                                    int* result )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -162,14 +163,10 @@ void detectCollisionAndComputeForces_kernel(
                                                    m_torce[ compId ] );
             }
             result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
-            // Vector3<T> relVelocityAtContact = 
-            // m_kinematics[compId].getVelocityAtPoint( ci.getContactPoint() ) -
-            // m_kinematics[secondaryId].getVelocityAtPoint( ci.getContactPoint() );
-            // Vector3<T> relAngVelocity = 
         }
     } } }
     // Adding the gravitational force to the torce
-    // m_torce[compId].addForce( massA * GrainsParameters<T>::m_gravity );
+    m_torce[compId].addForce( massA * Vector3<T>( gx, gy, gz ) );
 }
 
 
@@ -225,7 +222,7 @@ void moveComponents_kernel( RigidBody<T, U> const* const* RB,
 #define X( T, U )                                                              \
 template                                                                       \
 __GLOBAL__                                                                     \
-void detectCollisionAndComputeForces_kernel(                                   \
+void detectCollisionAndComputeContactForces_kernel(                            \
                                    LinkedCell<T> const* const* LC,             \
                                    RigidBody<T, U> const* const* RB,           \
                                    ContactForceModel<T> const* const* CF,      \
@@ -238,6 +235,7 @@ void detectCollisionAndComputeForces_kernel(                                   \
                                    unsigned int* m_cellHashStart,              \
                                    unsigned int* m_cellHashEnd,                \
                                    int numComponents,                          \
+                                   T gx, T gy, T gz,                           \
                                    int* result );                              \
                                                                                \
 template                                                                       \

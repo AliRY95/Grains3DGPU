@@ -292,7 +292,7 @@ void ComponentManagerGPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 // Detects collision between particles
 // TODO: thread safety flag and MaxOccupancy
 template <typename T>
-void ComponentManagerGPU<T>::detectCollisionAndComputeForces( 
+void ComponentManagerGPU<T>::detectCollisionAndComputeContactForces( 
                                         LinkedCell<T> const* const* LC,
                                         RigidBody<T, T> const* const* RB, 
                                         ContactForceModel<T> const* const* CF,
@@ -302,7 +302,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeForces(
     unsigned int numBlocks = ( m_nParticles + numThreads - 1 ) / numThreads;
     
     updateLinks( LC );
-    detectCollisionAndComputeForces_kernel<<< numBlocks, numThreads >>> 
+    detectCollisionAndComputeContactForces_kernel<<< numBlocks, numThreads >>> 
                                                           ( LC,
                                                             RB,
                                                             CF,
@@ -315,6 +315,9 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeForces(
                                                             m_cellHashStart,
                                                             m_cellHashEnd,
                                                             m_nParticles,
+                                                            GrainsParameters<T>::m_gravity[X],
+                                                            GrainsParameters<T>::m_gravity[Y],
+                                                            GrainsParameters<T>::m_gravity[Z],
                                                             result );
 }
 
