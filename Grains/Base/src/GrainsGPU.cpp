@@ -63,7 +63,7 @@ void GrainsGPU<T>::simulate()
           GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
-        Grains<T>::m_components->detectCollisionAndComputeForces( 
+        Grains<T>::m_components->detectCollisionAndComputeContactForces( 
                                                   Grains<T>::m_linkedCell, 
                                                   Grains<T>::m_rigidBodyList,
                                                   Grains<T>::m_contactForce,
@@ -79,7 +79,7 @@ void GrainsGPU<T>::simulate()
           GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
-        Grains<T>::m_d_components->detectCollisionAndComputeForces( 
+        Grains<T>::m_d_components->detectCollisionAndComputeContactForces( 
                                                 Grains<T>::m_d_linkedCell, 
                                                 Grains<T>::m_d_rigidBodyList,
                                                 Grains<T>::m_d_contactForce,

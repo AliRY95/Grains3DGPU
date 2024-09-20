@@ -167,7 +167,7 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @brief Detects collision between components and computes forces */
         // template <typename U>
         // TODO: @param
-        void detectCollisionAndComputeForces( 
+        void detectCollisionAndComputeContactForces( 
                                         LinkedCell<T> const* const* LC,
                                         RigidBody<T, T> const* const* RB,
                                         ContactForceModel<T> const* const* CF,

@@ -137,7 +137,7 @@ class ComponentManagerGPU : public ComponentManager<T>
 
         /** @brief Detects collision between particles */
         // template <typename U>
-        void detectCollisionAndComputeForces( 
+        void detectCollisionAndComputeContactForces( 
                                         LinkedCell<T> const* const* LC,
                                         RigidBody<T, T> const* const* RB, 
                                         ContactForceModel<T> const* const* CF,

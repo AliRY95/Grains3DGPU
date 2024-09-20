@@ -82,3 +82,6 @@ export GRAINS_Z_FLAGS="-L${GRAINS_Z_LIB} -lz"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GRAINS_XERCES_LIBDIR}
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GRAINS_ROOT}/lib
 # End LD_LIBRARY_PATH
+
+# Compatibilty for Xerces
+source $GRAINS_HOME/Env/grains_xerces.env.sh

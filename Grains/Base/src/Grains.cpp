@@ -58,6 +58,8 @@ void Grains<T>::initialize( DOMElement* rootElement )
 template <typename T>
 void Grains<T>::Construction( DOMElement* rootElement )
 {
+    // Output message
+    cout << shiftString3 << "Construction" << endl;
     // -------------------------------------------------------------------------
     // Checking if Construction node is available
     DOMNode* root = ReaderXML::getNode( rootElement, "Construction" );
@@ -95,8 +97,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Particles
-    // Another place to mention that particles must be read first, then 
-    // obstacles. See ContactForceModelBuilderFactory.hh
     DOMNode* particles = ReaderXML::getNode( root, "Particles" );
     DOMNodeList* allParticles = ReaderXML::getNodes( rootElement, "Particle" );
     // Number of unique shapes (rigid bodies) in the simulation
@@ -147,7 +147,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
             cudaDeviceSynchronize();
         }
 
-        cout << shiftString6 << "Reading particle types completed!" << endl;
+        cout << shiftString6 << "Reading particle types completed!\n" << endl;
     }
 
 
@@ -174,7 +174,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
             GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
             LC_coeff * T( 2 ) * linkedCellSize );
         GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
-        cout << shiftString6 << "LinkedCell with "
+        cout << shiftString9 << "LinkedCell with "
              << GrainsParameters<T>::m_numCells <<
              " cells is created on host." << endl;
     // }
@@ -189,10 +189,11 @@ void Grains<T>::Construction( DOMElement* rootElement )
             m_d_linkedCell );
 
         GrainsParameters<T>::m_numCells = d_numCells;
-        cout << shiftString6 << "LinkedCell with "
+        cout << shiftString9 << "LinkedCell with "
              << GrainsParameters<T>::m_numCells <<
              " cells is created on device." << endl;
     // }
+    cout << shiftString6 << "Constructing linked cell completed!\n" << endl;
     
 
 
@@ -239,7 +240,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
                                                m_d_contactForce );
         }
         cout << shiftString6 
-             << "Reading the contact force model completed!" 
+             << "Reading the contact force model completed!\n" 
              << endl;
     }
 
@@ -278,7 +279,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
                                                         m_d_timeIntegrator );
             }
             cout << shiftString6 
-                 << "Reading the time integration model completed!" 
+                 << "Reading the time integration model completed!\n" 
                  << endl;
         }
     }
@@ -296,7 +297,7 @@ void Grains<T>::Forces( DOMElement* rootElement )
     DOMNode* root = ReaderXML::getNode( rootElement, "Forces" );
 
     // Output message
-    cout << shiftString6 << "Forces" << endl;
+    cout << shiftString3 << "Forces" << endl;
 
 
     // Read the forces
@@ -315,6 +316,7 @@ void Grains<T>::Forces( DOMElement* rootElement )
             cout << shiftString9 
                     << "Gravity = " 
                     << GrainsParameters<T>::m_gravity 
+                    << "\n"
                     << endl;
         }
         else
@@ -333,6 +335,8 @@ void Grains<T>::Forces( DOMElement* rootElement )
 template <typename T>
 void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
 {
+    // Output message
+    cout << shiftString3 << "Simulation" << endl;
     // -------------------------------------------------------------------------
     // Checking if Construction node is available
     assert( rootElement != NULL );
@@ -342,9 +346,6 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
         cout << shiftString3 << "Simulation node is mandatory!" << endl;
         exit( 1 );
     }
-
-    // Output message
-    cout << shiftString9 << "Simulation" << endl;
 
 
 

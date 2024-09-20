@@ -57,7 +57,7 @@ void GrainsCPU<T>::simulate()
           GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
-        Grains<T>::m_components->detectCollisionAndComputeForces( 
+        Grains<T>::m_components->detectCollisionAndComputeContactForces( 
                                                   Grains<T>::m_linkedCell, 
                                                   Grains<T>::m_rigidBodyList,
                                                   Grains<T>::m_contactForce,

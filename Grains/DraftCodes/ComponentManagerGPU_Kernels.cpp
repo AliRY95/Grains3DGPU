@@ -139,7 +139,7 @@ void collisionDetectionRelativeN2( RigidBody<T, U> const* const* a,
 // TODO: CLEAN -- A LOT OF THINGS
 template <typename T, typename U>
 __GLOBAL__ 
-void detectCollisionAndComputeForces_kernel( 
+void detectCollisionAndComputeContactForces_kernel( 
                                    LinkedCell<T> const* const* LC,
                                    RigidBody<T, U> const* const* RB,
                                    ContactForceModel<T> const* const* CF,
@@ -226,7 +226,7 @@ void collisionDetectionN2( RigidBody<T, U> const* const* a,                    \
                            int* result );                                      \
 template                                                                       \
 __GLOBAL__                                                                     \
-void detectCollisionAndComputeForces_kernel(                                   \
+void detectCollisionAndComputeConatactForces_kernel(                           \
                                    LinkedCell<T> const* const* LC,             \
                                    RigidBody<T, U> const* const* RB,           \
                                    ContactForceModel<T> const* const* CF,      \

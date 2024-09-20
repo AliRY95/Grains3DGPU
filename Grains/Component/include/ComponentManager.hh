@@ -11,6 +11,7 @@
 #include "ContactForceModel.hh"
 #include "ContactForceModelBuilderFactory.hh"
 #include "CollisionDetection.hh"
+#include "GrainsParameters.hh"
 
 
 // =============================================================================
@@ -114,7 +115,7 @@ class ComponentManager
         /** @brief Detects collision between components and computes forces */
         // template <typename U>
         // TODO: @param
-        virtual void detectCollisionAndComputeForces( 
+        virtual void detectCollisionAndComputeContactForces( 
                                         LinkedCell<T> const* const* LC,
                                         RigidBody<T, T> const* const* RB, 
                                         ContactForceModel<T> const* const* CF,
