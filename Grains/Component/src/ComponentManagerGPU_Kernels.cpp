@@ -7,6 +7,7 @@
 #include "LinkedCellGPUWrapper.hh"
 #include "ContactForceModelBuilderFactory.hh"
 #include "GrainsParameters.hh"
+#include "VectorMath.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -84,7 +85,6 @@ void sortComponentsAndFindCellStart_kernel(
 
 // -----------------------------------------------------------------------------
 // LinkedCell collision detection kernel 
-// TODO: CLEAN -- A LOT OF THINGS
 template <typename T, typename U>
 __GLOBAL__ 
 void detectCollisionAndComputeForces_kernel( 
@@ -93,6 +93,7 @@ void detectCollisionAndComputeForces_kernel(
                                    ContactForceModel<T> const* const* CF,
                                    unsigned int* m_rigidBodyId,
                                    Transform3<T> const* m_transform,
+                                   Kinematics<T> const* m_velocity,
                                    Torce<T>* m_torce,
                                    int* m_compId,
                                    unsigned int* m_componentCellHash,
@@ -138,15 +139,27 @@ void detectCollisionAndComputeForces_kernel(
                                                           trB );
             if ( ci.getOverlapDistance() < T( 0 ) )
             {
+                // CF ID given materialIDs
                 unsigned int contactForceID = 
-                ContactForceModelBuilderFactory<T>::computeHash( matA, 
-                                                        rbB.getMaterial() );
+                ContactForceModelBuilderFactory<T>::computeHash( 
+                                                            matA, 
+                                                            rbB.getMaterial() );
+                // velocities of the particles
+                Kinematics<T> v1( m_velocity[ compId ] );
+                Kinematics<T> v2( m_velocity[ secondaryId ] );
+                // relative velocity at contact point
+                Vector3<T> relVel( 
+                                v1.kinematicsAtPoint( ci.getContactPoint() ) -
+                                v2.kinematicsAtPoint( ci.getContactPoint() ) );
+                // relative angular velocity
+                Vector3<T> relAngVel( v1.getAngularComponent() - 
+                                      v2.getAngularComponent() );
                 CF[contactForceID]->computeForces( ci, 
-                                                    zeroVector3T,
-                                                    zeroVector3T,
-                                                    massA,
-                                                    rbB.getMass(),
-                                                    m_torce[ compId ] );
+                                                   relVel,
+                                                   relAngVel,
+                                                   massA,
+                                                   rbB.getMass(),
+                                                   m_torce[ compId ] );
             }
             result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
             // Vector3<T> relVelocityAtContact = 
@@ -218,6 +231,7 @@ void detectCollisionAndComputeForces_kernel(                                   \
                                    ContactForceModel<T> const* const* CF,      \
                                    unsigned int* m_rigidBodyId,                \
                                    Transform3<T> const* m_transform,           \
+                                   Kinematics<T> const* m_velocity,            \
                                    Torce<T>* m_torce,                          \
                                    int* m_compId,                              \
                                    unsigned int* m_componentCellHash,          \

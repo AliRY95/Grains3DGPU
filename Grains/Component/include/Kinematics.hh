@@ -83,7 +83,7 @@ class Kinematics
         /** @brief Returns the total velocity U + om x R given R 
         @param R arm vector */
         __HOSTDEVICE__
-        Vector3<T> Velocity( Vector3<T> const& R ) const;
+        Vector3<T> kinematicsAtPoint( Vector3<T> const& R ) const;
         //@}    
 };
 

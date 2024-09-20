@@ -392,7 +392,6 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeForces(
         Transform3<T> const& trA = m_transform[ compId ];
         T massA = rbA.getMass();
         unsigned int matA = rbA.getMaterial();
-        // Torce<T>& m_torce[ compId ];
         for ( int k = -1; k < 2; k++ ) {
         for ( int j = -1; j < 2; j++ ) { 
         for ( int i = -1; i < 2; i++ ) {
@@ -419,13 +418,25 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeForces(
                                                               trB );
                 if ( ci.getOverlapDistance() < T( 0 ) )
                 {
+                    // CF ID given materialIDs
                     unsigned int contactForceID = 
                     ContactForceModelBuilderFactory<T>::computeHash( 
                                                             matA, 
                                                             rbB.getMaterial() );
+                    // velocities of the particles
+                    Kinematics<T> v1( m_velocity[ compId ] );
+                    Kinematics<T> v2( m_velocity[ secondaryId ] );
+                    // geometric point of contact
+                    Vector3<T> contactPt( ci.getContactPoint() );
+                    // relative velocity at contact point
+                    Vector3<T> relVel( v1.kinematicsAtPoint( contactPt ) -
+                                       v2.kinematicsAtPoint( contactPt ) );
+                    // relative angular velocity
+                    Vector3<T> relAngVel( v1.getAngularComponent() - 
+                                          v2.getAngularComponent() );
                     CF[contactForceID]->computeForces( ci, 
-                                                       zeroVector3T,
-                                                       zeroVector3T,
+                                                       relVel,
+                                                       relAngVel,
                                                        massA,
                                                        rbB.getMass(),
                                                        m_torce[ compId ] );

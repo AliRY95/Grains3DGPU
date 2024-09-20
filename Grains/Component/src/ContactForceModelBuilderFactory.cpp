@@ -113,7 +113,6 @@ void ContactForceModelBuilderFactory<T>::ContactForceModelCopyHostToDevice(
 {
     for ( int i = 0; i < GrainsParameters<T>::m_numContactPairs; i++ )
     {
-
 		if ( !h_cf[i] )
 			continue;
         // Extracting info from the host side object

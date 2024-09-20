@@ -221,21 +221,19 @@ void Grains<T>::Construction( DOMElement* rootElement )
     // but it should be fine by now
     unsigned int numMaterials = GrainsParameters<T>::m_materialMap.size();
     GrainsParameters<T>::m_numContactPairs = 
-                                        numMaterials * ( numMaterials - 1 ) / 2;
+                                        numMaterials * ( numMaterials + 1 ) / 2;
     DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
     if ( contacts )
     {
         cout << shiftString6 
              << "Reading the contact force model ..." 
              << endl;
-        unsigned int numContactPairs = 1;
-            // GrainsParameters<T>::m_materialMap.size() * 
-            // ( GrainsParameters<T>::m_materialMap.size() - 1 ) / 2;
         m_contactForce = ContactForceModelBuilderFactory<T>::create( rootElement );
         if ( GrainsParameters<T>::m_isGPU )
         {
             cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
-                        numContactPairs * sizeof( ContactForceModel<T>* ) ) );
+                                    GrainsParameters<T>::m_numContactPairs *
+                                    sizeof( ContactForceModel<T>* ) ) );
             ContactForceModelBuilderFactory<T>::
             ContactForceModelCopyHostToDevice( m_contactForce,
                                                m_d_contactForce );
