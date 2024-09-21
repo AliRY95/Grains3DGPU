@@ -42,6 +42,11 @@ class GrainsParameters
         /** \brief Number of different possible contact pairs (incl. obs-obs) */
         static unsigned int m_numContactPairs;
 
+        /* Post-Processing */
+        static T m_tSaveStart; /**< initial simulation time for PP */  
+        static T m_tSaveEnd; /**< end simulation time for PP */  
+        static T m_dtSave; /**< simulation time step for PP */
+        
         /* GPU */
         static bool m_isGPU; /**< is simulation on GPU? */
         //@}
