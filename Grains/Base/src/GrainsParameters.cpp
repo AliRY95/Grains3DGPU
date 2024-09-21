@@ -47,6 +47,14 @@ std::unordered_map<std::string, unsigned int> GrainsParameters<T>::m_materialMap
 template <typename T> 
 unsigned int GrainsParameters<T>::m_numContactPairs = 0;
 
+/* Post-Processing */
+template <typename T> 
+T GrainsParameters<T>::m_tSaveStart;
+template <typename T> 
+T GrainsParameters<T>::m_tSaveEnd;
+template <typename T> 
+T GrainsParameters<T>::m_dtSave;
+
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;
 

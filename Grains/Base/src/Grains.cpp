@@ -356,7 +356,14 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
     if ( nPostProcessing )
     {
         cout << shiftString6 << "Post-processing" << endl;
-
+        // Post-processing save time
+        DOMNode* nTime = ReaderXML::getNode( nPostProcessing, "TimeSave" );
+        T tStart = ReaderXML::getNodeAttr_Double( nTime, "Start" );
+        T tEnd = ReaderXML::getNodeAttr_Double( nTime, "End" );
+        T tStep = ReaderXML::getNodeAttr_Double( nTime, "dt" );
+        GrainsParameters<T>::m_tSaveStart = tStart;
+        GrainsParameters<T>::m_tSaveEnd = tEnd;
+        GrainsParameters<T>::m_dtSave = tStep;
         // Post-processing writers
         DOMNode* nWriters = ReaderXML::getNode( nPostProcessing, "Writers" );
         if ( nWriters )

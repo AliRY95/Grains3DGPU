@@ -58,9 +58,10 @@ void GrainsGPU<T>::simulate()
 
     // Collision detection on host
      // Collision detection on host
+     Grains<T>::m_postProcessor->PostProcessing_start();
     auto h_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
-          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
         Grains<T>::m_components->detectCollisionAndComputeContactForces( 
@@ -70,13 +71,37 @@ void GrainsGPU<T>::simulate()
                                                   h_collision ); 
         Grains<T>::m_components->moveComponents( Grains<T>::m_timeIntegrator,
                                                  Grains<T>::m_rigidBodyList );
+        
+        // Post-Processing
+        if ( GrainsParameters<T>::m_time >= GrainsParameters<T>::m_tSaveStart &&
+             GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tSaveEnd )
+        {
+            if ( std::fmod( GrainsParameters<T>::m_time - 
+                            GrainsParameters<T>::m_tSaveStart, 
+                            GrainsParameters<T>::m_dtSave ) <
+                            0.01 * GrainsParameters<T>::m_dt )
+            {
+                std::vector<unsigned int> id = 
+                                    Grains<T>::m_components->getRigidBodyId();
+                std::vector<Transform3<T>> t = 
+                                    Grains<T>::m_components->getTransform();
+                std::vector<Kinematics<T>> k = 
+                                    Grains<T>::m_components->getVelocity();
+                Grains<T>::m_postProcessor->PostProcessing( 
+                                                Grains<T>::m_rigidBodyList,
+                                                &id,
+                                                &t,
+                                                &k,
+                                                GrainsParameters<T>::m_time );
+            }
+        }
     }
     auto h_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
     // Collision detection on device
     auto d_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
-          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
         Grains<T>::m_d_components->detectCollisionAndComputeContactForces( 
@@ -86,10 +111,35 @@ void GrainsGPU<T>::simulate()
                                                 d_collision );
         Grains<T>::m_d_components->moveComponents( Grains<T>::m_d_timeIntegrator,
                                                    Grains<T>::m_d_rigidBodyList );
+        
+        // Post-Processing
+        if ( GrainsParameters<T>::m_time >= GrainsParameters<T>::m_tSaveStart &&
+             GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tSaveEnd )
+        {
+            if ( std::fmod( GrainsParameters<T>::m_time - 
+                            GrainsParameters<T>::m_tSaveStart, 
+                            GrainsParameters<T>::m_dtSave ) <
+                            0.01 * GrainsParameters<T>::m_dt )
+            {
+                std::vector<unsigned int> id = 
+                                    Grains<T>::m_d_components->getRigidBodyId();
+                std::vector<Transform3<T>> t = 
+                                    Grains<T>::m_d_components->getTransform();
+                std::vector<Kinematics<T>> k = 
+                                    Grains<T>::m_d_components->getVelocity();
+                Grains<T>::m_postProcessor->PostProcessing( 
+                                                Grains<T>::m_rigidBodyList,
+                                                &id,
+                                                &t,
+                                                &k,
+                                                GrainsParameters<T>::m_time );
+            }
+        }
     }
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
+    Grains<T>::m_postProcessor->PostProcessing_end();
 
 
 
