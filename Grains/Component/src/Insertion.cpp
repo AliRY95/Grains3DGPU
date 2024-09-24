@@ -1,3 +1,4 @@
+#include <ctime>
 #include "Insertion.hh"
 
 
@@ -6,10 +7,10 @@
 template <typename T>
 __HOST__
 Insertion<T>::Insertion()
-: m_positionType( DEFAULT )
-, m_orientationType( DEFAULT )
-, m_translationalVelType( DEFAULT )
-, m_angularVelType( DEFAULT )
+: m_positionType( DEFAULTINSERTION )
+, m_orientationType( DEFAULTINSERTION )
+, m_translationalVelType( DEFAULTINSERTION )
+, m_angularVelType( DEFAULTINSERTION )
 , m_positionInsertionInfo( NULL )
 , m_orientationInsertionInfo( NULL )
 , m_translationalVelInsertionInfo( NULL )
@@ -28,13 +29,24 @@ Insertion<T>::Insertion( DOMNode* dn,
 : m_numToInsert( numToInsert )                         
 {
     DOMNode* nIP = ReaderXML::getNode( dn, "InitialPosition" );
-    readXML( nIP, m_positionType, m_positionInsertionInfo );
+    std::cout << "Reading PositionInsertion Policy ..." << std::endl;
+    std::tie( m_positionType, m_positionInsertionInfo ) = 
+                                                        readTypeAndData( nIP );
+    
+    std::cout << "Reading OrientationInsertion Policy ..." << std::endl;
     DOMNode* nIO = ReaderXML::getNode( dn, "InitialOrientation" );
-    readXML( nIO, m_orientationType, m_orientationInsertionInfo );
+    std::tie( m_orientationType, m_orientationInsertionInfo ) = 
+                                                        readTypeAndData( nIO );
+    
+    std::cout << "Reading VeclocityInsertion Policy ..." << std::endl;
     DOMNode* nIV = ReaderXML::getNode( dn, "InitialVelocity" );
-    readXML( nIV, m_translationalVelType, m_translationalVelInsertionInfo );
+    std::tie( m_translationalVelType, m_translationalVelInsertionInfo ) = 
+                                                        readTypeAndData( nIV );
+    
+    std::cout << "Reading AngularVeclocityInsertion Policy ..." << std::endl;
     DOMNode* nIA = ReaderXML::getNode( dn, "InitialAngularVelocity" );
-    readXML( nIA, m_angularVelType, m_angularVelInsertionInfo );
+    std::tie( m_angularVelType, m_angularVelInsertionInfo ) = 
+                                                        readTypeAndData( nIA );
 }
 
 
@@ -48,10 +60,10 @@ Insertion<T>::Insertion( InsertionType pos,
                          InsertionType ori,
                          InsertionType vel,
                          InsertionType ome,
-                         InsertionInfo const& posData,
-                         InsertionInfo const& oriData,
-                         InsertionInfo const& velData,
-                         InsertionInfo const& omeData,
+                         InsertionInfo<T> const& posData,
+                         InsertionInfo<T> const& oriData,
+                         InsertionInfo<T> const& velData,
+                         InsertionInfo<T> const& omeData,
                          unsigned int numToInsert )
 : m_positionType( pos )
 , m_orientationType( ori )
@@ -78,39 +90,55 @@ Insertion<T>::~Insertion()
 
 
 // -----------------------------------------------------------------------------
-// Reads an XML node to figure out the insertion type and related info
+// Reads an XML node to set the insertion type and related info
 template <typename T>
 __HOST__
-void Insertion<T>::readXML( DOMNode* root,
-                            InsertionType& type,
-                            InsertionInfo& data )
+std::pair<InsertionType, InsertionInfo<T>> 
+Insertion<T>::readTypeAndData( DOMNode* root ) const
 {
+    InsertionType type;
+    InsertionInfo<T> data;
     std::string nType = ReaderXML::getNodeAttr_String( root, "Type" );
     if( nType == "Random" )
     {
-        type = Random;
-        data = 0;
-        // TODO: fix the seed here
-        // std::string seedString = ReaderXML::getNodeAttr_String( root, "Seed" );
-        // if ( seedString == "Default" )
+        type = RANDOMINSERTION;
+        std::string seedString = ReaderXML::getNodeAttr_String( root, "Seed" );
+        if ( seedString == "Default" )
+            data = T( 0 );
+        else if ( seedString == "UserDefined" )
+        {
+            unsigned int val = ReaderXML::getNodeAttr_Int( root, "Value" );
+            if ( val )
+                data = val;
+            else
+            {
+                std::cout << "Seed value is not provided. Default is used!" 
+                          << std::endl;
+                data = 0;
+            }
+        }
+        else if ( seedString == "Random" )
+        {
+            data = time( NULL );
+        }
     }
     else if( nType == "File" )
     {
-        type = FILE;
+        type = FILEINSERTION;
         data = ReaderXML::getNodeAttr_String( root, "Name" );
     }
     else if( nType == "Constant" )
     {
-        type = CONSTANT;
+        type = CONSTANTINSERTION;
         T xVal = T( ReaderXML::getNodeAttr_Double( root, "X" ) );
         T yVal = T( ReaderXML::getNodeAttr_Double( root, "Y" ) );
         T zVal = T( ReaderXML::getNodeAttr_Double( root, "Z" ) );
         data = Vector3<T>( xVal, yVal, zVal );
     }
-    else if( nType == "Constant" )
+    else if( nType == "Zero" )
     {
-        type = CONSTANT;
-        data = NULL;
+        type = DEFAULTINSERTION;
+        data = 0;
     }
     else
     {
@@ -119,54 +147,33 @@ void Insertion<T>::readXML( DOMNode* root,
                   << std::endl;
         exit( 1 );
     }
+    return ( std::make_pair( type, data ) );
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// return all required data members to insert components as a vector
+// Returns a vector of Vector3 accroding to type and data
 template <typename T>
 __HOST__
-std::vector<std::pair<Transform<T>, Kinematics<T>>> 
-Insertion<T>::fetchInsertionData() const
+std::vector<Vector3<T>> Insertion<T>::fetchInsertionDataForEach( 
+                                            InsertionType const type,
+                                            InsertionInfo<T> const& data ) const
 {
-
-    // First, positions
-    if ( m_positionType == FILE )
-    {
-         // Create a unique pointer to ifstream
-        std::ifstream fileStream = 
-            std::make_unique<std::ifstream>( std::get<std::string> m_positionInsertion );
-    }
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// return all required data members to insert components as a vector
-template <typename T>
-__HOST__
-std::vector<Vector3<T>> 
-Insertion<T>::fetchInsertionData( InsertionType const type,
-                                  InsertionInfo const& data,
-                                  unsigned int numToInsert ) const
-{
-    std::vector<Vector3<T>> output( numToInsert, Vector3<T>() )
+    std::vector<Vector3<T>> output( m_numToInsert, Vector3<T>() );
     Vector3<T> temp;
-    // // TODO:
-    // if ( type == RANDOM )
-    // {
 
-    // }
-    // else if ( type == FILE )
-    if ( type == FILE )
+    if ( type == RANDOMINSERTION )
+    {
+        // TODO
+    }
+    else if ( type == FILEINSERTION )
     {
         // retrieivng the insertion file name
-        std::string fileName = std::get<std::string> data;
+        std::string fileName = std::get<std::string>( data );
         // Create a unique pointer to ifstream
-        std::ifstream fileIn = std::make_unique<std::ifstream>( fileName );
+        std::ifstream fileIn( fileName );
         if ( !fileIn.is_open() )
         {
             std::cout << "Error in opening the insertion file "
@@ -175,17 +182,31 @@ Insertion<T>::fetchInsertionData( InsertionType const type,
                       << std::endl;
             exit( 1 );
         }
-        for ( unsigned int i = 0; i < numToInsert; i++ )
+        for ( unsigned int i = 0; i < m_numToInsert; i++ )
             fileIn >> output[i];
+        fileIn.close();
     }
-    else if ( type == CONSTANT )
+    else if ( type == CONSTANTINSERTION )
     {
-        Vector3<T> constant = std::get<Vector3<T>> data;
-        for ( unsigned int i = 0; i < numToInsert; i++ )
+        Vector3<T> constant = std::get<Vector3<T>>( data );
+        for ( unsigned int i = 0; i < m_numToInsert; i++ )
             output[i] = constant;
     }
     // else
     return( output );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns all required data members to insert components as a vector
+template <typename T>
+__HOST__
+std::vector<std::pair<Transform3<T>, Kinematics<T>>> 
+Insertion<T>::fetchInsertionData() const
+{
+    // fetchInsertionDataForEach( m_positionType, m_positionInsertionInfo );
 }
 
 

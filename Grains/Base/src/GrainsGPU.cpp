@@ -57,8 +57,7 @@ void GrainsGPU<T>::simulate()
                               cudaMemcpyHostToDevice ) );
 
     // Collision detection on host
-     // Collision detection on host
-     Grains<T>::m_postProcessor->PostProcessing_start();
+    Grains<T>::m_postProcessor->PostProcessing_start();
     auto h_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
           GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;

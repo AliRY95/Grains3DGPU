@@ -88,7 +88,7 @@ void GrainsCPU<T>::simulate()
                                                 GrainsParameters<T>::m_time );
             }
         }
-        // TODO: Force PP for the last step?
+        // TODO: Force to have PP for the last step?
     }
     auto h_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
