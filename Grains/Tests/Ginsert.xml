@@ -302,26 +302,23 @@
 </Forces>
 
 <Simulation>
-	<RestartFile Name="Grains/Init/insert" WritingMode="Hybrid"/>
-	<TimeSave Start="0." End="1.5" Every="0.006"/>
-	<CollisionalRelativeVelocity value="1.5"/>
 	<ParticleInsertion>
-		<Mode Type="InitialTime"/>
+		<InitialPosition Type="File" Name="./position.dat"/>
+		<InitialOrientation Type="Random" Seed="Default"/>
+		<InitalVelocity Type="Constant" X="0" Y="0" Z="0.001"/>
+		<InitalAngularVelocity Type="Zero"/>
+		<InitialAngularPosition Type="Random"/>		
+		<!-- <Mode Type="InitialTime"/>
 		<Order Type="Random"/>
-		<InitialAngularPosition Type="Random"/>
-		<RandomGeneratorSeed Type="Default"/>
-		<Frequency TryEvery="1"/>
-		<ForceInsertion Value="False"/>
-		<ParticlePosition>
+		<Frequency TryEvery="1"/> -->
+		<!-- <ParticlePosition>
 			<Windows>
 				<Window Type="Cylinder">
 					<BottomCentre X="0" Y="0" Z="0.13"/>
 					<Cylinder Radius="0.2277" Height="1.17" Direction="Z"/>
 				</Window>
 			</Windows>
-		</ParticlePosition>
-		<InitialVelocity Mode="Zero">
-		</InitialVelocity>
+		</ParticlePosition> -->
 	</ParticleInsertion>
 	<PostProcessing>
 		<TimeSave Start="0." End="0.001" dt="0.0001"/>
