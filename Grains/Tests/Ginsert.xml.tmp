@@ -9,7 +9,7 @@
 	<BoundingVolume Type="OBB"/>
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="0.001" dt="0.0001"/>
+		<TimeInterval Start="0." End="0.0001" dt="0.0001"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 	
