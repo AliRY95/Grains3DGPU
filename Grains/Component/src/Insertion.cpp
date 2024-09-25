@@ -6,15 +6,16 @@
 // Default constructor
 template <typename T>
 __HOST__
-Insertion<T>::Insertion()
+Insertion<T>::Insertion( unsigned int numToInsert )
 : m_positionType( DEFAULTINSERTION )
 , m_orientationType( DEFAULTINSERTION )
 , m_translationalVelType( DEFAULTINSERTION )
 , m_angularVelType( DEFAULTINSERTION )
-, m_positionInsertionInfo( NULL )
-, m_orientationInsertionInfo( NULL )
-, m_translationalVelInsertionInfo( NULL )
-, m_angularVelInsertionInfo( NULL )
+, m_positionInsertionInfo( 0 )
+, m_orientationInsertionInfo( 0 )
+, m_translationalVelInsertionInfo( 0 )
+, m_angularVelInsertionInfo( 0 )
+, m_numToInsert( numToInsert )
 {}
 
 
@@ -29,21 +30,29 @@ Insertion<T>::Insertion( DOMNode* dn,
 : m_numToInsert( numToInsert )                         
 {
     DOMNode* nIP = ReaderXML::getNode( dn, "InitialPosition" );
-    std::cout << "Reading PositionInsertion Policy ..." << std::endl;
+    std::cout << shiftString9
+              << "Reading PositionInsertion Policy ..." 
+              << std::endl;
     std::tie( m_positionType, m_positionInsertionInfo ) = 
                                                         readTypeAndData( nIP );
     
-    std::cout << "Reading OrientationInsertion Policy ..." << std::endl;
+    std::cout << shiftString9 
+              << "Reading OrientationInsertion Policy ..." 
+              << std::endl;
     DOMNode* nIO = ReaderXML::getNode( dn, "InitialOrientation" );
     std::tie( m_orientationType, m_orientationInsertionInfo ) = 
                                                         readTypeAndData( nIO );
     
-    std::cout << "Reading VeclocityInsertion Policy ..." << std::endl;
+    std::cout << shiftString9
+              << "Reading VeclocityInsertion Policy ..." 
+              << std::endl;
     DOMNode* nIV = ReaderXML::getNode( dn, "InitialVelocity" );
     std::tie( m_translationalVelType, m_translationalVelInsertionInfo ) = 
                                                         readTypeAndData( nIV );
     
-    std::cout << "Reading AngularVeclocityInsertion Policy ..." << std::endl;
+    std::cout << shiftString9
+              << "Reading AngularVeclocityInsertion Policy ..." 
+              << std::endl;
     DOMNode* nIA = ReaderXML::getNode( dn, "InitialAngularVelocity" );
     std::tie( m_angularVelType, m_angularVelInsertionInfo ) = 
                                                         readTypeAndData( nIA );
@@ -73,7 +82,7 @@ Insertion<T>::Insertion( InsertionType pos,
 , m_orientationInsertionInfo( oriData )
 , m_translationalVelInsertionInfo( velData )
 , m_angularVelInsertionInfo( omeData )
-, m_numToInsert( numToInsert )                         
+, m_numToInsert( numToInsert )
 {}
 
 
@@ -104,7 +113,7 @@ Insertion<T>::readTypeAndData( DOMNode* root ) const
         type = RANDOMINSERTION;
         std::string seedString = ReaderXML::getNodeAttr_String( root, "Seed" );
         if ( seedString == "Default" )
-            data = T( 0 );
+            data = 0;
         else if ( seedString == "UserDefined" )
         {
             unsigned int val = ReaderXML::getNodeAttr_Int( root, "Value" );
@@ -206,7 +215,42 @@ __HOST__
 std::vector<std::pair<Transform3<T>, Kinematics<T>>> 
 Insertion<T>::fetchInsertionData() const
 {
-    // fetchInsertionDataForEach( m_positionType, m_positionInsertionInfo );
+    // vector of positions
+    vector<Vector3<T>> pos = 
+    fetchInsertionDataForEach( m_positionType, m_positionInsertionInfo );
+    
+    // vector of orientation angles. These are not matrices, so we have to
+    // compute the rotation matrices.
+    vector<Vector3<T>> ori = 
+    fetchInsertionDataForEach( m_orientationType, m_orientationInsertionInfo );
+
+    // vector of velocities
+    vector<Vector3<T>> vel = 
+    fetchInsertionDataForEach( m_translationalVelType, m_translationalVelInsertionInfo );
+
+    // vector of angular velocities
+    vector<Vector3<T>> ang = 
+    fetchInsertionDataForEach( m_angularVelType, m_angularVelInsertionInfo );
+
+
+    Transform3<T> tr;
+    Kinematics<T> k;
+    std::vector<std::pair<Transform3<T>, Kinematics<T>>> output;
+    // preparing the output
+    for ( unsigned int i = 0; i < m_numToInsert; i++ )
+    {
+        // transform
+        tr.setBasis( ori[i][X], ori[i][Y], ori[i][Z] );
+        tr.setOrigin( pos[i] );
+
+        // kinematics
+        k.setTranslationalComponent( vel[i] );
+        k.setAngularComponent( ang[i] );
+
+        output.push_back( std::make_pair( tr, k ) );
+    }
+
+    return( output );
 }
 
 
