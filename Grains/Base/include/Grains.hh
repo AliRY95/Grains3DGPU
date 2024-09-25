@@ -10,6 +10,7 @@
 #include "HODCContactForceModel.hh"
 #include "TimeIntegrator.hh"
 #include "PostProcessingWriter.hh"
+#include "Insertion.hh"
 #include "ReaderXML.hh"
 
 
@@ -73,6 +74,10 @@ class Grains
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
         PostProcessingWriter<T>* m_postProcessor;
+        /** \brief Linked cell for broad-phase. We use a pointer because
+        the linkedCell is directly instantiated on device in the case that we
+        run Grains on GPU. */
+        Insertion<T>* m_insertion;
         //@}
 
 

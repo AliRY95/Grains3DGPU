@@ -90,7 +90,7 @@ class Insertion
 		//@{
         /** @brief Default constructor */
         __HOST__ 
-        Insertion();
+        Insertion( unsigned int numToInsert );
 
         /** @brief Constructor with XML node
 		@param dn XML node */

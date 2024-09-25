@@ -7,7 +7,7 @@
 	<BoundingVolume Type="OBB"/>
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="0.001" dt="0.0001"/>
+		<TimeInterval Start="0." End="0.0001" dt="0.0001"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 	
@@ -302,12 +302,15 @@
 </Forces>
 
 <Simulation>
+		<!-- <InitialPosition Type="Zero"/> -->
+		<!-- <InitialPosition Type="File" Name="./position.dat"/> -->
+		<!-- <InitialOrientation Type="Random" Seed="Default"/> -->
 	<ParticleInsertion>
-		<InitialPosition Type="File" Name="./position.dat"/>
-		<InitialOrientation Type="Random" Seed="Default"/>
-		<InitalVelocity Type="Constant" X="0" Y="0" Z="0.001"/>
-		<InitalAngularVelocity Type="Zero"/>
-		<InitialAngularPosition Type="Random"/>		
+		<InitialPosition Type="Constant" X="0" Y="0" Z="0"/>
+		<InitialOrientation Type="Constant" X="0" Y="0" Z="0"/>
+		<InitialVelocity Type="Constant" X="0" Y="0" Z="0.001"/>
+		<InitialAngularVelocity Type="Zero"/>
+		
 		<!-- <Mode Type="InitialTime"/>
 		<Order Type="Random"/>
 		<Frequency TryEvery="1"/> -->

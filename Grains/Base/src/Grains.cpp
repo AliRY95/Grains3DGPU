@@ -22,7 +22,9 @@ Grains<T>::Grains()
 // Destructor
 template <typename T>
 Grains<T>::~Grains()
-{}
+{
+    delete m_insertion;
+}
 
 
 
@@ -346,6 +348,27 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
         cout << shiftString3 << "Simulation node is mandatory!" << endl;
         exit( 1 );
     }
+
+
+
+
+    // -------------------------------------------------------------------------
+    // Insertion policies
+    DOMNode* nInsertion = ReaderXML::getNode( root, "ParticleInsertion" );
+    cout << shiftString6 << "Reading insertion policies ..." << endl;
+    if ( nInsertion )
+    {
+        m_insertion = new Insertion<T>( nInsertion, 
+                                        GrainsParameters<T>::m_numComponents );
+    }
+    else
+    {
+        cout << shiftString9 
+             << "No policy found, setting the insertion policy to default" 
+             << endl;
+        m_insertion = new Insertion<T>( GrainsParameters<T>::m_numComponents );
+    }
+    cout << shiftString6 << "Reading insertion policies completed.\n" << endl;
 
 
 
