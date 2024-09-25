@@ -113,28 +113,45 @@ Insertion<T>::readTypeAndData( DOMNode* root ) const
         type = RANDOMINSERTION;
         std::string seedString = ReaderXML::getNodeAttr_String( root, "Seed" );
         if ( seedString == "Default" )
-            data = 0;
+            data = T( 0 );
         else if ( seedString == "UserDefined" )
         {
             unsigned int val = ReaderXML::getNodeAttr_Int( root, "Value" );
             if ( val )
-                data = val;
+                data = T( val );
             else
             {
-                std::cout << "Seed value is not provided. Default is used!" 
+                std::cout << "Seed value is not provided. Aborting Grains!" 
                           << std::endl;
-                data = 0;
+                exit( 1 );
             }
         }
         else if ( seedString == "Random" )
         {
-            data = time( NULL );
+            data = T( time( NULL ) );
         }
+        std::cout << shiftString12
+                  << "Random initialization with "
+                  << std::get<T>( data )
+                  << " seed." << std::endl;
     }
     else if( nType == "File" )
     {
         type = FILEINSERTION;
         data = ReaderXML::getNodeAttr_String( root, "Name" );
+        // Check whether the file exists
+        std::ifstream file( std::get<std::string>( data ) );
+        if ( file.good() )
+            std::cout << shiftString12
+                      << "File initialization with path "
+                      << std::get<std::string>( data )
+                      << "." << std::endl;
+        else
+        {
+            std::cout << shiftString12
+                      << "File does not exist. Aborting Grains!" << std::endl;
+            exit( 1 );
+        }
     }
     else if( nType == "Constant" )
     {
@@ -143,11 +160,18 @@ Insertion<T>::readTypeAndData( DOMNode* root ) const
         T yVal = T( ReaderXML::getNodeAttr_Double( root, "Y" ) );
         T zVal = T( ReaderXML::getNodeAttr_Double( root, "Z" ) );
         data = Vector3<T>( xVal, yVal, zVal );
+        std::cout << shiftString12
+                  << "Constant initialization with ["
+                  << std::get<Vector3<T>>( data )
+                  << "]." << std::endl;
     }
     else if( nType == "Zero" )
     {
         type = DEFAULTINSERTION;
         data = 0;
+        std::cout << shiftString12
+                  << "Zero initialization."
+                  << std::endl;
     }
     else
     {
