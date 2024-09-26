@@ -9,7 +9,7 @@
 	<BoundingVolume Type="OBB"/>
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="0.0001" dt="0.0001"/>
+		<TimeInterval Start="0." End="0.01" dt="0.001"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 	
@@ -29,7 +29,7 @@
 
 
 	<Particles>
-		<Particle Number="10" Density="1163.66" Material="matP">
+		<Particle Number="2" Density="1163.66" Material="matP">
 			<AngularPosition Type="Identity"></AngularPosition>
 				<!-- <Sphere Radius="0.01"/> -->
 				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
@@ -300,7 +300,7 @@
 </Construction>
 
 <Forces>
-	<Gravity GX="0.0" GY="0.0" GZ="-9.81"/>
+	<Gravity GX="0.0" GY="0.0" GZ="0.0"/>
 </Forces>
 
 <Simulation>
@@ -326,7 +326,7 @@
 		</ParticlePosition> -->
 	</ParticleInsertion>
 	<PostProcessing>
-		<TimeSave Start="0." End="0.001" dt="0.0001"/>
+		<TimeSave Start="0." End="0.01" dt="0.001"/>
 		<Writers>
 			<RawData Name="./Results"/>
 		</Writers>

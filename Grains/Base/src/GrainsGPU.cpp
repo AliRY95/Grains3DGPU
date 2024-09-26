@@ -57,7 +57,13 @@ void GrainsGPU<T>::simulate()
                               cudaMemcpyHostToDevice ) );
 
     // Collision detection on host
+    // first, inserting partilces
+    Grains<T>::m_components->insertParticles( Grains<T>::m_insertion );
+    // then, copying to device
+    Grains<T>::m_d_components->copy( Grains<T>::m_components );
+    // setting up the PP
     Grains<T>::m_postProcessor->PostProcessing_start();
+    
     auto h_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
           GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
