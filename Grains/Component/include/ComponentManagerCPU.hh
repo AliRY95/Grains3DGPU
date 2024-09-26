@@ -78,15 +78,13 @@ class ComponentManagerCPU : public ComponentManager<T>
                              unsigned int nObstacles,
                              unsigned int nCells );
 
-        // /** @brief Constructor given the number of each rigid body, number of 
-        // obstacles, number of cells, initial positions and velocities as vectors. 
-        // Orientations are identity, and velocities set to zero.
-        // It is not checked whether the particles are intersecting. */
-        // ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
-        //                      unsigned int nObstacles,
-        //                      unsigned int nCells,
-        //                      std::vector<Vector3<T>> pos,
-        //                      std::vector<Vector3<T>> vel );
+        /** @brief Constructor given an insertion policy, the number of each 
+        rigid body, number of obstacles, and number of cells.
+        It is not checked whether the particles are intersecting. */
+        ComponentManagerCPU( Insertion<T> const& ins,
+                             std::vector<unsigned int> numEachRigidBody,
+                             unsigned int nObstacles,
+                             unsigned int nCells );
 
         /** @brief Destructor */
         ~ComponentManagerCPU();
@@ -154,6 +152,10 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @name Methods */
         //@{
+        /** @brief Inserts particles according to a given insertion policy
+        @param ins insertion policy */
+        void insertParticles( Insertion<T> const* ins ) final;
+
         // /** @brief Sorts particles based on a Z-curve */
         // void sortParticles();
 

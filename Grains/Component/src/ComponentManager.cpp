@@ -35,6 +35,20 @@ void ComponentManager<T>::copy( ComponentManager<T> const* cm )
 
 
 // -----------------------------------------------------------------------------
+// Inserts particles according to a given insertion policy
+template <typename T>
+void ComponentManager<T>::insertParticles( Insertion<T> const* ins )
+{
+    std::cout << "Cannot insert particles directly on the device."
+              << " Aborting Grains!"
+              << std::endl;
+    exit( 1 );
+}
+
+    
+    
+    
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class ComponentManager<float>;
 template class ComponentManager<double>;

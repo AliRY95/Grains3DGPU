@@ -11,6 +11,7 @@
 #include "ContactForceModel.hh"
 #include "ContactForceModelBuilderFactory.hh"
 #include "CollisionDetection.hh"
+#include "Insertion.hh"
 #include "GrainsParameters.hh"
 
 
@@ -100,6 +101,10 @@ class ComponentManager
         /** @brief Copies data from another ComponentManager object.
         @param cm component manager on device */
         void copy( ComponentManager<T> const* cm );
+
+        /** @brief Inserts particles according to a given insertion policy
+        @param ins insertion policy */
+        virtual void insertParticles( Insertion<T> const* ins );
 
         // /** @brief Sorts particles based on a Z-curve */
         // void sortParticles();

@@ -155,12 +155,63 @@ ComponentManagerCPU<T>::ComponentManagerCPU(
         m_componentCellHash.push_back( 0 );
     }
 
+    // Initialzing the vectors for obstacles
 
 
-    m_transform[0].setOrigin( Vector3<T>( -0.25, -0.25, 0.5 ) );
-    // m_transform[1].setOrigin( Vector3<T>( 0.25, 0.25, 0.5 ) );
-    m_velocity[0].setTranslationalComponent( Vector3<T>( 1e-1, 1e-1, 0 ) );
-    // m_velocity[1].setTranslationalComponent( Vector3<T>( -1e-1, -1e-1, 0 ) );
+    // Initialzing the vectors for cells
+    // The size of these vectors is one bigger that nCells because we reserve
+    // cellID = 0.
+    for ( int i = 0; i < m_nCells + 1; i++ )
+    {
+        m_cellHashStart.push_back( 0 );
+        m_cellHashEnd.push_back( 0 );
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Constructor with the number of each rigid body, number of obstacles, and 
+// number of cells. Components are randomly positioned.
+template <typename T>
+ComponentManagerCPU<T>::ComponentManagerCPU( 
+                                    Insertion<T> const& ins,
+                                    std::vector<unsigned int> numEachRigidBody,
+                                    unsigned int nObstacles,
+                                    unsigned int nCells )
+: m_nParticles( numEachRigidBody.back() )
+, m_nObstacles( nObstacles )
+, m_nCells( nCells )
+{
+    // Fetching insertion data from ins
+    std::vector<std::pair<Transform3<T>, Kinematics<T>>> const insData(
+                                                    ins.fetchInsertionData() );
+
+    // Initialzing the vectors for particles
+    unsigned int rb_counter = 0;
+    for( int i = 0; i < m_nParticles; i++ )
+    {
+        // m_rigidBodyId
+        if ( i == numEachRigidBody[ rb_counter ] )
+            ++rb_counter;
+        m_rigidBodyId.push_back( rb_counter );
+
+        // m_transform
+        m_transform.push_back( insData[i].first );
+        
+        // m_velocity
+        m_velocity.push_back( insData[i].second );
+
+        // m_torce
+        m_torce.push_back( Torce<T>() );
+
+        // m_compId
+        m_componentId.push_back( i );
+
+        // m_componentCellHash
+        m_componentCellHash.push_back( 0 );
+    }
 
     // Initialzing the vectors for obstacles
 
@@ -331,6 +382,29 @@ void ComponentManagerCPU<T>::setComponentId( std::vector<int> const& id )
 
 
 
+// -----------------------------------------------------------------------------
+// Inserts particles according to a given insertion policy
+template <typename T>
+void ComponentManagerCPU<T>::insertParticles( Insertion<T> const* ins )
+{
+    // Fetching insertion data from ins
+    std::vector<std::pair<Transform3<T>, Kinematics<T>>> const insData(
+                                                    ins->fetchInsertionData() );
+
+    // Inserting particles
+    for( int i = 0; i < m_nParticles; i++ )
+    {
+        // m_transform
+        m_transform[i] = insData[i].first;
+        
+        // m_velocity
+        m_velocity[i] = insData[i].second;
+    }
+}
+
+    
+    
+    
 // -----------------------------------------------------------------------------
 // Updates links between components and linked cell
 template <typename T>
