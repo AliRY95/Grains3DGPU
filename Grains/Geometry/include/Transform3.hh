@@ -4,6 +4,7 @@
 
 #include "Matrix3.hh"
 #include "Quaternion.hh"
+#include "ReaderXML.hh"
 
 
 // =============================================================================
@@ -49,6 +50,11 @@ class Transform3
         @param m 1D array contanining 12 values */
         __HOSTDEVICE__
         Transform3( T const t[12] );
+
+        /** @brief Constructor with an XML node
+        @param root the xml node */
+        __HOST__
+        Transform3( DOMNode* root );
 
         /** @brief Copy constructor
         @param t the transformation to be copied */

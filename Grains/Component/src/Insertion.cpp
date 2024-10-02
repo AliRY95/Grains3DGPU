@@ -205,7 +205,6 @@ std::vector<Vector3<T>> Insertion<T>::fetchInsertionDataForEach(
     {
         // retrieivng the insertion file name
         std::string fileName = std::get<std::string>( data );
-        // Create a unique pointer to ifstream
         std::ifstream fileIn( fileName );
         if ( !fileIn.is_open() )
         {
