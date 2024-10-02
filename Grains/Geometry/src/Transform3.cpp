@@ -46,6 +46,67 @@ Transform3<T>::Transform3( T const t[12] )
 
 
 // -----------------------------------------------------------------------------
+// Constructor using an XML node
+template <typename T>
+__HOST__
+Transform3<T>::Transform3( DOMNode* root )
+{
+    // Initialization of the 1D array containing all the transformation
+    // coefficients ordered as Mxx, Mxy, Mxz, Myx, Myy, Myz, Mzx, Mzy, Mzz,
+    // Ox, Oy, Oz  
+    T t[12] = { 1, 0, 0, 
+                0, 1, 0, 
+                0, 0, 1, 
+                0, 0, 0 };
+
+    // Origin
+    DOMNode* pos = ReaderXML::getNode( root, "Centre" );
+    if ( pos ) 
+    {
+        T x = T( ReaderXML::getNodeAttr_Double( pos, "X" ) );
+        T y = T( ReaderXML::getNodeAttr_Double( pos, "Y" ) );
+        T z = T( ReaderXML::getNodeAttr_Double( pos, "Z" ) );
+        setOrigin( Vector3<T>( x, y, x ) );
+    }
+
+    // Rotation matrix
+    // We only allow rotation matrices, stretching/scaling is prohibited
+    DOMNode* angPos = ReaderXML::getNode( root, "AngularPosition" ); 
+    string type = ReaderXML::getNodeAttr_String( angPos, "Type" );
+    if ( type == "Matrix" )
+    {
+        Matrix3<T> mat;
+        std::string values = ReaderXML::getNodeValue_String( angPos );
+        std::istringstream inValues( values.c_str() ); 
+        inValues >> mat;
+        setBasis( mat );
+        // TODO:
+        // Check that the matrix is a rotation matrix
+        // if ( !m_basis.isRotation() )
+        // {
+        //     cout << "A matrix in one of the AngularPosition XML nodes is"
+        //         << " not a rotation matrix !!!" << endl;
+        //     exit(1);
+        // }
+    }
+    else if ( type == "Angles" )
+    {
+        T aX = T( ReaderXML::getNodeAttr_Double( angPos, "aX" ) );
+        T aY = T( ReaderXML::getNodeAttr_Double( angPos, "aY" ) );
+        T aZ = T( ReaderXML::getNodeAttr_Double( angPos, "aZ" ) );
+        setBasis( aX, aY, aZ );
+    }
+    else
+    {
+        // set basis to zero rotation
+        setBasis( 0, 0, 0 );
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
 __HOSTDEVICE__

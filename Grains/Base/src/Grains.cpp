@@ -105,11 +105,10 @@ void Grains<T>::Construction( DOMElement* rootElement )
     // Number of unique shapes (rigid bodies) in the simulation
     unsigned int numRigidBodies = int( allParticles->getLength() );
     // Number of each unique shape in the simulation. For simplicity, we keep it
-    // accumulative. Vector [2, 5] means we have 2 id0 ridid bodies and then 
+    // accumulative. Vector [2, 5] means we have 2 id0 rigid bodies and then 
     // 5 - 2 = 3 id1 rigid bodies. it also indicates that there are 5 particles
     // in the simulation.
     std::vector<unsigned int> numEachRigidBody( numRigidBodies, 0 );
-    T linkedCellSize = T( 0 );
     if ( particles )
     {
         cout << shiftString6 << "Reading new particle types ..." << endl;
@@ -133,10 +132,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
             // Create the Rigid Body
             m_rigidBodyList[ i ] = new RigidBody<T, T>( nParticle );
-
-            // Finding the max circumscribed radius among all shapes
-            if ( m_rigidBodyList[i]->getCircumscribedRadius() > linkedCellSize )
-                linkedCellSize = m_rigidBodyList[i]->getCircumscribedRadius();
         }
 
         // if it is a GPU simulation, we allocate memory on device as well 
@@ -157,8 +152,16 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
 
     // -------------------------------------------------------------------------
-    // Scaling coefficient of linked cell size
+    // LinkedCell
     cout << shiftString6 << "Constructing linked cell ..." << endl;
+    // Finding the size of each cell -- max circumscribed radius among all RBs
+    T linkedCellSize = T( 0 );
+    for ( int i = 0; i < numRigidBodies; i++ )
+    {
+        if ( m_rigidBodyList[i]->getCircumscribedRadius() > linkedCellSize )
+            linkedCellSize = m_rigidBodyList[i]->getCircumscribedRadius();
+    }
+    // Scaling coefficient of linked cell size
     T LC_coeff = T( 1 );
     DOMNode* nLC = ReaderXML::getNode( root, "LinkedCell" );
     if ( ReaderXML::hasNodeAttr( nLC, "CellSizeFactor" ) )
