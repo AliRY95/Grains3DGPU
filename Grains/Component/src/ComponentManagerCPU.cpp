@@ -176,18 +176,14 @@ ComponentManagerCPU<T>::ComponentManagerCPU(
 // number of cells. Components are randomly positioned.
 template <typename T>
 ComponentManagerCPU<T>::ComponentManagerCPU( 
-                                    Insertion<T> const& ins,
                                     std::vector<unsigned int> numEachRigidBody,
                                     unsigned int nObstacles,
-                                    unsigned int nCells )
+                                    unsigned int nCells,
+                                    std::vector<Transform3<T>> initTr )
 : m_nParticles( numEachRigidBody.back() )
 , m_nObstacles( nObstacles )
 , m_nCells( nCells )
 {
-    // Fetching insertion data from ins
-    std::vector<std::pair<Transform3<T>, Kinematics<T>>> const insData(
-                                                    ins.fetchInsertionData() );
-
     // Initialzing the vectors for particles
     unsigned int rb_counter = 0;
     for( int i = 0; i < m_nParticles; i++ )
@@ -198,10 +194,10 @@ ComponentManagerCPU<T>::ComponentManagerCPU(
         m_rigidBodyId.push_back( rb_counter );
 
         // m_transform
-        m_transform.push_back( insData[i].first );
+        m_transform.push_back( initTr[ rb_counter ] );
         
         // m_velocity
-        m_velocity.push_back( insData[i].second );
+        m_velocity.push_back( Kinematics<T>() );
 
         // m_torce
         m_torce.push_back( Torce<T>() );
@@ -395,7 +391,8 @@ void ComponentManagerCPU<T>::insertParticles( Insertion<T> const* ins )
     for( int i = 0; i < m_nParticles; i++ )
     {
         // m_transform
-        m_transform[i] = insData[i].first;
+        m_transform[i].composeLeftByRotation( insData[i].first );
+        m_transform[i].setOrigin( insData[i].first.getOrigin() );
         
         // m_velocity
         m_velocity[i] = insData[i].second;

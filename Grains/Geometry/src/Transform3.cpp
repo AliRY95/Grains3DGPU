@@ -91,10 +91,14 @@ Transform3<T>::Transform3( DOMNode* root )
     }
     else if ( type == "Angles" )
     {
+        // read in degree
         T aX = T( ReaderXML::getNodeAttr_Double( angPos, "aX" ) );
         T aY = T( ReaderXML::getNodeAttr_Double( angPos, "aY" ) );
         T aZ = T( ReaderXML::getNodeAttr_Double( angPos, "aZ" ) );
-        setBasis( aX, aY, aZ );
+        // change to Radian
+        setBasis( RADS_PER_DEG<T> * aX, 
+                  RADS_PER_DEG<T> * aY,
+                  RADS_PER_DEG<T> * aZ );
     }
     else
     {

@@ -13,8 +13,8 @@
 		<ContactForceModel>
 			<Material materialA="matP" materialB="matP"/>			
 			<HODC>
-				<stiff>0.0</stiff>
-				<en>1.0</en>
+				<stiff>1.e5</stiff>
+				<en>0.8</en>
 				<ks>0</ks>
 				<mut>0</mut>
 				<muc>0</muc>
@@ -25,296 +25,62 @@
 
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="0.01" dt="1.e-4"/>
+		<TimeInterval Start="0." End="1.05" dt="1.e-4"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 
+
 	<Particles>
-		<Particle Number="2" Density="1163.66" Material="matP">
-			<AngularPosition Type="Identity"></AngularPosition>
+		<Particle Number="1" Density="1163.66" Material="matP">
 				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
 				<!-- <Sphere Radius="0.01"/> -->
 			<Convex CrustThickness="1.e-4">
-				<Box LX="0.04" LY="0.04" LZ="0.08"/>
+				<Box LX="0.05" LY="0.05" LZ="0.1"/>
 			</Convex>
+			<AngularPosition Type="Angular" aX="90" aY="0" aZ="0"/>
+		</Particle>
+		<Particle Number="1" Density="1163.66" Material="matP">
+				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
+				<!-- <Sphere Radius="0.01"/> -->
+			<Convex CrustThickness="1.e-4">
+				<Box LX="0.05" LY="0.05" LZ="0.05"/>
+			</Convex>
+			<AngularPosition Type="Angular" aX="0" aY="0" aZ="0"/>
 		</Particle>
 	</Particles>
 
 
-
 	<Obstacles>
-		<Composite name="CylindericalContainer">
-			<Obstacle name="Rectangle0">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0" Y="0.249885" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					1	0	0
-					-0	6.12323399574e-17	-1
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle1">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.0772188" Y="0.237655" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.951056516295	1.89218336522e-17	-0.309016994375
-					-0.309016994375	5.82354159245e-17	-0.951056516295
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle2">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.146879" Y="0.202161" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.809016994375	3.59914663903e-17	-0.587785252292
-					-0.587785252292	4.95380036309e-17	-0.809016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle3">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.202161" Y="0.146879" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.587785252292	4.95380036309e-17	-0.809016994375
-					-0.809016994375	3.59914663903e-17	-0.587785252292
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle4">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.237655" Y="0.0772188" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.309016994375	5.82354159245e-17	-0.951056516295
-					-0.951056516295	1.89218336522e-17	-0.309016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle5">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.249885" Y="1.53011e-17" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					6.12323399574e-17	6.12323399574e-17	-1
-					-1	3.74939945665e-33	-6.12323399574e-17
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle6">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.237655" Y="-0.0772188" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.309016994375	5.82354159245e-17	-0.951056516295
-					-0.951056516295	-1.89218336522e-17	0.309016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle7">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.202161" Y="-0.146879" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.587785252292	4.95380036309e-17	-0.809016994375
-					-0.809016994375	-3.59914663903e-17	0.587785252292
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle8">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.146879" Y="-0.202161" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.809016994375	3.59914663903e-17	-0.587785252292
-					-0.587785252292	-4.95380036309e-17	0.809016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle9">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="0.0772188" Y="-0.237655" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.951056516295	1.89218336522e-17	-0.309016994375
-					-0.309016994375	-5.82354159245e-17	0.951056516295
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle10">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="3.06021e-17" Y="-0.249885" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-1	7.49879891331e-33	-1.22464679915e-16
-					-1.22464679915e-16	-6.12323399574e-17	1
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle11">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.0772188" Y="-0.237655" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.951056516295	-1.89218336522e-17	0.309016994375
-					0.309016994375	-5.82354159245e-17	0.951056516295
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle12">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.146879" Y="-0.202161" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.809016994375	-3.59914663903e-17	0.587785252292
-					0.587785252292	-4.95380036309e-17	0.809016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle13">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.202161" Y="-0.146879" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.587785252292	-4.95380036309e-17	0.809016994375
-					0.809016994375	-3.59914663903e-17	0.587785252292
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle14">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.237655" Y="-0.0772188" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-0.309016994375	-5.82354159245e-17	0.951056516295
-					0.951056516295	-1.89218336522e-17	0.309016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle15">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.249885" Y="-4.59032e-17" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					-1.83697019872e-16	-6.12323399574e-17	1
-					1	-1.124819837e-32	1.83697019872e-16
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle16">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.237655" Y="0.0772188" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.309016994375	-5.82354159245e-17	0.951056516295
-					0.951056516295	1.89218336522e-17	-0.309016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle17">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.202161" Y="0.146879" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.587785252292	-4.95380036309e-17	0.809016994375
-					0.809016994375	3.59914663903e-17	-0.587785252292
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle18">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.146879" Y="0.202161" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.809016994375	-3.59914663903e-17	0.587785252292
-					0.587785252292	4.95380036309e-17	-0.809016994375
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Rectangle19">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.0791558" LY="1.3"/>
-				</Convex>
-				<Centre X="-0.0772188" Y="0.237655" Z="0.65"/>
-				<AngularPosition Type="Matrix">
-					0.951056516295	-1.89218336522e-17	0.309016994375
-					0.309016994375	5.82354159245e-17	-0.951056516295
-					-0	1	6.12323399574e-17
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-			<Obstacle name="Bottom">
-				<Convex CrustThickness="0.00">
-					<Rectangle LX="0.506" LY="0.506"/>
-				</Convex>
-				<Centre X="0" Y="0" Z="0"/>
-				<AngularPosition Type="Matrix">
-					1	0	0
-					0	1	0
-					-0	0	1
-				</AngularPosition>
-				<Material>matW</Material>
-			</Obstacle>
-		</Composite>
+		<Obstacle name="Rectangle0">
+			<Convex CrustThickness="0.00">
+				<Rectangle LX="0.0791558" LY="1.3"/>
+			</Convex>
+			<Centre X="0" Y="0.249885" Z="0.65"/>
+			<AngularPosition Type="Matrix">
+				1	0	0
+				-0	6.12323399574e-17	-1
+				-0	1	6.12323399574e-17
+			</AngularPosition>
+			<Material>matW</Material>
+		</Obstacle>
 	</Obstacles>
-
-
-
 </Construction>
+
 
 <Forces>
 	<Gravity GX="0.0" GY="0.0" GZ="0.0"/>
 </Forces>
 
+
 <Simulation>
 		<!-- <InitialPosition Type="Zero"/> -->
 		<!-- <InitialPosition Type="File" Name="./position.dat"/> -->
 		<!-- <InitialOrientation Type="Random" Seed="Default"/> -->
+		<!-- <InitialVelocity Type="Constant" X="0" Y="0" Z="0.001"/> -->
 	<ParticleInsertion>
 		<InitialPosition Type="File" Name="./position.dat"/>
 		<InitialOrientation Type="Random" Seed="Random"/>
-		<InitialVelocity Type="Constant" X="0" Y="0" Z="0.001"/>
+		<InitialVelocity Type="File" Name="./velocity.dat"/>
 		<InitialAngularVelocity Type="Zero"/>
 		
 		<!-- <Mode Type="InitialTime"/>
@@ -331,7 +97,7 @@
 	</ParticleInsertion>
 			<!-- <Paraview RootName="insert" Directory="Grains/Init" WritingMode="Binary"/> -->
 	<PostProcessing>
-		<TimeSave Start="0." End="0.01" dt="0.001"/>
+		<TimeSave Start="0." End="1.0" dt="0.1"/>
 		<Writers>
 			<RawData Name="./Results"/>
 		</Writers>

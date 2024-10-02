@@ -81,10 +81,10 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @brief Constructor given an insertion policy, the number of each 
         rigid body, number of obstacles, and number of cells.
         It is not checked whether the particles are intersecting. */
-        ComponentManagerCPU( Insertion<T> const& ins,
-                             std::vector<unsigned int> numEachRigidBody,
+        ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
                              unsigned int nObstacles,
-                             unsigned int nCells );
+                             unsigned int nCells,
+                             std::vector<Transform3<T>> initTr );
 
         /** @brief Destructor */
         ~ComponentManagerCPU();

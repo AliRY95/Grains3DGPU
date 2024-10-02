@@ -107,8 +107,12 @@ void Grains<T>::Construction( DOMElement* rootElement )
     // Number of each unique shape in the simulation. For simplicity, we keep it
     // accumulative. Vector [2, 5] means we have 2 id0 rigid bodies and then 
     // 5 - 2 = 3 id1 rigid bodies. it also indicates that there are 5 particles
-    // in the simulation.
+    // in the simulation in total.
     std::vector<unsigned int> numEachRigidBody( numRigidBodies, 0 );
+    // We also store the initial transformations of the particles to pass to the
+    // ComponentManager to create particles with the initial transformation
+    // required.
+    std::vector<Transform3<T>> initTransform;
     if ( particles )
     {
         cout << shiftString6 << "Reading new particle types ..." << endl;
@@ -132,6 +136,11 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
             // Create the Rigid Body
             m_rigidBodyList[ i ] = new RigidBody<T, T>( nParticle );
+
+            // Initial transformation of the rigid body
+            // One draw back is we might end up with the same rigid body shape, 
+            // but with different initial transformation. 
+            initTransform.push_back( Transform3<T>( nParticle ) );
         }
 
         // if it is a GPU simulation, we allocate memory on device as well 
@@ -209,7 +218,8 @@ void Grains<T>::Construction( DOMElement* rootElement )
     GrainsParameters<T>::m_numComponents = numEachRigidBody.back();
     m_components = new ComponentManagerCPU<T>( numEachRigidBody, 
                                                0,
-                                               GrainsParameters<T>::m_numCells );
+                                               GrainsParameters<T>::m_numCells,
+                                               initTransform );
     if ( GrainsParameters<T>::m_isGPU )
     {
         m_d_components = new ComponentManagerGPU<T>( GrainsParameters<T>::m_numComponents,
