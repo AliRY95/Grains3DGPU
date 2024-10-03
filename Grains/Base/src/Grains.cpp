@@ -398,9 +398,11 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
         T tStart = ReaderXML::getNodeAttr_Double( nTime, "Start" );
         T tEnd = ReaderXML::getNodeAttr_Double( nTime, "End" );
         T tStep = ReaderXML::getNodeAttr_Double( nTime, "dt" );
-        GrainsParameters<T>::m_tSaveStart = tStart;
-        GrainsParameters<T>::m_tSaveEnd = tEnd;
-        GrainsParameters<T>::m_dtSave = tStep;
+        for ( T t = tStart; t <= tEnd; t += tStep )
+            GrainsParameters<T>::m_tSave.push( t );
+        // Save for tEnd as well
+        GrainsParameters<T>::m_tSave.push( tEnd );
+        
         // Post-processing writers
         DOMNode* nWriters = ReaderXML::getNode( nPostProcessing, "Writers" );
         if ( nWriters )

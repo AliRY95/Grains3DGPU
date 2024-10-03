@@ -49,11 +49,7 @@ unsigned int GrainsParameters<T>::m_numContactPairs = 0;
 
 /* Post-Processing */
 template <typename T> 
-T GrainsParameters<T>::m_tSaveStart;
-template <typename T> 
-T GrainsParameters<T>::m_tSaveEnd;
-template <typename T> 
-T GrainsParameters<T>::m_dtSave;
+std::queue<T> GrainsParameters<T>::m_tSave;
 
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;

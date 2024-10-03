@@ -11,8 +11,8 @@
 		<ContactForceModel>
 			<Material materialA="matP" materialB="matP"/>			
 			<HODC>
-				<stiff>1.e5</stiff>
-				<en>0.8</en>
+				<stiff>5.e2</stiff>
+				<en>1.</en>
 				<ks>0</ks>
 				<mut>0</mut>
 				<muc>0</muc>
@@ -23,17 +23,17 @@
 
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="1.05" dt="1.e-4"/>
+		<TimeInterval Start="0." End="1.2" dt="1.e-6"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 
 
 	<Particles>
 		<Particle Number="1" Density="1163.66" Material="matP">
-				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
 				<!-- <Sphere Radius="0.01"/> -->
+				<!-- <Box LX="0.05" LY="0.05" LZ="0.1"/> -->
 			<Convex CrustThickness="1.e-4">
-				<Box LX="0.05" LY="0.05" LZ="0.1"/>
+				<Superquadric a="0.025" b="0.025" c="0.05" n1="8" n2="8"/>
 			</Convex>
 			<AngularPosition Type="Angular" aX="90" aY="0" aZ="0"/>
 		</Particle>
@@ -41,7 +41,7 @@
 				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
 				<!-- <Sphere Radius="0.01"/> -->
 			<Convex CrustThickness="1.e-4">
-				<Box LX="0.05" LY="0.05" LZ="0.05"/>
+				<Superquadric a="0.025" b="0.025" c="0.05" n1="8" n2="8"/>
 			</Convex>
 			<AngularPosition Type="Angular" aX="0" aY="0" aZ="0"/>
 		</Particle>
@@ -95,7 +95,7 @@
 	</ParticleInsertion>
 			<!-- <Paraview RootName="insert" Directory="Grains/Init" WritingMode="Binary"/> -->
 	<PostProcessing>
-		<TimeSave Start="0." End="1.0" dt="0.1"/>
+		<TimeSave Start="0." End="1.1" dt="0.01"/>
 		<Writers>
 			<RawData Name="./Results"/>
 		</Writers>
