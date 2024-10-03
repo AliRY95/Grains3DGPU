@@ -65,19 +65,17 @@ ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
 , m_nObstacles( nObstacles )
 , m_nCells( nCells )
 {
-    // // Initializing the vectors for obstacles
-    // for( int i = 1; i < m_nObstacles + 1; i++ )
-    // {
-    //     m_rigidBodyId.push_back( 0 );
-    //     m_transform.push_back( Transform3<T>() );
-    //     m_velocity.push_back( Kinematics<T>() );
-    //     m_torce.push_back( Torce<T>() );
-    //     m_componentId.push_back( -i );
-    //     m_componentCellHash.push_back( 0 );
-    //     // m_isActive.push_back( 0 );
-    // }
+    // m_rigidBodyId.reserve( m_nParticles + m_nObstacles );
+    // m_transform.reserve( m_nParticles + m_nObstacles );
+    // m_velocity.reserve( m_nParticles + m_nObstacles );
+    // m_torce.reserve( m_nParticles + m_nObstacles );
+    // m_componentId.reserve( m_nParticles + m_nObstacles );
+    // m_componentCellHash.reserve( m_nParticles );
+    // // m_isActive.reserve( m_nParticles + m_nObstacles );
+    // m_cellHashStart.reserve( m_nCells + 1 );
+    // m_cellHashEnd.reserve( m_nCells + 1 );
 
-    // Initializing the vectors for particles
+    // Initializing the vectors
     for( int i = 0; i < m_nParticles; i++ )
     {
         m_rigidBodyId.push_back( 0 );

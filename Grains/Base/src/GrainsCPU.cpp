@@ -71,9 +71,9 @@ void GrainsCPU<T>::simulate()
                                                  Grains<T>::m_rigidBodyList );
         
         // Post-Processing
-        if ( fabs( GrainsParameters<T>::m_time - 
-                   GrainsParameters<T>::m_tSave.front() ) < 
-                   0.01 * GrainsParameters<T>::m_dt )
+        if ( GrainsParameters<T>::m_tSave.front() - 
+             GrainsParameters<T>::m_time < 
+             0.01 * GrainsParameters<T>::m_dt )
         {
             GrainsParameters<T>::m_tSave.pop();
             std::vector<unsigned int> id = 
@@ -89,7 +89,12 @@ void GrainsCPU<T>::simulate()
                                                 &k,
                                                 GrainsParameters<T>::m_time );
         }
-        // TODO: Force to have PP for the last step?
+        // In case we get past the saveTime, we need to remove it from the queue
+        else if ( GrainsParameters<T>::m_time > 
+                  GrainsParameters<T>::m_tSave.front() )
+        {
+            GrainsParameters<T>::m_tSave.pop();
+        }
     }
     auto h_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;

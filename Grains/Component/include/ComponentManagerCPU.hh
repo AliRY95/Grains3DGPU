@@ -25,22 +25,22 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** \brief number of cells in manager */
         unsigned int m_nCells;
         /** \brief components rigid body Id */
-        std::vector<unsigned int> m_rigidBodyId; 
+        std::vector<unsigned int> m_rigidBodyId;
         /** \brief components transformation */
-        std::vector<Transform3<T>> m_transform; 
+        std::vector<Transform3<T>> m_transform;
         /** \brief array of components velocities */
         std::vector<Kinematics<T>> m_velocity;
         /** \brief array of components torce */
         std::vector<Torce<T>> m_torce;
         /** \brief components Id with positive values for particles and negative
         values for obstacles. */
-        std::vector<int> m_componentId; 
+        std::vector<int> m_componentId;
         /** \brief components cell hash */
-        std::vector<unsigned int> m_componentCellHash; 
+        std::vector<unsigned int> m_componentCellHash;
         /** \brief cells hash start */
-        std::vector<unsigned int> m_cellHashStart; 
+        std::vector<unsigned int> m_cellHashStart;
         /** \brief cells hash end */
-        std::vector<unsigned int> m_cellHashEnd; 
+        std::vector<unsigned int> m_cellHashEnd;
 
         // /**< components neighbor Id */ 
         // std::vector<unsigned int> m_neighborsId; 

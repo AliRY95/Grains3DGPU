@@ -103,7 +103,7 @@ Transform3<T>::Transform3( DOMNode* root )
     else
     {
         // set basis to zero rotation
-        setBasis( 0, 0, 0 );
+        setBasis( T( 0 ), T( 0 ), T( 0 ) );
     }
 }
 
