@@ -33,7 +33,9 @@ T GrainsParameters<T>::m_time;
 
 /* Numbers */
 template <typename T> 
-unsigned int GrainsParameters<T>::m_numComponents = 0;
+unsigned int GrainsParameters<T>::m_numParticles = 0;
+template <typename T> 
+unsigned int GrainsParameters<T>::m_numObstacles = 0;
 template <typename T> 
 unsigned int GrainsParameters<T>::m_numCells = 0;
 
@@ -49,11 +51,7 @@ unsigned int GrainsParameters<T>::m_numContactPairs = 0;
 
 /* Post-Processing */
 template <typename T> 
-T GrainsParameters<T>::m_tSaveStart;
-template <typename T> 
-T GrainsParameters<T>::m_tSaveEnd;
-template <typename T> 
-T GrainsParameters<T>::m_dtSave;
+std::queue<T> GrainsParameters<T>::m_tSave;
 
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;

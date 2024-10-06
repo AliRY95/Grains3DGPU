@@ -44,7 +44,7 @@ GrainsCPU<T>::~GrainsCPU()
 template <typename T>
 void GrainsCPU<T>::simulate()
 {
-    unsigned int N = GrainsParameters<T>::m_numComponents;
+    unsigned int N = GrainsParameters<T>::m_numParticles;
     int* h_collision = new int[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )
@@ -71,29 +71,30 @@ void GrainsCPU<T>::simulate()
                                                  Grains<T>::m_rigidBodyList );
         
         // Post-Processing
-        if ( GrainsParameters<T>::m_time >= GrainsParameters<T>::m_tSaveStart &&
-             GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tSaveEnd )
+        if ( GrainsParameters<T>::m_tSave.front() - 
+             GrainsParameters<T>::m_time < 
+             0.01 * GrainsParameters<T>::m_dt )
         {
-            if ( std::fmod( GrainsParameters<T>::m_time - 
-                            GrainsParameters<T>::m_tSaveStart, 
-                            GrainsParameters<T>::m_dtSave ) <=
-                            0.01 * GrainsParameters<T>::m_dt )
-            {
-                std::vector<unsigned int> id = 
+            GrainsParameters<T>::m_tSave.pop();
+            std::vector<unsigned int> id = 
                                     Grains<T>::m_components->getRigidBodyId();
-                std::vector<Transform3<T>> t = 
-                                    Grains<T>::m_components->getTransform();
-                std::vector<Kinematics<T>> k = 
-                                    Grains<T>::m_components->getVelocity();
-                Grains<T>::m_postProcessor->PostProcessing( 
+            std::vector<Transform3<T>> t = 
+                                Grains<T>::m_components->getTransform();
+            std::vector<Kinematics<T>> k = 
+                                Grains<T>::m_components->getVelocity();
+            Grains<T>::m_postProcessor->PostProcessing( 
                                                 Grains<T>::m_rigidBodyList,
                                                 &id,
                                                 &t,
                                                 &k,
                                                 GrainsParameters<T>::m_time );
-            }
         }
-        // TODO: Force to have PP for the last step?
+        // In case we get past the saveTime, we need to remove it from the queue
+        else if ( GrainsParameters<T>::m_time > 
+                  GrainsParameters<T>::m_tSave.front() )
+        {
+            GrainsParameters<T>::m_tSave.pop();
+        }
     }
     auto h_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;

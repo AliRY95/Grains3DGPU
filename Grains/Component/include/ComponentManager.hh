@@ -102,6 +102,13 @@ class ComponentManager
         @param cm component manager on device */
         void copy( ComponentManager<T> const* cm );
 
+        /** @brief Initializes the RigidBody IDs and transformations for the 
+        simulation
+        @param numEachRigidBody accumulating vector for number of different RB 
+        @param initTr initial transformation of components */
+        virtual void initialize( std::vector<unsigned int> numEachRigidBody,
+                                 std::vector<Transform3<T>> initTr );
+
         /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */
         virtual void insertParticles( Insertion<T> const* ins );

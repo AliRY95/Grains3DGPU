@@ -58,6 +58,8 @@ Convex<T>* ConvexBuilderFactory<T>::create( string& type,
         convex = new Cone<T>( fileIn );
     else if ( type == "Superquadric" ) 
         convex = new Superquadric<T>( fileIn );
+    else if ( type == "Rectangle" ) 
+        convex = new Rectangle<T>( fileIn );
     else
     {
         cout << "Invalid convex type: " << type.c_str() << endl;

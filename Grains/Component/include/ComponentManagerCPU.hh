@@ -18,29 +18,29 @@ class ComponentManagerCPU : public ComponentManager<T>
     protected:
         /** @name Parameters */
         //@{
-        /** \brief number of particles in manager */
+        /** \brief Number of particles in manager */
         unsigned int m_nParticles;
-        /** \brief number of obstacles in manager */
+        /** \brief Number of obstacles in manager */
         unsigned int m_nObstacles;
-        /** \brief number of cells in manager */
+        /** \brief Number of cells in manager */
         unsigned int m_nCells;
-        /** \brief components rigid body Id */
-        std::vector<unsigned int> m_rigidBodyId; 
-        /** \brief components transformation */
-        std::vector<Transform3<T>> m_transform; 
-        /** \brief array of components velocities */
+        /** \brief Components rigid body Id */
+        std::vector<unsigned int> m_rigidBodyId;
+        /** \brief Components transformation */
+        std::vector<Transform3<T>> m_transform;
+        /** \brief Array of components velocities */
         std::vector<Kinematics<T>> m_velocity;
-        /** \brief array of components torce */
+        /** \brief Array of components torce */
         std::vector<Torce<T>> m_torce;
-        /** \brief components Id with positive values for particles and negative
+        /** \brief Components Id with positive values for particles and negative
         values for obstacles. */
-        std::vector<int> m_componentId; 
-        /** \brief components cell hash */
-        std::vector<unsigned int> m_componentCellHash; 
-        /** \brief cells hash start */
-        std::vector<unsigned int> m_cellHashStart; 
-        /** \brief cells hash end */
-        std::vector<unsigned int> m_cellHashEnd; 
+        std::vector<int> m_componentId;
+        /** \brief Components cell hash */
+        std::vector<unsigned int> m_componentCellHash;
+        /** \brief Cells hash start */
+        std::vector<unsigned int> m_cellHashStart;
+        /** \brief Cells hash end */
+        std::vector<unsigned int> m_cellHashEnd;
 
         // /**< components neighbor Id */ 
         // std::vector<unsigned int> m_neighborsId; 
@@ -58,31 +58,8 @@ class ComponentManagerCPU : public ComponentManager<T>
         ComponentManagerCPU();
 
         /** @brief Constructor with the number of particles, obstacles, and
-        cells. Particles are assumed to have the same shape (rigid body ID = 0). 
-        Transformations are all identity, velocities and torce are set to zero.
-        It is not checked whether the particles are intersecting. 
-        This constructor must be used only when we want to later modify the 
-        transformations, otherwise having all particles at the origin is not a 
-        physical configuration. */
+        cells. All other data members are set to default. */
         ComponentManagerCPU( unsigned int nParticles,
-                             unsigned int nObstacles,
-                             unsigned int nCells );
-
-        /** @brief Constructor given the number of each rigid body, number of 
-        obstacles, and number of cells. rigidBodyId is set according to the
-        number of each rigid body.
-        Transformations are randomly chosen in the global domain taken from 
-        GrainsParameters, while velocities and torce are set to zero.
-        It is not checked whether the particles are intersecting. */
-        ComponentManagerCPU( std::vector<unsigned int> numEachRigidBody,
-                             unsigned int nObstacles,
-                             unsigned int nCells );
-
-        /** @brief Constructor given an insertion policy, the number of each 
-        rigid body, number of obstacles, and number of cells.
-        It is not checked whether the particles are intersecting. */
-        ComponentManagerCPU( Insertion<T> const& ins,
-                             std::vector<unsigned int> numEachRigidBody,
                              unsigned int nObstacles,
                              unsigned int nCells );
 
@@ -152,6 +129,13 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @name Methods */
         //@{
+        /** @brief Initializes the RigidBody IDs and transformations for the 
+        simulation
+        @param numEachRigidBody accumulating vector for number of different RB 
+        @param initTr initial transformation of components */
+        void initialize( std::vector<unsigned int> numEachRigidBody,
+                         std::vector<Transform3<T>> initTr ) final;
+
         /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */
         void insertParticles( Insertion<T> const* ins ) final;

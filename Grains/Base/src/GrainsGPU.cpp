@@ -42,7 +42,7 @@ GrainsGPU<T>::~GrainsGPU()
 template <typename T>
 void GrainsGPU<T>::simulate()
 {
-    unsigned int N = GrainsParameters<T>::m_numComponents;
+    unsigned int N = GrainsParameters<T>::m_numParticles;
     int* h_collision = new int[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )
@@ -78,27 +78,23 @@ void GrainsGPU<T>::simulate()
                                                  Grains<T>::m_rigidBodyList );
         
         // Post-Processing
-        if ( GrainsParameters<T>::m_time >= GrainsParameters<T>::m_tSaveStart &&
-             GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tSaveEnd )
+        if ( fabs( GrainsParameters<T>::m_time - 
+                   GrainsParameters<T>::m_tSave.front() ) < 
+                   0.01 * GrainsParameters<T>::m_dt )
         {
-            if ( std::fmod( GrainsParameters<T>::m_time - 
-                            GrainsParameters<T>::m_tSaveStart, 
-                            GrainsParameters<T>::m_dtSave ) <
-                            0.01 * GrainsParameters<T>::m_dt )
-            {
-                std::vector<unsigned int> id = 
+            GrainsParameters<T>::m_tSave.pop();
+            std::vector<unsigned int> id = 
                                     Grains<T>::m_components->getRigidBodyId();
-                std::vector<Transform3<T>> t = 
-                                    Grains<T>::m_components->getTransform();
-                std::vector<Kinematics<T>> k = 
-                                    Grains<T>::m_components->getVelocity();
-                Grains<T>::m_postProcessor->PostProcessing( 
+            std::vector<Transform3<T>> t = 
+                                Grains<T>::m_components->getTransform();
+            std::vector<Kinematics<T>> k = 
+                                Grains<T>::m_components->getVelocity();
+            Grains<T>::m_postProcessor->PostProcessing( 
                                                 Grains<T>::m_rigidBodyList,
                                                 &id,
                                                 &t,
                                                 &k,
                                                 GrainsParameters<T>::m_time );
-            }
         }
     }
     auto h_end = chrono::high_resolution_clock::now();
@@ -118,27 +114,23 @@ void GrainsGPU<T>::simulate()
                                                    Grains<T>::m_d_rigidBodyList );
         
         // Post-Processing
-        if ( GrainsParameters<T>::m_time >= GrainsParameters<T>::m_tSaveStart &&
-             GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tSaveEnd )
+        if ( fabs( GrainsParameters<T>::m_time - 
+                   GrainsParameters<T>::m_tSave.front() ) < 
+                   0.01 * GrainsParameters<T>::m_dt )
         {
-            if ( std::fmod( GrainsParameters<T>::m_time - 
-                            GrainsParameters<T>::m_tSaveStart, 
-                            GrainsParameters<T>::m_dtSave ) <
-                            0.01 * GrainsParameters<T>::m_dt )
-            {
-                std::vector<unsigned int> id = 
+            GrainsParameters<T>::m_tSave.pop();
+            std::vector<unsigned int> id = 
                                     Grains<T>::m_d_components->getRigidBodyId();
-                std::vector<Transform3<T>> t = 
-                                    Grains<T>::m_d_components->getTransform();
-                std::vector<Kinematics<T>> k = 
-                                    Grains<T>::m_d_components->getVelocity();
-                Grains<T>::m_postProcessor->PostProcessing( 
+            std::vector<Transform3<T>> t = 
+                                Grains<T>::m_d_components->getTransform();
+            std::vector<Kinematics<T>> k = 
+                                Grains<T>::m_d_components->getVelocity();
+            Grains<T>::m_postProcessor->PostProcessing( 
                                                 Grains<T>::m_rigidBodyList,
                                                 &id,
                                                 &t,
                                                 &k,
                                                 GrainsParameters<T>::m_time );
-            }
         }
     }
     cudaDeviceSynchronize();
