@@ -51,17 +51,17 @@
 
 
 	<Obstacles>
-		<Obstacle name="Rectangle0">
-			<Convex CrustThickness="0.00">
-				<Rectangle LX="0.0791558" LY="1.3"/>
+		<Obstacle Name="Rectangle0" Density="0" Material="matW">
+				<!-- <Rectangle LX="0.0791558" LY="1.3"/> -->
+			<Convex CrustThickness="1.e-4">
+				<Box LX="0.05" LY="0.05" LZ="0.1"/>
 			</Convex>
 			<Centre X="0" Y="0.249885" Z="0.65"/>
-			<AngularPosition Type="Matrix">
+			<AngularPosition Type="Identity">
 				1	0	0
-				-0	6.12323399574e-17	-1
-				-0	1	6.12323399574e-17
+				0	1	0
+				0	0	1
 			</AngularPosition>
-			<Material>matW</Material>
 		</Obstacle>
 	</Obstacles>
 </Construction>

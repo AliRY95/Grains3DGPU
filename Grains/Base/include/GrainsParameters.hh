@@ -17,20 +17,30 @@ class GrainsParameters
         /** @name Parameters */
         //@{
         /* Spatial */
-        static Vector3<T> m_origin; /**< global domain origin */
-        static Vector3<T> m_dimension; /**< global domain dimension */
-        static bool m_isPeriodic; /**< is simulation periodic? */
+        /** @brief Global domain origin */
+        static Vector3<T> m_origin;
+        /** @brief Global domain dimension */
+        static Vector3<T> m_dimension;
+        /** @brief Is simulation periodic? */
+        static bool m_isPeriodic;
 
         /* Temporal */
-        static T m_tStart; /**< initial simulation time */  
-        static T m_tEnd; /**< end simulation time */  
-        static T m_dt; /**< simulation time step */
-        static T m_time; /**< physical time */
+        /** @brief Initial simulation time */
+        static T m_tStart;
+        /** @brief End simulation time */
+        static T m_tEnd;
+        /** @brief Simulation time step */
+        static T m_dt;
+        /** @brief Physical time */
+        static T m_time;
         
         /* Numbers */
-        static unsigned int m_numComponents; /**< number of components in 
-                                                  simulation */
-        static unsigned int m_numCells; /**< number of cells in simulation */
+        /** @brief Number of particles in simulation */
+        static unsigned int m_numParticles;
+        /** @brief Number of obstacles in simulation */
+        static unsigned int m_numObstacles;
+        /** @brief Number of cells in simulation */
+        static unsigned int m_numCells;
 
         /* Simulation */
         /** \brief Gravity vector */
@@ -47,7 +57,8 @@ class GrainsParameters
         static std::queue<T> m_tSave;
         
         /* GPU */
-        static bool m_isGPU; /**< is simulation on GPU? */
+        /** \brief is simulation on GPU? */
+        static bool m_isGPU;
         //@}
 };
 

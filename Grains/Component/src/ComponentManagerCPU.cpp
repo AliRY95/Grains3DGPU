@@ -56,7 +56,7 @@ ComponentManagerCPU<T>::ComponentManagerCPU()
 
 // -----------------------------------------------------------------------------
 // Constructor with the number of particles, number of obstacles, and number of
-// cells with all other data members at zero.
+// cells with all other data members initialized as default.
 template <typename T>
 ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
                                              unsigned int nObstacles,
@@ -65,18 +65,18 @@ ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
 , m_nObstacles( nObstacles )
 , m_nCells( nCells )
 {
-    // m_rigidBodyId.reserve( m_nParticles + m_nObstacles );
-    // m_transform.reserve( m_nParticles + m_nObstacles );
-    // m_velocity.reserve( m_nParticles + m_nObstacles );
-    // m_torce.reserve( m_nParticles + m_nObstacles );
-    // m_componentId.reserve( m_nParticles + m_nObstacles );
-    // m_componentCellHash.reserve( m_nParticles );
-    // // m_isActive.reserve( m_nParticles + m_nObstacles );
-    // m_cellHashStart.reserve( m_nCells + 1 );
-    // m_cellHashEnd.reserve( m_nCells + 1 );
+    m_rigidBodyId.reserve( m_nParticles + m_nObstacles );
+    m_transform.reserve( m_nParticles + m_nObstacles );
+    m_velocity.reserve( m_nParticles + m_nObstacles );
+    m_torce.reserve( m_nParticles + m_nObstacles );
+    m_componentId.reserve( m_nParticles + m_nObstacles );
+    m_componentCellHash.reserve( m_nParticles );
+    // m_isActive.reserve( m_nParticles + m_nObstacles );
+    m_cellHashStart.reserve( m_nCells + 1 );
+    m_cellHashEnd.reserve( m_nCells + 1 );
 
     // Initializing the vectors
-    for( int i = 0; i < m_nParticles; i++ )
+    for( int i = 0; i < m_nParticles + m_nObstacles; i++ )
     {
         m_rigidBodyId.push_back( 0 );
         m_transform.push_back( Transform3<T>() );
@@ -88,129 +88,6 @@ ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
     }
 
     // Initializing the vectors for cells
-    // The size of these vectors is one bigger that nCells because we reserve
-    // cellID = 0.
-    for ( int i = 0; i < m_nCells + 1; i++ )
-    {
-        m_cellHashStart.push_back( 0 );
-        m_cellHashEnd.push_back( 0 );
-    }
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Constructor with the number of each rigid body, number of obstacles, and 
-// number of cells. Components are randomly positioned.
-template <typename T>
-ComponentManagerCPU<T>::ComponentManagerCPU( 
-                                    std::vector<unsigned int> numEachRigidBody,
-                                    unsigned int nObstacles,
-                                    unsigned int nCells )
-: m_nParticles( numEachRigidBody.back() )
-, m_nObstacles( nObstacles )
-, m_nCells( nCells )
-{
-    // Randomly initializing transforms
-    std::default_random_engine generator;
-    std::uniform_real_distribution<T> locationX( T( 0 ), 
-                                        GrainsParameters<T>::m_dimension[X] );
-    std::uniform_real_distribution<T> locationY( T( 0 ), 
-                                        GrainsParameters<T>::m_dimension[Y] );
-    std::uniform_real_distribution<T> locationZ( T( 0 ), 
-                                        GrainsParameters<T>::m_dimension[Z] );
-    std::uniform_real_distribution<T> angle( T( 0 ), TWO_PI<T> );
-
-    // Initialzing the vectors for particles
-    unsigned int rb_counter = 0;
-    Transform3<T> tr;
-    for( int i = 0; i < m_nParticles; i++ )
-    {
-        // m_rigidBodyId
-        if ( i == numEachRigidBody[ rb_counter ] )
-            ++rb_counter;
-        m_rigidBodyId.push_back( rb_counter );
-
-        // m_transform
-        tr.setBasis( angle( generator ), 
-                     angle( generator ), 
-                     angle( generator ) );
-        tr.setOrigin( GrainsParameters<T>::m_origin + 
-                      Vector3<T>( locationX( generator ),
-                                  locationY( generator ),
-                                  locationZ( generator ) ) );
-        m_transform.push_back( tr );
-        
-        m_velocity.push_back( Kinematics<T>() );
-
-        m_torce.push_back( Torce<T>() );
-
-        // m_compId
-        m_componentId.push_back( i );
-
-        // m_componentCellHash
-        m_componentCellHash.push_back( 0 );
-    }
-
-    // Initialzing the vectors for obstacles
-
-
-    // Initialzing the vectors for cells
-    // The size of these vectors is one bigger that nCells because we reserve
-    // cellID = 0.
-    for ( int i = 0; i < m_nCells + 1; i++ )
-    {
-        m_cellHashStart.push_back( 0 );
-        m_cellHashEnd.push_back( 0 );
-    }
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Constructor with the number of each rigid body, number of obstacles, and 
-// number of cells. Components are randomly positioned.
-template <typename T>
-ComponentManagerCPU<T>::ComponentManagerCPU( 
-                                    std::vector<unsigned int> numEachRigidBody,
-                                    unsigned int nObstacles,
-                                    unsigned int nCells,
-                                    std::vector<Transform3<T>> initTr )
-: m_nParticles( numEachRigidBody.back() )
-, m_nObstacles( nObstacles )
-, m_nCells( nCells )
-{
-    // Initialzing the vectors for particles
-    unsigned int rb_counter = 0;
-    for( int i = 0; i < m_nParticles; i++ )
-    {
-        // m_rigidBodyId
-        if ( i == numEachRigidBody[ rb_counter ] )
-            ++rb_counter;
-        m_rigidBodyId.push_back( rb_counter );
-
-        // m_transform
-        m_transform.push_back( initTr[ rb_counter ] );
-        
-        // m_velocity
-        m_velocity.push_back( Kinematics<T>() );
-
-        // m_torce
-        m_torce.push_back( Torce<T>() );
-
-        // m_compId
-        m_componentId.push_back( i );
-
-        // m_componentCellHash
-        m_componentCellHash.push_back( 0 );
-    }
-
-    // Initialzing the vectors for obstacles
-
-
-    // Initialzing the vectors for cells
     // The size of these vectors is one bigger that nCells because we reserve
     // cellID = 0.
     for ( int i = 0; i < m_nCells + 1; i++ )
@@ -377,6 +254,35 @@ void ComponentManagerCPU<T>::setComponentId( std::vector<int> const& id )
 
 
 // -----------------------------------------------------------------------------
+// Initializes the RigidBody IDs and transformations for the simulation
+template <typename T>
+void ComponentManagerCPU<T>::initialize( 
+                                    std::vector<unsigned int> numEachRigidBody,
+                                    std::vector<Transform3<T>> initTr )
+{
+    // Making sure that we have data for all particles and obstacles
+    // and the number of initial TR matches the number of RBs
+    assert( numEachRigidBody.back() == m_nParticles + m_nObstacles &&
+            numEachRigidBody.size() == initTr.size() );
+
+    // Assigning
+    unsigned int rb_counter = 0;
+    for( int i = 0; i < m_nParticles + m_nObstacles; i++ )
+    {
+        // m_rigidBodyId
+        if ( i == numEachRigidBody[ rb_counter ] )
+            ++rb_counter;
+        m_rigidBodyId[i] = rb_counter;
+
+        // m_transform
+        m_transform[i] = initTr[ rb_counter ];
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Inserts particles according to a given insertion policy
 template <typename T>
 void ComponentManagerCPU<T>::insertParticles( Insertion<T> const* ins )
@@ -417,7 +323,6 @@ void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
     // Reseting start and end of each cell hash value
     std::fill( m_cellHashStart.begin(), m_cellHashStart.end(), 0 );
     std::fill( m_cellHashEnd.begin(), m_cellHashEnd.end(), 0 );
-
 
     // Finding the start and end of each cell hash value
     for ( int i = 0; i < m_nParticles; i++ )
@@ -513,6 +418,45 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
         } } }
         // Adding the gravitational force to the torce
         m_torce[compId].addForce( massA * GrainsParameters<T>::m_gravity );
+        
+
+
+        // Now, we take care of contacts between obstacles and particles.
+        // We loop over all obstacles.
+        // TODO: can we do better?
+        for ( int oId = m_nParticles; oId < m_nObstacles; oId++ ) {
+            RigidBody<T, T> const& rbB = *( RB[ m_rigidBodyId[ oId ] ] );
+            Transform3<T> const& trB = m_transform[ oId ];
+            ContactInfo<T> ci = closestPointsRigidBodies( rbA,
+                                                          rbB,
+                                                          trA, 
+                                                          trB );
+            if ( ci.getOverlapDistance() < T( 0 ) )
+            {
+                // CF ID given materialIDs
+                unsigned int contactForceID = 
+                ContactForceModelBuilderFactory<T>::computeHash( 
+                                                            matA, 
+                                                            rbB.getMaterial() );
+                // velocities of the particles
+                Kinematics<T> v1( m_velocity[ compId ] );
+                Kinematics<T> v2( m_velocity[ oId ] );
+                // geometric point of contact
+                Vector3<T> contactPt( ci.getContactPoint() );
+                // relative velocity at contact point
+                Vector3<T> relVel( v1.kinematicsAtPoint( contactPt ) -
+                                   v2.kinematicsAtPoint( contactPt ) );
+                // relative angular velocity
+                Vector3<T> relAngVel( v1.getAngularComponent() - 
+                                      v2.getAngularComponent() );
+                CF[contactForceID]->computeForces( ci, 
+                                                   relVel,
+                                                   relAngVel,
+                                                   massA,
+                                                   rbB.getMass(),
+                                                   m_torce[ compId ] );
+            }
+        }
     }
 }
 

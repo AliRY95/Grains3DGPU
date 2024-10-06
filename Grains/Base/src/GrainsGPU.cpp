@@ -42,7 +42,7 @@ GrainsGPU<T>::~GrainsGPU()
 template <typename T>
 void GrainsGPU<T>::simulate()
 {
-    unsigned int N = GrainsParameters<T>::m_numComponents;
+    unsigned int N = GrainsParameters<T>::m_numParticles;
     int* h_collision = new int[N];
     // Zeroing out
     for( int i = 0; i < N; i++ )

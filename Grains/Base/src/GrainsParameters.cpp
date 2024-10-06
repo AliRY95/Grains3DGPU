@@ -33,7 +33,9 @@ T GrainsParameters<T>::m_time;
 
 /* Numbers */
 template <typename T> 
-unsigned int GrainsParameters<T>::m_numComponents = 0;
+unsigned int GrainsParameters<T>::m_numParticles = 0;
+template <typename T> 
+unsigned int GrainsParameters<T>::m_numObstacles = 0;
 template <typename T> 
 unsigned int GrainsParameters<T>::m_numCells = 0;
 
