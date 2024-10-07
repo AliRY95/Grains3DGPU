@@ -90,8 +90,8 @@ void GrainsCPU<T>::simulate()
                                                 GrainsParameters<T>::m_time );
         }
         // In case we get past the saveTime, we need to remove it from the queue
-        else if ( GrainsParameters<T>::m_time > 
-                  GrainsParameters<T>::m_tSave.front() )
+        if ( GrainsParameters<T>::m_time > 
+             GrainsParameters<T>::m_tSave.front() )
         {
             GrainsParameters<T>::m_tSave.pop();
         }

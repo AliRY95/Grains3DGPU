@@ -50,9 +50,9 @@
 
 	<Obstacles>
 		<Obstacle Name="Rectangle0" Density="0" Material="matW">
-				<!-- <Rectangle LX="0.0791558" LY="1.3"/> -->
+				<!-- <Box LX="0.05" LY="0.05" LZ="0.1"/> -->
 			<Convex CrustThickness="1.e-4">
-				<Box LX="0.05" LY="0.05" LZ="0.1"/>
+				<Rectangle LX="0.0791558" LY="1.3"/>
 			</Convex>
 			<Centre X="0" Y="0.249885" Z="0.65"/>
 			<AngularPosition Type="Identity">
