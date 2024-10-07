@@ -504,8 +504,3 @@ void ComponentManagerCPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
 // Explicit instantiation
 template class ComponentManagerCPU<float>;
 template class ComponentManagerCPU<double>;
-
-
-#undef numCells
-#undef numComponents
-

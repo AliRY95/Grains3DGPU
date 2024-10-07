@@ -303,12 +303,13 @@
 
 <Simulation>
 		<!-- <InitialPosition Type="Constant" X="0" Y="0" Z="0"/> -->
-		<!-- <InitialOrientation Type="Constant" X="0" Y="0" Z="0"/> -->
 		<!-- <InitialPosition Type="Zero"/> -->
+		<!-- <InitialOrientation Type="Constant" X="0" Y="0" Z="0"/> -->
+		<!-- <InitialVelocity Type="Constant" X="0" Y="0" Z="0.001"/> -->
 	<ParticleInsertion>
 		<InitialPosition Type="File" Name="./position.dat"/>
 		<InitialOrientation Type="Random" Seed="Random"/>
-		<InitialVelocity Type="Constant" X="0" Y="0" Z="0.001"/>
+		<InitialVelocity Type="Zero"/>
 		<InitialAngularVelocity Type="Zero"/>
 		
 		<!-- <Mode Type="InitialTime"/>

@@ -119,7 +119,6 @@ void HODCContactForceModel<T>::performForcesCalculus(
     Vector3<T> geometricPointOfContact = contactInfos.getContactPoint();
     Vector3<T> penetration = contactInfos.getContactVector();
     
-
     // Normal linear elastic force
     // We do this here as we want to modify the penetration vector
     delFN = m_stiff * penetration;
@@ -138,15 +137,15 @@ void HODCContactForceModel<T>::performForcesCalculus(
         tangent = v_t / normv_t;
   
     // Normal dissipative force  
-    T avmass = T( 2 ) * m1 * m2 / ( m1 + m2 );
-    T omega0 = sqrt( T( 2 ) * m_stiff / avmass );
+    T avmass = m1 * m2 / ( m1 + m2 );
+    T omega0 = sqrt( m_stiff / avmass );
     if ( avmass == T( 0 ) ) 
     {
-        avmass = m2 == T( 0 ) ? m1 : m2;
+        avmass = m2 == T( 0 ) ? T( 0.5 ) * m1 : T( 0.5 ) * m2;
         omega0 = T( 2 ) * sqrt( m_stiff / avmass );
     }
     T muen = - omega0 * m_muen;
-    delFN += - muen * avmass * v_n;
+    delFN += - T( 2 ) * muen * avmass * v_n;
     T normFN = norm( delFN );
   
     // Tangential dissipative force

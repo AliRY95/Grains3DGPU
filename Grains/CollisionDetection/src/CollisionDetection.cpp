@@ -143,13 +143,17 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
         T rA = rbA.getCircumscribedRadius();
         T rB = rbB.getCircumscribedRadius();
         Vector3<T> vecBA = cenB - cenA;
-        T dist = vecBA.norm();
-        T overlap = dist - rA - rB;
+        // T dist = vecBA.norm();
+        // We calculate the overlap, and then normalize the distance vector.
+        T overlap = vecBA.norm() - rA - rB;
+        vecBA.normalize();
         if ( overlap < T( 0 ) )
         {
+            // Vector3<T> contactPt = cenA + 
+            //                  ( T( .5 ) * (rA - rB) / dist + T( .5 ) ) * vecBA;
             Vector3<T> contactPt = cenA + 
-                             ( T( .5 ) * (rA - rB) / dist + T( .5 ) ) * vecBA;
-            Vector3<T> contactVec = ( overlap / dist ) * vecBA;
+                                  ( rA + T( .5 ) * overlap ) * vecBA;
+            Vector3<T> contactVec = overlap * vecBA;
             return( ContactInfo<T>( contactPt,
                                     contactVec,
                                     overlap ) );
