@@ -27,7 +27,7 @@ template <typename T>
 __HOST__
 Insertion<T>::Insertion( DOMNode* dn,
                          unsigned int numToInsert )
-: m_numToInsert( numToInsert )                         
+: m_numToInsert( numToInsert )
 {
     DOMNode* nIP = ReaderXML::getNode( dn, "InitialPosition" );
     std::cout << shiftString9

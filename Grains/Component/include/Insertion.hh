@@ -30,18 +30,7 @@ enum InsertionMode {
     OVERTIME
 };
 
-/** @brief Random generator seed */
-enum RandomGeneratorSeed 
-{
-    /** @brief initialized to default value (i.e., 1) */
-    RGS_DEFAULT,
-    /** @brief initialized to a user provided value */
-    RGS_UDEF,
-    /** @brief randomly initialized */
-    RGS_RANDOM /**< randomly initialized */
-};
-
-/** \brief info required for comping up with an insertion position. It can be 
+/** @brief info required for comping up with an insertion position. It can be 
 either a value (T) that is used as the seed for random generator algorithm, a 
 string (std::string) that is used as the pathToFile, a 3d vector (vector3<T>) 
 for constant values, and a value (0) in case the default insertion option is 
@@ -72,13 +61,13 @@ class Insertion
         InsertionType m_translationalVelType;
         /** \brief insertion type for angular velocity */
         InsertionType m_angularVelType;
-        /** \brief info required for comping up with an insertion position. */
+        /** \brief info required for coming up with an insertion position. */
         InsertionInfo<T> m_positionInsertionInfo;
-        /** \brief info required for comping up with an insertion orientation.*/
+        /** \brief info required for coming up with an insertion orientation.*/
         InsertionInfo<T> m_orientationInsertionInfo;
-        /** \brief info required for comping up with an insertion velocity. */
+        /** \brief info required for coming up with an insertion velocity. */
         InsertionInfo<T> m_translationalVelInsertionInfo;
-        /** \brief info required for comping up with an insertion omega. */
+        /** \brief info required for coming up with an insertion omega. */
         InsertionInfo<T> m_angularVelInsertionInfo;
         /** \brief number of components to insert. */
         unsigned int m_numToInsert;
