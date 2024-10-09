@@ -413,16 +413,13 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
     DOMNode* nInsertion = ReaderXML::getNode( root, "ParticleInsertion" );
     cout << shiftString6 << "Reading insertion policies ..." << endl;
     if ( nInsertion )
-    {
-        m_insertion = new Insertion<T>( nInsertion, 
-                                        GrainsParameters<T>::m_numParticles );
-    }
+        m_insertion = new Insertion<T>( nInsertion );
     else
     {
         cout << shiftString9 
              << "No policy found, setting the insertion policy to default" 
              << endl;
-        m_insertion = new Insertion<T>( GrainsParameters<T>::m_numParticles );
+        m_insertion = new Insertion<T>();
     }
     cout << shiftString6 << "Reading insertion policies completed.\n" << endl;
 

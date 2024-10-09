@@ -33,7 +33,7 @@ InsertionWindow<T>::InsertionWindow( DOMNode* dn,
     std::string nType = ReaderXML::getNodeAttr_String( dn, "Type" );
     if ( nType == "Box" )
     {
-        m_type = BOX;
+        m_type = BOXWINDOW;
         DOMNode* nP1 = ReaderXML::getNode( dn, "MinPoint" );
         T xVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "X" ) );
         T yVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "Y" ) );
@@ -57,7 +57,7 @@ InsertionWindow<T>::InsertionWindow( DOMNode* dn,
     }
     else if ( nType == "Annulus" )
     {
-        m_type = ANNULUS;
+        m_type = ANNULUSWINDOW;
         DOMNode* nP1 = ReaderXML::getNode( dn, "BottomPoint" );
         T xVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "X" ) );
         T yVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "Y" ) );
@@ -108,14 +108,14 @@ __HOST__
 Vector3<T> InsertionWindow<T>::generateRandomPoint()
 {
     Vector3<T> out;
-    if ( m_type == BOX )
+    if ( m_type == BOXWINDOW )
     {
         out = Vector3<T>( 
                 m_v1[X] + m_dist( m_randGenerator ) * ( m_v2[X] - m_v1[X] ),
                 m_v1[Y] + m_dist( m_randGenerator ) * ( m_v2[Y] - m_v1[Y] ),
                 m_v1[Z] + m_dist( m_randGenerator ) * ( m_v2[Z] - m_v1[Z] ) );
     }
-    else if ( m_type == ANNULUS )
+    else if ( m_type == ANNULUSWINDOW )
     {
         // Step 1: Sample random angle theta between 0 and 2*pi
         T theta = m_dist( m_randGenerator ) * TWO_PI<T>;

@@ -285,21 +285,21 @@ void ComponentManagerCPU<T>::initialize(
 // -----------------------------------------------------------------------------
 // Inserts particles according to a given insertion policy
 template <typename T>
-void ComponentManagerCPU<T>::insertParticles( Insertion<T> const* ins )
+void ComponentManagerCPU<T>::insertParticles( Insertion<T>* ins )
 {
-    // Fetching insertion data from ins
-    std::vector<std::pair<Transform3<T>, Kinematics<T>>> const insData(
-                                                    ins->fetchInsertionData() );
-
+    std::pair<Transform3<T>, Kinematics<T>> insData;
     // Inserting particles
     for( int i = 0; i < m_nParticles; i++ )
     {
+        // Fetching insertion data from ins
+        insData = ins->fetchInsertionData();
+
         // m_transform
-        m_transform[i].composeLeftByRotation( insData[i].first );
-        m_transform[i].setOrigin( insData[i].first.getOrigin() );
+        m_transform[i].composeLeftByRotation( insData.first );
+        m_transform[i].setOrigin( insData.first.getOrigin() );
         
         // m_velocity
-        m_velocity[i] = insData[i].second;
+        m_velocity[i] = insData.second;
     }
 }
 

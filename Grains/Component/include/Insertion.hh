@@ -3,6 +3,7 @@
 
 
 #include <variant>
+#include "InsertionWindow.hh"
 #include "Transform3.hh"
 #include "Kinematics.hh"
 #include "ReaderXML.hh"
@@ -36,7 +37,9 @@ string (std::string) that is used as the pathToFile, a 3d vector (vector3<T>)
 for constant values, and a value (0) in case the default insertion option is 
 desired. */
 template <typename T>
-using InsertionInfo = std::variant<T, std::string, Vector3<T>>;
+using InsertionInfo = std::variant<std::vector<InsertionWindow<T>>, 
+                                   std::ifstream, 
+                                   Vector3<T>>;
 //@}
 
 
@@ -69,8 +72,6 @@ class Insertion
         InsertionInfo<T> m_translationalVelInsertionInfo;
         /** \brief info required for coming up with an insertion omega. */
         InsertionInfo<T> m_angularVelInsertionInfo;
-        /** \brief number of components to insert. */
-        unsigned int m_numToInsert;
         //@}
 
 
@@ -79,27 +80,12 @@ class Insertion
 		//@{
         /** @brief Default constructor */
         __HOST__ 
-        Insertion( unsigned int numToInsert );
+        Insertion();
 
-        /** @brief Constructor with XML node
-		@param dn XML node */
+        /** @brief Constructor with XML element
+		@param dn XML element */
 		__HOST__
-		Insertion( DOMNode* dn, 
-                   unsigned int numToInsert );
-
-        /** @brief Constructor with InsertionType and InsertionInfo for each 
-        component. 
-        // TODO: params comments */
-        __HOST__ 
-        Insertion( InsertionType const pos,
-                   InsertionType const ori,
-                   InsertionType const vel,
-                   InsertionType const ome,
-                   InsertionInfo<T> const& posData,
-                   InsertionInfo<T> const& oriData,
-                   InsertionInfo<T> const& velData,
-                   InsertionInfo<T> const& omeData,
-                   unsigned int numToInsert );
+		Insertion( DOMNode* dn );
 
 		/** @brief Destructor */
 		__HOST__
@@ -126,15 +112,13 @@ class Insertion
         @param type insertion type
         @param data insertion info */
         __HOST__
-        std::vector<Vector3<T>> fetchInsertionDataForEach( 
-                                        InsertionType const type,
-                                        InsertionInfo<T> const& data ) const;
+        Vector3<T> fetchInsertionDataForEach( InsertionType const type,
+                                              InsertionInfo<T>& data );
 
         /** @brief Returns all required data members to insert components as a 
         vector */
         __HOST__
-        std::vector<std::pair<Transform3<T>, Kinematics<T>>> 
-        fetchInsertionData() const;
+        std::pair<Transform3<T>, Kinematics<T>> fetchInsertionData();
 		//@}
 };
 
