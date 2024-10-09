@@ -111,7 +111,7 @@ class ComponentManager
 
         /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */
-        virtual void insertParticles( Insertion<T> const* ins );
+        virtual void insertParticles( Insertion<T>* ins );
 
         // /** @brief Sorts particles based on a Z-curve */
         // void sortParticles();

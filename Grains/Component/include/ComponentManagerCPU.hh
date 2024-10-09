@@ -138,7 +138,7 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */
-        void insertParticles( Insertion<T> const* ins ) final;
+        void insertParticles( Insertion<T>* ins ) final;
 
         // /** @brief Sorts particles based on a Z-curve */
         // void sortParticles();

@@ -12,9 +12,9 @@
 /** @brief Various supported insertion window types */
 enum InsertionWindowType {
     /** @brief Window with the shape of a box */
-    BOX,
+    BOXWINDOW,
     /** @brief Window with the shape of an annulus */
-    ANNULUS
+    ANNULUSWINDOW
 };
 
 /** @brief Random generator seed */
