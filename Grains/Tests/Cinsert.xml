@@ -23,7 +23,7 @@
 
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="0.5" dt="1.e-6"/>
+		<TimeInterval Start="0." End="1.e-5" dt="1.e-6"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 
@@ -62,6 +62,7 @@
 			</AngularPosition>
 		</Obstacle>
 	</Obstacles>
+
 </Construction>
 
 
@@ -84,9 +85,8 @@
 				</Window>
 			</Windows>
 		</InitialPosition>
-		<InitialOrientation Type="Random" Seed="Random">
-		</InitialOrientation>
-		<InitialVelocity Type="File" Name="./velocity.dat"/>
+		<InitialOrientation Type="Zero"/>
+		<InitialVelocity Type="Zero"/>
 		<InitialAngularVelocity Type="Zero"/>
 		
 		<!-- <Mode Type="InitialTime"/>
