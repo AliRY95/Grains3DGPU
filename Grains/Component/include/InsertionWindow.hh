@@ -34,7 +34,8 @@ enum RandomGeneratorSeed
 /** @brief The class InsertionWindow.
 
     This class defines a window of either box or annulus shape, and can return a
-    random point within the window with a uniform distribution.
+    random point within the window with a uniform distribution. This class is 
+    not optimized (performance-wise) for insertion over time.
 
     @author A.YAZDANI - 2024 - Construction */
 // =============================================================================

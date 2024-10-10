@@ -106,7 +106,7 @@ class Insertion
         @param dn XML node */
         __HOST__
         std::pair<InsertionType, InsertionInfo<T>> 
-        readTypeAndData( DOMNode* root ) const;
+        readTypeAndData( DOMNode* root );
 
         /** @brief Returns a vector of Vector3 accroding to type and data
         @param type insertion type

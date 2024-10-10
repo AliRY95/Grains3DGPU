@@ -9,7 +9,7 @@
 template <typename T>
 __HOST__
 static INLINE
-std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataRand( DOMNode* root )
+InsertionInfo<T> readDataRand( DOMNode* root )
 {
     // Random generator seed. We pass it to InsertionWindow directly.
     // We also set the seed with srand. We use it for to randomly pick an 
@@ -30,6 +30,12 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataRand( DOMNode* root )
 
         // srand
         srand( static_cast<unsigned>( val ) );
+
+        std::cout << shiftString12
+                  << "Random initialization with "
+                  << val
+                  << " seed." 
+                  << std::endl;
     }
     else if ( seedString == "Random" )
     {
@@ -37,6 +43,10 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataRand( DOMNode* root )
 
         // srand
         srand( static_cast<unsigned>( time( NULL ) ) );
+
+        std::cout << shiftString12
+                  << "Random initialization with random seed." 
+                  << std::endl;
     }
     // if ( seedString == "Default" )
     else
@@ -45,11 +55,10 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataRand( DOMNode* root )
 
         // srand
         srand( static_cast<unsigned>( 0 ) );
+        std::cout << shiftString12
+                  << "Random initialization with default seed." 
+                  << std::endl;
     }
-    std::cout << shiftString12
-              << "Random initialization with "
-              << rgs
-              << " seed." << std::endl;
 
     // Insertion window
     DOMNode* nWindows = ReaderXML::getNode( root, "Windows" );
@@ -65,7 +74,7 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataRand( DOMNode* root )
         }
     }
 
-    return ( std::make_pair( RANDOMINSERTION, insertionWindows ) );
+    return ( insertionWindows );
 }
 
 
@@ -76,7 +85,7 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataRand( DOMNode* root )
 template <typename T>
 __HOST__
 static INLINE
-std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataFile( DOMNode* root )
+InsertionInfo<T> readDataFile( DOMNode* root )
 {
     std::string fileName = ReaderXML::getNodeAttr_String( root, "Name" );
     std::ifstream file( fileName );
@@ -95,7 +104,7 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataFile( DOMNode* root )
         exit( 1 );
     }
 
-    return ( std::make_pair( FILEINSERTION, file ) );
+    return ( file );
 }
 
 
@@ -106,7 +115,7 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataFile( DOMNode* root )
 template <typename T>
 __HOST__
 static INLINE
-std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataCons( DOMNode* root )
+InsertionInfo<T> readDataCons( DOMNode* root )
 {
     T xVal = T( ReaderXML::getNodeAttr_Double( root, "X" ) );
     T yVal = T( ReaderXML::getNodeAttr_Double( root, "Y" ) );
@@ -117,7 +126,7 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataCons( DOMNode* root )
               << vec
               << "]." << std::endl;
     
-    return ( std::make_pair( CONSTANTINSERTION, vec ) );
+    return ( vec );
 }
 
 
@@ -128,14 +137,14 @@ std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataCons( DOMNode* root )
 template <typename T>
 __HOST__
 static INLINE
-std::pair<InsertionType, InsertionInfo<T>> readTypeAndDataZero( DOMNode* root )
+InsertionInfo<T> readDataZero( DOMNode* root )
 {
     Vector3<T> vec( T( 0 ), T( 0 ), T( 0 ) );
     std::cout << shiftString12
               << "Zero initialization."
               << std::endl;
     
-    return ( std::make_pair( DEFAULTINSERTION, vec ) );
+    return ( vec );
 }
 
 
@@ -152,10 +161,10 @@ Insertion<T>::Insertion()
 , m_orientationType( DEFAULTINSERTION )
 , m_translationalVelType( DEFAULTINSERTION )
 , m_angularVelType( DEFAULTINSERTION )
-, m_positionInsertionInfo( 0 )
-, m_orientationInsertionInfo( 0 )
-, m_translationalVelInsertionInfo( 0 )
-, m_angularVelInsertionInfo( 0 )
+, m_positionInsertionInfo( Vector3<T>() )
+, m_orientationInsertionInfo( Vector3<T>() )
+, m_translationalVelInsertionInfo( Vector3<T>() )
+, m_angularVelInsertionInfo( Vector3<T>() )
 {}
 
 
@@ -167,33 +176,65 @@ template <typename T>
 __HOST__
 Insertion<T>::Insertion( DOMNode* dn )
 {
+    // We define a lambda function to read the XML node
+    auto read = []( DOMNode* root, 
+                    InsertionType& type, 
+                    InsertionInfo<T>& data )
+    {
+        std::string nType = ReaderXML::getNodeAttr_String( root, "Type" );
+        if( nType == "Random" )
+        {
+            type = RANDOMINSERTION;
+            data = readDataRand<T>( root );
+        }
+        else if ( nType == "File" )
+        {
+            type = FILEINSERTION;
+            data = readDataFile<T>( root );
+        }
+        else if ( nType == "Constant" )
+        {
+            type = CONSTANTINSERTION;
+            data = readDataCons<T>( root );
+        }
+        else if( nType == "Zero" )
+        {
+            type = DEFAULTINSERTION;
+            data = readDataZero<T>( root );
+        }
+        else
+        {
+            std::cout << "Unknown Type in ParticleInsertion! "
+                      << "Aborting Grains!"
+                      << std::endl;
+            exit( 1 );
+        }
+    };
+
+
     DOMNode* nIP = ReaderXML::getNode( dn, "InitialPosition" );
     std::cout << shiftString9
               << "Reading PositionInsertion Policy ..." 
               << std::endl;
-    std::tie( m_positionType, m_positionInsertionInfo ) = 
-                                                        readTypeAndData( nIP );
+    read( nIP, m_positionType, m_positionInsertionInfo );
     
     std::cout << shiftString9 
               << "Reading OrientationInsertion Policy ..." 
               << std::endl;
     DOMNode* nIO = ReaderXML::getNode( dn, "InitialOrientation" );
-    std::tie( m_orientationType, m_orientationInsertionInfo ) = 
-                                                        readTypeAndData( nIO );
+    read( nIO, m_orientationType, m_orientationInsertionInfo );
     
     std::cout << shiftString9
               << "Reading VeclocityInsertion Policy ..." 
               << std::endl;
     DOMNode* nIV = ReaderXML::getNode( dn, "InitialVelocity" );
-    std::tie( m_translationalVelType, m_translationalVelInsertionInfo ) = 
-                                                        readTypeAndData( nIV );
+    read( nIV, m_translationalVelType, m_translationalVelInsertionInfo );
     
     std::cout << shiftString9
               << "Reading AngularVeclocityInsertion Policy ..." 
               << std::endl;
     DOMNode* nIA = ReaderXML::getNode( dn, "InitialAngularVelocity" );
-    std::tie( m_angularVelType, m_angularVelInsertionInfo ) = 
-                                                        readTypeAndData( nIA );
+    read( nIA, m_angularVelType, m_angularVelInsertionInfo );
 }
 
 
@@ -219,40 +260,11 @@ Insertion<T>::~Insertion()
 
 
 // -----------------------------------------------------------------------------
-// Reads an XML node to set the insertion type and related info
-template <typename T>
-__HOST__
-std::pair<InsertionType, InsertionInfo<T>> 
-Insertion<T>::readTypeAndData( DOMNode* root ) const
-{
-    std::string nType = ReaderXML::getNodeAttr_String( root, "Type" );
-    if( nType == "Random" )
-        return ( readTypeAndDataRand<T>( root ) );
-    else if ( nType == "File" )
-        return ( readTypeAndDataFile<T>( root ) );
-    else if ( nType == "Constant" )
-        return ( readTypeAndDataCons<T>( root ) );
-    else if( nType == "Zero" )
-        return ( readTypeAndDataZero<T>( root ) );
-    else
-    {
-        std::cout << "Unknown Type in ParticleInsertion! "
-                  << "Aborting Grains!"
-                  << std::endl;
-        exit( 1 );
-    }
-}
-
-
-
-
-// -----------------------------------------------------------------------------
 // Returns a vector of Vector3 accroding to type and data
 template <typename T>
 __HOST__
-Vector3<T> Insertion<T>::fetchInsertionDataForEach( 
-                                                InsertionType const type,
-                                                InsertionInfo<T>& data )
+Vector3<T> Insertion<T>::fetchInsertionDataForEach( InsertionType const type,
+                                                    InsertionInfo<T>& data )
 {
     // We only return a vector3. It is clear how it works for position, and 
     // kinematics. However, for orientation, it returns the vector3 of rotation

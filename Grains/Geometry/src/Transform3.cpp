@@ -66,7 +66,7 @@ Transform3<T>::Transform3( DOMNode* root )
         T x = T( ReaderXML::getNodeAttr_Double( pos, "X" ) );
         T y = T( ReaderXML::getNodeAttr_Double( pos, "Y" ) );
         T z = T( ReaderXML::getNodeAttr_Double( pos, "Z" ) );
-        setOrigin( Vector3<T>( x, y, x ) );
+        setOrigin( Vector3<T>( x, y, z ) );
     }
 
     // Rotation matrix

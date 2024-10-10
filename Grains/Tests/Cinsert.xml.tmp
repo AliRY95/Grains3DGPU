@@ -25,7 +25,7 @@
 
 
 	<TemporalSetting>
-		<TimeInterval Start="0." End="0.5" dt="1.e-6"/>
+		<TimeInterval Start="0." End="1.e-5" dt="1.e-6"/>
 		<TimeIntegration Type="FirstOrderExplicit"/>
 	</TemporalSetting>
 
@@ -53,10 +53,10 @@
 	<Obstacles>
 		<Obstacle Name="Rectangle0" Density="0" Material="matW">
 				<!-- <Box LX="0.05" LY="0.05" LZ="0.1"/> -->
-			<Convex CrustThickness="1.e-4">
-				<Rectangle LX="0.0791558" LY="1.3"/>
+			<Convex CrustThickness="0.0">
+				<Rectangle LX="0.5" LY="0.5"/>
 			</Convex>
-			<Centre X="0" Y="0.249885" Z="0.65"/>
+			<Centre X="0.1" Y="0.2" Z="0.3"/>
 			<AngularPosition Type="Identity">
 				1	0	0
 				0	1	0
@@ -64,6 +64,7 @@
 			</AngularPosition>
 		</Obstacle>
 	</Obstacles>
+
 </Construction>
 
 
@@ -71,16 +72,29 @@
 	<Gravity GX="0.0" GY="0.0" GZ="0.0"/>
 </Forces>
 
-
+<!-- <Window Type="Box">
+					<MinPoint X="0" Y="0" Z="0"/>
+					<MaxPoint X="0" Y="0" Z="0.5"/>
+				</Window> -->
 <Simulation>
 		<!-- <InitialPosition Type="Zero"/> -->
 		<!-- <InitialPosition Type="File" Name="./position.dat"/> -->
 		<!-- <InitialOrientation Type="Random" Seed="Default"/> -->
 		<!-- <InitialVelocity Type="Constant" X="0" Y="0" Z="0.001"/> -->
+		<!-- <InitialPosition Type="File" Name="./position.dat"> -->
 	<ParticleInsertion>
-		<InitialPosition Type="File" Name="./position.dat"/>
-		<InitialOrientation Type="Random" Seed="Random"/>
-		<InitialVelocity Type="File" Name="./velocity.dat"/>
+		<InitialPosition Type="Random" Seed="Random">
+			<Windows>
+				
+				<Window Type="Annulus">
+					<BottomPoint X="0.1" Y="0.1" Z="0.5"/>
+					<TopPoint X="0.1" Y="0.1" Z="1.0"/>
+					<Radius Inner="0.0" Outter="0.0"/>
+				</Window>
+			</Windows>
+		</InitialPosition>
+		<InitialOrientation Type="Zero"/>
+		<InitialVelocity Type="Zero"/>
 		<InitialAngularVelocity Type="Zero"/>
 		
 		<!-- <Mode Type="InitialTime"/>
