@@ -30,6 +30,12 @@ InsertionInfo<T> readDataRand( DOMNode* root )
 
         // srand
         srand( static_cast<unsigned>( val ) );
+
+        std::cout << shiftString12
+                  << "Random initialization with "
+                  << val
+                  << " seed." 
+                  << std::endl;
     }
     else if ( seedString == "Random" )
     {
@@ -37,6 +43,10 @@ InsertionInfo<T> readDataRand( DOMNode* root )
 
         // srand
         srand( static_cast<unsigned>( time( NULL ) ) );
+
+        std::cout << shiftString12
+                  << "Random initialization with random seed." 
+                  << std::endl;
     }
     // if ( seedString == "Default" )
     else
@@ -45,11 +55,10 @@ InsertionInfo<T> readDataRand( DOMNode* root )
 
         // srand
         srand( static_cast<unsigned>( 0 ) );
+        std::cout << shiftString12
+                  << "Random initialization with default seed." 
+                  << std::endl;
     }
-    std::cout << shiftString12
-              << "Random initialization with "
-              << rgs
-              << " seed." << std::endl;
 
     // Insertion window
     DOMNode* nWindows = ReaderXML::getNode( root, "Windows" );

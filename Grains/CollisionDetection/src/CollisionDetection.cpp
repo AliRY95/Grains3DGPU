@@ -6,8 +6,111 @@
 #include "MiscMath.hh"
 #include "MatrixMath.hh"
 
+#include "Sphere.hh"
+
+
+/* ========================================================================== */
+/*                             Low-Level Methods                              */
+/* ========================================================================== */
+// Returns whether two rigid bodies os spherical shape intersect
+template <typename T, typename U>
+__HOSTDEVICE__
+static INLINE
+bool intersectSpheres( RigidBody<T, U> const& rbA,
+                       RigidBody<T, U> const& rbB,
+                       Vector3<T> const& b2a )
+{
+    T radiiSum = rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius();
+    T dist2 = norm2( b2a );
+    return ( dist2 < radiiSum * radiiSum );
+}
+
+
+
 
 // -----------------------------------------------------------------------------
+// Returns the contact information (if any) for 2 rigid bodies of spherical 
+// shape
+template <typename T, typename U>
+__HOSTDEVICE__
+static INLINE
+ContactInfo<T> closestPointsSpheres( RigidBody<T, U> const& rbA,
+                                     RigidBody<T, U> const& rbB,
+                                     Transform3<T> const& a2w,
+                                     Transform3<T> const& b2w )
+{
+    T rA = rbA.getCircumscribedRadius();
+    T rB = rbB.getCircumscribedRadius();
+    Vector3<T> cenA = a2w.getOrigin();
+    Vector3<T> vecBA = b2w.getOrigin() - cenA;
+    // We calculate the overlap, and then normalize the distance vector.
+    T overlap = vecBA.norm() - rA - rB;
+    vecBA.normalize();
+    if ( overlap < T( 0 ) )
+    {
+        Vector3<T> contactPt = cenA + 
+                               ( rA + T( .5 ) * overlap ) * vecBA;
+        Vector3<T> contactVec = overlap * vecBA;
+        return( ContactInfo<T>( contactPt,
+                                contactVec,
+                                overlap ) );
+    }
+    else
+        return ( noContact );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Returns the contact information (if any) for 2 rigid bodies if THE FIRST ONE 
+// is a rectangle
+template <typename T, typename U>
+__HOSTDEVICE__
+static INLINE
+ContactInfo<T> closestPointsRectangle( RigidBody<T, U> const& rbA,
+                                       RigidBody<T, U> const& rbB,
+                                       Transform3<T> const& a2w,
+                                       Transform3<T> const& b2w )
+{
+    Convex<T> const* convexA = rbA.getConvex();
+    Convex<T> const* convexB = rbB.getConvex();
+
+    // rectangle center
+    Vector3<T> const rPt = a2w.getOrigin();
+    // rectangle normal is a2w.getBasis() * [0, 0, 1] which is the last column
+    // of the transformation matrix
+    Vector3<T> rNorm = ( a2w.getBasis() )[Z]; 
+    rNorm.normalized();
+    rNorm = copysign( T( 1 ), rNorm * ( b2w.getOrigin() - rPt ) ) * rNorm;
+    Vector3<T> pointA = ( b2w ) 
+                        ( convexB->support( ( -rNorm ) * b2w.getBasis() ) );
+    if ( rNorm * ( pointA - rPt ) < T( 0 ) )
+    {
+        // The projection point on the rectangle plane
+        Vector3<T> pointB = pointA - ( rNorm * pointA ) * rNorm;
+        // The projection point lies on the rectangle?
+        // TODO:
+        // if ( ( pointB - rPt ).isInBox(  ) )
+        // {
+            Vector3<T> contactPt = ( pointA + pointB ) / 2.0;
+            Vector3<T> contactVec = pointA - pointB;
+            T overlap = - norm( contactVec );        
+            return ( ContactInfo<T>( contactPt,
+                                     contactVec,
+                                     overlap ) );
+        // }
+    }
+    else
+        return ( noContact );
+}
+
+
+
+
+/* ========================================================================== */
+/*                            High-Level Methods                              */
+/* ========================================================================== */
 // Returns whether 2 rigid bodies intersect
 template <typename T, typename U>
 __HOSTDEVICE__
@@ -23,9 +126,9 @@ bool intersectRigidBodies( RigidBody<T, U> const& rbA,
     if ( convexA->getConvexType() == SPHERE && 
          convexB->getConvexType() == SPHERE )
     {
-        T radiiSum = rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius();
-        T dist2 = norm2( b2w.getOrigin() - a2w.getOrigin() );
-        return ( dist2 < radiiSum * radiiSum );
+        return( intersectSpheres<T>( rbA,
+                                     rbB,
+                                     b2w.getOrigin() - a2w.getOrigin() ) );
     }
 
     // General case
@@ -78,9 +181,9 @@ bool intersectRigidBodies( RigidBody<T, U> const& rbA,
     if ( convexA->getConvexType() == SPHERE && 
          convexB->getConvexType() == SPHERE )
     {
-        T radiiSum = rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius();
-        T dist2 = norm2( b2a.getOrigin() );
-        return ( dist2 < radiiSum * radiiSum );
+        return( intersectSpheres<T>( rbA,
+                                     rbB,
+                                     b2a.getOrigin() ) );
     }
 
     // General case
@@ -134,32 +237,13 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
     Convex<T> const* convexB = rbB.getConvex();
     
     // In case the 2 rigid bodies are spheres
-        // TODO: is_same should be removed
     if ( convexA->getConvexType() == SPHERE && 
          convexB->getConvexType() == SPHERE )
     {
-        Vector3<T> cenA = a2w.getOrigin();
-        Vector3<T> cenB = b2w.getOrigin();
-        T rA = rbA.getCircumscribedRadius();
-        T rB = rbB.getCircumscribedRadius();
-        Vector3<T> vecBA = cenB - cenA;
-        // T dist = vecBA.norm();
-        // We calculate the overlap, and then normalize the distance vector.
-        T overlap = vecBA.norm() - rA - rB;
-        vecBA.normalize();
-        if ( overlap < T( 0 ) )
-        {
-            // Vector3<T> contactPt = cenA + 
-            //                  ( T( .5 ) * (rA - rB) / dist + T( .5 ) ) * vecBA;
-            Vector3<T> contactPt = cenA + 
-                                  ( rA + T( .5 ) * overlap ) * vecBA;
-            Vector3<T> contactVec = overlap * vecBA;
-            return( ContactInfo<T>( contactPt,
-                                    contactVec,
-                                    overlap ) );
-        }
-        else
-            return ( noContact );
+        return ( closestPointsSpheres( rbA,
+                                       rbB,
+                                       a2w,
+                                       b2w ) );
     }
 
     
