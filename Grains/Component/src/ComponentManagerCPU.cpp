@@ -293,7 +293,7 @@ void ComponentManagerCPU<T>::insertParticles( Insertion<T>* ins )
     {
         // Fetching insertion data from ins
         insData = ins->fetchInsertionData();
-
+        
         // m_transform
         m_transform[i].composeLeftByRotation( insData.first );
         m_transform[i].setOrigin( insData.first.getOrigin() );
@@ -470,6 +470,7 @@ void ComponentManagerCPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
                                              RigidBody<T, T> const* const* RB )
 {
     // #pragma omp parallel for
+    m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
     for ( int pId = 0; pId < m_nParticles; pId++ )
     {
         // Rigid body
@@ -489,6 +490,13 @@ void ComponentManagerCPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
                      m_velocity[ pId ],
                      transMotion, 
                      rotMotion );
+        
+        // Quaternion and rotation quaternion conjugate
+        Vector3<T> om = m_velocity[ pId ].getAngularComponent();
+        Quaternion<T> qRotCon( qRot.conjugate() );
+        // Write torque in body-fixed coordinates system
+        Vector3<T> angAcc( qRotCon.multToVector3( om * qRot ) );
+        std::cout << "angAcc: " << angAcc << std::endl;
         // and update the transformation of the component
         m_transform[ pId ].updateTransform( transMotion, rotMotion );
         // TODO

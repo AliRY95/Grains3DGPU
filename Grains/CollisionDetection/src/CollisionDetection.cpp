@@ -6,8 +6,6 @@
 #include "MiscMath.hh"
 #include "MatrixMath.hh"
 
-#include "Sphere.hh"
-
 
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
@@ -63,7 +61,7 @@ ContactInfo<T> closestPointsSpheres( RigidBody<T, U> const& rbA,
 
 
 // -----------------------------------------------------------------------------
-// Returns the contact information (if any) for 2 rigid bodies if THE FIRST ONE 
+// Returns the contact information (if any) for 2 rigid bodies if the SECOND ONE 
 // is a rectangle
 template <typename T, typename U>
 __HOSTDEVICE__
@@ -77,14 +75,14 @@ ContactInfo<T> closestPointsRectangle( RigidBody<T, U> const& rbA,
     Convex<T> const* convexB = rbB.getConvex();
 
     // rectangle center
-    Vector3<T> const rPt = a2w.getOrigin();
+    Vector3<T> const rPt = b2w.getOrigin();
     // rectangle normal is a2w.getBasis() * [0, 0, 1] which is the last column
     // of the transformation matrix
-    Vector3<T> rNorm = ( a2w.getBasis() )[Z]; 
+    Vector3<T> rNorm = ( b2w.getBasis() )[Z]; 
     rNorm.normalized();
-    rNorm = copysign( T( 1 ), rNorm * ( b2w.getOrigin() - rPt ) ) * rNorm;
-    Vector3<T> pointA = ( b2w ) 
-                        ( convexB->support( ( -rNorm ) * b2w.getBasis() ) );
+    rNorm = copysign( T( 1 ), rNorm * ( a2w.getOrigin() - rPt ) ) * rNorm;
+    Vector3<T> pointA = ( a2w ) 
+                        ( convexB->support( ( -rNorm ) * a2w.getBasis() ) );
     if ( rNorm * ( pointA - rPt ) < T( 0 ) )
     {
         // The projection point on the rectangle plane
@@ -93,7 +91,7 @@ ContactInfo<T> closestPointsRectangle( RigidBody<T, U> const& rbA,
         // TODO:
         // if ( ( pointB - rPt ).isInBox(  ) )
         // {
-            Vector3<T> contactPt = ( pointA + pointB ) / 2.0;
+            Vector3<T> contactPt = T( 0.5 ) * ( pointA + pointB );
             Vector3<T> contactVec = pointA - pointB;
             T overlap = - norm( contactVec );        
             return ( ContactInfo<T>( contactPt,
@@ -240,10 +238,17 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
     if ( convexA->getConvexType() == SPHERE && 
          convexB->getConvexType() == SPHERE )
     {
-        return ( closestPointsSpheres( rbA,
-                                       rbB,
-                                       a2w,
-                                       b2w ) );
+        return ( closestPointsSpheres<T>( rbA,
+                                          rbB,
+                                          a2w,
+                                          b2w ) );
+    }
+    else if ( convexB->getConvexType() == RECTANGLE )
+    {
+        return( closestPointsRectangle<T>( rbA,
+                                           rbB,
+                                           a2w,
+                                           b2w ) );
     }
 
     

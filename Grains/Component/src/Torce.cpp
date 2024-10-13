@@ -138,6 +138,48 @@ void Torce<T>::addForce( Vector3<T> const& f,
 
 
 // -----------------------------------------------------------------------------
+// Output operator
+template <typename T>
+__HOST__
+std::ostream& operator << ( std::ostream& fileOut, 
+                            Torce<T> const& t )
+{
+    fileOut << t.getTorque() << std::endl << t.getForce();
+    return ( fileOut );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Input operator
+template <typename T>
+__HOST__
+std::istream& operator >> ( std::istream& fileIn, 
+                            Torce<T>& t )
+{
+    Vector3<T> vec;
+    fileIn >> vec;
+    t.setTorque( vec );
+    fileIn >> vec;
+    t.setForce( vec );
+    return ( fileIn );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Torce<float>;
 template class Torce<double>;
+
+#define X( T ) \
+template std::ostream& operator << <T>( std::ostream& fileOut,                 \
+                                        Torce<T> const& t );              \
+                                                                               \
+template std::istream& operator >> <T>( std::istream& fileIn,                  \
+                                        Torce<T>& t );
+X( float )
+X( double )
+#undef X

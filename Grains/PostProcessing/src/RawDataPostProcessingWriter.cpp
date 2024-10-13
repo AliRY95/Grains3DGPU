@@ -116,7 +116,6 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
 	m_angular_velocity_x << stime;
 	m_angular_velocity_y << stime;
 	m_angular_velocity_z << stime;
-	m_angular_velocity_z << stime;
   
   
 	for ( size_t i = 0; i < numParticles; i++ )
@@ -140,7 +139,7 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
 										ios::scientific, m_ndigits, velT[Z] );
     
         // Angular velocity
-        velT = k->at( i ).getAngularComponent();
+        velR = k->at( i ).getAngularComponent();
         m_angular_velocity_x << " " << GrainsMisc<T>::realToString(
 										ios::scientific, m_ndigits, velR[X] );
         m_angular_velocity_y << " " << GrainsMisc<T>::realToString(

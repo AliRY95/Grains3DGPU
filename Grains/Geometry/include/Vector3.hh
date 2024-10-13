@@ -153,7 +153,6 @@ class Vector3
 };
 
 
-
 /** @name External Methods - I/O methods */
 //@{
 /** @brief Input operator
