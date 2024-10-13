@@ -27,10 +27,6 @@ InsertionInfo<T> readDataRand( DOMNode* root )
                         << std::endl;
             exit( 1 );
         }
-
-        // srand
-        srand( static_cast<unsigned>( val ) );
-
         std::cout << shiftString12
                   << "Random initialization with "
                   << val
@@ -40,10 +36,6 @@ InsertionInfo<T> readDataRand( DOMNode* root )
     else if ( seedString == "Random" )
     {
         rgs = RGS_RANDOM;
-
-        // srand
-        srand( static_cast<unsigned>( time( NULL ) ) );
-
         std::cout << shiftString12
                   << "Random initialization with random seed." 
                   << std::endl;
@@ -52,13 +44,12 @@ InsertionInfo<T> readDataRand( DOMNode* root )
     else
     {
         rgs = RGS_DEFAULT;
-
-        // srand
-        srand( static_cast<unsigned>( 0 ) );
         std::cout << shiftString12
                   << "Random initialization with default seed." 
                   << std::endl;
     }
+    // srand
+    // srand( static_cast<unsigned>( time( NULL ) ) );
 
     // Insertion window
     DOMNode* nWindows = ReaderXML::getNode( root, "Windows" );
@@ -269,24 +260,30 @@ Vector3<T> Insertion<T>::fetchInsertionDataForEach( InsertionType const type,
     // We only return a vector3. It is clear how it works for position, and 
     // kinematics. However, for orientation, it returns the vector3 of rotation
     // angles. We later construct a rotation matrix.
-    Vector3<T> output;
-
     if ( type == RANDOMINSERTION )
     {
+        // TODO: support multiple InsertionWindow
         // Randomly choose between the available insertion windows
-        auto IWs = std::get<std::vector<InsertionWindow<T>>>( data );
-        int random_IW = rand() % ( IWs.size() + 1 );
+        // std::vector<InsertionWindow<T>> IWs = 
+        //                     std::get<std::vector<InsertionWindow<T>>>( data );
+        // int random_IW = rand() % IWs.size();
         // Generates a random point within the chosen window
-        output = IWs[random_IW].generateRandomPoint();
+        // output = IWs[random_IW].generateRandomPoint();
+        // output = IWs[0].generateRandomPoint();
+        Vector3<T> output;
+        output = std::get<std::vector<InsertionWindow<T>>>( data )[0].generateRandomPoint();
+        return( output );
     }
     else if ( type == FILEINSERTION )
+    {
+        Vector3<T> output;
         std::get<std::ifstream>( data ) >> output;
+        return( output );
+    }
     else if ( type == CONSTANTINSERTION )
-        output = std::get<Vector3<T>>( data );
-    else if ( type == DEFAULTINSERTION )
-        output = Vector3<T>();
-    
-    return( output );
+        return( std::get<Vector3<T>>( data ) );
+    else
+        return( Vector3<T>() );
 }
 
 
@@ -298,24 +295,23 @@ template <typename T>
 __HOST__
 std::pair<Transform3<T>, Kinematics<T>> Insertion<T>::fetchInsertionData()
 {
-    // vector of positions
+    // Position
     Vector3<T> pos = fetchInsertionDataForEach( m_positionType, 
                                                 m_positionInsertionInfo );
     
-    // vector of orientation angles. These are not matrices, so we have to
-    // compute the rotation matrices.
+    // Orientation angles. These are not matrices, so we have to compute the
+    // rotation matrices.
     Vector3<T> ori = fetchInsertionDataForEach( m_orientationType, 
                                                 m_orientationInsertionInfo );
 
-    // vector of velocities
+    // Velocity
     Vector3<T> vel = fetchInsertionDataForEach( m_translationalVelType, 
                                                 m_translationalVelInsertionInfo );
 
-    // vector of angular velocities
+    // Angular velocity
     Vector3<T> ang = fetchInsertionDataForEach( m_angularVelType, 
                                                 m_angularVelInsertionInfo );
-
-
+  
     // Transformation
     Transform3<T> tr;
     tr.setBasis( ori[X], ori[Y], ori[Z] );

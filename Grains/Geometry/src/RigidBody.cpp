@@ -39,6 +39,12 @@ RigidBody<T, U>::RigidBody( Convex<T>* convex,
     m_mass = density * m_volume;
     // Storing inertia and inverse of it
     m_convex->computeInertia( m_inertia, m_inertia_1 );
+    // Considering the density for tensor of inertia
+    for ( int i = 0; i < 6; i++ )
+    {
+        m_inertia[i] *= density;
+        m_inertia_1[i] /= density; 
+    }
     // Last, bounding volume and circumscribed radius
     // We cast type T to U just in case they are different.
     // It happens only at the start when the rigid body is created.
@@ -86,6 +92,12 @@ RigidBody<T, U>::RigidBody( DOMNode* root )
     m_mass = density * m_volume;
     // Storing inertia and inverse of it
     m_convex->computeInertia( m_inertia, m_inertia_1 );
+    // Considering the density for tensor of inertia
+    for ( int i = 0; i < 6; i++ )
+    {
+        m_inertia[i] *= density;
+        m_inertia_1[i] /= density; 
+    }
     // Last, bounding volume and circumscribed radius
     // We cast type T to U just in case they are different.
     // It happens only at the start when the rigid body is created.
@@ -286,6 +298,12 @@ Kinematics<T> RigidBody<T, U>::computeAcceleration(
                     m_inertia_1[5] * angAcc[2];
     // Write I^-1.(T + I.w ^ w) in space-fixed coordinates system
     angAcc = q.multToVector3( angAccTemp * qCon );
+
+    // Spheres
+    // Vector3<T> angAcc = t.getTorque();
+    // angAcc[0] = m_inertia_1[0] * angAcc[0];
+    // angAcc[1] = m_inertia_1[3] * angAcc[1];
+    // angAcc[2] = m_inertia_1[5] * angAcc[2];
 
     return( Kinematics<T>( t.getForce() / m_mass, angAcc ) );
 }

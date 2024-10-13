@@ -72,10 +72,7 @@
 	<Gravity GX="0.0" GY="0.0" GZ="0.0"/>
 </Forces>
 
-<!-- <Window Type="Box">
-					<MinPoint X="0" Y="0" Z="0"/>
-					<MaxPoint X="0" Y="0" Z="0.5"/>
-				</Window> -->
+
 <Simulation>
 		<!-- <InitialPosition Type="Zero"/> -->
 		<!-- <InitialPosition Type="File" Name="./position.dat"/> -->
@@ -85,11 +82,9 @@
 	<ParticleInsertion>
 		<InitialPosition Type="Random" Seed="Random">
 			<Windows>
-				
-				<Window Type="Annulus">
-					<BottomPoint X="0.1" Y="0.1" Z="0.5"/>
-					<TopPoint X="0.1" Y="0.1" Z="1.0"/>
-					<Radius Inner="0.0" Outter="0.0"/>
+				<Window Type="Box">
+					<MinPoint X="0" Y="0" Z="0"/>
+					<MaxPoint X="0" Y="0" Z="0.5"/>
 				</Window>
 			</Windows>
 		</InitialPosition>

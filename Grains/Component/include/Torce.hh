@@ -96,6 +96,26 @@ class Torce
 };
 
 
+/** @name External Methods - I/O methods */
+//@{
+/** @brief Input operator
+@param fileIn input stream
+@param t torce */
+template <typename T>
+__HOST__
+std::istream& operator >> ( std::istream& fileIn, 
+                            Torce<T>& t );
+
+/** @brief Output operator
+@param fileOut output stream
+@param t torce */
+template <typename T>
+__HOST__
+std::ostream& operator << ( std::ostream& fileOut, 
+                            Torce<T> const& t );
+//@}
+
+
 typedef Torce<float> TorceF;
 typedef Torce<double> TorceD;
 
