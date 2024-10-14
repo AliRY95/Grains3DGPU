@@ -417,22 +417,27 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
             }
         } } }
         // Adding the gravitational force to the torce
-        m_torce[compId].addForce( massA * GrainsParameters<T>::m_gravity );
+        m_torce[ compId ].addForce( massA * GrainsParameters<T>::m_gravity );
         
 
 
         // Now, we take care of contacts between obstacles and particles.
         // We loop over all obstacles.
         // TODO: can we do better?
-        for ( int oId = m_nParticles; oId < m_nObstacles; oId++ ) {
+        for ( int oId = m_nParticles; oId < m_nParticles + m_nObstacles; oId++ ) 
+        {
+            RigidBody<T, T> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
+            Transform3<T> const& trA = m_transform[ compId ];
             RigidBody<T, T> const& rbB = *( RB[ m_rigidBodyId[ oId ] ] );
             Transform3<T> const& trB = m_transform[ oId ];
+            std::cout << trA << std::endl << trB << std::endl;
             ContactInfo<T> ci = closestPointsRigidBodies( rbA,
                                                           rbB,
                                                           trA, 
                                                           trB );
             if ( ci.getOverlapDistance() < T( 0 ) )
             {
+                std::cout << "HERE!" << std::endl;
                 // CF ID given materialIDs
                 unsigned int contactForceID = 
                 ContactForceModelBuilderFactory<T>::computeHash( 
@@ -457,6 +462,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
                                                    m_torce[ compId ] );
             }
         }
+        std::cout << trA << std::endl;
     }
 }
 
@@ -470,7 +476,7 @@ void ComponentManagerCPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
                                              RigidBody<T, T> const* const* RB )
 {
     // #pragma omp parallel for
-    m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
+    // m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
     for ( int pId = 0; pId < m_nParticles; pId++ )
     {
         // Rigid body
@@ -478,25 +484,26 @@ void ComponentManagerCPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
 
         // First, we compute quaternion of orientation
         Quaternion<T> qRot( m_transform[ pId ].getBasis() );
-        // Next, we compute accelerations and reset torces
-        Kinematics<T> const& acceleration = rb->computeAcceleration( 
-                                                                m_torce[ pId ], 
-                                                                qRot );
+        // Computing momentums in the space-fixed coordinate
+        Kinematics<T> const& momentum = rb->computeMomentum( m_torce[ pId ], 
+                                                             qRot );
+        // Reset torces
         m_torce[ pId ].reset();
         // Finally, we move particles using the given time integration
         Vector3<T> transMotion;
         Quaternion<T> rotMotion;
-        (*TI)->Move( acceleration, 
+        (*TI)->Move( momentum, 
                      m_velocity[ pId ],
                      transMotion, 
                      rotMotion );
         
-        // Quaternion and rotation quaternion conjugate
-        Vector3<T> om = m_velocity[ pId ].getAngularComponent();
-        Quaternion<T> qRotCon( qRot.conjugate() );
-        // Write torque in body-fixed coordinates system
-        Vector3<T> angAcc( qRotCon.multToVector3( om * qRot ) );
-        std::cout << "angAcc: " << angAcc << std::endl;
+        // // Quaternion and rotation quaternion conjugate
+        // Vector3<T> om = m_velocity[ pId ].getAngularComponent();
+        // Quaternion<T> qRotCon( qRot.conjugate() );
+        // // Write torque in body-fixed coordinates system
+        // Vector3<T> angAcc( qRot.multToVector3( om * qRotCon ) );
+        // std::cout << "angAcc: " << angAcc << std::endl;
+        // std::cout << "qRot: " << qRot << std::endl;
         // and update the transformation of the component
         m_transform[ pId ].updateTransform( transMotion, rotMotion );
         // TODO

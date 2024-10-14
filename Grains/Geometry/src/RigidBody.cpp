@@ -275,8 +275,7 @@ U RigidBody<T, U>::getCircumscribedRadius() const
 // Computes the acceleration of the rigid body given a torce
 template <typename T, typename U>
 __HOSTDEVICE__
-Kinematics<T> RigidBody<T, U>::computeAcceleration( 
-                                                Torce<T> const& t,
+Kinematics<T> RigidBody<T, U>::computeMomentum( Torce<T> const& t,
                                                 Quaternion<T> const& q ) const
 {
     // Translational momentum is t.getForce() / m_mass.
@@ -285,6 +284,7 @@ Kinematics<T> RigidBody<T, U>::computeAcceleration(
     Quaternion<T> qCon( q.conjugate() );
     // Write torque in body-fixed coordinates system
     Vector3<T> angAcc( qCon.multToVector3( t.getTorque() * q ) );
+    // Vector3<T> angAcc( t.getTorque() );
     Vector3<T> angAccTemp;
     // Compute I^-1.(T + I.w ^ w) in body-fixed coordinates system 
     angAccTemp[0] = m_inertia_1[0] * angAcc[0] + 
