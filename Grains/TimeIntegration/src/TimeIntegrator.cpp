@@ -42,10 +42,12 @@ Quaternion<T> TimeIntegrator<T>::computeQuaternionChange(
     // Quaternion change over dt
     Quaternion<T> qRotChange;
     T nOmega = norm( avgAngVel );
-    if ( nOmega > LOWEPS<T> ) 
+    if ( nOmega > HIGHEPS<T> ) 
     {
         T c = cos( nOmega * m_dt / T( 2 ) );
         T s = sin( nOmega * m_dt / T( 2 ) );
+        // T c = cos( nOmega * m_dt );
+        // T s = sin( nOmega * m_dt );
         return ( Quaternion<T>( ( s / nOmega ) * avgAngVel, c ) );
     } 
     else 

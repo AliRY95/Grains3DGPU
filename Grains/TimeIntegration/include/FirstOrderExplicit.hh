@@ -48,12 +48,12 @@ class FirstOrderExplicit : public TimeIntegrator<T>
 		TimeIntegrator<T>* clone() const final;
 
         /** @brief Computes the new velocity and transformation change over dt
-		@param acceleration acceleration
+		@param momentum acceleration
 		@param velocity velocity 
 		@param transMotion translational motion over dt
 		@param rotMotion rotational motion over dt */
         __HOSTDEVICE__
-        void Move( Kinematics<T> const& acceleration,
+        void Move( Kinematics<T> const& momentum,
                    Kinematics<T>& velocity,
                    Vector3<T>& transMotion,
                    Quaternion<T>& rotMotion ) const final;

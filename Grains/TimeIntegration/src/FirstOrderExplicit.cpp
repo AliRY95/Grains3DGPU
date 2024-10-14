@@ -61,7 +61,7 @@ TimeIntegrator<T>* FirstOrderExplicit<T>::clone() const
 // Computes the new velocity and transformation change over dt
 template <typename T>
 __HOSTDEVICE__
-void FirstOrderExplicit<T>::Move( Kinematics<T> const& acceleration,
+void FirstOrderExplicit<T>::Move( Kinematics<T> const& momentum,
 								  Kinematics<T>& velocity,                                  
 								  Vector3<T>& transMotion,
 								  Quaternion<T>& rotMotion ) const
@@ -70,12 +70,12 @@ void FirstOrderExplicit<T>::Move( Kinematics<T> const& acceleration,
 	// Translational velocity and motion
 	transMotion = dt * velocity.getTranslationalComponent();
 	velocity.addToTranslationalComponent( 
-							dt * acceleration.getTranslationalComponent() );
+							dt * momentum.getTranslationalComponent() );
 
 	// Angular velocity and motion
 	rotMotion = this->computeQuaternionChange( velocity.getAngularComponent() );
 	velocity.addToAngularComponent( 
-							dt * acceleration.getAngularComponent() );
+							dt * momentum.getAngularComponent() );
 }
 
 

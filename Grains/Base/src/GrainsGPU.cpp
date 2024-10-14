@@ -64,11 +64,22 @@ void GrainsGPU<T>::simulate()
     // setting up the PP
     Grains<T>::m_postProcessor->PostProcessing_start();
     
+    cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
     auto h_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
-          GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
+        // Output time
+        ostringstream oss;
+        oss.width( 10 );
+        oss << left << GrainsParameters<T>::m_time;
+        std::cout << '\r' 
+                  << oss.str() 
+                  << "  \t" 
+                  << GrainsParameters<T>::m_tEnd
+                  << std::flush;
+        
         Grains<T>::m_components->detectCollisionAndComputeContactForces( 
                                                   Grains<T>::m_linkedCell, 
                                                   Grains<T>::m_rigidBodyList,
@@ -99,12 +110,26 @@ void GrainsGPU<T>::simulate()
     }
     auto h_end = chrono::high_resolution_clock::now();
     std::cout << "Time: " << GrainsParameters<T>::m_time << endl;
+
+
+
     // Collision detection on device
+    cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
     auto d_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
           GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
+        // Output time
+        ostringstream oss;
+        oss.width( 10 );
+        oss << left << GrainsParameters<T>::m_time;
+        std::cout << '\r' 
+                  << oss.str() 
+                  << "  \t" 
+                  << GrainsParameters<T>::m_tEnd
+                  << std::flush;
+        
         Grains<T>::m_d_components->detectCollisionAndComputeContactForces( 
                                                 Grains<T>::m_d_linkedCell, 
                                                 Grains<T>::m_d_rigidBodyList,
@@ -131,6 +156,12 @@ void GrainsGPU<T>::simulate()
                                                 &t,
                                                 &k,
                                                 GrainsParameters<T>::m_time );
+        }
+        // In case we get past the saveTime, we need to remove it from the queue
+        if ( GrainsParameters<T>::m_time > 
+             GrainsParameters<T>::m_tSave.front() )
+        {
+            GrainsParameters<T>::m_tSave.pop();
         }
     }
     cudaDeviceSynchronize();

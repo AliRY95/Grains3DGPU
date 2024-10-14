@@ -196,14 +196,13 @@ void moveComponents_kernel( RigidBody<T, U> const* const* RB,
     // First, we compute quaternion of orientation
     Quaternion<T> qRot( m_transform[ tid ].getBasis() );
     // Next, we compute accelerations and reset torces
-    Kinematics<T> const& acceleration = rb->computeAcceleration( 
-                                                            m_torce[ tid ], 
-                                                            qRot );
+    Kinematics<T> const& momentum = rb->computeMomentum( m_torce[ tid ], 
+                                                         qRot );
     m_torce[ tid ].reset();
     // Finally, we move particles using the given time integration
     Vector3<T> transMotion;
     Quaternion<T> rotMotion;
-    (*TI)->Move( acceleration, 
+    (*TI)->Move( momentum, 
                  m_velocity[ tid ],
                  transMotion, 
                  rotMotion );

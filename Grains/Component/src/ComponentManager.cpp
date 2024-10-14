@@ -53,7 +53,7 @@ void ComponentManager<T>::initialize( std::vector<unsigned int> numEachRigidBody
 // -----------------------------------------------------------------------------
 // Inserts particles according to a given insertion policy
 template <typename T>
-void ComponentManager<T>::insertParticles( Insertion<T> const* ins )
+void ComponentManager<T>::insertParticles( Insertion<T>* ins )
 {
     std::cout << "Cannot insert particles directly on the device. "
               << "Try inserting on host first, and copy to device. "

@@ -56,12 +56,23 @@ void GrainsCPU<T>::simulate()
     // setting up the PP
     Grains<T>::m_postProcessor->PostProcessing_start();
 
+    cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
     auto h_start = chrono::high_resolution_clock::now();
     // time marching
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
-          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
+        // Output time
+        ostringstream oss;
+        oss.width( 10 );
+        oss << left << GrainsParameters<T>::m_time;
+        std::cout << '\r' 
+                  << oss.str() 
+                  << "  \t" 
+                  << GrainsParameters<T>::m_tEnd
+                  << std::flush;
+
         Grains<T>::m_components->detectCollisionAndComputeContactForces( 
                                                   Grains<T>::m_linkedCell, 
                                                   Grains<T>::m_rigidBodyList,

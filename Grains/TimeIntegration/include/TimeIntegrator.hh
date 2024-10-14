@@ -76,12 +76,12 @@ class TimeIntegrator
 		Quaternion<T> computeQuaternionChange( Vector3<T> const& v ) const;
 
 		/** @brief Computes the new velocity and transformation change over dt
-		@param acceleration acceleration
+		@param momentum acceleration
 		@param velocity velocity 
 		@param transMotion translational motion over dt
 		@param rotMotion rotational motion over dt */
 		__HOSTDEVICE__    
-		virtual void Move( Kinematics<T> const& acceleration,
+		virtual void Move( Kinematics<T> const& momentum,
 						   Kinematics<T>& velocity,
 						   Vector3<T>& transMotion,
 						   Quaternion<T>& rotMotion ) const = 0;
