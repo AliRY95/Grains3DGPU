@@ -86,25 +86,36 @@ void RawDataPostProcessingWriter<T>::PostProcessing_start()
 
 
 // -----------------------------------------------------------------------------
-// Writes data
+// Writes data -- Particles come first, followed by obtacles
 template <typename T>
 __HOST__
 void RawDataPostProcessingWriter<T>::PostProcessing( 
-								RigidBody<T, T> const* const* rb,
-								std::vector<unsigned int> const* rigidBodyID,
-								std::vector<Transform3<T>> const* t,
-								std::vector<Kinematics<T>> const* k,
+								RigidBody<T, T> const* const* particleRB,
+								RigidBody<T, T> const* const* obstacleRB,
+								ComponentManager<T> const* cm,
 								T currentTime )
 {
-    // Aux. variables 
-	unsigned int numParticles = rigidBodyID->size();
+	// Particles
+	unsigned int numParticles = cm->getNumberOfParticles();
+	std::vector<unsigned int> rbParticle = cm->getRigidBodyId();
+	std::vector<Transform3<T>> tParticle = cm->getTransform();
+	std::vector<Kinematics<T>> kParticle = cm->getVelocity();
+	// Obstacles
+	unsigned int numObstacles = cm->getNumberOfObstacles();
+	std::vector<unsigned int> rbObstacle = cm->getRigidBodyIdObstacles();
+	std::vector<Transform3<T>> tObstacle = cm->getTransform();
+	// TODO:
+	std::vector<Kinematics<T>> kObstacle( numObstacles );
+    // Aux. variables
 	Vector3<T> centre;
-	Vector3<T> velT; 
-	Vector3<T> velR; 
+	Vector3<T> velT;
+	Vector3<T> velR;
 	unsigned int type;
 	m_particle_class.open( ( m_filerootname + "_particleType.dat" ).c_str(), 
 							ios::out );
 
+
+	// Writing current time at the beginning of each line
 	std::string stime = GrainsMisc<T>::realToString( 
 											ios::scientific, 6, currentTime );
 	m_gc_coordinates_x << stime;
@@ -116,12 +127,13 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
 	m_angular_velocity_x << stime;
 	m_angular_velocity_y << stime;
 	m_angular_velocity_z << stime;
+
   
-  
+	// Writing particles data
 	for ( size_t i = 0; i < numParticles; i++ )
 	{
     	// Center of mass position
-        centre = t->at( i ).getOrigin();
+        centre = tParticle[i].getOrigin();
         m_gc_coordinates_x << " " << GrainsMisc<T>::realToString( 
 										ios::scientific, m_ndigits, centre[X] );
         m_gc_coordinates_y << " " << GrainsMisc<T>::realToString( 
@@ -130,7 +142,7 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
 										ios::scientific, m_ndigits, centre[Z] );
 
         // Translational velocity
-        velT = k->at( i ).getTranslationalComponent();
+        velT = kParticle[i].getTranslationalComponent();
         m_translational_velocity_x << " " << GrainsMisc<T>::realToString( 
 										ios::scientific, m_ndigits, velT[X] );
         m_translational_velocity_y << " " << GrainsMisc<T>::realToString( 
@@ -139,7 +151,7 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
 										ios::scientific, m_ndigits, velT[Z] );
     
         // Angular velocity
-        velR = k->at( i ).getAngularComponent();
+        velR = kParticle[i].getAngularComponent();
         m_angular_velocity_x << " " << GrainsMisc<T>::realToString(
 										ios::scientific, m_ndigits, velR[X] );
         m_angular_velocity_y << " " << GrainsMisc<T>::realToString(
@@ -151,10 +163,50 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
         // m_coordination_number << " " << pp->getCoordinationNumber();
 	
 		// Particle type
-		type = rb[ rigidBodyID->at( i ) ]->getConvex()->getConvexType();
+		type = particleRB[ rbParticle[i] ]->getConvex()->getConvexType();
 		// m_particle_class << type << " " ;	 
-	}      
+	}
+
+
+	// Writing obstacles data
+	for ( size_t i = 0; i < numObstacles; i++ )
+	{
+    	// Center of mass position
+        centre = tObstacle[i].getOrigin();
+        m_gc_coordinates_x << " " << GrainsMisc<T>::realToString( 
+										ios::scientific, m_ndigits, centre[X] );
+        m_gc_coordinates_y << " " << GrainsMisc<T>::realToString( 
+										ios::scientific, m_ndigits, centre[Y] );
+        m_gc_coordinates_z << " " << GrainsMisc<T>::realToString(
+										ios::scientific, m_ndigits, centre[Z] );
+
+        // Translational velocity
+        velT = kObstacle[i].getTranslationalComponent();
+        m_translational_velocity_x << " " << GrainsMisc<T>::realToString( 
+										ios::scientific, m_ndigits, velT[X] );
+        m_translational_velocity_y << " " << GrainsMisc<T>::realToString( 
+										ios::scientific, m_ndigits, velT[Y] );
+        m_translational_velocity_z << " " << GrainsMisc<T>::realToString(
+										ios::scientific, m_ndigits, velT[Z] );
     
+        // Angular velocity
+        velR = kObstacle[i].getAngularComponent();
+        m_angular_velocity_x << " " << GrainsMisc<T>::realToString(
+										ios::scientific, m_ndigits, velR[X] );
+        m_angular_velocity_y << " " << GrainsMisc<T>::realToString(
+										ios::scientific, m_ndigits, velR[Y] );
+        m_angular_velocity_z << " " << GrainsMisc<T>::realToString(
+										ios::scientific, m_ndigits, velR[Z] );
+    
+        // // Number of contacts
+        // m_coordination_number << " " << pp->getCoordinationNumber();
+	
+		// Particle type
+		type = obstacleRB[ rbObstacle[i] ]->getConvex()->getConvexType();
+		// m_particle_class << type << " " ;
+	}  
+    
+
 	// Closing
     m_gc_coordinates_x << endl;
     m_gc_coordinates_y << endl;  

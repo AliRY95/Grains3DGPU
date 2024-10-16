@@ -99,17 +99,10 @@ void GrainsGPU<T>::simulate()
                    0.01 * GrainsParameters<T>::m_dt )
         {
             GrainsParameters<T>::m_tSave.pop();
-            std::vector<unsigned int> id = 
-                                    Grains<T>::m_components->getRigidBodyId();
-            std::vector<Transform3<T>> t = 
-                                Grains<T>::m_components->getTransform();
-            std::vector<Kinematics<T>> k = 
-                                Grains<T>::m_components->getVelocity();
             Grains<T>::m_postProcessor->PostProcessing( 
                                             Grains<T>::m_particleRigidBodyList,
-                                            &id,
-                                            &t,
-                                            &k,
+                                            Grains<T>::m_obstacleRigidBodyList,
+                                            Grains<T>::m_components,
                                             GrainsParameters<T>::m_time );
         }
     }
@@ -154,17 +147,10 @@ void GrainsGPU<T>::simulate()
                    0.01 * GrainsParameters<T>::m_dt )
         {
             GrainsParameters<T>::m_tSave.pop();
-            std::vector<unsigned int> id = 
-                                    Grains<T>::m_d_components->getRigidBodyId();
-            std::vector<Transform3<T>> t = 
-                                Grains<T>::m_d_components->getTransform();
-            std::vector<Kinematics<T>> k = 
-                                Grains<T>::m_d_components->getVelocity();
             Grains<T>::m_postProcessor->PostProcessing( 
                                             Grains<T>::m_particleRigidBodyList,
-                                            &id,
-                                            &t,
-                                            &k,
+                                            Grains<T>::m_obstacleRigidBodyList,
+                                            Grains<T>::m_d_components,
                                             GrainsParameters<T>::m_time );
         }
         // In case we get past the saveTime, we need to remove it from the queue
