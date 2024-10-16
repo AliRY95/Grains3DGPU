@@ -21,6 +21,7 @@ ComponentManager<T>::~ComponentManager()
 
 // -----------------------------------------------------------------------------
 // Copies data from another ComponentManager object
+// It is useful for copying data from host->device or device->host
 template <typename T>
 void ComponentManager<T>::copy( ComponentManager<T> const* cm )
 {
@@ -35,12 +36,30 @@ void ComponentManager<T>::copy( ComponentManager<T> const* cm )
 
 
 // -----------------------------------------------------------------------------
-// Initializes the RigidBody IDs and transformations for the simulation
+// Initializes the RigidBody IDs and transformations for obstacles
 template <typename T>
-void ComponentManager<T>::initialize( std::vector<unsigned int> numEachRigidBody,
-                                      std::vector<Transform3<T>> initTr )
+void ComponentManager<T>::initializeObstacles( 
+                                    std::vector<unsigned int> numEachRigidBody,
+                                    std::vector<Transform3<T>> initTr )
 {
-    std::cout << "Cannot initialize directly on the device. "
+    std::cout << "Cannot initialize obstacles directly on the device. "
+              << "Try initializing on host first, and copy to device. "
+              << "Aborting Grains!"
+              << std::endl;
+    exit( 1 );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Initializes the RigidBody IDs and transformations for particles
+template <typename T>
+void ComponentManager<T>::initializeParticles( 
+                                    std::vector<unsigned int> numEachRigidBody,
+                                    std::vector<Transform3<T>> initTr )
+{
+    std::cout << "Cannot initialize particles directly on the device. "
               << "Try initializing on host first, and copy to device. "
               << "Aborting Grains!"
               << std::endl;

@@ -38,38 +38,93 @@ void sortComponentsAndFindCellStart_kernel(
                                         unsigned int* cellStart,
                                         unsigned int* cellEnd );
 
-/** @brief Computes the collision forces for all given components using 
-LinkedCell and a thread-per-particle policy
-@param TODO */
+/** @brief Detects collision between particles and obstacles and computes forces
+@param particleRB array of rigid bodies for particles
+@param obstacleRB array of rigid bodies for obstacles
+@param CF array of all contact force models
+@param rigidBodyId array of rigid body IDs for particles
+@param transform array of particles transformations
+@param velocity array of particles velocities
+@param torce array of particles torces
+@param obstacleTransform array of obstacles transformations
+@param nParticles number of particles
+@param nObstacles number of obstacles */
 template <typename T, typename U>
 __GLOBAL__ 
-void detectCollisionAndComputeContactForces_kernel( 
-                                        LinkedCell<T> const* const* LC,
-                                        RigidBody<T, U> const* const* RB,
-                                        ContactForceModel<T> const* const* CF,
-                                        unsigned int* m_rigidBodyId,
-                                        Transform3<T> const* m_transform,
-                                        Kinematics<T> const* m_velocity,
-                                        Torce<T>* m_torce,
-                                        int* m_compId,
-                                        unsigned int* m_componentCellHash,
-                                        unsigned int* m_cellHashStart,
-                                        unsigned int* m_cellHashEnd,
-                                        int numComponents,
-                                        T gx, T gy, T gz,
-                                        int* result );
+void detectCollisionAndComputeContactForcesObstacles_kernel( 
+                                    RigidBody<T, U> const* const* particleRB,
+                                    RigidBody<T, U> const* const* obstacleRB,
+                                    ContactForceModel<T> const* const* CF,
+                                    unsigned int* rigidBodyId,
+                                    Transform3<T> const* transform,
+                                    Kinematics<T> const* velocity,
+                                    Torce<T>* torce,
+                                    unsigned int* obstacleRigidBodyId,
+                                    Transform3<T> const* obstacleTransform,
+                                    int nParticles,
+                                    int nObstacles );
+                                    
+/** @brief Detects collision between particles and particles and computes forces
+@param particleRB array of rigid bodies for particles
+@param LC linked cell
+@param CF array of all contact force models
+@param rigidBodyId array of rigid body IDs for particles
+@param transform array of particles transformations
+@param velocity array of particles velocities
+@param torce array of particles torces
+@param particleId array of particles ids
+@param particleCellHash array of particles cell hashes
+@param cellHashStart array of cells starting index
+@param cellHashEnd array of cells ending index
+@param nParticles number of particles */
+template <typename T, typename U>
+__GLOBAL__ 
+void detectCollisionAndComputeContactForcesParticles_kernel( 
+                                    RigidBody<T, U> const* const* particleRB,
+                                    LinkedCell<T> const* const* LC,
+                                    ContactForceModel<T> const* const* CF,
+                                    unsigned int* rigidBodyId,
+                                    Transform3<T> const* transform,
+                                    Kinematics<T> const* velocity,
+                                    Torce<T>* torce,
+                                    unsigned int* particleId,
+                                    unsigned int* particleCellHash,
+                                    unsigned int* cellHashStart,
+                                    unsigned int* cellHashEnd,
+                                    int nParticles,
+                                    int* result );
 
-/** @brief Updates components transformation and velocities
-@param TODO */
+/** @brief Adds external forces such as gravity
+@param particleRB array of rigid bodies for particles
+@param rigidBodyId array of rigid body IDs for particles
+@param torce array of particles torces
+@param g the gravity field
+@param nParticles number of particles */
 template <typename T, typename U>
 __GLOBAL__ 
-void moveComponents_kernel( RigidBody<T, U> const* const* RB,
-                            TimeIntegrator<T> const* const* TI,
-                            unsigned int* m_rigidBodyId,
-                            Transform3<T>* m_transform,
-                            Kinematics<T>* m_velocity,
-                            Torce<T>* m_torce,
-                            int numComponents );
+void addExternalForces_kernel( RigidBody<T, U> const* const* particleRB,
+                               unsigned int* rigidBodyId,
+                               Torce<T>* torce,
+                               T gX, T gY, T gZ,
+                               int nParticles );
+                           
+/** @brief Updates the position and velocities of particles
+@param particleRB array of rigid bodies for particles
+@param TI time integrator scheme
+@param rigidBodyId array of rigid body IDs for particles
+@param transform array of particles transformations
+@param velocity array of particles velocities
+@param torce array of particles torces
+@param nParticles number of particles */
+template <typename T, typename U>
+__GLOBAL__ 
+void moveParticles_kernel( RigidBody<T, U> const* const* particleRB,
+                           TimeIntegrator<T> const* const* TI,
+                           unsigned int* rigidBodyId,
+                           Transform3<T>* transform,
+                           Kinematics<T>* velocity,
+                           Torce<T>* torce,
+                           int nParticles );
 //@}
 
 

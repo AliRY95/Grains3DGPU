@@ -18,29 +18,30 @@ class ComponentManagerCPU : public ComponentManager<T>
     protected:
         /** @name Parameters */
         //@{
+        /** \brief Particles rigid body Id */
+        std::vector<unsigned int> m_rigidBodyId;
+        /** \brief Obsatcles rigid body Id */
+        std::vector<unsigned int> m_obstacleRigidBodyId;
+        /** \brief Particles transformation */
+        std::vector<Transform3<T>> m_transform;
+        /** \brief Obstacles transformation */
+        std::vector<Transform3<T>> m_obstacleTransform;
+        /** \brief Particles velocities */
+        std::vector<Kinematics<T>> m_velocity;
+        /** \brief Particles torce */
+        std::vector<Torce<T>> m_torce;
+        /** \brief Particles Id */
+        std::vector<unsigned int> m_particleId;
+        /** \brief Particles cell hash */
+        std::vector<unsigned int> m_particleCellHash;
+        /** \brief Cells and particle Ids each cell contains */
+        std::vector<std::vector<unsigned int>> m_cell;
         /** \brief Number of particles in manager */
         unsigned int m_nParticles;
         /** \brief Number of obstacles in manager */
         unsigned int m_nObstacles;
         /** \brief Number of cells in manager */
         unsigned int m_nCells;
-        /** \brief Components rigid body Id */
-        std::vector<unsigned int> m_rigidBodyId;
-        /** \brief Components transformation */
-        std::vector<Transform3<T>> m_transform;
-        /** \brief Array of components velocities */
-        std::vector<Kinematics<T>> m_velocity;
-        /** \brief Array of components torce */
-        std::vector<Torce<T>> m_torce;
-        /** \brief Components Id with positive values for particles and negative
-        values for obstacles. */
-        std::vector<int> m_componentId;
-        /** \brief Components cell hash */
-        std::vector<unsigned int> m_componentCellHash;
-        /** \brief Cells hash start */
-        std::vector<unsigned int> m_cellHashStart;
-        /** \brief Cells hash end */
-        std::vector<unsigned int> m_cellHashEnd;
 
         // /**< components neighbor Id */ 
         // std::vector<unsigned int> m_neighborsId; 
@@ -70,6 +71,21 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @name Get methods */
         //@{
+        /** @brief Gets particles rigid body Id */
+        std::vector<unsigned int> getRigidBodyId() const final;
+
+        /** @brief Gets particles transformation */
+        std::vector<Transform3<T>> getTransform() const final;
+
+        /** @brief Gets particles velocities */
+        std::vector<Kinematics<T>> getVelocity() const final;
+
+        /** @brief Gets particles torces */
+        std::vector<Torce<T>> getTorce() const final;
+
+        /** @brief Gets the array of particles Ids */
+        std::vector<unsigned int> getParticleId() const final;
+
         /** @brief Gets the number of particles in manager */
         unsigned int getNumberOfParticles() const final;
 
@@ -78,21 +94,6 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @brief Gets the number of cells in manager */
         unsigned int getNumberOfCells() const final;
-
-        /** @brief Gets components rigid body Id */
-        std::vector<unsigned int> getRigidBodyId() const final;
-
-        /** @brief Gets components transformation */
-        std::vector<Transform3<T>> getTransform() const final;
-
-        /** @brief Gets components velocities */
-        std::vector<Kinematics<T>> getVelocity() const final;
-
-        /** @brief Gets components torce */
-        std::vector<Torce<T>> getTorce() const final;
-
-        /** @brief Gets the array of component Ids */
-        std::vector<int> getComponentId() const final;
 
         // /** @brief Gets the array of components neighbor Id */
         // std::vector<unsigned int> getNeighborsId() const;
@@ -104,20 +105,20 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @name Set methods */
         //@{
-        /** @brief Sets the array of components rigid body Id */
+        /** @brief Sets the array of particles rigid body Ids */
         void setRigidBodyId( std::vector<unsigned int> const& id ) final;
 
-        /** @brief Sets components transformation */
+        /** @brief Sets particles transformations */
         void setTransform( std::vector<Transform3<T>> const& t ) final;
 
-        /** @brief Sets components velocities */
+        /** @brief Sets particles velocities */
         void setVelocity( std::vector<Kinematics<T>> const& v ) final;
 
-        /** @brief Sets components torce */
+        /** @brief Sets particles torces */
         void setTorce( std::vector<Torce<T>> const& t ) final;
 
-        /** @brief Sets the array of component Ids */
-        void setComponentId( std::vector<int> const& id ) final;
+        /** @brief Sets the array of particles Ids */
+        void setParticleId( std::vector<unsigned int> const& id ) final;
 
         // /** @brief Sets the array of components neighbor Id */
         // void setNeighborsId( std::vector<unsigned int> const& id );
@@ -129,12 +130,19 @@ class ComponentManagerCPU : public ComponentManager<T>
 
         /** @name Methods */
         //@{
-        /** @brief Initializes the RigidBody IDs and transformations for the 
-        simulation
+        /** @brief Initializes the RigidBody IDs and transformations for 
+        // obstacles in the simulation
         @param numEachRigidBody accumulating vector for number of different RB 
-        @param initTr initial transformation of components */
-        void initialize( std::vector<unsigned int> numEachRigidBody,
-                         std::vector<Transform3<T>> initTr ) final;
+        @param initTr initial transformation of obstacles */
+        void initializeObstacles( std::vector<unsigned int> numEachRigidBody,
+                                  std::vector<Transform3<T>> initTr ) final;
+
+        /** @brief Initializes the RigidBody IDs and transformations for 
+        // particles in the simulation
+        @param numEachRigidBody accumulating vector for number of different RB 
+        @param initTr initial transformation of particles */
+        void initializeParticles( std::vector<unsigned int> numEachRigidBody,
+                                  std::vector<Transform3<T>> initTr ) final;
 
         /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */
@@ -146,22 +154,54 @@ class ComponentManagerCPU : public ComponentManager<T>
         // /** @brief Creates a neighbor list */
         // void createNeighborList();
 
-        /** @brief Updates links between components and linked cell */
-        // template <typename U>
+        /** @brief Updates links between particles and linked cell
+        @param LC linked cell */
         void updateLinks( LinkedCell<T> const* const* LC ) final;
         
-        /** @brief Detects collision between components and computes forces */
-        // template <typename U>
-        // TODO: @param
-        void detectCollisionAndComputeContactForces( 
-                                        LinkedCell<T> const* const* LC,
-                                        RigidBody<T, T> const* const* RB,
-                                        ContactForceModel<T> const* const* CF,
-                                        int* result ) final;
+        /** @brief Detects collision between particles and obstacles and 
+        // computes forces
+        @param particleRB array of rigid bodies for particles
+        @param obstacleRB array of rigid bodies for obstacles
+        @param CF array of all contact force models */
+        void detectCollisionAndComputeContactForcesObstacles( 
+                                RigidBody<T, T> const* const* particleRB,
+                                RigidBody<T, T> const* const* obstacleRB,
+                                ContactForceModel<T> const* const* CF ) final;
 
-        /** @brief Updates the position and velocities of components */
-        void moveComponents( TimeIntegrator<T> const* const* TI,
-                             RigidBody<T, T> const* const* RB ) final;
+        /** @brief Detects collision between particles and particles and 
+        // computes forces
+        @param particleRB array of rigid bodies for particles
+        @param LC linked cell
+        @param CF array of all contact force models */
+        void detectCollisionAndComputeContactForcesParticles( 
+                                RigidBody<T, T> const* const* particleRB,
+                                LinkedCell<T> const* const* LC,
+                                ContactForceModel<T> const* const* CF,
+                                int* result ) final;
+                                        
+        /** @brief Detects collision between components and computes forces
+        @param particleRB array of rigid bodies for particles
+        @param obstacleRB array of rigid bodies for obstacles
+        @param LC linked cell
+        @param CF array of all contact force models */
+        void detectCollisionAndComputeContactForces( 
+                                    RigidBody<T, T> const* const* particleRB,
+                                    RigidBody<T, T> const* const* obstacleRB,
+                                    LinkedCell<T> const* const* LC,
+                                    ContactForceModel<T> const* const* CF,
+                                    int* result ) final;
+
+        /** @brief Adds external forces such as gravity
+        @param particleRB array of rigid bodies for particles
+        @param g gravity field */
+        void addExternalForces( RigidBody<T, T> const* const* particleRB,
+                                Vector3<T> const& g ) final;
+
+        /** @brief Updates the position and velocities of particles
+        @param particleRB array of rigid bodies for particles
+        @param TI time integration scheme */
+        void moveParticles( RigidBody<T, T> const* const* particleRB,
+                            TimeIntegrator<T> const* const* TI ) final;
         //@}
 };
 
