@@ -92,11 +92,34 @@ std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
 
 
 // -----------------------------------------------------------------------------
+// Gets obstacles rigid body Ids
+template <typename T>
+std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyIdObstacles() 
+                                                                        const
+{
+    return( m_obstacleRigidBodyId );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Gets particles transformations
 template <typename T>
 std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
 {
     return( m_transform );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets obstacles transformations
+template <typename T>
+std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransformObstacles() const
+{
+    return( m_obstacleTransform );
 }
 
 
@@ -171,9 +194,22 @@ unsigned int ComponentManagerCPU<T>::getNumberOfCells() const
 // -----------------------------------------------------------------------------
 // Sets the array of particles rigid body Ids
 template <typename T>
-void ComponentManagerCPU<T>::setRigidBodyId( std::vector<unsigned int> const& id )
+void ComponentManagerCPU<T>::setRigidBodyId( 
+                                        std::vector<unsigned int> const& id )
 {
     m_rigidBodyId = id;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets the array of obstacles rigid body Ids
+template <typename T>
+void ComponentManagerCPU<T>::setRigidBodyIdObstacles( 
+                                        std::vector<unsigned int> const& id )
+{
+    m_obstacleRigidBodyId = id;
 }
 
 
@@ -185,6 +221,18 @@ template <typename T>
 void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& t )
 {
     m_transform = t;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets obstacles transformations
+template <typename T>
+void ComponentManagerCPU<T>::setTransformObstacles( 
+                                        std::vector<Transform3<T>> const& t )
+{
+    m_obstacleTransform = t;
 }
 
 
@@ -215,7 +263,8 @@ void ComponentManagerCPU<T>::setTorce( std::vector<Torce<T>> const& t )
 // -----------------------------------------------------------------------------
 // Sets the array of particle Ids
 template <typename T>
-void ComponentManagerCPU<T>::setParticleId( std::vector<unsigned int> const& id )
+void ComponentManagerCPU<T>::setParticleId( 
+                                        std::vector<unsigned int> const& id )
 {
     m_particleId = id;
 }
@@ -227,20 +276,20 @@ void ComponentManagerCPU<T>::setParticleId( std::vector<unsigned int> const& id 
 // Initializes the RigidBody IDs and transformations of the obstacles
 template <typename T>
 void ComponentManagerCPU<T>::initializeObstacles( 
-                                    std::vector<unsigned int> numEachRigidBody,
-                                    std::vector<Transform3<T>> initTr )
+                            std::vector<unsigned int> numEachUniqueObstacles,
+                            std::vector<Transform3<T>> initTr )
 {
     // Making sure that we have data for all obstacles and the number of initial
     // TR matches the number of RBs
-    assert( numEachRigidBody.back() == m_nObstacles &&
-            numEachRigidBody.size() == initTr.size() );
+    assert( numEachUniqueObstacles.back() == m_nObstacles &&
+            numEachUniqueObstacles.size() == initTr.size() );
 
     // Assigning
     unsigned int rb_counter = 0;
     for( int i = 0; i < m_nObstacles; i++ )
     {
         // m_rigidBodyId
-        if ( i == numEachRigidBody[ rb_counter ] )
+        if ( i == numEachUniqueObstacles[ rb_counter ] )
             ++rb_counter;
         m_obstacleRigidBodyId[i] = rb_counter;
 
@@ -256,20 +305,20 @@ void ComponentManagerCPU<T>::initializeObstacles(
 // Initializes the RigidBody IDs and transformations of the particles
 template <typename T>
 void ComponentManagerCPU<T>::initializeParticles( 
-                                    std::vector<unsigned int> numEachRigidBody,
-                                    std::vector<Transform3<T>> initTr )
+                            std::vector<unsigned int> numEachUniqueParticles,
+                            std::vector<Transform3<T>> initTr )
 {
     // Making sure that we have data for all particles and the number of initial
     // TR matches the number of RBs
-    assert( numEachRigidBody.back() == m_nParticles &&
-            numEachRigidBody.size() == initTr.size() );
+    assert( numEachUniqueParticles.back() == m_nParticles &&
+            numEachUniqueParticles.size() == initTr.size() );
 
     // Assigning
     unsigned int rb_counter = 0;
     for( int i = 0; i < m_nParticles; i++ )
     {
         // m_rigidBodyId
-        if ( i == numEachRigidBody[ rb_counter ] )
+        if ( i == numEachUniqueParticles[ rb_counter ] )
             ++rb_counter;
         m_rigidBodyId[i] = rb_counter;
 

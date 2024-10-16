@@ -26,10 +26,12 @@ template <typename T>
 void ComponentManager<T>::copy( ComponentManager<T> const* cm )
 {
     setRigidBodyId( cm->getRigidBodyId() );
+    setRigidBodyIdObstacles( cm->getRigidBodyIdObstacles() );
     setTransform( cm->getTransform() );
+    setTransformObstacles( cm->getTransformObstacles() );
     setVelocity( cm->getVelocity() );
     setTorce( cm->getTorce() );
-    setComponentId( cm->getComponentId() );
+    setParticleId( cm->getParticleId() );
 }
 
 
@@ -39,8 +41,8 @@ void ComponentManager<T>::copy( ComponentManager<T> const* cm )
 // Initializes the RigidBody IDs and transformations for obstacles
 template <typename T>
 void ComponentManager<T>::initializeObstacles( 
-                                    std::vector<unsigned int> numEachRigidBody,
-                                    std::vector<Transform3<T>> initTr )
+                            std::vector<unsigned int> numEachUniqueObstacles,
+                            std::vector<Transform3<T>> initTr )
 {
     std::cout << "Cannot initialize obstacles directly on the device. "
               << "Try initializing on host first, and copy to device. "
@@ -56,8 +58,8 @@ void ComponentManager<T>::initializeObstacles(
 // Initializes the RigidBody IDs and transformations for particles
 template <typename T>
 void ComponentManager<T>::initializeParticles( 
-                                    std::vector<unsigned int> numEachRigidBody,
-                                    std::vector<Transform3<T>> initTr )
+                            std::vector<unsigned int> numEachUniqueParticles,
+                            std::vector<Transform3<T>> initTr )
 {
     std::cout << "Cannot initialize particles directly on the device. "
               << "Try initializing on host first, and copy to device. "

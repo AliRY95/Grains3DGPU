@@ -87,6 +87,23 @@ std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyId() const
 
 
 // -----------------------------------------------------------------------------
+// Gets the array of obstacles rigid body Ids
+template <typename T>
+std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyIdObstacles() 
+                                                                        const
+{
+    std::vector<unsigned int> h_obstaclesRigidBodyId( m_nObstacles );
+    cudaErrCheck( cudaMemcpy( h_obstaclesRigidBodyId.data(),
+                              m_obstacleRigidBodyId,
+                              m_nObstacles * sizeof( unsigned int ), 
+                              cudaMemcpyDeviceToHost ) );
+    return( h_obstaclesRigidBodyId );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Gets particles transformations
 template <typename T>
 std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransform() const
@@ -97,6 +114,22 @@ std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransform() const
                               m_nParticles * sizeof( Transform3<T> ), 
                               cudaMemcpyDeviceToHost ) );
     return( h_transform );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets obstacles transformations
+template <typename T>
+std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransformObstacles() const
+{
+    std::vector<Transform3<T>> h_obstacleTransform( m_nObstacles );
+    cudaErrCheck( cudaMemcpy( h_obstacleTransform.data(),
+                              m_obstacleTransform,
+                              m_nObstacles * sizeof( Transform3<T> ), 
+                              cudaMemcpyDeviceToHost ) );
+    return( h_obstacleTransform );
 }
 
 
@@ -186,11 +219,27 @@ unsigned int ComponentManagerGPU<T>::getNumberOfCells() const
 // -----------------------------------------------------------------------------
 // Sets the array of particles rigid body Ids
 template <typename T>
-void ComponentManagerGPU<T>::setRigidBodyId( std::vector<unsigned int> const& id )
+void ComponentManagerGPU<T>::setRigidBodyId( 
+                                        std::vector<unsigned int> const& id )
 {
     cudaErrCheck( cudaMemcpy( m_rigidBodyId,
                               id.data(),
                               m_nParticles * sizeof( unsigned int ), 
+                              cudaMemcpyHostToDevice ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets the array of obstacles rigid body Ids
+template <typename T>
+void ComponentManagerGPU<T>::setRigidBodyIdObstacles( 
+                                        std::vector<unsigned int> const& id )
+{
+    cudaErrCheck( cudaMemcpy( m_obstacleRigidBodyId,
+                              id.data(),
+                              m_nObstacles * sizeof( unsigned int ), 
                               cudaMemcpyHostToDevice ) );
 }
 
@@ -205,6 +254,21 @@ void ComponentManagerGPU<T>::setTransform( std::vector<Transform3<T>> const& t )
     cudaErrCheck( cudaMemcpy( m_transform,
                               t.data(),
                               m_nParticles * sizeof( Transform3<T> ), 
+                              cudaMemcpyHostToDevice ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets obstacles transformations
+template <typename T>
+void ComponentManagerGPU<T>::setTransformObstacles( 
+                                        std::vector<Transform3<T>> const& t )
+{
+    cudaErrCheck( cudaMemcpy( m_obstacleTransform,
+                              t.data(),
+                              m_nObstacles * sizeof( Transform3<T> ), 
                               cudaMemcpyHostToDevice ) );
 }
 

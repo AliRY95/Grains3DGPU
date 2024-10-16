@@ -99,98 +99,130 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
 
     // -------------------------------------------------------------------------
-    // Particles and obstacles
+    // Particles
     DOMNode* particles = ReaderXML::getNode( root, "Particles" );
     DOMNodeList* allParticles = ReaderXML::getNodes( rootElement, "Particle" );
-    DOMNode* obstacles = ReaderXML::getNode( root, "Obstacles" );
-    DOMNodeList* allObstacles = ReaderXML::getNodes( rootElement, "Obstacle" );
     // Number of unique shapes (rigid bodies) in the simulation
-    unsigned int numParticles = allParticles->getLength();
-    unsigned int numObstacles = allObstacles->getLength();
-    unsigned int numRigidBodies = numParticles + numObstacles;
+    unsigned int numUniqueParticles = allParticles->getLength();
     // Number of each unique shape in the simulation. For simplicity, we keep it
     // accumulative. Vector [2, 5] means we have 2 id0 rigid bodies and then 
     // 5 - 2 = 3 id1 rigid bodies. it also indicates that there are 5 different
     // rigid bodies in the simulation in total.
-    std::vector<unsigned int> numEachRigidBody( numRigidBodies, 0 );
+    std::vector<unsigned int> numEachUniqueParticle( numUniqueParticles, 0 );
     // We also store the initial transformations of the rigid bodies to pass to 
     // the ComponentManager to create particles with the initial transformation
     // required.
-    std::vector<Transform3<T>> initTransform;
-    initTransform.reserve( numRigidBodies );
+    std::vector<Transform3<T>> particlesInitialTransform;
+    particlesInitialTransform.reserve( numUniqueParticles );
     // Memory allocation for m_rigidBodyList with respect to the number of
     // shapes in the simulation.
-    m_rigidBodyList = ( RigidBody<T, T>** ) malloc( 
-                        numRigidBodies * sizeof( RigidBody<T, T>* ) );
-    // We always read the particles first (if any).
+    m_particleRigidBodyList = 
+                        ( RigidBody<T, T>** ) malloc( 
+                        numUniqueParticles * sizeof( RigidBody<T, T>* ) );
     if ( particles )
     {
         cout << shiftString6 << "Reading new particle types ..." << endl;
         
         // Populating the array with different kind of rigid bodies in the XML
         // file
-        for ( int i = 0; i < numParticles; i++ )
+        for ( int i = 0; i < numUniqueParticles; i++ )
         {
             DOMNode* nParticle = allParticles->item( i );
             if ( i == 0 )
-                numEachRigidBody[ i ] =  
+                numEachUniqueParticle[ i ] =  
                             ReaderXML::getNodeAttr_Int( nParticle, "Number" );
             else
-                numEachRigidBody[ i ] = numEachRigidBody[ i - 1 ] + 
+                numEachUniqueParticle[ i ] = numEachUniqueParticle[ i - 1 ] + 
                             ReaderXML::getNodeAttr_Int( nParticle, "Number" );
 
             // Create the Rigid Body
-            m_rigidBodyList[ i ] = new RigidBody<T, T>( nParticle );
+            m_particleRigidBodyList[ i ] = new RigidBody<T, T>( nParticle );
 
             // Initial transformation of the rigid body
             // One draw back is we might end up with the same rigid body shape, 
             // but with different initial transformation. 
-            initTransform.push_back( Transform3<T>( nParticle ) );
+            particlesInitialTransform.push_back( Transform3<T>( nParticle ) );
         }
 
         cout << shiftString6 << "Reading particle types completed!\n" << endl;
     }
-    // We always read the obstacles second (if any).
+    // if it is a GPU simulation and we actually have rigid bodies in the
+    // simulation, we allocate memory on device as well.
+    if ( GrainsParameters<T>::m_isGPU && numUniqueParticles > 0 )
+    {
+        cudaErrCheck( cudaMalloc( (void**) &m_d_particleRigidBodyList,
+                      numUniqueParticles * sizeof( RigidBody<T, T>* ) ) );
+        RigidBodyCopyHostToDevice( m_particleRigidBodyList, 
+                                   m_d_particleRigidBodyList,
+                                   numUniqueParticles );
+        cudaDeviceSynchronize();
+    }
+
+    
+
+
+    // -------------------------------------------------------------------------
+    // Obstacles
+    DOMNode* obstacles = ReaderXML::getNode( root, "Obstacles" );
+    DOMNodeList* allObstacles = ReaderXML::getNodes( rootElement, "Obstacle" );
+    // Number of unique shapes (rigid bodies) in the simulation
+    unsigned int numUniqueObstacles = allObstacles->getLength();
+    // Number of each unique shape in the simulation. For simplicity, we keep it
+    // accumulative. Vector [2, 5] means we have 2 id0 rigid bodies and then 
+    // 5 - 2 = 3 id1 rigid bodies. it also indicates that there are 5 different
+    // rigid bodies in the simulation in total.
+    std::vector<unsigned int> numEachUniqueObstacle( numUniqueObstacles, 0 );
+    // We also store the initial transformations of the rigid bodies to pass to 
+    // the ComponentManager to create particles with the initial transformation
+    // required.
+    std::vector<Transform3<T>> obstaclesInitialTransform;
+    obstaclesInitialTransform.reserve( numUniqueObstacles );
+    // Memory allocation for m_rigidBodyList with respect to the number of
+    // shapes in the simulation.
+    m_obstacleRigidBodyList = 
+                        ( RigidBody<T, T>** ) malloc( 
+                        numUniqueObstacles * sizeof( RigidBody<T, T>* ) );
     if ( obstacles )
     {
         cout << shiftString6 << "Reading new obstacle types ..." << endl;
         
         // Populating the array with different kind of rigid bodies in the XML
         // file
-        for ( int i = 0; i < numObstacles; i++ )
+        for ( int i = 0; i < numUniqueObstacles; i++ )
         {
             DOMNode* nObstacle = allObstacles->item( i );
             // We only add one because the obstacles are added one by one in the
             // XML file
-            if ( numParticles + i == 0 )
-                numEachRigidBody[ numParticles + i ] = 1;
+            if ( i == 0 )
+                numEachUniqueObstacle[ i ] =  
+                            ReaderXML::getNodeAttr_Int( nObstacle, "Number" );
             else
-                numEachRigidBody[ numParticles + i ] = 
-                                numEachRigidBody[ numParticles + i - 1 ] + 1;
+                numEachUniqueObstacle[ i ] = numEachUniqueObstacle[ i - 1 ] + 
+                            ReaderXML::getNodeAttr_Int( nObstacle, "Number" );
 
             // Create the Rigid Body
-            m_rigidBodyList[ numParticles + i ] = new RigidBody<T, T>( nObstacle );
+            m_obstacleRigidBodyList[ i ] = new RigidBody<T, T>( nObstacle );
 
             // Initial transformation of the rigid body
             // One draw back is we might end up with the same rigid body shape, 
             // but with different initial transformation. 
-            initTransform.push_back( Transform3<T>( nObstacle ) );
+            obstaclesInitialTransform.push_back( Transform3<T>( nObstacle ) );
         }
 
         cout << shiftString6 << "Reading obstacle types completed!\n" << endl;
     }
-
     // if it is a GPU simulation and we actually have rigid bodies in the
     // simulation, we allocate memory on device as well.
-    if ( GrainsParameters<T>::m_isGPU && numRigidBodies > 0 )
+    if ( GrainsParameters<T>::m_isGPU && numUniqueObstacles > 0 )
     {
-        cudaErrCheck( cudaMalloc( (void**) &m_d_rigidBodyList,
-                      numRigidBodies * sizeof( RigidBody<T, T>* ) ) );
-        RigidBodyCopyHostToDevice( m_rigidBodyList, 
-                                   m_d_rigidBodyList,
-                                   numRigidBodies );
+        cudaErrCheck( cudaMalloc( (void**) &m_d_obstacleRigidBodyList,
+                      numUniqueObstacles * sizeof( RigidBody<T, T>* ) ) );
+        RigidBodyCopyHostToDevice( m_obstacleRigidBodyList, 
+                                   m_d_obstacleRigidBodyList,
+                                   numUniqueObstacles );
         cudaDeviceSynchronize();
     }
+
 
 
 
@@ -201,11 +233,11 @@ void Grains<T>::Construction( DOMElement* rootElement )
     // Finding the size of each cell -- max circumscribed radius among all
     // particles. Note that we loop until numParticles, because we do not care
     // about the circumscribed radius of the obstacles.
-    T linkedCellSize = T( 0 );
-    for ( int i = 0; i < numParticles; i++ )
+    T LCSize = T( 0 );
+    for ( int i = 0; i < numUniqueParticles; i++ )
     {
-        if ( m_rigidBodyList[i]->getCircumscribedRadius() > linkedCellSize )
-            linkedCellSize = m_rigidBodyList[i]->getCircumscribedRadius();
+        if ( m_particleRigidBodyList[i]->getCircumscribedRadius() > LCSize )
+            LCSize = m_particleRigidBodyList[i]->getCircumscribedRadius();
     }
     // Scaling coefficient of linked cell size
     T LC_coeff = T( 1 );
@@ -224,7 +256,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
         *m_linkedCell = new LinkedCell<T>( 
             GrainsParameters<T>::m_origin,
             GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
-            LC_coeff * T( 2 ) * linkedCellSize );
+            LC_coeff * T( 2 ) * LCSize );
         GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
         cout << shiftString9 << "LinkedCell with "
              << GrainsParameters<T>::m_numCells <<
@@ -237,7 +269,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
         int d_numCells = createLinkedCellOnDevice( 
             GrainsParameters<T>::m_origin,
             GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
-            LC_coeff * T( 2 ) * linkedCellSize,
+            LC_coeff * T( 2 ) * LCSize,
             m_d_linkedCell );
 
         GrainsParameters<T>::m_numCells = d_numCells;
@@ -252,15 +284,16 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Setting up the component managers
-    GrainsParameters<T>::m_numParticles = numEachRigidBody[ numParticles - 1 ];
-    GrainsParameters<T>::m_numObstacles = numEachRigidBody.back() - 
-                                          GrainsParameters<T>::m_numParticles;
+    GrainsParameters<T>::m_numParticles = numEachUniqueParticle.back();
+    GrainsParameters<T>::m_numObstacles = numEachUniqueObstacle.back();
     m_components =
             new ComponentManagerCPU<T>( GrainsParameters<T>::m_numParticles,
                                         GrainsParameters<T>::m_numObstacles,
                                         GrainsParameters<T>::m_numCells );
-    m_components->initialize( numEachRigidBody,
-                              initTransform );
+    m_components->initializeParticles( numEachUniqueParticle,
+                                       particlesInitialTransform );
+    m_components->initializeObstacles( numEachUniqueObstacle,
+                                       obstaclesInitialTransform );
     if ( GrainsParameters<T>::m_isGPU )
     {
         m_d_components = 

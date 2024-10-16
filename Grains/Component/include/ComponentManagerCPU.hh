@@ -74,8 +74,14 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @brief Gets particles rigid body Id */
         std::vector<unsigned int> getRigidBodyId() const final;
 
+        /** @brief Gets obstacles rigid body Id */
+        std::vector<unsigned int> getRigidBodyIdObstacles() const final;
+
         /** @brief Gets particles transformation */
         std::vector<Transform3<T>> getTransform() const final;
+
+        /** @brief Gets obstacles transformation */
+        std::vector<Transform3<T>> getTransformObstacles() const final;
 
         /** @brief Gets particles velocities */
         std::vector<Kinematics<T>> getVelocity() const final;
@@ -108,8 +114,15 @@ class ComponentManagerCPU : public ComponentManager<T>
         /** @brief Sets the array of particles rigid body Ids */
         void setRigidBodyId( std::vector<unsigned int> const& id ) final;
 
+        /** @brief Sets the array of obstacles rigid body Ids */
+        void setRigidBodyIdObstacles( 
+                                    std::vector<unsigned int> const& id ) final;
+
         /** @brief Sets particles transformations */
         void setTransform( std::vector<Transform3<T>> const& t ) final;
+
+        /** @brief Sets obstacles transformations */
+        void setTransformObstacles( std::vector<Transform3<T>> const& t ) final;
 
         /** @brief Sets particles velocities */
         void setVelocity( std::vector<Kinematics<T>> const& v ) final;
@@ -132,17 +145,21 @@ class ComponentManagerCPU : public ComponentManager<T>
         //@{
         /** @brief Initializes the RigidBody IDs and transformations for 
         // obstacles in the simulation
-        @param numEachRigidBody accumulating vector for number of different RB 
+        @param numEachUniqueObstacles accumulating vector for number of 
+        different RB 
         @param initTr initial transformation of obstacles */
-        void initializeObstacles( std::vector<unsigned int> numEachRigidBody,
-                                  std::vector<Transform3<T>> initTr ) final;
+        void initializeObstacles( 
+                            std::vector<unsigned int> numEachUniqueObstacles,
+                            std::vector<Transform3<T>> initTr ) final;
 
         /** @brief Initializes the RigidBody IDs and transformations for 
         // particles in the simulation
-        @param numEachRigidBody accumulating vector for number of different RB 
+        @param numEachUniqueParticles accumulating vector for number of 
+        different RB 
         @param initTr initial transformation of particles */
-        void initializeParticles( std::vector<unsigned int> numEachRigidBody,
-                                  std::vector<Transform3<T>> initTr ) final;
+        void initializeParticles( 
+                            std::vector<unsigned int> numEachUniqueParticles,
+                            std::vector<Transform3<T>> initTr ) final;
 
         /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */

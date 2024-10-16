@@ -67,11 +67,17 @@ class ComponentManagerGPU : public ComponentManager<T>
 
         /** @name Get methods */
         //@{
-        /** @brief Gets particles rigid body Ids */
+        /** @brief Gets particles rigid body Id */
         std::vector<unsigned int> getRigidBodyId() const final;
 
-        /** @brief Gets particles transformations */
+        /** @brief Gets obstacles rigid body Id */
+        std::vector<unsigned int> getRigidBodyIdObstacles() const final;
+
+        /** @brief Gets particles transformation */
         std::vector<Transform3<T>> getTransform() const final;
+
+        /** @brief Gets obstacles transformation */
+        std::vector<Transform3<T>> getTransformObstacles() const final;
 
         /** @brief Gets particles velocities */
         std::vector<Kinematics<T>> getVelocity() const final;
@@ -104,8 +110,15 @@ class ComponentManagerGPU : public ComponentManager<T>
         /** @brief Sets the array of particles rigid body Ids */
         void setRigidBodyId( std::vector<unsigned int> const& id ) final;
 
+        /** @brief Sets the array of obstacles rigid body Ids */
+        void setRigidBodyIdObstacles( 
+                                    std::vector<unsigned int> const& id ) final;
+
         /** @brief Sets particles transformations */
         void setTransform( std::vector<Transform3<T>> const& t ) final;
+
+        /** @brief Sets obstacles transformations */
+        void setTransformObstacles( std::vector<Transform3<T>> const& t ) final;
 
         /** @brief Sets particles velocities */
         void setVelocity( std::vector<Kinematics<T>> const& v ) final;
