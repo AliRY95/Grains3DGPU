@@ -9,43 +9,7 @@
 #include "QuaternionMath.hh"
 
 
-/* ========================================================================== */
-/*                             Low-Level Methods                              */
-/* ========================================================================== */
-// Sorts both vectors data and key based on the key values
-static INLINE void sortByKey( std::vector<int>& data, 
-                              std::vector<unsigned int>& key )
-{
-    // Create a vector of indices
-    std::size_t N = data.size();
-    std::vector<std::size_t> indices( N );
-    for ( std::size_t i = 0; i < indices.size(); ++i )
-        indices[i] = i;
-
-    // Sort the indices based on the key vector
-    std::sort( indices.begin(), 
-               indices.end(), 
-               [&key]( std::size_t i1, std::size_t i2 ) 
-               { return key[i1] < key[i2]; } );
-
-    // Reorder the key and data vectors based on the sorted indices
-    std::vector<int> sortedData( N );
-    std::vector<unsigned int> sortedKey( N );
-    for ( std::size_t i = 0; i < N; ++i )
-    {
-        sortedKey[i] = key[ indices[i] ];
-        sortedData[i] = data[ indices[i] ];
-    }
-    key = sortedKey;
-    data = sortedData;
-}
-
-
-
-
-/* ========================================================================== */
-/*                            High-Level Methods                              */
-/* ========================================================================== */
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 ComponentManagerCPU<T>::ComponentManagerCPU()
@@ -65,35 +29,41 @@ ComponentManagerCPU<T>::ComponentManagerCPU( unsigned int nParticles,
 , m_nObstacles( nObstacles )
 , m_nCells( nCells )
 {
-    m_rigidBodyId.reserve( m_nParticles + m_nObstacles );
-    m_transform.reserve( m_nParticles + m_nObstacles );
-    m_velocity.reserve( m_nParticles + m_nObstacles );
-    m_torce.reserve( m_nParticles + m_nObstacles );
-    m_componentId.reserve( m_nParticles + m_nObstacles );
-    m_componentCellHash.reserve( m_nParticles );
-    // m_isActive.reserve( m_nParticles + m_nObstacles );
-    m_cellHashStart.reserve( m_nCells + 1 );
-    m_cellHashEnd.reserve( m_nCells + 1 );
+    m_rigidBodyId.reserve( m_nParticles );
+    m_obstacleRigidBodyId.reserve( m_nObstacles );
+    m_transform.reserve( m_nParticles );
+    m_obstacleTransform.reserve( m_nObstacles );
+    m_velocity.reserve( m_nParticles );
+    m_torce.reserve( m_nParticles );
+    m_particleId.reserve( m_nParticles );
+    m_particleCellHash.reserve( m_nParticles );
+    m_cell.reserve( m_nCells + 1 );
 
-    // Initializing the vectors
-    for( int i = 0; i < m_nParticles + m_nObstacles; i++ )
+    // Initializing the vectors for particles
+    for( int i = 0; i < m_nParticles; i++ )
     {
         m_rigidBodyId.push_back( 0 );
         m_transform.push_back( Transform3<T>() );
         m_velocity.push_back( Kinematics<T>() );
         m_torce.push_back( Torce<T>() );
-        m_componentId.push_back( i );
-        m_componentCellHash.push_back( 0 );
+        m_particleId.push_back( i );
         // m_isActive.push_back( 0 );
+    }
+
+    // Initializing the vectors for obstacles
+    for( int i = 0; i < m_nObstacles; i++ )
+    {
+        m_obstacleRigidBodyId.push_back( 0 );
+        m_obstacleTransform.push_back( Transform3<T>() );
     }
 
     // Initializing the vectors for cells
     // The size of these vectors is one bigger that nCells because we reserve
     // cellID = 0.
+    std::vector<unsigned int> zeroVec( 1, 0 );
     for ( int i = 0; i < m_nCells + 1; i++ )
     {
-        m_cellHashStart.push_back( 0 );
-        m_cellHashEnd.push_back( 0 );
+        m_cell.push_back( zeroVec );
     }
 }
 
@@ -106,6 +76,84 @@ template <typename T>
 ComponentManagerCPU<T>::~ComponentManagerCPU()
 {}
 
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets particles rigid body Ids
+template <typename T>
+std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
+{
+    return( m_rigidBodyId );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets obstacles rigid body Ids
+template <typename T>
+std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyIdObstacles() 
+                                                                        const
+{
+    return( m_obstacleRigidBodyId );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets particles transformations
+template <typename T>
+std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
+{
+    return( m_transform );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets obstacles transformations
+template <typename T>
+std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransformObstacles() const
+{
+    return( m_obstacleTransform );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets particles velocities
+template <typename T>
+std::vector<Kinematics<T>> ComponentManagerCPU<T>::getVelocity() const
+{
+    return( m_velocity );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets particles torces
+template <typename T>
+std::vector<Torce<T>> ComponentManagerCPU<T>::getTorce() const
+{
+    return( m_torce );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Gets the array of particle Ids
+template <typename T>
+std::vector<unsigned int> ComponentManagerCPU<T>::getParticleId() const
+{
+    return( m_particleId );
+}
 
 
 
@@ -144,64 +192,10 @@ unsigned int ComponentManagerCPU<T>::getNumberOfCells() const
 
 
 // -----------------------------------------------------------------------------
-// Gets components rigid body Id
+// Sets the array of particles rigid body Ids
 template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
-{
-    return( m_rigidBodyId );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets components transformation
-template <typename T>
-std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
-{
-    return( m_transform );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets components velocities
-template <typename T>
-std::vector<Kinematics<T>> ComponentManagerCPU<T>::getVelocity() const
-{
-    return( m_velocity );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets components torce
-template <typename T>
-std::vector<Torce<T>> ComponentManagerCPU<T>::getTorce() const
-{
-    return( m_torce );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Gets the array of component Ids
-template <typename T>
-std::vector<int> ComponentManagerCPU<T>::getComponentId() const
-{
-    return( m_componentId );
-}
-
-
-
-
-// -----------------------------------------------------------------------------
-// Sets the array of components rigid body Id
-template <typename T>
-void ComponentManagerCPU<T>::setRigidBodyId( std::vector<unsigned int> const& id )
+void ComponentManagerCPU<T>::setRigidBodyId( 
+                                        std::vector<unsigned int> const& id )
 {
     m_rigidBodyId = id;
 }
@@ -210,7 +204,19 @@ void ComponentManagerCPU<T>::setRigidBodyId( std::vector<unsigned int> const& id
 
 
 // -----------------------------------------------------------------------------
-// Sets components transformation
+// Sets the array of obstacles rigid body Ids
+template <typename T>
+void ComponentManagerCPU<T>::setRigidBodyIdObstacles( 
+                                        std::vector<unsigned int> const& id )
+{
+    m_obstacleRigidBodyId = id;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets particles transformations
 template <typename T>
 void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& t )
 {
@@ -221,7 +227,19 @@ void ComponentManagerCPU<T>::setTransform( std::vector<Transform3<T>> const& t )
 
 
 // -----------------------------------------------------------------------------
-// Sets components velocity
+// Sets obstacles transformations
+template <typename T>
+void ComponentManagerCPU<T>::setTransformObstacles( 
+                                        std::vector<Transform3<T>> const& t )
+{
+    m_obstacleTransform = t;
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Sets particles velocities
 template <typename T>
 void ComponentManagerCPU<T>::setVelocity( std::vector<Kinematics<T>> const& v )
 {
@@ -232,7 +250,7 @@ void ComponentManagerCPU<T>::setVelocity( std::vector<Kinematics<T>> const& v )
 
 
 // -----------------------------------------------------------------------------
-// Sets components torce
+// Sets particles torces
 template <typename T>
 void ComponentManagerCPU<T>::setTorce( std::vector<Torce<T>> const& t )
 {
@@ -243,34 +261,64 @@ void ComponentManagerCPU<T>::setTorce( std::vector<Torce<T>> const& t )
 
 
 // -----------------------------------------------------------------------------
-// Sets the array of component Ids
+// Sets the array of particle Ids
 template <typename T>
-void ComponentManagerCPU<T>::setComponentId( std::vector<int> const& id )
+void ComponentManagerCPU<T>::setParticleId( 
+                                        std::vector<unsigned int> const& id )
 {
-    m_componentId = id;
+    m_particleId = id;
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Initializes the RigidBody IDs and transformations for the simulation
+// Initializes the RigidBody IDs and transformations of the obstacles
 template <typename T>
-void ComponentManagerCPU<T>::initialize( 
-                                    std::vector<unsigned int> numEachRigidBody,
-                                    std::vector<Transform3<T>> initTr )
+void ComponentManagerCPU<T>::initializeObstacles( 
+                            std::vector<unsigned int> numEachUniqueObstacles,
+                            std::vector<Transform3<T>> initTr )
 {
-    // Making sure that we have data for all particles and obstacles
-    // and the number of initial TR matches the number of RBs
-    assert( numEachRigidBody.back() == m_nParticles + m_nObstacles &&
-            numEachRigidBody.size() == initTr.size() );
+    // Making sure that we have data for all obstacles and the number of initial
+    // TR matches the number of RBs
+    assert( numEachUniqueObstacles.back() == m_nObstacles &&
+            numEachUniqueObstacles.size() == initTr.size() );
 
     // Assigning
     unsigned int rb_counter = 0;
-    for( int i = 0; i < m_nParticles + m_nObstacles; i++ )
+    for( int i = 0; i < m_nObstacles; i++ )
     {
         // m_rigidBodyId
-        if ( i == numEachRigidBody[ rb_counter ] )
+        if ( i == numEachUniqueObstacles[ rb_counter ] )
+            ++rb_counter;
+        m_obstacleRigidBodyId[i] = rb_counter;
+
+        // m_transform
+        m_obstacleTransform[i] = initTr[ rb_counter ];
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Initializes the RigidBody IDs and transformations of the particles
+template <typename T>
+void ComponentManagerCPU<T>::initializeParticles( 
+                            std::vector<unsigned int> numEachUniqueParticles,
+                            std::vector<Transform3<T>> initTr )
+{
+    // Making sure that we have data for all particles and the number of initial
+    // TR matches the number of RBs
+    assert( numEachUniqueParticles.back() == m_nParticles &&
+            numEachUniqueParticles.size() == initTr.size() );
+
+    // Assigning
+    unsigned int rb_counter = 0;
+    for( int i = 0; i < m_nParticles; i++ )
+    {
+        // m_rigidBodyId
+        if ( i == numEachUniqueParticles[ rb_counter ] )
             ++rb_counter;
         m_rigidBodyId[i] = rb_counter;
 
@@ -311,31 +359,21 @@ void ComponentManagerCPU<T>::insertParticles( Insertion<T>* ins )
 template <typename T>
 void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 {
-    // Updating m_componentCellHash according to the linkedCell. That is, 
+    // Reset
+    for ( int i = 0; i < m_nCells + 1; i++ )
+        m_cell[ i ].clear();
+
+    // Updating m_particleCellHash according to the linkedCell. That is, 
     // assigning a hash value to each particle based on the cell it belongs to.
     (*LC)->computeLinearLinkedCellHashCPU( m_transform,
                                            m_nParticles,
-                                           m_componentCellHash );
+                                           m_particleCellHash );
 
-    // Sorting the hash values and componentIds according to the hash values
-    sortByKey( m_componentId, m_componentCellHash );
-
-    // Reseting start and end of each cell hash value
-    std::fill( m_cellHashStart.begin(), m_cellHashStart.end(), 0 );
-    std::fill( m_cellHashEnd.begin(), m_cellHashEnd.end(), 0 );
-
-    // Finding the start and end of each cell hash value
+    // Update cells
     for ( int i = 0; i < m_nParticles; i++ )
     {
-        unsigned int hash = m_componentCellHash[ i ];
-        if ( i == 0 )
-            m_cellHashStart[ hash ] = i;
-        if ( i != 0 && hash != m_componentCellHash[ i - 1 ] )
-            m_cellHashStart.at( hash ) = i;
-        if ( i > 0 )
-            m_cellHashEnd[ m_componentCellHash[ i - 1 ] ] = i;
-        if ( i == m_nParticles - 1 )
-            m_cellHashEnd[ hash ] = i + 1;
+        unsigned int cellId = m_particleCellHash[ i ];
+        m_cell[ cellId ].push_back( i );
     }
 }
 
@@ -343,47 +381,102 @@ void ComponentManagerCPU<T>::updateLinks( LinkedCell<T> const* const* LC )
 
 
 // -----------------------------------------------------------------------------
-// Detects collision between particles
+// Detects collision and computes forces between particles and obstacles
 template <typename T>
-void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces( 
-                                        LinkedCell<T> const* const* LC,
-                                        RigidBody<T, T> const* const* RB,
-                                        ContactForceModel<T> const* const* CF,
-                                        int* result )
+void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles( 
+                                    RigidBody<T, T> const* const* particleRB,
+                                    RigidBody<T, T> const* const* obstacleRB,
+                                    ContactForceModel<T> const* const* CF )
 {
-    // updating links between components and linked cell
-    updateLinks( LC );
-    
+    // Loop over all particles
+    for ( int pId = 0; pId < m_nParticles; pId++ )
+    {
+        // Parameters of the particle
+        RigidBody<T, T> const& rbA = *( particleRB[ m_rigidBodyId[ pId ] ] );
+        Transform3<T> const& trA = m_transform[ pId ];
+        T massA = rbA.getMass();
+        unsigned int matA = rbA.getMaterial();
+        
+        // Loop over all obstacles
+        for ( int oId = 0; oId < m_nObstacles; oId++ )
+        {
+            RigidBody<T, T> const& rbB = 
+                                *( obstacleRB[ m_obstacleRigidBodyId[ oId ] ] );
+            Transform3<T> const& trB = m_obstacleTransform[ oId ];
+            ContactInfo<T> ci = closestPointsRigidBodies( rbA,
+                                                          rbB,
+                                                          trA, 
+                                                          trB );
+            if ( ci.getOverlapDistance() < T( 0 ) )
+            {
+                // CF ID given materialIDs
+                unsigned int contactForceID = 
+                ContactForceModelBuilderFactory<T>::computeHash( 
+                                                            matA, 
+                                                            rbB.getMaterial() );
+                // velocities of the particles
+                Kinematics<T> v1( m_velocity[ pId ] );
+                // Kinematics<T> v2( m_velocity[ oId ] );
+                Kinematics<T> v2;
+                // geometric point of contact
+                Vector3<T> contactPt( ci.getContactPoint() );
+                // relative velocity at contact point
+                Vector3<T> relVel( v1.kinematicsAtPoint( contactPt ) -
+                                   v2.kinematicsAtPoint( contactPt ) );
+                // relative angular velocity
+                Vector3<T> relAngVel( v1.getAngularComponent() - 
+                                      v2.getAngularComponent() );
+                CF[contactForceID]->computeForces( ci, 
+                                                   relVel,
+                                                   relAngVel,
+                                                   massA,
+                                                   rbB.getMass(),
+                                                   m_torce[ pId ] );
+            }
+        }
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Detects collision and computes forces between particles and particles
+template <typename T>
+void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles( 
+                                    RigidBody<T, T> const* const* particleRB,
+                                    LinkedCell<T> const* const* LC,
+                                    ContactForceModel<T> const* const* CF,
+                                    int* result )
+{
+    // Loop over all particles
     // #pragma omp parallel for
     for ( int pId = 0; pId < m_nParticles; pId++ )
     {
         // Parameters of the primary particle
-        unsigned int const compId = m_componentId[ pId ];
-        unsigned int const cellHash = m_componentCellHash[ pId ];
-        RigidBody<T, T> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
-        Transform3<T> const& trA = m_transform[ compId ];
+        unsigned int const particleId = m_particleId[ pId ];
+        unsigned int const cellHash = m_particleCellHash[ pId ];
+        RigidBody<T, T> const& rbA = 
+                                *( particleRB[ m_rigidBodyId[ particleId ] ] );
+        Transform3<T> const& trA = m_transform[ particleId ];
         T massA = rbA.getMass();
         unsigned int matA = rbA.getMaterial();
+
+        // Loop over all neighboring particles
         for ( int k = -1; k < 2; k++ ) {
         for ( int j = -1; j < 2; j++ ) { 
         for ( int i = -1; i < 2; i++ ) {
             int neighboringCellHash =
                 (*LC)->computeNeighboringCellLinearHash( cellHash, i, j, k );
-            int startId = m_cellHashStart[ neighboringCellHash ];
-            int endId = m_cellHashEnd[ neighboringCellHash ];
-            for ( int id = startId; id < endId; id++ )
-            {           
-                unsigned int const secondaryId = m_componentId[ id ];
+            for ( auto id : m_cell[ neighboringCellHash ] )
+            {
+                unsigned int const secondaryId = id;
                 // To skip self-collision
-                if ( secondaryId == compId )
+                if ( secondaryId == particleId )
                     continue;
                 RigidBody<T, T> const& rbB = 
-                                        *( RB[ m_rigidBodyId[ secondaryId ] ] );
-                Transform3<T> const& trB = m_transform[ secondaryId ];
-                // result[compId] += intersectRigidBodies( rigidBodyA,
-                //                                     rigidBodyA,
-                //                                     transformA, 
-                //                                     transformB );
+                                *( particleRB[ m_rigidBodyId[ secondaryId ] ] );
+                Transform3<T> const& trB = m_transform[ secondaryId ];;
                 ContactInfo<T> ci = closestPointsRigidBodies( rbA,
                                                               rbB,
                                                               trA, 
@@ -396,7 +489,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
                                                             matA, 
                                                             rbB.getMaterial() );
                     // velocities of the particles
-                    Kinematics<T> v1( m_velocity[ compId ] );
+                    Kinematics<T> v1( m_velocity[ particleId ] );
                     Kinematics<T> v2( m_velocity[ secondaryId ] );
                     // geometric point of contact
                     Vector3<T> contactPt( ci.getContactPoint() );
@@ -411,58 +504,11 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
                                                        relAngVel,
                                                        massA,
                                                        rbB.getMass(),
-                                                       m_torce[ compId ] );
+                                                       m_torce[ particleId ] );
                 }
-                result[compId] += ( ci.getOverlapDistance() < T( 0 ) );
+                result[ particleId ] += ( ci.getOverlapDistance() < T( 0 ) );
             }
         } } }
-        // Adding the gravitational force to the torce
-        m_torce[ compId ].addForce( massA * GrainsParameters<T>::m_gravity );
-        
-
-
-        // Now, we take care of contacts between obstacles and particles.
-        // We loop over all obstacles.
-        // TODO: can we do better?
-        for ( int oId = m_nParticles; oId < m_nParticles + m_nObstacles; oId++ ) 
-        {
-            RigidBody<T, T> const& rbA = *( RB[ m_rigidBodyId[ compId ] ] );
-            Transform3<T> const& trA = m_transform[ compId ];
-            RigidBody<T, T> const& rbB = *( RB[ m_rigidBodyId[ oId ] ] );
-            Transform3<T> const& trB = m_transform[ oId ];
-            std::cout << trA << std::endl << trB << std::endl;
-            ContactInfo<T> ci = closestPointsRigidBodies( rbA,
-                                                          rbB,
-                                                          trA, 
-                                                          trB );
-            if ( ci.getOverlapDistance() < T( 0 ) )
-            {
-                std::cout << "HERE!" << std::endl;
-                // CF ID given materialIDs
-                unsigned int contactForceID = 
-                ContactForceModelBuilderFactory<T>::computeHash( 
-                                                            matA, 
-                                                            rbB.getMaterial() );
-                // velocities of the particles
-                Kinematics<T> v1( m_velocity[ compId ] );
-                Kinematics<T> v2( m_velocity[ oId ] );
-                // geometric point of contact
-                Vector3<T> contactPt( ci.getContactPoint() );
-                // relative velocity at contact point
-                Vector3<T> relVel( v1.kinematicsAtPoint( contactPt ) -
-                                   v2.kinematicsAtPoint( contactPt ) );
-                // relative angular velocity
-                Vector3<T> relAngVel( v1.getAngularComponent() - 
-                                      v2.getAngularComponent() );
-                CF[contactForceID]->computeForces( ci, 
-                                                   relVel,
-                                                   relAngVel,
-                                                   massA,
-                                                   rbB.getMass(),
-                                                   m_torce[ compId ] );
-            }
-        }
-        std::cout << trA << std::endl;
     }
 }
 
@@ -470,17 +516,68 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
 
 
 // -----------------------------------------------------------------------------
-// Moves components in the simulation
+// Detects collision and computes forces between all components
 template <typename T>
-void ComponentManagerCPU<T>::moveComponents( TimeIntegrator<T> const* const* TI,
-                                             RigidBody<T, T> const* const* RB )
+void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces( 
+                                    RigidBody<T, T> const* const* particleRB,
+                                    RigidBody<T, T> const* const* obstacleRB,
+                                    LinkedCell<T> const* const* LC,
+                                    ContactForceModel<T> const* const* CF,
+                                    int* result )
+{
+    // Updates links between components and linked cell
+    updateLinks( LC );
+    
+    // Particle-particle interactions
+    detectCollisionAndComputeContactForcesParticles( particleRB,
+                                                     LC,
+                                                     CF,
+                                                     result );
+    
+    // Particle-obstacle interactions
+    detectCollisionAndComputeContactForcesObstacles( particleRB,
+                                                     obstacleRB,
+                                                     CF );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Adds external forces such as gravity
+template <typename T>
+void ComponentManagerCPU<T>::addExternalForces( 
+                                    RigidBody<T, T> const* const* particleRB,
+                                    Vector3<T> const& g )
+{
+    // #pragma omp parallel for
+    // m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
+    for ( int pId = 0; pId < m_nParticles; pId++ )
+    {
+        // Parameters of the primary particle
+        RigidBody<T, T> const& rb = *( particleRB[ m_rigidBodyId[ pId ] ] );
+        T mass = rb.getMass();
+        // Adding the gravitational force to the torce
+        m_torce[ pId ].addForce( mass * g );
+    }
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Updates the position and velocities of particles
+template <typename T>
+void ComponentManagerCPU<T>::moveParticles( 
+                                    RigidBody<T, T> const* const* particleRB,
+                                    TimeIntegrator<T> const* const* TI )
 {
     // #pragma omp parallel for
     // m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
     for ( int pId = 0; pId < m_nParticles; pId++ )
     {
         // Rigid body
-        RigidBody<T, T> const* rb = RB[ m_rigidBodyId[ pId ] ];
+        RigidBody<T, T> const* rb = particleRB[ m_rigidBodyId[ pId ] ];
 
         // First, we compute quaternion of orientation
         Quaternion<T> qRot( m_transform[ pId ].getBasis() );
