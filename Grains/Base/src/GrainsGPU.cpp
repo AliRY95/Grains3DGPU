@@ -67,7 +67,7 @@ void GrainsGPU<T>::simulate()
     cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
     auto h_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
-          GrainsParameters<T>::m_time < GrainsParameters<T>::m_tEnd;
+          GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
           GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
     {
         // Output time
@@ -81,12 +81,17 @@ void GrainsGPU<T>::simulate()
                   << std::flush;
         
         Grains<T>::m_components->detectCollisionAndComputeContactForces( 
-                                                  Grains<T>::m_linkedCell, 
-                                                  Grains<T>::m_rigidBodyList,
-                                                  Grains<T>::m_contactForce,
-                                                  h_collision ); 
-        Grains<T>::m_components->moveComponents( Grains<T>::m_timeIntegrator,
-                                                 Grains<T>::m_rigidBodyList );
+                                            Grains<T>::m_particleRigidBodyList,
+                                            Grains<T>::m_obstacleRigidBodyList,
+                                            Grains<T>::m_linkedCell, 
+                                            Grains<T>::m_contactForce,
+                                            h_collision ); 
+        Grains<T>::m_components->addExternalForces( 
+                                            Grains<T>::m_particleRigidBodyList,
+                                            GrainsParameters<T>::m_gravity );
+        Grains<T>::m_components->moveParticles( 
+                                            Grains<T>::m_particleRigidBodyList,
+                                            Grains<T>::m_timeIntegrator );
         
         // Post-Processing
         if ( fabs( GrainsParameters<T>::m_time - 
@@ -101,11 +106,11 @@ void GrainsGPU<T>::simulate()
             std::vector<Kinematics<T>> k = 
                                 Grains<T>::m_components->getVelocity();
             Grains<T>::m_postProcessor->PostProcessing( 
-                                                Grains<T>::m_rigidBodyList,
-                                                &id,
-                                                &t,
-                                                &k,
-                                                GrainsParameters<T>::m_time );
+                                            Grains<T>::m_particleRigidBodyList,
+                                            &id,
+                                            &t,
+                                            &k,
+                                            GrainsParameters<T>::m_time );
         }
     }
     auto h_end = chrono::high_resolution_clock::now();
@@ -131,12 +136,17 @@ void GrainsGPU<T>::simulate()
                   << std::flush;
         
         Grains<T>::m_d_components->detectCollisionAndComputeContactForces( 
-                                                Grains<T>::m_d_linkedCell, 
-                                                Grains<T>::m_d_rigidBodyList,
-                                                Grains<T>::m_d_contactForce,
-                                                d_collision );
-        Grains<T>::m_d_components->moveComponents( Grains<T>::m_d_timeIntegrator,
-                                                   Grains<T>::m_d_rigidBodyList );
+                                        Grains<T>::m_d_particleRigidBodyList,
+                                        Grains<T>::m_d_obstacleRigidBodyList,
+                                        Grains<T>::m_d_linkedCell, 
+                                        Grains<T>::m_d_contactForce,
+                                        d_collision );
+        Grains<T>::m_d_components->addExternalForces( 
+                                            Grains<T>::m_particleRigidBodyList,
+                                            GrainsParameters<T>::m_gravity );
+        Grains<T>::m_d_components->moveParticles(
+                                        Grains<T>::m_d_particleRigidBodyList,
+                                        Grains<T>::m_d_timeIntegrator );
         
         // Post-Processing
         if ( fabs( GrainsParameters<T>::m_time - 
@@ -151,11 +161,11 @@ void GrainsGPU<T>::simulate()
             std::vector<Kinematics<T>> k = 
                                 Grains<T>::m_d_components->getVelocity();
             Grains<T>::m_postProcessor->PostProcessing( 
-                                                Grains<T>::m_rigidBodyList,
-                                                &id,
-                                                &t,
-                                                &k,
-                                                GrainsParameters<T>::m_time );
+                                            Grains<T>::m_particleRigidBodyList,
+                                            &id,
+                                            &t,
+                                            &k,
+                                            GrainsParameters<T>::m_time );
         }
         // In case we get past the saveTime, we need to remove it from the queue
         if ( GrainsParameters<T>::m_time > 

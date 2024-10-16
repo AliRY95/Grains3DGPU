@@ -194,11 +194,9 @@ void Grains<T>::Construction( DOMElement* rootElement )
             // We only add one because the obstacles are added one by one in the
             // XML file
             if ( i == 0 )
-                numEachUniqueObstacle[ i ] =  
-                            ReaderXML::getNodeAttr_Int( nObstacle, "Number" );
+                numEachUniqueObstacle[ i ] = 1;
             else
-                numEachUniqueObstacle[ i ] = numEachUniqueObstacle[ i - 1 ] + 
-                            ReaderXML::getNodeAttr_Int( nObstacle, "Number" );
+                numEachUniqueObstacle[ i ] = numEachUniqueObstacle[ i - 1 ] + 1;
 
             // Create the Rigid Body
             m_obstacleRigidBodyList[ i ] = new RigidBody<T, T>( nObstacle );
@@ -284,16 +282,24 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Setting up the component managers
-    GrainsParameters<T>::m_numParticles = numEachUniqueParticle.back();
+    GrainsParameters<T>::m_numParticles = 0;
+    GrainsParameters<T>::m_numObstacles = 0;
+    if ( !numEachUniqueParticle.empty() )
+        GrainsParameters<T>::m_numParticles = numEachUniqueParticle.back();
+    if ( !numEachUniqueObstacle.empty() )
     GrainsParameters<T>::m_numObstacles = numEachUniqueObstacle.back();
     m_components =
             new ComponentManagerCPU<T>( GrainsParameters<T>::m_numParticles,
                                         GrainsParameters<T>::m_numObstacles,
                                         GrainsParameters<T>::m_numCells );
-    m_components->initializeParticles( numEachUniqueParticle,
-                                       particlesInitialTransform );
-    m_components->initializeObstacles( numEachUniqueObstacle,
-                                       obstaclesInitialTransform );
+    // Initialize the particles and obstacles
+    if ( !numEachUniqueParticle.empty() )
+        m_components->initializeParticles( numEachUniqueParticle,
+                                           particlesInitialTransform );
+    if ( !numEachUniqueObstacle.empty() )
+        m_components->initializeObstacles( numEachUniqueObstacle,
+                                           obstaclesInitialTransform );
+    // In case of GPU simulation
     if ( GrainsParameters<T>::m_isGPU )
     {
         m_d_components = 
