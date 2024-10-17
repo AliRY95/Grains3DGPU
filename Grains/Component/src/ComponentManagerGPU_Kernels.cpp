@@ -143,6 +143,7 @@ void detectCollisionAndComputeContactForcesObstacles_kernel(
                                                relAngVel,
                                                massA,
                                                rbB.getMass(),
+                                               trA.getOrigin(),
                                                torce[ pId ] );
         }
     }
@@ -228,6 +229,7 @@ void detectCollisionAndComputeContactForcesParticles_kernel(
                                                    relAngVel,
                                                    massA,
                                                    rbB.getMass(),
+                                                   trA.getOrigin(),
                                                    torce[ primaryId ] );
             }
             result[ primaryId ] += ( ci.getOverlapDistance() < T( 0 ) );

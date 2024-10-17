@@ -431,6 +431,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
                                                    relAngVel,
                                                    massA,
                                                    rbB.getMass(),
+                                                   trA.getOrigin(),
                                                    m_torce[ pId ] );
             }
         }
@@ -504,6 +505,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                                                        relAngVel,
                                                        massA,
                                                        rbB.getMass(),
+                                                       trA.getOrigin(),
                                                        m_torce[ particleId ] );
                 }
                 result[ particleId ] += ( ci.getOverlapDistance() < T( 0 ) );

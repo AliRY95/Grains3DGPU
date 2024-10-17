@@ -25,20 +25,6 @@ GrainsCPU<T>::~GrainsCPU()
 
 
 
-// // -----------------------------------------------------------------------------
-// // Initializes the simulation using the XML input
-// template <typename T>
-// void GrainsCPU<T>::initialize( DOMElement* rootElement )
-// {   
-//     // Read the input file
-//     // Construction( rootElement );
-//     // Forces( rootElement );
-//     // AdditionalFeatures( rootElement );
-// }
-
-
-
-
 // -----------------------------------------------------------------------------
 // Runs the simulation over the prescribed time interval
 template <typename T>
