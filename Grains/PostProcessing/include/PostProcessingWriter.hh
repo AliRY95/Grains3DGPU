@@ -3,9 +3,7 @@
 
 
 #include "Basic.hh"
-#include "RigidBody.hh"
-#include "Transform3.hh"
-#include "Kinematics.hh"
+#include "ComponentManager.hh"
 #include "GrainsMisc.hh"
 #include "ReaderXML.hh"
 
@@ -60,12 +58,10 @@ class PostProcessingWriter
 
 		/** @brief Writes data */
 		__HOST__
-		virtual void PostProcessing( 
-								RigidBody<T, T> const* const* rb,
-								std::vector<unsigned int> const* rigidBodyID,
-								std::vector<Transform3<T>> const* t,
-								std::vector<Kinematics<T>> const* k,
-								T currentTime ) = 0;
+		virtual void PostProcessing( RigidBody<T, T> const* const* particleRB,
+									 RigidBody<T, T> const* const* obstacleRB,
+									 ComponentManager<T> const* cm,
+									 T currentTime ) = 0;
 
 		/** @brief Finalizes writing data */
 		__HOST__

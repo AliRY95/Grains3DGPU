@@ -82,10 +82,9 @@ class RawDataPostProcessingWriter : public PostProcessingWriter<T>
 
 		/** @brief Writes data TODO:PARAMS*/
 		__HOST__
-		void PostProcessing( RigidBody<T, T> const* const* rb,
-							 std::vector<unsigned int> const* rigidBodyID,
-							 std::vector<Transform3<T>> const* t,
-							 std::vector<Kinematics<T>> const* k,
+		void PostProcessing( RigidBody<T, T> const* const* particleRB,
+							 RigidBody<T, T> const* const* obstacleRB,
+							 ComponentManager<T> const* cm,
 							 T currentTime );
 
 		/** @brief Finalizes writing data */

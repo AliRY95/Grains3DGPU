@@ -410,7 +410,7 @@ void Grains<T>::Forces( DOMElement* rootElement )
                 T( ReaderXML::getNodeAttr_Double( nGravity, "GY" ) );
             GrainsParameters<T>::m_gravity[Z] = 
                 T( ReaderXML::getNodeAttr_Double( nGravity, "GZ" ) );
-            cout << shiftString9 
+            cout << shiftString6 
                     << "Gravity = " 
                     << GrainsParameters<T>::m_gravity 
                     << "\n"
