@@ -76,24 +76,27 @@ ContactInfo<T> closestPointsRectangle( RigidBody<T, U> const& rbA,
 
     // rectangle center
     Vector3<T> const rPt = b2w.getOrigin();
-    // rectangle normal is a2w.getBasis() * [0, 0, 1] which is the last column
+    // rectangle normal is b2w.getBasis() * [0, 0, 1] which is the last column
     // of the transformation matrix
-    Vector3<T> rNorm = ( b2w.getBasis() )[Z]; 
+    Vector3<T> rNorm( b2w.getBasis()[X][Z], 
+                      b2w.getBasis()[Y][Z],
+                      b2w.getBasis()[Z][Z] ); 
     rNorm.normalized();
     rNorm = copysign( T( 1 ), rNorm * ( a2w.getOrigin() - rPt ) ) * rNorm;
+    // Contact point on the particle
     Vector3<T> pointA = ( a2w ) 
-                        ( convexB->support( ( -rNorm ) * a2w.getBasis() ) );
+                        ( convexA->support( ( -rNorm ) * a2w.getBasis() ) );
     if ( rNorm * ( pointA - rPt ) < T( 0 ) )
     {
         // The projection point on the rectangle plane
-        Vector3<T> pointB = pointA - ( rNorm * pointA ) * rNorm;
+        Vector3<T> pointB = ( ( rPt - pointA ) * rNorm ) * rNorm + pointA;
         // The projection point lies on the rectangle?
         // TODO:
         // if ( ( pointB - rPt ).isInBox(  ) )
         // {
             Vector3<T> contactPt = T( 0.5 ) * ( pointA + pointB );
-            Vector3<T> contactVec = pointA - pointB;
-            T overlap = - norm( contactVec );        
+            Vector3<T> contactVec = pointB - pointA;
+            T overlap = - norm( contactVec );
             return ( ContactInfo<T>( contactPt,
                                      contactVec,
                                      overlap ) );
@@ -285,7 +288,7 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
             //
             Vector3<T> ptA, ptB;
             int nbIterGJK = 0;
-            T distance = computeClosestPoints_GJK_SV( *convexA, 
+            T distance = computeClosestPoints_GJK_JH( *convexA, 
                                                       *convexB,
                                                       a2wCrust,
                                                       b2wCrust,

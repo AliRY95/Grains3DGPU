@@ -365,8 +365,10 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
     T det[16][4] = { T( 0 ) };       // cached sub-determinants
     T dp[4][4] = { T( 0 ) };
 
-    Vector3<T> v = a2w( a.support( zeroVector3T ) ) - 
-                   b2w( b.support( zeroVector3T ) );
+    // Vector3<T> v = a2w( a.support( zeroVector3T ) ) - 
+    //                b2w( b.support( zeroVector3T ) );
+    Vector3<T> v = a2w( zeroVector3T ) - 
+                   b2w( zeroVector3T );
     Vector3<T> w;
     T dist = v.norm();
     T mu = 0;
