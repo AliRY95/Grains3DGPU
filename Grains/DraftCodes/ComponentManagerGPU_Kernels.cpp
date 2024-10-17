@@ -199,6 +199,7 @@ void detectCollisionAndComputeContactForces_kernel(
                                                     zeroVector3T,
                                                     massA,
                                                     rbB.getMass(),
+                                                    trA.getOrigin(),
                                                     m_torce[ compId ] );
             }
             result[compId] += ( ci.getOverlapDistance() < T( 0 ) );

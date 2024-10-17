@@ -75,6 +75,7 @@ class ContactForceModel
 									Vector3<T> const& relAngVelocity,
 									T m1,
 									T m2, 
+                                    Vector3<T> const& trOrigin,
 									Torce<T>& torce ) const = 0;
 		//@}
 };

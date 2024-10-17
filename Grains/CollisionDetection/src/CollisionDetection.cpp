@@ -257,9 +257,6 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
                 ( rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius() );
     if ( overlap < U( 0 ) )
     {
-        // TODO: RECTANGLE
-
-
         // General case
         // Bounding volume test
         // If the types T and U are not the same, we must cast transformations
@@ -323,6 +320,8 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
             // about the direction of the overlap vector
             Vector3<T> contactVec = ptA - ptB;
             contactVec.normalize();
+            contactVec.round();
+            contactVec *= - distance;
 
             return ( ContactInfo<T>( contactPt, contactVec, distance ) );
         }
