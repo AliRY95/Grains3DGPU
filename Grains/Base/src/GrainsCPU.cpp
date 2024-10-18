@@ -99,7 +99,7 @@ void GrainsCPU<T>::simulate()
 
     // Time comparison
     chrono::duration<double> h_time = h_end - h_start;
-    std::cout << "CPU: " << h_time.count() << endl;
+    std::cout << "\nCPU: " << h_time.count() << endl;
 
     // accuracy
     int trueHostCount = 0, trueDeviceCount = 0;
