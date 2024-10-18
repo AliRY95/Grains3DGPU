@@ -107,7 +107,6 @@ void GrainsGPU<T>::simulate()
         }
     }
     auto h_end = chrono::high_resolution_clock::now();
-    std::cout << "\nTime: " << GrainsParameters<T>::m_time << endl;
 
 
 
@@ -162,7 +161,6 @@ void GrainsGPU<T>::simulate()
     }
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();
-    std::cout << "\nTime: " << GrainsParameters<T>::m_time << endl;
     Grains<T>::m_postProcessor->PostProcessing_end();
 
 

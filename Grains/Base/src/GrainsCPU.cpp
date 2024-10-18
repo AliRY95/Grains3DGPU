@@ -93,7 +93,6 @@ void GrainsCPU<T>::simulate()
         }
     }
     auto h_end = chrono::high_resolution_clock::now();
-    std::cout << "\nTime: " << GrainsParameters<T>::m_time << endl;
     Grains<T>::m_postProcessor->PostProcessing_end();
 
 

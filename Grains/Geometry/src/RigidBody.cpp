@@ -294,10 +294,42 @@ U RigidBody<T, U>::getCircumscribedRadius() const
 
 
 // -----------------------------------------------------------------------------
-// Computes the acceleration of the rigid body given a torce
+// Computes the acceleration of the rigid body given a torce and angular 
+// velocity in the body-fixed coordinate system -- In the body-fixed coordinate 
+// system, the moment of inertia tensor is assumed to be diagonal.
 template <typename T, typename U>
 __HOSTDEVICE__
-Kinematics<T> RigidBody<T, U>::computeMomentum( Torce<T> const& t,
+Kinematics<T> RigidBody<T, U>::computeMomentum( Vector3<T> const& omega,
+                                                Torce<T> const& t ) const
+{
+    // Translational momentum
+    Vector3<T> transMomentum( t.getForce() / m_mass );
+
+    // Angular momentum
+    // Torque
+    Vector3<T> angMomentum( t.getTorque() );
+    // Compute T + (I.w) ^ w in the body-fixed coordinates system     
+    angMomentum[0] += ( m_inertia[3] - m_inertia[5] ) * omega[Y] * omega[Z];
+    angMomentum[1] += ( m_inertia[5] - m_inertia[0] ) * omega[X] * omega[Z];
+    angMomentum[2] += ( m_inertia[0] - m_inertia[3] ) * omega[X] * omega[Y];
+    // Compute I^-1.(T + w ^ (I.w)) in the body-fixed coordinates system     
+    angMomentum[0] *= m_inertia_1[0];
+    angMomentum[1] *= m_inertia_1[3];
+    angMomentum[2] *= m_inertia_1[5];
+
+    return( Kinematics<T>( transMomentum, angMomentum ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Computes the acceleration of the rigid body given the angular velocity and a
+// torce in the space-fixed coordinate system
+template <typename T, typename U>
+__HOSTDEVICE__
+Kinematics<T> RigidBody<T, U>::computeMomentum( Vector3<T> const& omega,
+                                                Torce<T> const& t,
                                                 Quaternion<T> const& q ) const
 {
     // Translational momentum
@@ -306,10 +338,26 @@ Kinematics<T> RigidBody<T, U>::computeMomentum( Torce<T> const& t,
     // Angular momentum
     // Quaternion and rotation quaternion conjugate
     Quaternion<T> qCon( q.conjugate() );
-    // Write torque in body-fixed coordinates system
+    // Write omega in the body-fixed coordinates system
+    Vector3<T> angVelocity( qCon.multToVector3( omega * q ) );
+    // Write torque in the body-fixed coordinates system
     Vector3<T> angMomentum( qCon.multToVector3( t.getTorque() * q ) );
-    // Vector3<T> angMomentum( t.getTorque() );
+
+    // Compute I.w in the body-fixed coordinates system
     Vector3<T> angMomentumTemp;
+    angMomentumTemp[0] = m_inertia[0] * angVelocity[0] + 
+                         m_inertia[1] * angVelocity[1] + 
+                         m_inertia[2] * angVelocity[2];
+    angMomentumTemp[1] = m_inertia[1] * angVelocity[0] +
+                         m_inertia[3] * angVelocity[1] +
+                         m_inertia[4] * angVelocity[2];
+    angMomentumTemp[2] = m_inertia[2] * angVelocity[0] + 
+                         m_inertia[4] * angVelocity[1] +
+                         m_inertia[5] * angVelocity[2];
+
+    // Compute T + I.w ^ w in the body-fixed coordinates system 
+    angMomentum += angMomentumTemp ^ angVelocity;
+    
     // Compute I^-1.(T + I.w ^ w) in body-fixed coordinates system 
     angMomentumTemp[0] = m_inertia_1[0] * angMomentum[0] + 
                          m_inertia_1[1] * angMomentum[1] + 
@@ -322,12 +370,6 @@ Kinematics<T> RigidBody<T, U>::computeMomentum( Torce<T> const& t,
                          m_inertia_1[5] * angMomentum[2];
     // Write I^-1.(T + I.w ^ w) in space-fixed coordinates system
     angMomentum = q.multToVector3( angMomentumTemp * qCon );
-
-    // Spheres
-    // Vector3<T> angMomentum = t.getTorque();
-    // angMomentum[0] = m_inertia_1[0] * angMomentum[0];
-    // angMomentum[1] = m_inertia_1[3] * angMomentum[1];
-    // angMomentum[2] = m_inertia_1[5] * angMomentum[2];
 
     return( Kinematics<T>( transMomentum, angMomentum ) );
 }

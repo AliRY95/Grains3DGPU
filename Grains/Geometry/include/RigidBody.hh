@@ -157,11 +157,24 @@ class RigidBody
         /**@name Methods */
         //@{
         /** @brief Computes the acceleration of the rigid body as a kinematics
-        object after imposing a torce (Torque + Force). 
-        @param t imposed torce
-        @param q quaternion of rotation */
+        object after imposing a torce (Torque + Force). The assumption is that
+        the torce is given in the body-fixed coordinate system, hence, there is
+        no need to have the quaternion
+        @param omega angular velocity in the body-fixed coordinate system
+        @param t imposed torce in the body-fixed coordinate system */
         __HOSTDEVICE__
-        Kinematics<T> computeMomentum( Torce<T> const& t,
+        Kinematics<T> computeMomentum( Vector3<T> const& omega,
+                                       Torce<T> const& t ) const;
+
+        /** @brief Computes the acceleration of the rigid body as a kinematics
+        object after imposing a torce (Torque + Force). The assumption is that
+        the torce is given in the space-fixed coordinate system.
+        @param omega angular velocity in the space-fixed coordinate system
+        @param t imposed torce in the space-fixed coordinate system
+        @param q quaternion of rotation from space to body coordinate systems */
+        __HOSTDEVICE__
+        Kinematics<T> computeMomentum( Vector3<T> const& omega,
+                                       Torce<T> const& t,
                                        Quaternion<T> const& q ) const;
         //@}    
 };

@@ -367,8 +367,8 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
 
     // Vector3<T> v = a2w( a.support( zeroVector3T ) ) - 
     //                b2w( b.support( zeroVector3T ) );
-    Vector3<T> v = a2w( zeroVector3T ) - 
-                   b2w( zeroVector3T );
+    Vector3<T> v( a2w( zeroVector3T ) - 
+                  b2w( zeroVector3T ) );
     Vector3<T> w;
     T dist = v.norm();
     T mu = 0;
@@ -396,7 +396,6 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
         ++num_iterations;
         if ( !closest( bits, last, last_bit, all_bits, y, dp, det, v ) )
             break;
-        // printf( "GJK1: %f, %f, %f \n", v[0], v[1], v[2] );
         dist = v.norm();
     }
     computePoints( bits, det, p, q, pa, pb );

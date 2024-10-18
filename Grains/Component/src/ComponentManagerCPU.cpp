@@ -575,7 +575,7 @@ void ComponentManagerCPU<T>::moveParticles(
                                     TimeIntegrator<T> const* const* TI )
 {
     // #pragma omp parallel for
-    // m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
+    m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
     for ( int pId = 0; pId < m_nParticles; pId++ )
     {
         // Rigid body
@@ -584,8 +584,14 @@ void ComponentManagerCPU<T>::moveParticles(
         // First, we compute quaternion of orientation
         Quaternion<T> qRot( m_transform[ pId ].getBasis() );
         // Computing momentums in the space-fixed coordinate
-        Kinematics<T> const& momentum = rb->computeMomentum( m_torce[ pId ], 
-                                                             qRot );
+        // Kinematics<T> const& momentum = rb->computeMomentum( 
+        //                                 m_velocity[ pId ].getAngularComponent(),
+        //                                 m_torce[ pId ], 
+        //                                 qRot );
+
+        Kinematics<T> const& momentum = rb->computeMomentum( 
+                                        m_velocity[ pId ].getAngularComponent(),
+                                        m_torce[ pId ] );
         // Reset torces
         m_torce[ pId ].reset();
         // Finally, we move particles using the given time integration
