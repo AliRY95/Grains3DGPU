@@ -143,6 +143,7 @@ void detectCollisionAndComputeContactForcesObstacles_kernel(
                                                relAngVel,
                                                massA,
                                                rbB.getMass(),
+                                               trA.getOrigin(),
                                                torce[ pId ] );
         }
     }
@@ -228,6 +229,7 @@ void detectCollisionAndComputeContactForcesParticles_kernel(
                                                    relAngVel,
                                                    massA,
                                                    rbB.getMass(),
+                                                   trA.getOrigin(),
                                                    torce[ primaryId ] );
             }
             result[ primaryId ] += ( ci.getOverlapDistance() < T( 0 ) );
@@ -288,8 +290,10 @@ void moveParticles_kernel( RigidBody<T, U> const* const* RB,
     // First, we compute quaternion of orientation
     Quaternion<T> qRot( transform[ pId ].getBasis() );
     // Next, we compute accelerations and reset torces
-    Kinematics<T> const& momentum = rb->computeMomentum( torce[ pId ], 
-                                                         qRot );
+    Kinematics<T> const& momentum = rb->computeMomentum( 
+                                        velocity[ pId ].getAngularComponent(),
+                                        torce[ pId ], 
+                                        qRot );
     torce[ pId ].reset();
     // Finally, we move particles using the given time integration
     Vector3<T> transMotion;

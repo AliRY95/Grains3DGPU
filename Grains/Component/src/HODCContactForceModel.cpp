@@ -120,7 +120,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
     Vector3<T> penetration = contactInfos.getContactVector();
     
     // Normal linear elastic force
-    // We do this here as we want to modify the penetration vector
+    // We do this here as we want to modify the penetration vector later
     delFN = m_stiff * penetration;
 
     // Unit normal vector at contact point
@@ -132,7 +132,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
 
     // Unit tangential vector along relative velocity at contact point 
     T normv_t = norm( v_t );
-    Vector3<T> tangent = zeroVector3T;
+    Vector3<T> tangent( zeroVector3T );
     if ( normv_t > EPS<T> )
         tangent = v_t / normv_t;
   
@@ -149,7 +149,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
     T normFN = norm( delFN );
   
     // Tangential dissipative force
-    delFT = ( -m_muet * avmass ) * v_t;  
+    delFT = ( -m_muet * T( 2 ) * avmass ) * v_t;  
 
     // Tangential Coulomb saturation
     T fn = m_muec * normFN;
@@ -162,7 +162,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
     {
         // Relative angular velocity at contact point
         Vector3<T> wn = ( relAngVelocity * penetration ) * penetration;
-        Vector3<T> wt = relAngVelocity - wn ;
+        Vector3<T> wt = relAngVelocity - wn;
         T normwt = norm( wt );
 
         // Anti-spinning effect along the normal wn
@@ -170,7 +170,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
         
         // Classical rolling resistance moment
         if ( normwt > EPS<T> )
-            delM -= m_kms * normFN * wt;    
+            delM -= m_kms * normFN * wt;
     }
 }
 
@@ -187,6 +187,7 @@ void HODCContactForceModel<T>::computeForces(
                                         Vector3<T> const& relAngVelocity,
                                         T m1,
                                         T m2,
+                                        Vector3<T> const& trOrigin,
                                         Torce<T>& torce ) const
 {
     // Compute contact force and torque
@@ -201,7 +202,7 @@ void HODCContactForceModel<T>::computeForces(
                            delM );
 
     Vector3<T> geometricPointOfContact = contactInfos.getContactPoint();
-    torce.addForce( delFN + delFT, geometricPointOfContact );
+    torce.addForce( delFN + delFT, geometricPointOfContact - trOrigin );
     if ( m_kms )
         torce.addTorque( delM );
 }

@@ -25,20 +25,6 @@ GrainsCPU<T>::~GrainsCPU()
 
 
 
-// // -----------------------------------------------------------------------------
-// // Initializes the simulation using the XML input
-// template <typename T>
-// void GrainsCPU<T>::initialize( DOMElement* rootElement )
-// {   
-//     // Read the input file
-//     // Construction( rootElement );
-//     // Forces( rootElement );
-//     // AdditionalFeatures( rootElement );
-// }
-
-
-
-
 // -----------------------------------------------------------------------------
 // Runs the simulation over the prescribed time interval
 template <typename T>
@@ -107,7 +93,6 @@ void GrainsCPU<T>::simulate()
         }
     }
     auto h_end = chrono::high_resolution_clock::now();
-    std::cout << "\nTime: " << GrainsParameters<T>::m_time << endl;
     Grains<T>::m_postProcessor->PostProcessing_end();
 
 

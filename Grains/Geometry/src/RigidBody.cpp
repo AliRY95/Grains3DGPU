@@ -37,13 +37,24 @@ RigidBody<T, U>::RigidBody( Convex<T>* convex,
     // Volume and mass
     m_volume = m_convex->computeVolume();
     m_mass = density * m_volume;
-    // Storing inertia and inverse of it
-    m_convex->computeInertia( m_inertia, m_inertia_1 );
     // Considering the density for tensor of inertia
-    for ( int i = 0; i < 6; i++ )
+    if ( density == 0 )
     {
-        m_inertia[i] *= density;
-        m_inertia_1[i] /= density; 
+        for ( int i = 0; i < 6; i++ )
+        {
+            m_inertia[i] = 0;
+            m_inertia_1[i] = 0; 
+        }
+    }
+    else
+    {
+        // Storing inertia and inverse of it
+        m_convex->computeInertia( m_inertia, m_inertia_1 );
+        for ( int i = 0; i < 6; i++ )
+        {
+            m_inertia[i] *= density;
+            m_inertia_1[i] /= density; 
+        }
     }
     // Last, bounding volume and circumscribed radius
     // We cast type T to U just in case they are different.
@@ -90,13 +101,24 @@ RigidBody<T, U>::RigidBody( DOMNode* root )
     m_volume = m_convex->computeVolume();
     T density = T( ReaderXML::getNodeAttr_Double( root, "Density" ) );
     m_mass = density * m_volume;
-    // Storing inertia and inverse of it
-    m_convex->computeInertia( m_inertia, m_inertia_1 );
     // Considering the density for tensor of inertia
-    for ( int i = 0; i < 6; i++ )
+    if ( density == 0 )
     {
-        m_inertia[i] *= density;
-        m_inertia_1[i] /= density; 
+        for ( int i = 0; i < 6; i++ )
+        {
+            m_inertia[i] = 0;
+            m_inertia_1[i] = 0; 
+        }
+    }
+    else
+    {
+        // Storing inertia and inverse of it
+        m_convex->computeInertia( m_inertia, m_inertia_1 );
+        for ( int i = 0; i < 6; i++ )
+        {
+            m_inertia[i] *= density;
+            m_inertia_1[i] /= density; 
+        }
     }
     // Last, bounding volume and circumscribed radius
     // We cast type T to U just in case they are different.
@@ -272,40 +294,84 @@ U RigidBody<T, U>::getCircumscribedRadius() const
 
 
 // -----------------------------------------------------------------------------
-// Computes the acceleration of the rigid body given a torce
+// Computes the acceleration of the rigid body given a torce and angular 
+// velocity in the body-fixed coordinate system -- In the body-fixed coordinate 
+// system, the moment of inertia tensor is assumed to be diagonal.
 template <typename T, typename U>
 __HOSTDEVICE__
-Kinematics<T> RigidBody<T, U>::computeMomentum( Torce<T> const& t,
+Kinematics<T> RigidBody<T, U>::computeMomentum( Vector3<T> const& omega,
+                                                Torce<T> const& t ) const
+{
+    // Translational momentum
+    Vector3<T> transMomentum( t.getForce() / m_mass );
+
+    // Angular momentum
+    // Torque
+    Vector3<T> angMomentum( t.getTorque() );
+    // Compute T + (I.w) ^ w in the body-fixed coordinates system     
+    angMomentum[0] += ( m_inertia[3] - m_inertia[5] ) * omega[Y] * omega[Z];
+    angMomentum[1] += ( m_inertia[5] - m_inertia[0] ) * omega[X] * omega[Z];
+    angMomentum[2] += ( m_inertia[0] - m_inertia[3] ) * omega[X] * omega[Y];
+    // Compute I^-1.(T + w ^ (I.w)) in the body-fixed coordinates system     
+    angMomentum[0] *= m_inertia_1[0];
+    angMomentum[1] *= m_inertia_1[3];
+    angMomentum[2] *= m_inertia_1[5];
+
+    return( Kinematics<T>( transMomentum, angMomentum ) );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Computes the acceleration of the rigid body given the angular velocity and a
+// torce in the space-fixed coordinate system
+template <typename T, typename U>
+__HOSTDEVICE__
+Kinematics<T> RigidBody<T, U>::computeMomentum( Vector3<T> const& omega,
+                                                Torce<T> const& t,
                                                 Quaternion<T> const& q ) const
 {
-    // Translational momentum is t.getForce() / m_mass.
+    // Translational momentum
+    Vector3<T> transMomentum( t.getForce() / m_mass );
+
     // Angular momentum
     // Quaternion and rotation quaternion conjugate
     Quaternion<T> qCon( q.conjugate() );
-    // Write torque in body-fixed coordinates system
-    Vector3<T> angAcc( qCon.multToVector3( t.getTorque() * q ) );
-    // Vector3<T> angAcc( t.getTorque() );
-    Vector3<T> angAccTemp;
+    // Write omega in the body-fixed coordinates system
+    Vector3<T> angVelocity( qCon.multToVector3( omega * q ) );
+    // Write torque in the body-fixed coordinates system
+    Vector3<T> angMomentum( qCon.multToVector3( t.getTorque() * q ) );
+
+    // Compute I.w in the body-fixed coordinates system
+    Vector3<T> angMomentumTemp;
+    angMomentumTemp[0] = m_inertia[0] * angVelocity[0] + 
+                         m_inertia[1] * angVelocity[1] + 
+                         m_inertia[2] * angVelocity[2];
+    angMomentumTemp[1] = m_inertia[1] * angVelocity[0] +
+                         m_inertia[3] * angVelocity[1] +
+                         m_inertia[4] * angVelocity[2];
+    angMomentumTemp[2] = m_inertia[2] * angVelocity[0] + 
+                         m_inertia[4] * angVelocity[1] +
+                         m_inertia[5] * angVelocity[2];
+
+    // Compute T + I.w ^ w in the body-fixed coordinates system 
+    angMomentum += angMomentumTemp ^ angVelocity;
+    
     // Compute I^-1.(T + I.w ^ w) in body-fixed coordinates system 
-    angAccTemp[0] = m_inertia_1[0] * angAcc[0] + 
-                    m_inertia_1[1] * angAcc[1] + 
-                    m_inertia_1[2] * angAcc[2];
-    angAccTemp[1] = m_inertia_1[1] * angAcc[0] +
-                    m_inertia_1[3] * angAcc[1] +
-                    m_inertia_1[4] * angAcc[2];
-    angAccTemp[2] = m_inertia_1[2] * angAcc[0] + 
-                    m_inertia_1[4] * angAcc[1] +
-                    m_inertia_1[5] * angAcc[2];
+    angMomentumTemp[0] = m_inertia_1[0] * angMomentum[0] + 
+                         m_inertia_1[1] * angMomentum[1] + 
+                         m_inertia_1[2] * angMomentum[2];
+    angMomentumTemp[1] = m_inertia_1[1] * angMomentum[0] +
+                         m_inertia_1[3] * angMomentum[1] +
+                         m_inertia_1[4] * angMomentum[2];
+    angMomentumTemp[2] = m_inertia_1[2] * angMomentum[0] + 
+                         m_inertia_1[4] * angMomentum[1] +
+                         m_inertia_1[5] * angMomentum[2];
     // Write I^-1.(T + I.w ^ w) in space-fixed coordinates system
-    angAcc = q.multToVector3( angAccTemp * qCon );
+    angMomentum = q.multToVector3( angMomentumTemp * qCon );
 
-    // Spheres
-    // Vector3<T> angAcc = t.getTorque();
-    // angAcc[0] = m_inertia_1[0] * angAcc[0];
-    // angAcc[1] = m_inertia_1[3] * angAcc[1];
-    // angAcc[2] = m_inertia_1[5] * angAcc[2];
-
-    return( Kinematics<T>( t.getForce() / m_mass, angAcc ) );
+    return( Kinematics<T>( transMomentum, angMomentum ) );
 }
 
 

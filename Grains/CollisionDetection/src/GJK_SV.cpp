@@ -746,13 +746,10 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
     // openGJK parameters
     T v[3];
     // Grains3D parameters
-    // Vector3<T> wVec( b2w.getOrigin() - a2w.getOrigin() );
-    // Vector3<T> vVec( b2w.getOrigin() - a2w.getOrigin() );
-    // Vector3<T> vVec( zeroVector3T );
-    // Vector3<T> wVec( a2w( a.support( ( -vVec ) * a2w.getBasis() ) ) - 
-    //                  b2w( b.support( (  vVec ) * b2w.getBasis() ) ) );
-    Vector3<T> vVec( a2w( a.support( zeroVector3T ) ) - 
-                     b2w( b.support( zeroVector3T ) ) );
+    // Vector3<T> vVec( a2w( a.support( zeroVector3T ) ) - 
+    //                  b2w( b.support( zeroVector3T ) ) );
+    Vector3<T> vVec( a2w( zeroVector3T ) - 
+                     b2w( zeroVector3T ) );
     Vector3<T> wVec;
     Vector3<T> dVec;
     
@@ -815,7 +812,6 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
 
         // Invoke distance sub-algorithm
         subalgorithm( &s, v );
-        // printf( "GJK2: %f, %f, %f \n", v[0], v[1], v[2] );
         vVec.setValue( v[0], v[1], v[2] );
         dist = norm( vVec );
 

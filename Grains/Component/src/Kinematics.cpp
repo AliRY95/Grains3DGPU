@@ -118,6 +118,7 @@ __HOSTDEVICE__
 Vector3<T> Kinematics<T>::kinematicsAtPoint( Vector3<T> const& R ) const
 {
     return ( m_translational + ( m_angular ^ R ) );
+    // return ( m_translational );
 }
 
 

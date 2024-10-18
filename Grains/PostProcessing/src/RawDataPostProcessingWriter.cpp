@@ -103,7 +103,7 @@ void RawDataPostProcessingWriter<T>::PostProcessing(
 	// Obstacles
 	unsigned int numObstacles = cm->getNumberOfObstacles();
 	std::vector<unsigned int> rbObstacle = cm->getRigidBodyIdObstacles();
-	std::vector<Transform3<T>> tObstacle = cm->getTransform();
+	std::vector<Transform3<T>> tObstacle = cm->getTransformObstacles();
 	// TODO:
 	std::vector<Kinematics<T>> kObstacle( numObstacles );
     // Aux. variables
