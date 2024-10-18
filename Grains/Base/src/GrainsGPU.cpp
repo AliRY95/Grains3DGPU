@@ -59,8 +59,6 @@ void GrainsGPU<T>::simulate()
     // Collision detection on host
     // first, inserting partilces
     Grains<T>::m_components->insertParticles( Grains<T>::m_insertion );
-    // then, copying to device
-    Grains<T>::m_d_components->copy( Grains<T>::m_components );
     // setting up the PP
     Grains<T>::m_postProcessor->PostProcessing_start();
     
@@ -111,7 +109,9 @@ void GrainsGPU<T>::simulate()
 
 
     // Collision detection on device
-    cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
+    // Copying to device
+    Grains<T>::m_d_components->copy( Grains<T>::m_components );
+    cout << "\nTime \t TO \tend \tParticles \tIn \tOut" << endl;
     auto d_start = chrono::high_resolution_clock::now();
     for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
           GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
@@ -168,7 +168,7 @@ void GrainsGPU<T>::simulate()
     // Time comparison
     chrono::duration<double> h_time = h_end - h_start;
     chrono::duration<double> d_time = d_end - d_start;
-    std::cout << "CPU: " << h_time.count() << endl;
+    std::cout << "\nCPU: " << h_time.count() << endl;
     std::cout << "GPU: " << d_time.count() << endl;
     int* h_d_collision = new int[N];
     cudaErrCheck( cudaMemcpy( h_d_collision,

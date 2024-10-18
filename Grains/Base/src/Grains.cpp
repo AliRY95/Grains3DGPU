@@ -354,7 +354,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
         T tEnd = ReaderXML::getNodeAttr_Double( nTime, "End" );
         T tStep = ReaderXML::getNodeAttr_Double( nTime, "dt" );
         GrainsParameters<T>::m_tStart = tStart;
-        GrainsParameters<T>::m_tEnd = tEnd;
+        GrainsParameters<T>::m_tEnd = tEnd + HIGHEPS<T>;
         GrainsParameters<T>::m_dt = tStep;
         DOMNode* nTI = ReaderXML::getNode( tempSetting, "TimeIntegration" );
         if ( nTI )
