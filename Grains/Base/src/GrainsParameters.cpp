@@ -17,7 +17,7 @@ bool GrainsParameters<T>::m_isGPU = false;
 template <typename T> 
 Vector3<T> GrainsParameters<T>::m_origin = zeroVector3T;
 template <typename T> 
-Vector3<T> GrainsParameters<T>::m_dimension = zeroVector3T;
+Vector3<T> GrainsParameters<T>::m_maxCoordinate = zeroVector3T;
 template <typename T> 
 bool GrainsParameters<T>::m_isPeriodic = false;
 

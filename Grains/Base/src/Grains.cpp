@@ -78,7 +78,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
     // -------------------------------------------------------------------------
     // Domain size: origin, max coordinates and periodicity
     DOMNode* domain = ReaderXML::getNode( root, "LinkedCell" );
-    GrainsParameters<T>::m_dimension.setValue( 
+    GrainsParameters<T>::m_maxCoordinate.setValue( 
         T( ReaderXML::getNodeAttr_Double( domain, "MX" ) ),
         T( ReaderXML::getNodeAttr_Double( domain, "MY" ) ),
         T( ReaderXML::getNodeAttr_Double( domain, "MZ" ) ) );
@@ -247,34 +247,29 @@ void Grains<T>::Construction( DOMElement* rootElement )
     cout << shiftString9 << "Cell size factor = " << LC_coeff << endl;
 
     // Creating linked cell
-    // TODO: FIX when finalizing
-    // if ( !GrainsParameters<T>::m_isGPU )
-    // {
-        m_linkedCell = ( LinkedCell<T>** ) malloc( sizeof( LinkedCell<T>* ) );
-        *m_linkedCell = new LinkedCell<T>( 
-            GrainsParameters<T>::m_origin,
-            GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
-            LC_coeff * T( 2 ) * LCSize );
-        GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
-        cout << shiftString9 << "LinkedCell with "
-             << GrainsParameters<T>::m_numCells <<
-             " cells is created on host." << endl;
-    // }
-    // else
-    // {
+    m_linkedCell = ( LinkedCell<T>** ) malloc( sizeof( LinkedCell<T>* ) );
+    *m_linkedCell = new LinkedCell<T>( GrainsParameters<T>::m_origin,
+                                       GrainsParameters<T>::m_maxCoordinate, 
+                                       LC_coeff * T( 2 ) * LCSize );
+    GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
+    cout << shiftString9 << "LinkedCell with "
+         << GrainsParameters<T>::m_numCells
+         << " cells is created on host." << endl;
+    if ( GrainsParameters<T>::m_isGPU )
+    {
         cudaErrCheck( cudaMalloc( (void**)&m_d_linkedCell,
                                    sizeof( LinkedCell<T>* ) ) );
         int d_numCells = createLinkedCellOnDevice( 
             GrainsParameters<T>::m_origin,
-            GrainsParameters<T>::m_origin + GrainsParameters<T>::m_dimension, 
+            GrainsParameters<T>::m_maxCoordinate, 
             LC_coeff * T( 2 ) * LCSize,
             m_d_linkedCell );
 
         GrainsParameters<T>::m_numCells = d_numCells;
         cout << shiftString9 << "LinkedCell with "
-             << GrainsParameters<T>::m_numCells <<
-             " cells is created on device." << endl;
-    // }
+             << GrainsParameters<T>::m_numCells
+             << " cells is created on device." << endl;
+    }
     cout << shiftString6 << "Constructing linked cell completed!\n" << endl;
     
 

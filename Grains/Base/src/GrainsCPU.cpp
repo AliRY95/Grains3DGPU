@@ -30,6 +30,7 @@ GrainsCPU<T>::~GrainsCPU()
 template <typename T>
 void GrainsCPU<T>::simulate()
 {
+    cout << "\n\n\n\n\nStarting the simulation ..." << endl;
     unsigned int N = GrainsParameters<T>::m_numParticles;
     int* h_collision = new int[N];
     // Zeroing out

@@ -20,7 +20,7 @@ class GrainsParameters
         /** @brief Global domain origin */
         static Vector3<T> m_origin;
         /** @brief Global domain dimension */
-        static Vector3<T> m_dimension;
+        static Vector3<T> m_maxCoordinate;
         /** @brief Is simulation periodic? */
         static bool m_isPeriodic;
 
