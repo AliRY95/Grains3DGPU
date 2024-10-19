@@ -28,11 +28,9 @@ LinkedCell<T>::LinkedCell( Vector3<T> const& min,
     Vector3<T> numCellsPerDir( EPS<T>, EPS<T>, EPS<T> );
     numCellsPerDir += m_maxCorner - m_minCorner;
     numCellsPerDir /= m_cellExtent;
-    // Not performant sensitive as it is called only once in the beggining.
-    // So, just do a bit of unoptimized work is fine for now.
-    m_numCellsPerDir.x = ceil( numCellsPerDir[X] );
-    m_numCellsPerDir.y = ceil( numCellsPerDir[Y] );
-    m_numCellsPerDir.z = ceil( numCellsPerDir[Z] );
+    m_numCellsPerDir.x = int( numCellsPerDir[X] );
+    m_numCellsPerDir.y = int( numCellsPerDir[Y] );
+    m_numCellsPerDir.z = int( numCellsPerDir[Z] );
     m_numCells = m_numCellsPerDir.x * m_numCellsPerDir.y * m_numCellsPerDir.z;
 }
 
