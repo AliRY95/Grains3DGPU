@@ -288,7 +288,7 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
             //
             Vector3<T> ptA, ptB;
             int nbIterGJK = 0;
-            T distance = computeClosestPoints_GJK_JH( *convexA, 
+            T distance = computeClosestPoints_GJK_SV( *convexA, 
                                                       *convexB,
                                                       a2wCrust,
                                                       b2wCrust,

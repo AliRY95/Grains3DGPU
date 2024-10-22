@@ -10,40 +10,14 @@ MAINOBJ := $(MAINSRC:%.cpp=$(OBJDIR)/%.o)
 
 # Include and library from Grains
 GRAINSINC   := $(GRAINS_ROOT)/include
-GRAINSLIB   := $(GRAINS_ROOT)/lib
+GRAINSLIB   := $(GRAINS_ROOT)/lib$(GRAINS_FULL_EXT)
 GRAINSFLAGS := -L$(GRAINSLIB) -lgrains
 
 
 # Compiler
-# Comment: the general CC flags and MPI flags are defined in the
-# environment file and should not be altered unless you are a hard core
-# Grains developer
-COMP  := $(GRAINS_MPI_BINDIR)/$(GRAINS_MPICCC) $(GRAINS_GENCCFLAGS) $(GRAINS_MPICCFLAGS)
-LINK  := $(GRAINS_MPI_BINDIR)/$(GRAINS_MPICCC) $(GRAINS_GENCCFLAGS) $(GRAINS_MPICCFLAGS)
-DEBUG  := -g
-
-
-# XML
-MACRO       = -D_XML
-XERCESINC   := $(XERCESC_ROOT)/include
-XERCESLIB   := $(XERCESC_ROOT)/lib
-XERCESFLAGS := -L$(XERCESLIB) -lxerces-c -lxerces-depdom
-
-
-# MPI
-MPIINC	    := $(GRAINS_MPI_INCDIR)
-MPILIB      := $(GRAINS_MPI_LIBDIR)
-MPIFLAGS    := -L$(MPILIB) $(LIBMPI_FOR_GRAINS___)
-
-
-# Other macros
-MACRO      += -D_TIMER
-
-
-# Compiler flags
-INCFLAGS  := $(XERCESINC:%=-I%) $(GRAINSINC:%=-I%) $(MPIINC:%=-I%)
-COMPFLAGS := $(DEBUG) $(INCFLAGS)
-LINKFLAGS := $(DEBUG)
+INCFLAGS  := $(INCDIR:%=-I%) $(GRAINSINC:%=-I%) $(GRAINS_XERCES_INCDIR:%=-I%)
+COMPFLAGS := $(GRAINS_GPU_COMPILER_FLAGS) $(INCFLAGS)
+LINKFLAGS := $(GRAINS_GPU_LINKER_FLAGS) $(GRAINS_Z_FLAGS) $(GRAINS_XERCES_FLAGS) $(GRAINSFLAGS)
 
 
 # -----------------------------------------------------------------------------
@@ -53,25 +27,19 @@ LINKFLAGS := $(DEBUG)
 all : grains
 
 # EXECUTABLE
-grains : MESS START $(EXEDIR)/grains
+grains : MESS $(EXEDIR)/grains
 	@echo '----------------------'
 	@echo 'Software grains built!'
 	@echo '----------------------'
 
 $(EXEDIR)/grains : app
-	@echo 'Building software grains'
-	$(LINK) $(MAINOBJ) -o $@ $(LINKFLAGS) $(GRAINSFLAGS) $(MPIFLAGS) $(XERCESFLAGS)
+	@echo 'Building software Grains'
+	$(GRAINS_GPU_COMPILER) $(MAINOBJ) -o $@ $(LINKFLAGS)
 
 MESS   :
 	@echo '***********************************************************'
-	@echo 'Binary compiled with' $(GRAINS_SERCOMPIL_ENV)-$(GRAINS_SERCOMPIL_VERSION) ', ' $(GRAINS_MPI_DISTRIB)-$(GRAINS_MPI_VERSION)', and ' $(GRAINS_CUDA_DISTRIB)-$(GRAINS_CUDA_VERSION)
+	@echo 'Binary compiling with' $(GRAINS_CPP_COMPILER_DIST)-$(GRAINS_CPP_COMPILER_VERSION)', and' $(GRAINS_GPU_COMPILER_DIST)-$(GRAINS_GPU_COMPILER_VERSION)
 	@echo '***********************************************************'
-
-START  :
-	@echo 'MPI libraries = '$(LIBMPI_FOR_GRAINS___)
-	@echo 'Compilation flags = $(GRAINS_GENCCFLAGS)$(GRAINS_MPICCFLAGS)$(COMPFLAGS)'
-	@echo 'Macros = $(MACRO)'
-	@echo
 
 app    :  Grains $(MAINOBJ)
 
@@ -80,7 +48,7 @@ Grains :
 
 $(OBJDIR)/%.o : %.cpp
 	@echo 'Compiling '$<
-	$(COMP) $(COMPFLAGS) $(MACRO) -c $< -o $@
+	$(GRAINS_GPU_COMPILER) $(COMPFLAGS) -c $< -o $@
 
 
 # DEPENDENCIES
@@ -99,6 +67,7 @@ include ./Makedepend      # DO NOT DELETE
 # CLEAN
 clean :
 	( cd ../../Grains; make clean; cd ../Main/src )
-	@echo 'Main   : deleting binary and object files'
+	@echo 'Main   : deleting binary and object files ...'
 	rm -f $(MAINOBJ)
 	rm -f $(EXEDIR)/*
+	@echo 'Main   : Deleted.'
