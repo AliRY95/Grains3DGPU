@@ -43,11 +43,13 @@
 
 
 ### Folders ###
+XERCES-2.8.0/
 Grains/include/
 Grains/obj*
 Grains/lib*
 Grains/DraftCodes/
-XERCES-2.8.0/
+Main/obj*
+Main/bin*
 Tools/PrePost/*/bin*
 Tools/PrePost/*/obj*
 
