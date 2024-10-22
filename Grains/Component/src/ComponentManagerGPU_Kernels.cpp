@@ -255,12 +255,13 @@ void addExternalForces_kernel( RigidBody<T, U> const* const* particleRB,
     if ( pId >= nParticles )
         return;
     
-    // Rigid body
-    RigidBody<T, U> const* rb = particleRB[ rigidBodyId[ pId ] ];
-    T mass = rb->getMass();
+    // // Rigid body
+    // RigidBody<T, U> const* rb = particleRB[ rigidBodyId[ pId ] ];
+    // T mass = rb->getMass();
+    // // T mass = particleRB[ rigidBodyId[ pId ] ]->getMass();
 
-    // Add to torce
-    torce[ pId ].addForce( mass * Vector3<T>( gX, gY, gZ ) );
+    // // Add to torce
+    // torce[ pId ].addForce( mass * Vector3<T>( gX, gY, gZ ) );
 }
 
 
@@ -286,6 +287,11 @@ void moveParticles_kernel( RigidBody<T, U> const* const* RB,
     
     // Rigid body
     RigidBody<T, U> const* rb = RB[ rigidBodyId[ pId ] ];
+
+    T mass = rb->getMass();
+    // Add to torce
+    torce[ pId ].addForce( mass * Vector3<T>( 0, 0, -0.1 ) );
+
 
     // First, we compute quaternion of orientation
     Quaternion<T> qRot( transform[ pId ].getBasis() );
