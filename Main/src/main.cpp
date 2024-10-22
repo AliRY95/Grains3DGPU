@@ -4,7 +4,11 @@
 /* ========================================================================== */
 #include <cuda.h>
 #include <cuda_runtime.h>
+
+#include "Grains.hh"
+#include "GrainsMisc.hh"
 #include "GrainsBuilderFactory.hh"
+#include "ReaderXML.hh"
 
 
 using namespace std;
@@ -47,7 +51,11 @@ int main(int argc, char* argv[])
 
             // Tasks to perform before time-stepping
             grains->initialize( rootNode );
-            // ReaderXML::terminate();
+            ReaderXML::terminate();
+
+            // Delete the temporary input file
+            std::string cmd = "/bin/rm " + filename_exe;
+            GrainsMisc<float>::m_returnSysCmd = system( cmd.c_str() );
 
             // Run the simulation
             grains->simulate();
@@ -74,7 +82,11 @@ int main(int argc, char* argv[])
 
             // Tasks to perform before time-stepping
             grains->initialize( rootNode );
-            // ReaderXML::terminate();
+            ReaderXML::terminate();
+
+            // Delete the temporary input file
+            std::string cmd = "/bin/rm " + filename_exe;
+            GrainsMisc<double>::m_returnSysCmd = system( cmd.c_str() );
 
             // Run the simulation
             grains->simulate();
@@ -85,10 +97,6 @@ int main(int argc, char* argv[])
             // Delete the Grains application
             delete grains;
         }
-        
-        // Delete the temporary input file
-        // string cmd = "/bin/rm " + filename_exe;
-        // GrainsExec::m_return_syscmd = system( cmd.c_str() );
     }
 
     return ( 0 );

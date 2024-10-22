@@ -64,8 +64,8 @@ SRCFILESPP := $(subst $(SRCDIRPP)/,,$(SRCFILES_WP_PP))
 
 
 # Target directories
-OBJDIR := obj
-LIBDIR := lib
+OBJDIR := obj$(GRAINS_FULL_EXT)
+LIBDIR := lib$(GRAINS_FULL_EXT)
 
 
 # Substitutions for objects
@@ -99,7 +99,9 @@ LINKFLAGS := $(GRAINS_GPU_LINKER_FLAGS) $(GRAINS_Z_FLAGS) $(GRAINS_XERCES_FLAGS)
 all : grains
 
 grains : MESS CPINC BASE COMPONENT COLLISION GEOMETRY TIME XML PP
-		$(GRAINS_GPU_COMPILER) $(LINKFLAGS) -o $(LIBDIR)/grains \
+		$(GRAINS_GPU_COMPILER) -shared -Xcompiler \"-Wl,-soname,libgrains.so\" \
+		$(LINKFLAGS) \
+		-o $(LIBDIR)/libgrains.so \
 		$(OBJS_XML) $(OBJS_TIME) $(OBJS_GEOMETRY) $(OBJS_COMPONENT) \
 		$(OBJS_COLLISION) $(OBJS_BASE) $(OBJS_PP)
 	@echo 'Compilation is complete'
@@ -160,7 +162,8 @@ depend:
 
 # CLEAN
 clean : 
-	@echo 'Grains : Deleting object and library files'
+	@echo 'Grains : Deleting object and library files ...'
 	rm -f $(INCDIROUT)/*
 	rm -f $(OBJDIR)/*.o
 	rm -f $(LIBDIR)/*
+	@echo 'Grains : Deleted.'
