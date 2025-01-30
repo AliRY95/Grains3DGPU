@@ -13,16 +13,7 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-/** @name GJK_SV : Data structure for simplex */
-//@{
-template <typename T>
-struct Simplex {
-	int nvrtx;                /**< Number of points defining the simplex */
-	Vector3<T> vrtx[4];       /**< Coordinates of the points of the simplex */
-};
-//@}
-
-/** @name GJK_SV : External methods */
+/** @name GJK_AY : External methods */
 //@{
 /** @brief Returns the minimal distance between 2 convex shapes and a point per
 convex shape that represents the tips of the minimal distance segment using the

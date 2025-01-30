@@ -64,12 +64,12 @@ export GRAINS_GPU_COMPILER_FLAGS="-t=8 -x cu -m64 -O3 -dlto -dc \
     -cudart static -cudadevrt static \
     -maxrregcount=128 -use_fast_math -extra-device-vectorization -restrict \
     -Xcompiler "-rdynamic,-fPIC,-fopenmp" \
-    -g -diag-suppress 554"
+    -pg -g -diag-suppress 554"
 export GRAINS_GPU_LINKER_FLAGS="-O3 -dlto -arch=sm_75 -lineinfo -lcudart \
     -maxrregcount=128 -use_fast_math -extra-device-vectorization -restrict \
     -lcudart -lcudadevrt \
     -lgomp \
-    -g"
+    -pg -g"
 ###########
 export GRAINS_XERCES_FLAGS="-L${GRAINS_XERCES_LIBDIR} -lxerces-c -lxerces-depdom"
 ###########

@@ -288,7 +288,7 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
             //
             Vector3<T> ptA, ptB;
             int nbIterGJK = 0;
-            T distance = computeClosestPoints_GJK_SV( *convexA, 
+            T distance = computeClosestPoints_GJK_AY( *convexA, 
                                                       *convexB,
                                                       a2wCrust,
                                                       b2wCrust,
@@ -337,6 +337,58 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
 
 
 // -----------------------------------------------------------------------------
+// Returns the distance between 2 rigid bodies
+template <typename T, typename U>
+__HOSTDEVICE__
+T distanceRigidBodies( RigidBody<T, U> const& rbA,
+                       RigidBody<T, U> const& rbB,
+                       Transform3<T> const& a2w,
+                       Transform3<T> const& b2w,
+                       int const method )
+{
+    Convex<T> const* convexA = rbA.getConvex();
+    Convex<T> const* convexB = rbB.getConvex();
+    
+    Vector3<T> ptA, ptB;
+    int nbIterGJK = 0;
+    T distance = 0;
+    if ( method == 1 )
+    {
+        distance = computeClosestPoints_GJK_JH( *convexA, 
+                                                *convexB,
+                                                a2w,
+                                                b2w,
+                                                ptA,
+                                                ptB,
+                                                nbIterGJK );
+    }
+    else if ( method == 2 )
+    {
+        distance = computeClosestPoints_GJK_SV( *convexA, 
+                                                *convexB,
+                                                a2w,
+                                                b2w,
+                                                ptA,
+                                                ptB,
+                                                nbIterGJK );
+    }
+    else if ( method == 3 )
+    {
+        distance = computeClosestPoints_GJK_AY( *convexA, 
+                                                *convexB,
+                                                a2w,
+                                                b2w,
+                                                ptA,
+                                                ptB,
+                                                nbIterGJK );
+    }
+    return ( distance );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 #define X( T, U ) \
 template                                                                       \
@@ -350,7 +402,14 @@ __HOSTDEVICE__                                                                 \
 ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,           \
                                          RigidBody<T, U> const& rbB,           \
                                          Transform3<T> const& a2w,             \
-                                         Transform3<T> const& b2w );
+                                         Transform3<T> const& b2w );           \
+template                                                                       \
+__HOSTDEVICE__                                                                 \
+T distanceRigidBodies( RigidBody<T, U> const& rbA,                             \
+                       RigidBody<T, U> const& rbB,                             \
+                       Transform3<T> const& a2w,                               \
+                       Transform3<T> const& b2w,                               \
+                       int const method );
 X( float, float )
 X( double, float )
 X( double, double )

@@ -2,6 +2,7 @@
 #include "Grains.hh"
 #include "GrainsCPU.hh"
 #include "GrainsGPU.hh"
+#include "GrainsTestDev.hh"
 
 
 // -----------------------------------------------------------------------------
@@ -114,6 +115,8 @@ Grains<T>* GrainsBuilderFactory<T>::create( DOMElement* root )
         grains = new GrainsCPU<T>();
     else if ( option == "GPU" )
         grains = new GrainsGPU<T>();
+    else if ( option == "GrainsTestDev" )
+        grains = new GrainsTestDev<T>();
         
     // Postconditions
     if ( !grains )

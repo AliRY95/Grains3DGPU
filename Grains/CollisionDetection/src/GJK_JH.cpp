@@ -29,7 +29,7 @@ static INLINE void computeDet( unsigned int const bits,
             unsigned int s2 = sj | last_bit;
             det[s2][j] = dp[last][last] - dp[last][j];
             det[s2][last] = dp[j][j] - dp[j][last];
-            for ( int k = 0, sk = 1; k < j; ++k, sk <<= 1 )
+            for ( unsigned int k = 0, sk = 1; k < j; ++k, sk <<= 1 )
             {
                 if ( bits & sk )
                 {
@@ -387,7 +387,7 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
         q[last] = b.support( v * b2w.getBasis() );
         w = a2w( p[last] ) - b2w( q[last] );
         set_max( mu, v * w / dist );
-        if ( dist - mu <= dist * EPS<T> )
+        if ( dist - mu <= dist * LOWEPS<T> )
             break;
         if ( degenerate( all_bits, y, w ) )
             break;

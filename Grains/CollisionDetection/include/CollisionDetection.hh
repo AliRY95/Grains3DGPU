@@ -66,6 +66,22 @@ ContactInfo<T> closestPointsRigidBodies( RigidBody<T, U> const& rbA,
 // ContactInfo closestPointsRigidBodies( RigidBody const& rbA,
 //                                       RigidBody const& rbB,
 //                                       Transform3d const& b2a );
+
+
+/** @brief Returns the di (if any) for 2 rigid bodies
+ @param rbA first rigid body
+ @param rbB second rigid body
+ @param a2w geometric tramsformation describing convex A in the world reference
+ frame
+ @param b2w geometric tramsformation describing convex B in the world reference
+ frame */
+ template <typename T, typename U>
+__HOSTDEVICE__
+T distanceRigidBodies( RigidBody<T, U> const& rbA,
+                       RigidBody<T, U> const& rbB,
+                       Transform3<T> const& a2w,
+                       Transform3<T> const& b2w,
+                       int const method );
 //@}
 
 

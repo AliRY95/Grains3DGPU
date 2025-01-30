@@ -687,7 +687,6 @@ static INLINE void S3D( gkSimplex<T>* s, T* v )
 
 
 // -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__
 static INLINE void subalgorithm( gkSimplex<T>* s, T* v ) 
@@ -732,15 +731,11 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
     // counter for number of vertices
     unsigned int i = 0;
     // relative tolerance
-    constexpr T relError = 1.e-6;
+    constexpr T relError = LOWEPS<T>;
     // absolute tolerance
     constexpr T absError = 1.e-4 * relError;
     // optimality gap
     T mu = T( 0 );
-
-    /* Acceleration parameters */
-    bool acceleration = false;
-    T momentum = T( 0 ), oneMinusMomentum = T( 1 );
 
     /* Initialization */
     // openGJK parameters
@@ -751,7 +746,6 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
     Vector3<T> vVec( a2w( zeroVector3T ) - 
                      b2w( zeroVector3T ) );
     Vector3<T> wVec;
-    Vector3<T> dVec;
     
     /* Initialise simplex */
     T dist = norm( vVec );
@@ -763,46 +757,13 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
     /* Begin GJK iteration */
     do {
         numIterations++;
-
-        // Finding the suitable direction using either Nesterov or original
-        // The number 8 is hard-coded. Emprically, it shows the best convergence
-        // for superquadrics. For the rest of shapes, we really do not need to 
-        // use Nesterov as the improvemenet is marginal.
-        if ( acceleration && numIterations % 8 != 0 )
-        {
-            momentum = numIterations / ( numIterations + 2. );
-            oneMinusMomentum = T( 1 ) - momentum;
-            dVec = momentum * dVec + 
-                   momentum * oneMinusMomentum * vVec +
-                   oneMinusMomentum * oneMinusMomentum * wVec;
-        }
-        else
-            dVec = vVec;
-    
-        wVec = a2w( a.support( ( -dVec ) * a2w.getBasis() ) ) - 
-               b2w( b.support( (  dVec ) * b2w.getBasis() ) );
+        wVec = a2w( a.support( ( -vVec ) * a2w.getBasis() ) ) - 
+               b2w( b.support( (  vVec ) * b2w.getBasis() ) );
     
         // termination criteria
         mu = dist - vVec * wVec / dist;
         if ( mu < dist * relError || mu < absError )
-        {
-            if ( acceleration )
-            {
-                // if d == v
-                if ( norm( dVec - vVec ) < LOWEPS<T> )
-                    break;
-                // otherwise turn off the acceleration
-                else
-                {
-                    acceleration = false;
-                    wVec = a2w( a.support( ( -vVec ) * a2w.getBasis() ) ) - 
-                           b2w( b.support( (  vVec ) * b2w.getBasis() ) );
-                }
-            }
-            // if the acceleration is off, we reached convergence.
-            else
-                break;
-        }
+            break;
 
         // Add the new vertex to simplex
         i = s.nvrtx;

@@ -39,7 +39,7 @@
     @author A.Yazdani - 2024 - Modifying for Grains, adding witness points, and
     implementing device code along with templating */
 // =============================================================================
-/** @name openGJK : Structs */
+/** @name GJK_SV : Structs */
 //@{
 /** @brief Data structure for simplex */
 template <typename T>
@@ -50,7 +50,7 @@ struct gkSimplex {
 //@}
 
 
-/** @name openGJK : External methods */
+/** @name GJK_SV : External methods */
 //@{
 /** @brief Returns the minimal distance between 2 convex shapes and a point per
 convex shape that represents the tips of the minimal distance segment
@@ -76,4 +76,4 @@ T computeClosestPoints_GJK_SV( Convex<T> const& a,
 //@}
 
 
-#endif // _OPENGJK_HH_
+#endif

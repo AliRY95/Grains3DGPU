@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE Grains3D SYSTEM "/home/alireza/Desktop/Work/Codes/GrainsGPU/Main/dtd/Grains3D.dtd">
-<Grains3D Type="GPU" Precision="Single">
+<Grains3D Type="GrainsTestDev" Precision="Single">
 
 <Construction>
 	<LinkedCell MX="0.5" MY="0.5" MZ="1.0" CellSizeFactor="1."/>
@@ -106,4 +104,3 @@
 </Simulation>
 
 </Grains3D>
-
