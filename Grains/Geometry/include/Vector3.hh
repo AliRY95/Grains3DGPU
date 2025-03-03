@@ -30,6 +30,11 @@ class Vector3
         __HOSTDEVICE__
         Vector3( T def = T() );
 
+        /** @brief Constructor with the buffer
+        @param buffer buffer */
+        __HOSTDEVICE__
+        Vector3( T const* buffer );
+
         /** @brief Constructor with 3 components as inputs
         @param x 1st component
         @param y 2nd component
@@ -50,9 +55,25 @@ class Vector3
         //@}
 
 
-        /** @name Sets methods */
+        /** @name Get methods */
         //@{
-        /** @brief Sets the components */
+        /** @brief Gets the pointer to the buffer */
+        __HOSTDEVICE__
+        T const* getBuffer() const;
+        //@}
+        
+        
+        /** @name Set methods */
+        //@{
+        /** @brief Sets the vector to a 1D array of 3 values as input
+        @param buffer the 1D array of values ordered as: 0=Vx, 1=Vy, 2=Vz */
+        __HOSTDEVICE__
+        void setValue( T const* buffer );
+        
+        /** @brief Sets the components
+        @param x the x component
+        @param y the y component
+        @param z the z component */
         __HOSTDEVICE__
         void setValue( T x,
                        T y,
@@ -119,7 +140,7 @@ class Vector3
         /** @brief ith component accessor
         @param i component index */
         __HOSTDEVICE__
-        T operator [] ( size_t i ) const;
+        T const& operator [] ( size_t i ) const;
 
         /** @brief ith component accessor - modifiable lvalue
         @param i component index */

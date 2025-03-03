@@ -15,6 +15,18 @@ Vector3<T>::Vector3( T def )
 
 
 // -----------------------------------------------------------------------------
+// Constructor with the pointer to a buffer
+template <typename T>
+__HOSTDEVICE__
+Vector3<T>::Vector3( T const* buffer )
+{
+    setValue( buffer );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Constructor with 3 components as inputs
 template <typename T>
 __HOSTDEVICE__
@@ -55,7 +67,33 @@ Vector3<T>::~Vector3()
 
 
 // -----------------------------------------------------------------------------
-/* Sets the components */
+/* Gets the pointer to the buffer */
+template <typename T>
+__HOSTDEVICE__
+T const* Vector3<T>::getBuffer() const
+{
+    return( m_comp );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+/* Sets the components using a pointer to a buffer */
+template <typename T>
+__HOSTDEVICE__
+void Vector3<T>::setValue( T const* buffer )
+{
+    m_comp[X] = buffer[X];
+    m_comp[Y] = buffer[Y];
+    m_comp[Z] = buffer[Z];
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+/* Sets the components using three different values */
 template <typename T>
 __HOSTDEVICE__
 void Vector3<T>::setValue( T x,
@@ -226,7 +264,7 @@ Vector3<T>& Vector3<T>::operator /= ( T d )
 // ith component accessor
 template <typename T>
 __HOSTDEVICE__
-T Vector3<T>::operator [] ( size_t i ) const
+T const& Vector3<T>::operator [] ( size_t i ) const
 {
     return ( m_comp[i] );
 }
@@ -254,9 +292,7 @@ Vector3<T>& Vector3<T>::operator = ( Vector3<T> const& vec )
 {
     if ( &vec != this )
     {
-        m_comp[X] = vec.m_comp[X];
-        m_comp[Y] = vec.m_comp[Y];
-        m_comp[Z] = vec.m_comp[Z];
+        setValue( vec.getBuffer() );
     }
     return ( *this );
 }
@@ -351,7 +387,7 @@ std::istream& operator >> ( std::istream& fileIn,
 template class Vector3<float>;
 template class Vector3<double>;
 
-#define X( T ) \
+#define X( T )                                                                 \
 template std::ostream& operator << <T>( std::ostream& fileOut,                 \
                                         Vector3<T> const& v );                 \
                                                                                \

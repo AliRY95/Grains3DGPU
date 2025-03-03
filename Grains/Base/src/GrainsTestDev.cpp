@@ -7,6 +7,10 @@
 #include "RigidBodyGPUWrapper.hh"
 #include "Box.hh"
 #include "Superquadric.hh"
+#include "Cylinder.hh"
+#include "GJK_JH.hh"
+#include "VectorMath.hh"
+
 
 namespace GrainsCPU
 {
@@ -26,6 +30,7 @@ void collisionDetectionGJK( RigidBody<T, T> const* const* rb,
                                        t1[i], 
                                        t2[i],
                                        method );
+        // dist[i] = norm( t1[i].getOrigin() + t2[i].getOrigin() );
     }
 };
 } // GrainsCPU namespace end
@@ -39,13 +44,14 @@ namespace GrainsGPU
 {
 // ...
 template <typename T>
-__global__ 
-void collisionDetectionGJK( RigidBody<T, T> const* const* rb,
-                            Transform3<T> const* t1,
-                            Transform3<T> const* t2,
-                            T* dist,
-                            int const method,
-                            int const N )
+__global__ void 
+// __maxnreg__( 49 )
+collisionDetectionGJK( RigidBody<T, T> const* const* rb,
+                        Transform3<T> const* t1,
+                        Transform3<T> const* t2,
+                        T* dist,
+                        int const method,
+                        int const N )
 {
     int bid = gridDim.x * gridDim.y * blockIdx.z + 
               blockIdx.y * gridDim.x + 
@@ -57,6 +63,7 @@ void collisionDetectionGJK( RigidBody<T, T> const* const* rb,
                                      t1[tid], 
                                      t2[tid],
                                      method );
+    // dist[tid] = norm( t1[tid].getOrigin() + t2[tid].getOrigin() );
 };
 } // GrainsGPU namespace end
 
@@ -87,17 +94,20 @@ template <typename T>
 void GrainsTestDev<T>::simulate()
 {
     int const method = 3;
-    int userN = 2;
+    int userN = 100;
     int const N = userN * 24 * 256; // No. pair particles
     // int const N = 10;
-    T r1 = 0.05, r2 = 0.05, r3 = 0.05; // Radii for now!
+    T r1 = T( 0.05 );
+    T r2 = T( 0.05 ); 
+    T r3 = T( 0.05 ); // Radii for now!
     
     /* ====================================================================== */
     /* Creating two random Vector3 arrays for centers of pair-particles       */
     /* ====================================================================== */
     default_random_engine generator;
-    normal_distribution<T> distribution1( -0.05, 0.05 );
-    normal_distribution<T> distribution2( +0.05, 0.05 );
+    normal_distribution<T> distribution1( -0.05, 0.005 );
+    normal_distribution<T> distribution2( +0.05, 0.005 );
+    uniform_real_distribution<T> rotation( 0, 2. * PI<T> );
 
     // Allocating memory on host and device
     Transform3<T> *h_tr1 = new Transform3<T>[N];
@@ -112,15 +122,15 @@ void GrainsTestDev<T>::simulate()
     // Randomize array on host
     for( int i = 0; i < N; i++ )
     {
-        h_tr1[i].setBasis( distribution1( generator ),
-                           distribution1( generator ),
-                           distribution1( generator ) );
+        h_tr1[i].setBasis( rotation( generator ),
+                           rotation( generator ),
+                           rotation( generator ) );
         h_tr1[i].setOrigin( Vector3<T>( distribution1( generator ), 
                                         distribution1( generator ), 
                                         distribution1( generator ) ) );
-        h_tr2[i].setBasis( distribution2( generator ),
-                           distribution2( generator ),
-                           distribution2( generator ) );
+        h_tr2[i].setBasis( rotation( generator ),
+                           rotation( generator ),
+                           rotation( generator ) );
         h_tr2[i].setOrigin( Vector3<T>( distribution2( generator ), 
                                         distribution2( generator ), 
                                         distribution2( generator ) ) );
@@ -140,8 +150,12 @@ void GrainsTestDev<T>::simulate()
     /* Creating Particles                                                     */
     /* ====================================================================== */
     // Convex
-    Convex<T> *h_convex1 = new Superquadric<T>( r1, r2, r3, 3., 3. );
-    Convex<T> *h_convex2 = new Superquadric<T>( r1, r2, r3, 3., 3. );
+    // Convex<T> *h_convex1 = new Box<T>( 2 * r1, 2 * r2, 2 * r3 );
+    // Convex<T> *h_convex2 = new Box<T>( 2 * r1, 2 * r2, 2 * r3 );
+    // Convex<T> *h_convex1 = new Cylinder<T>( r1, r2 );
+    // Convex<T> *h_convex2 = new Cylinder<T>( r1, r2 );
+    Convex<T> *h_convex1 = new Superquadric<T>( r1, r2, r3, T( 3. ), T( 3 ) );
+    Convex<T> *h_convex2 = new Superquadric<T>( r1, r2, r3, T( 3 ), T( 3 ) );
     RigidBody<T, T>** h_rb = ( RigidBody<T, T>** ) malloc( 2 * sizeof( RigidBody<T, T>* ) );
     h_rb[0] = new RigidBody<T, T>( h_convex1, T( 0 ), 0, 1 );
     h_rb[1] = new RigidBody<T, T>( h_convex2, T( 0 ), 0, 1 );
@@ -156,7 +170,7 @@ void GrainsTestDev<T>::simulate()
     /* ====================================================================== */
     /* Collision detection                                                    */
     /* ====================================================================== */
-    T* h_collision = new T[N];
+    T* h_collision = new T[N];    
     // Zeroing out      
     for( int i = 0; i < N; i++ )
     {
@@ -171,6 +185,8 @@ void GrainsTestDev<T>::simulate()
                               cudaMemcpyHostToDevice ) );
 
     // Collision detection on host
+    Vector3<T> pa, pb;
+    int nbIter;
     auto h_start = chrono::high_resolution_clock::now();
     GrainsCPU::collisionDetectionGJK<T>( h_rb,
                                          h_tr1,

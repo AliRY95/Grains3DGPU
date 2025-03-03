@@ -35,7 +35,7 @@ class Transform3
         __HOSTDEVICE__
         Transform3( T def = T() );
 
-        /** @brief Constructor with origin coordinates as inputs and matrix is 
+        /** @brief Constructor with origin coordinates as inputs and matrix as 
         identity
         @param x origin x-coordinate 
         @param y origin y-coordinate
@@ -47,9 +47,18 @@ class Transform3
 
         /** @brief Constructor with a 1D array of 12 values as inputs containing
         the rotation matrix coefficients following by the origin coordinates
-        @param m 1D array contanining 12 values */
+        @param buffer 1D array contanining 12 values */
         __HOSTDEVICE__
-        Transform3( T const t[12] );
+        Transform3( T const* buffer );
+
+        /** @brief Constructor with two tranformations. This constructs a 
+        transformation which is equal to 't2 o inv( t1 )', representing t2 in
+        local coordinate of t1.
+        @param t1 primary transformation
+        @param t2 secondary transformation */
+        __HOSTDEVICE__
+        Transform3( Transform3<T> const& t1, 
+                    Transform3<T> const& t2 );
 
         /** @brief Constructor with an XML node
         @param root the xml node */
@@ -84,10 +93,10 @@ class Transform3
         /** @brief Sets the transformation with an 1D array of 12 values as 
         inputs. The 1D array must be organized as: 0=Mxx, 1=Mxy, 2=Mxz, 3=Myx,
         4=Myy, 5=Myz, 6=Mzx, 7=Mzy, 8=Mzz, 9=Ox, 10=Oy, 11=Oz 
-        @param t the 1D array of values containing the tranformation
+        @param buffer the 1D array of values containing the tranformation
         coefficients */
         __HOSTDEVICE__
-        void setValue( T const t[12] );
+        void setValue( T const* buffer );
 
         /** @brief Sets the matrix part of the transformation
         @param m matrix part of the transformation */
@@ -115,9 +124,12 @@ class Transform3
 
         /** @brief Sets the transformation to the inverse of another 
         transformation
-        @param t the other transformation */ 
+        @param t the other transformation
+        @param isRotation if the other transformation is rotation. Default is
+        false */ 
         __HOSTDEVICE__
-        void setToInverseTransform( Transform3<T> const& t );
+        void setToInverseTransform( Transform3<T> const& t,
+                                    bool isRotation = false );
 
         /** @brief Sets the transformation composition of affine transformations
         this = t2 o t1 (t1 first followed by t2)

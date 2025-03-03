@@ -20,9 +20,9 @@ Matrix3<T>::Matrix3()
 // Constructor with a 1D array of values as input
 template <typename T>
 __HOSTDEVICE__
-Matrix3<T>::Matrix3( T const* mat )
+Matrix3<T>::Matrix3( T const* buffer )
 {
-    setValue( mat );
+    setValue( buffer );
 }
 
 
@@ -36,7 +36,9 @@ Matrix3<T>::Matrix3( T xx, T xy, T xz,
                      T yx, T yy, T yz,
                      T zx, T zy, T zz )
 {
-    setValue( xx, xy, xz, yx, yy, yz, zx, zy, zz );
+    setValue( xx, xy, xz, 
+              yx, yy, yz, 
+              zx, zy, zz );
 }
 
 
@@ -48,9 +50,7 @@ template <typename T>
 __HOSTDEVICE__
 Matrix3<T>::Matrix3( Matrix3<T> const& mat )
 {
-  for ( int i = 0; i < 3; ++i )
-    for ( int j = 0; j < 3; ++j )
-      m_comp[i][j] = mat.m_comp[i][j];
+    setValue( mat.getBuffer() );
 }
 
 
@@ -67,14 +67,32 @@ Matrix3<T>::~Matrix3()
 
 
 // -----------------------------------------------------------------------------
+/* Gets the pointer to the buffer */
+template <typename T>
+__HOSTDEVICE__
+T const* Matrix3<T>::getBuffer() const
+{
+    return( m_comp );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Sets the matrix to a 1D array of 9 values as input
 template <typename T>
 __HOSTDEVICE__
-void Matrix3<T>::setValue( T const* mat )
+void Matrix3<T>::setValue( T const* buffer )
 {
-    m_comp[X][X] = *mat++; m_comp[X][Y] = *mat++; m_comp[X][Z] = *mat++;
-    m_comp[Y][X] = *mat++; m_comp[Y][Y] = *mat++; m_comp[Y][Z] = *mat++;
-    m_comp[Z][X] = *mat++; m_comp[Z][Y] = *mat++; m_comp[Z][Z] = *mat;
+    m_comp[XX] = buffer[XX];
+    m_comp[XY] = buffer[XY];
+    m_comp[XZ] = buffer[XZ];
+    m_comp[YX] = buffer[YX];
+    m_comp[YY] = buffer[YY];
+    m_comp[YZ] = buffer[YZ];
+    m_comp[ZX] = buffer[ZX];
+    m_comp[ZY] = buffer[ZY];
+    m_comp[ZZ] = buffer[ZZ];
 }
 
 
@@ -88,9 +106,9 @@ void Matrix3<T>::setValue( T xx, T xy, T xz,
                            T yx, T yy, T yz,
                            T zx, T zy, T zz )
 {
-    m_comp[X][X] = xx; m_comp[X][Y] = xy; m_comp[X][Z] = xz;
-    m_comp[Y][X] = yx; m_comp[Y][Y] = yy; m_comp[Y][Z] = yz;
-    m_comp[Z][X] = zx; m_comp[Z][Y] = zy; m_comp[Z][Z] = zz;
+    m_comp[XX] = xx; m_comp[XY] = xy; m_comp[XZ] = xz;
+    m_comp[YX] = yx; m_comp[YY] = yy; m_comp[YZ] = yz;
+    m_comp[ZX] = zx; m_comp[ZY] = zy; m_comp[ZZ] = zz;
 }
 
 
@@ -103,9 +121,9 @@ __HOSTDEVICE__
 Matrix3<T> Matrix3<T>::absolute() const
 {
     return ( Matrix3<T>(
-        fabs( m_comp[X][X] ), fabs( m_comp[X][Y] ), fabs( m_comp[X][Z] ),
-        fabs( m_comp[Y][X] ), fabs( m_comp[Y][Y] ), fabs( m_comp[Y][Z] ),
-        fabs( m_comp[Z][X] ), fabs( m_comp[Z][Y] ), fabs( m_comp[Z][Z] ) ) );
+        fabs( m_comp[XX] ), fabs( m_comp[XY] ), fabs( m_comp[XZ] ),
+        fabs( m_comp[YX] ), fabs( m_comp[YY] ), fabs( m_comp[YZ] ),
+        fabs( m_comp[ZX] ), fabs( m_comp[ZY] ), fabs( m_comp[ZZ] ) ) );
 }
 
 
@@ -118,10 +136,9 @@ __HOSTDEVICE__
 T Matrix3<T>::determinant() const
 {
     return ( 
-    m_comp[X][X] * ( m_comp[Y][Y] * m_comp[Z][Z] - m_comp[Y][Z] * m_comp[Z][Y] )
-  - m_comp[X][Y] * ( m_comp[Y][X] * m_comp[Z][Z] - m_comp[Y][Z] * m_comp[Z][X] )
-  + m_comp[X][Z] * ( m_comp[Y][X] * m_comp[Z][Y] - m_comp[Y][Y] * m_comp[Z][X] )
-    );
+        m_comp[XX] * ( m_comp[YY] * m_comp[ZZ] - m_comp[YZ] * m_comp[ZY] ) +
+        m_comp[XY] * ( m_comp[YZ] * m_comp[ZX] - m_comp[YX] * m_comp[ZZ] ) +
+        m_comp[XZ] * ( m_comp[YX] * m_comp[ZY] - m_comp[YY] * m_comp[ZX] ) );
 }
 
 
@@ -133,23 +150,24 @@ template <typename T>
 __HOSTDEVICE__
 Matrix3<T> Matrix3<T>::inverse() const
 {
-    Vector3<T> co( m_comp[Y][Y] * m_comp[Z][Z] - m_comp[Y][Z] * m_comp[Z][Y],
-                   m_comp[Y][Z] * m_comp[Z][X] - m_comp[Y][X] * m_comp[Z][Z],
-                   m_comp[Y][X] * m_comp[Z][Y] - m_comp[Y][Y] * m_comp[Z][X] );
-    T d = (*this)[X] * co;
-    if ( fabs( d ) < HIGHEPS<T> )
+    T __RESTRICT__ out[9];
+    out[XX] = ( m_comp[YY] * m_comp[ZZ] - m_comp[YZ] * m_comp[ZY] );
+    out[YX] = ( m_comp[YZ] * m_comp[ZX] - m_comp[YX] * m_comp[ZZ] );
+    out[ZX] = ( m_comp[YX] * m_comp[ZY] - m_comp[YY] * m_comp[ZX] );
+    T det = m_comp[XX] * out[XX] + m_comp[XY] * out[YX] + m_comp[XZ] * out[ZX];
+    if ( fabs( det ) < HIGHEPS<T> )
         printf( "Matrix is not inversible!\n" );
-    T s = T( 1 ) / d;
-    return ( Matrix3<T>( 
-    co[X] * s,
-    ( m_comp[X][Z] * m_comp[Z][Y] - m_comp[X][Y] * m_comp[Z][Z] ) * s,
-    ( m_comp[X][Y] * m_comp[Y][Z] - m_comp[X][Z] * m_comp[Y][Y] ) * s,
-    co[Y] * s,
-    ( m_comp[X][X] * m_comp[Z][Z] - m_comp[X][Z] * m_comp[Z][X] ) * s,
-    ( m_comp[X][Z] * m_comp[Y][X] - m_comp[X][X] * m_comp[Y][Z] ) * s,
-    co[Z] * s,
-    ( m_comp[X][Y] * m_comp[Z][X] - m_comp[X][X] * m_comp[Z][Y] ) * s,
-    ( m_comp[X][X] * m_comp[Y][Y] - m_comp[X][Y] * m_comp[Y][X] ) * s ) );
+    T s = T( 1 ) / det;
+    out[ZZ] = s * ( out[XX] );
+    out[XY] = s * ( m_comp[XZ] * m_comp[ZY] - m_comp[XY] * m_comp[ZZ] );
+    out[XZ] = s * ( m_comp[XY] * m_comp[YZ] - m_comp[XZ] * m_comp[YY] );
+    out[YX] = s * ( out[XZ] );
+    out[YY] = s * ( m_comp[XX] * m_comp[ZZ] - m_comp[XZ] * m_comp[ZX] );
+    out[YZ] = s * ( m_comp[XZ] * m_comp[YY] - m_comp[XX] * m_comp[YZ] );
+    out[ZX] = s * ( out[ZX] );
+    out[ZY] = s * ( m_comp[XY] * m_comp[ZX] - m_comp[XX] * m_comp[ZY] );
+    out[ZZ] = s * ( m_comp[XX] * m_comp[YY] - m_comp[XY] * m_comp[YX] );
+    return ( Matrix3<T>( out ) );
 }
 
 
@@ -161,9 +179,9 @@ template <typename T>
 __HOSTDEVICE__
 Matrix3<T> Matrix3<T>::transpose() const
 {
-    return ( Matrix3<T>( m_comp[X][X], m_comp[Y][X], m_comp[Z][X],
-                         m_comp[X][Y], m_comp[Y][Y], m_comp[Z][Y],
-                         m_comp[X][Z], m_comp[Y][Z], m_comp[Z][Z] ) );
+    return ( Matrix3<T>( m_comp[XX], m_comp[YX], m_comp[ZX],
+                         m_comp[XY], m_comp[YY], m_comp[ZY],
+                         m_comp[XZ], m_comp[YZ], m_comp[ZZ] ) );
 }
 
 
@@ -175,10 +193,10 @@ template <typename T>
 __HOSTDEVICE__
 Matrix3<T>& Matrix3<T>::operator += ( Matrix3<T> const& m )
 {
-    setValue(
-        m_comp[X][X] + m[X][X], m_comp[X][Y] + m[X][Y], m_comp[X][Z] + m[X][Z],
-        m_comp[Y][X] + m[Y][X], m_comp[Y][Y] + m[Y][Y], m_comp[Y][Z] + m[Y][Z],
-        m_comp[Z][X] + m[Z][X], m_comp[Z][Y] + m[Z][Y], m_comp[Z][Z] + m[Z][Z]);
+    T const* b = m.getBuffer();
+    setValue( m_comp[XX] + b[XX], m_comp[XY] + b[XY], m_comp[XZ] + b[XZ],
+              m_comp[YX] + b[YX], m_comp[YY] + b[YY], m_comp[YZ] + b[YZ],
+              m_comp[ZX] + b[ZX], m_comp[ZY] + b[ZY], m_comp[ZZ] + b[ZZ] );
     return ( *this );
 }
 
@@ -191,10 +209,10 @@ template <typename T>
 __HOSTDEVICE__
 Matrix3<T>& Matrix3<T>::operator -= ( Matrix3<T> const& m )
 {
-    setValue(
-        m_comp[X][X] - m[X][X], m_comp[X][Y] - m[X][Y], m_comp[X][Z] - m[X][Z],
-        m_comp[Y][X] - m[Y][X], m_comp[Y][Y] - m[Y][Y], m_comp[Y][Z] - m[Y][Z],
-        m_comp[Z][X] - m[Z][X], m_comp[Z][Y] - m[Z][Y], m_comp[Z][Z] - m[Z][Z]);
+    T const* b = m.getBuffer();
+    setValue( m_comp[XX] - b[XX], m_comp[XY] - b[XY], m_comp[XZ] - b[XZ],
+              m_comp[YX] - b[YX], m_comp[YY] - b[YY], m_comp[YZ] - b[YZ],
+              m_comp[ZX] - b[ZX], m_comp[ZY] - b[ZY], m_comp[ZZ] - b[ZZ] );
     return ( *this );
 }
 
@@ -207,10 +225,9 @@ template <typename T>
 __HOSTDEVICE__
 Matrix3<T>& Matrix3<T>::operator *= ( T d )
 {
-    setValue(
-        d * m_comp[X][X], d * m_comp[X][Y], d * m_comp[X][Z],
-        d * m_comp[Y][X], d * m_comp[Y][Y], d * m_comp[Y][Z],
-        d * m_comp[Z][X], d * m_comp[Z][Y], d * m_comp[Z][Z] );
+    setValue( d * m_comp[XX], d * m_comp[XY], d * m_comp[XZ],
+              d * m_comp[YX], d * m_comp[YY], d * m_comp[YZ],
+              d * m_comp[ZX], d * m_comp[ZY], d * m_comp[ZZ] );
     return ( *this );
 }
 
@@ -223,16 +240,16 @@ template <typename T>
 __HOSTDEVICE__
 Matrix3<T>& Matrix3<T>::operator *= ( Matrix3<T> const& m )
 {
-    setValue(
-    m_comp[X][X] * m[X][X] + m_comp[X][Y] * m[Y][X] + m_comp[X][Z] * m[Z][X],
-    m_comp[X][X] * m[X][Y] + m_comp[X][Y] * m[Y][Y] + m_comp[X][Z] * m[Z][Y],
-    m_comp[X][X] * m[X][Z] + m_comp[X][Y] * m[Y][Z] + m_comp[X][Z] * m[Z][Z],
-    m_comp[Y][X] * m[X][X] + m_comp[Y][Y] * m[Y][X] + m_comp[Y][Z] * m[Z][X],
-    m_comp[Y][X] * m[X][Y] + m_comp[Y][Y] * m[Y][Y] + m_comp[Y][Z] * m[Z][Y],
-    m_comp[Y][X] * m[X][Z] + m_comp[Y][Y] * m[Y][Z] + m_comp[Y][Z] * m[Z][Z],
-    m_comp[Z][X] * m[X][X] + m_comp[Z][Y] * m[Y][X] + m_comp[Z][Z] * m[Z][X],
-    m_comp[Z][X] * m[X][Y] + m_comp[Z][Y] * m[Y][Y] + m_comp[Z][Z] * m[Z][Y],
-    m_comp[Z][X] * m[X][Z] + m_comp[Z][Y] * m[Y][Z] + m_comp[Z][Z] * m[Z][Z] );
+    T const* b = m.getBuffer();
+    setValue( m_comp[XX] * b[XX] + m_comp[XY] * b[YX] + m_comp[XZ] * b[ZX],
+              m_comp[XX] * b[XY] + m_comp[XY] * b[YY] + m_comp[XZ] * b[ZY],
+              m_comp[XX] * b[XZ] + m_comp[XY] * b[YZ] + m_comp[XZ] * b[ZZ],
+              m_comp[YX] * b[XX] + m_comp[YY] * b[YX] + m_comp[YZ] * b[ZX],
+              m_comp[YX] * b[XY] + m_comp[YY] * b[YY] + m_comp[YZ] * b[ZY],
+              m_comp[YX] * b[XZ] + m_comp[YY] * b[YZ] + m_comp[YZ] * b[ZZ],
+              m_comp[ZX] * b[XX] + m_comp[ZY] * b[YX] + m_comp[ZZ] * b[ZX],
+              m_comp[ZX] * b[XY] + m_comp[ZY] * b[YY] + m_comp[ZZ] * b[ZY],
+              m_comp[ZX] * b[XZ] + m_comp[ZY] * b[YZ] + m_comp[ZZ] * b[ZZ] );
     return ( *this );
 }
 
@@ -245,7 +262,7 @@ template <typename T>
 __HOSTDEVICE__
 Vector3<T>& Matrix3<T>::operator [] ( unsigned int i ) const
 {
-    return ( *( Vector3<T>* )m_comp[i] );
+    return ( *( Vector3<T>* )( m_comp + 3 * i ) );
 }
 
 
@@ -258,11 +275,7 @@ __HOSTDEVICE__
 Matrix3<T>& Matrix3<T>::operator = ( Matrix3<T> const& m )
 {
     if ( &m != this )
-    {
-        for ( int i = 0; i < 3; ++i )
-            for ( int j = 0; j < 3; ++j )
-                m_comp[i][j] = m.m_comp[i][j];
-    }
+        setValue( m.getBuffer() );
     return ( *this );
 }
 
@@ -275,11 +288,10 @@ template <typename T>
 __HOSTDEVICE__ 
 Matrix3<T>& Matrix3<T>::operator - ()
 {
-  setValue(
-        - m_comp[X][X], - m_comp[X][Y], - m_comp[X][Z],
-        - m_comp[Y][X], - m_comp[Y][Y], - m_comp[Y][Z],
-        - m_comp[Z][X], - m_comp[Z][Y], - m_comp[Z][Z] );
-  return ( *this );
+    setValue( - m_comp[XX], - m_comp[XY], - m_comp[XZ],
+              - m_comp[YX], - m_comp[YY], - m_comp[YZ],
+              - m_comp[ZX], - m_comp[ZY], - m_comp[ZZ] );
+    return ( *this );
 }
 
 

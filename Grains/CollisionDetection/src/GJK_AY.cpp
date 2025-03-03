@@ -469,16 +469,18 @@ T computeClosestPoints_GJK_AY( Convex<T> const& a,
     // bool acceleration = GrainsExec::m_colDetAcceleration;   // isAcceleration?
     // T momentum = T( 0 ), oneMinusMomentum = T( 1 );         // in case we use acceleration
 
+	// compute b2a transformation and store in register
+	Transform3<T> b2a( a2w, b2w );
+
     // Initializing vectors
-    Vector3<T> v( a2w( a.support( zeroVector3T ) ) - 
-                  b2w( b.support( zeroVector3T ) ) );
-    Vector3<T> w( v );
+    Vector3<T> v( a.support( zeroVector3T ) - 
+                  b2a( b.support( zeroVector3T ) ) );
+    Vector3<T> w;
     // Vector3<T> d( v );
-    T dist = norm( v );
+    T dist = v.norm();
 
     while ( bits < 15 && dist > HIGHEPS<T> && numIterations < 1000 )
     {
-        ++numIterations;
         // Updating the bits, ...
         for ( unsigned int new_index = 0; new_index < 4; ++new_index )
         {
@@ -494,9 +496,9 @@ T computeClosestPoints_GJK_AY( Convex<T> const& a,
         // The number 8 is hard-coded. Emprically, it shows the best convergence
         // for superquadrics. For the rest of shapes, we really do not need to 
         // use Nesterov as the improvemenet is marginal.
-        p[last] = a.support( ( -v ) * a2w.getBasis() );
-        q[last] = b.support( (  v ) * b2w.getBasis() );
-        w = a2w( p[last] ) - b2w( q[last] );
+        p[last] = a.support( ( -v ) );
+        q[last] = b.support( (  v ) * b2a.getBasis() );
+        w = p[last] - b2a( q[last] );
         
         // termination criteria -- optimiality gap
         mu = dist - v * w / dist;
@@ -509,8 +511,9 @@ T computeClosestPoints_GJK_AY( Convex<T> const& a,
         // if not terminated, get ready for the next iteration
         y[last] = w;
         bits |= ( 1 << last );
+		++numIterations;
 		sv_subalgorithm( y, bits, lambdas, v );
-        dist = norm( v );
+        dist = v.norm();
     }
     // compute witness points
     computePoints( bits, p, q, lambdas, pa, pb );

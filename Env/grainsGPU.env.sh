@@ -59,14 +59,17 @@ export GRAINS_CPP_LINKER_FLAGS="${GRAINS_CPP_COMPILER_FLAGS} -shared"
 ###########
 export GRAINS_GPU_COMPILER="${GRAINS_GPU_COMPILER_BINDIR}/${GRAINS_GPU_COMPILER}"
 export GRAINS_GPU_LINKER="${GRAINS_GPU_COMPILER_BINDIR}/${GRAINS_GPU_COMPILER}"
-export GRAINS_GPU_COMPILER_FLAGS="-t=8 -x cu -m64 -O3 -dlto -dc \
+export GRAINS_GPU_COMPILER_FLAGS="-t=8 -x cu -m64 \
+    -O3 -dlto -dc \
     -std=c++20 -arch=sm_75 -lineinfo \
     -cudart static -cudadevrt static \
-    -maxrregcount=128 -use_fast_math -extra-device-vectorization -restrict \
+    -use_fast_math -extra-device-vectorization -restrict \
     -Xcompiler "-rdynamic,-fPIC,-fopenmp" \
-    -pg -g -diag-suppress 554"
-export GRAINS_GPU_LINKER_FLAGS="-O3 -dlto -arch=sm_75 -lineinfo -lcudart \
-    -maxrregcount=128 -use_fast_math -extra-device-vectorization -restrict \
+    -pg -g \
+    -diag-suppress 554"
+export GRAINS_GPU_LINKER_FLAGS="-O3 -dlto \
+    -arch=sm_75 -lineinfo -lcudart \
+    -use_fast_math -extra-device-vectorization -restrict \
     -lcudart -lcudadevrt \
     -lgomp \
     -pg -g"

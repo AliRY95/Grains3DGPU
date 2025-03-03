@@ -34,7 +34,7 @@
     #define __DEVICE__        __device__
     #define __HOSTDEVICE__    __host__ __device__
     #define __GLOBAL__        __global__
-    #define INLINE            __forceinline__
+    #define INLINE            __inline__
     #define __RESTRICT__      __restrict__
 #else
     #define __HOST__          
@@ -82,6 +82,21 @@ enum Direction
     Z, // z direction
     W, // scalar component of quaternions
     NONE // no direction
+};
+
+
+/** @brief Matrix dimensions */
+enum MatDirection
+{
+    XX,
+    XY,
+    XZ,
+    YX,
+    YY,
+    YZ,
+    ZX,
+    ZY,
+    ZZ
 };
 //@}
 

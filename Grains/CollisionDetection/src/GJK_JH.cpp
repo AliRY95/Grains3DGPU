@@ -355,6 +355,7 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
                                Vector3<T>& pb, 
                                int& nbIter )
 {
+    // GJK variables
     unsigned int bits = 0;           // identifies current simplex
     unsigned int last = 0;           // identifies last found support point
     unsigned int last_bit = 0;       // last_bit = 1<<last
@@ -362,20 +363,35 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
     Vector3<T> p[4];                 // support points of A in local
     Vector3<T> q[4];                 // support points of B in local
     Vector3<T> y[4];                 // support points of A-B in world
+    T mu = 0.;                       // optimality gap
+    int numIterations = 0;           // No. iterations
     T det[16][4] = { T( 0 ) };       // cached sub-determinants
     T dp[4][4] = { T( 0 ) };
 
+    // Misc variables, e.g. tolerance, ...
+    // T relError = GrainsExec::m_colDetTolerance;             // rel error for opt gap
+    // T absError = T( 1.e-4 ) * relError;                     // abs error for optimality gap
+    // relative tolerance
+    constexpr T relError = LOWEPS<T>;
+    // absolute tolerance
+    constexpr T absError = 1.e-4 * relError;
+    // bool acceleration = GrainsExec::m_colDetAcceleration;   // isAcceleration?
+    // T momentum = T( 0 ), oneMinusMomentum = T( 1 );         // in case we use acceleration
+
+    // compute b2a transformation and store in register
+	Transform3<T> b2a( a2w, b2w );
+
+    // Initializing vectors
     // Vector3<T> v = a2w( a.support( zeroVector3T ) ) - 
     //                b2w( b.support( zeroVector3T ) );
-    Vector3<T> v( a2w( zeroVector3T ) - 
-                  b2w( zeroVector3T ) );
+    Vector3<T> v( a.support( zeroVector3T ) - 
+                  b2a( b.support( zeroVector3T ) ) );
     Vector3<T> w;
     T dist = v.norm();
-    T mu = 0;
-    unsigned int num_iterations = 0;
 
-    while ( bits < 15 && dist > HIGHEPS<T> && num_iterations < 1000 )
+    while ( bits < 15 && dist > HIGHEPS<T> && numIterations < 1000 )
     {
+        // Updating the bits, ...
         last = 0;
         last_bit = 1;
         while (bits & last_bit) 
@@ -383,26 +399,35 @@ T computeClosestPoints_GJK_JH( Convex<T> const& a,
             ++last;
             last_bit <<= 1;
         }
-        p[last] = a.support( ( -v ) * a2w.getBasis() );
-        q[last] = b.support( v * b2w.getBasis() );
-        w = a2w( p[last] ) - b2w( q[last] );
+
+        // p[last] = a.support( ( -v ) * a2w.getBasis() );
+        // q[last] = b.support( v * b2w.getBasis() );
+        // w = a2w( p[last] ) - b2w( q[last] );
+        p[last] = a.support( ( -v ) );
+        q[last] = b.support( (  v ) * b2a.getBasis() );
+        w = p[last] - b2a( q[last] );
+
+        // termination criteria -- optimiality gap
         set_max( mu, v * w / dist );
-        if ( dist - mu <= dist * LOWEPS<T> )
+        if ( dist - mu <= dist * relError || mu < absError )
             break;
+        // termination criteria -- degenerate case
         if ( degenerate( all_bits, y, w ) )
             break;
+        
+        // if not terminated, get ready for the next iteration
         y[last] = w;
         all_bits = bits | last_bit;
-        ++num_iterations;
+        ++numIterations;
         if ( !closest( bits, last, last_bit, all_bits, y, dp, det, v ) )
             break;
         dist = v.norm();
     }
     computePoints( bits, det, p, q, pa, pb );
-    if ( num_iterations > 1000 ) 
+    if ( numIterations > 1000 ) 
         catch_me();
     else 
-        nbIter = num_iterations;
+        nbIter = numIterations;
     return ( dist );
 }
 

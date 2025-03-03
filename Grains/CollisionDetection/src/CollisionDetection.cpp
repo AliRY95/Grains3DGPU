@@ -352,8 +352,8 @@ T distanceRigidBodies( RigidBody<T, U> const& rbA,
     Vector3<T> ptA, ptB;
     int nbIterGJK = 0;
     T distance = 0;
-    if ( method == 1 )
-    {
+    // if ( method == 1 )
+    // {
         distance = computeClosestPoints_GJK_JH( *convexA, 
                                                 *convexB,
                                                 a2w,
@@ -361,27 +361,27 @@ T distanceRigidBodies( RigidBody<T, U> const& rbA,
                                                 ptA,
                                                 ptB,
                                                 nbIterGJK );
-    }
-    else if ( method == 2 )
-    {
-        distance = computeClosestPoints_GJK_SV( *convexA, 
-                                                *convexB,
-                                                a2w,
-                                                b2w,
-                                                ptA,
-                                                ptB,
-                                                nbIterGJK );
-    }
-    else if ( method == 3 )
-    {
-        distance = computeClosestPoints_GJK_AY( *convexA, 
-                                                *convexB,
-                                                a2w,
-                                                b2w,
-                                                ptA,
-                                                ptB,
-                                                nbIterGJK );
-    }
+    // }
+    // else if ( method == 2 )
+    // {
+        // distance = computeClosestPoints_GJK_SV( *convexA, 
+        //                                         *convexB,
+        //                                         a2w,
+        //                                         b2w,
+        //                                         ptA,
+        //                                         ptB,
+        //                                         nbIterGJK );
+    // }
+    // else if ( method == 3 )
+    // {
+        // distance = computeClosestPoints_GJK_AY( *convexA, 
+        //                                         *convexB,
+        //                                         a2w,
+        //                                         b2w,
+        //                                         ptA,
+        //                                         ptB,
+        //                                         nbIterGJK );
+    // }
     return ( distance );
 }
 

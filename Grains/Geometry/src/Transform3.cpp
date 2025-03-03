@@ -37,9 +37,23 @@ Transform3<T>::Transform3( T x, T y, T z )
 // rotation matrix coefficients following by the origin coordinates
 template <typename T>
 __HOSTDEVICE__
-Transform3<T>::Transform3( T const t[12] ) 
+Transform3<T>::Transform3( T const* buffer ) 
 { 
-    setValue( t );    
+    setValue( buffer );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Constructor with a two transformations such that 'this = b2w o inv(a2w) = b2a'
+template <typename T>
+__HOSTDEVICE__
+Transform3<T>::Transform3( Transform3<T> const& a2w,
+                           Transform3<T> const& b2w )
+: Transform3<T>( b2w )
+{
+    this->relativeToTransform( a2w );
 }
 
 
@@ -161,12 +175,10 @@ Vector3<T> Transform3<T>::getOrigin() const
 // Sets the transformation with an 1D array of 12 values as inputs 
 template <typename T>
 __HOSTDEVICE__
-void Transform3<T>::setValue( T const t[12] ) 
+void Transform3<T>::setValue( T const* buffer ) 
 {
-    m_basis.setValue( t[0], t[1], t[2], 
-                      t[3], t[4], t[5], 
-                      t[6], t[7], t[8] );
-    m_origin.setValue( t[9], t[10], t[11] );
+    m_basis.setValue( buffer );
+    m_origin.setValue( buffer + 9 );
 }
 
 
@@ -193,15 +205,15 @@ void Transform3<T>::setBasis( T aX,
                               T aY,
                               T aZ )
 {
-    m_basis = Matrix3<T>( cos(aZ)*cos(aY),
-                          cos(aZ)*sin(aY)*sin(aX) - sin(aZ)*cos(aX),
-                          cos(aZ)*sin(aY)*cos(aX) + sin(aZ)*sin(aX),
-                          sin(aZ)*cos(aY),
-                          sin(aZ)*sin(aY)*sin(aX) + cos(aZ)*cos(aX),
-                          sin(aZ)*sin(aY)*cos(aX) - cos(aZ)*sin(aX),
+    m_basis = Matrix3<T>( cos(aZ) * cos(aY),
+                          cos(aZ) * sin(aY) * sin(aX) - sin(aZ) * cos(aX),
+                          cos(aZ) * sin(aY) * cos(aX) + sin(aZ) * sin(aX),
+                          sin(aZ) * cos(aY),
+                          sin(aZ) * sin(aY) * sin(aX) + cos(aZ) * cos(aX),
+                          sin(aZ) * sin(aY) * cos(aX) - cos(aZ) * sin(aX),
                           -sin(aY),
-                          cos(aY)*sin(aX),
-                          cos(aY)*cos(aX) );
+                          cos(aY) * sin(aX),
+                          cos(aY) * cos(aX) );
 }
 
 
@@ -238,12 +250,14 @@ void Transform3<T>::setIdentity()
 // Set the transformation to the inverse of another transformation t
 template <typename T>
 __HOSTDEVICE__
-void Transform3<T>::setToInverseTransform( Transform3<T> const& t ) 
+void Transform3<T>::setToInverseTransform( Transform3<T> const& t,
+                                           bool isRotation ) 
 {
-    m_basis = t.m_basis.inverse();
-    m_origin.setValue( - m_basis[X] * t.m_origin, 
-                       - m_basis[Y] * t.m_origin, 
-                       - m_basis[Z] * t.m_origin );
+    if ( isRotation )
+        m_basis = t.m_basis.transpose();
+    else
+        m_basis = t.m_basis.inverse();
+    m_origin.setValue( ( - m_basis * t.m_origin ).getBuffer() );
 }
 
 
@@ -270,16 +284,16 @@ template <typename T>
 __HOSTDEVICE__
 void Transform3<T>::composeWithScaling( Vector3<T> const& v )
 {
-    T x = v[X], y = v[Y], z = v[Z];
-    m_basis[X][X] *= x;
-    m_basis[X][Y] *= y;
-    m_basis[X][Z] *= z;
-    m_basis[Y][X] *= x;
-    m_basis[Y][Y] *= y;
-    m_basis[Y][Z] *= z;
-    m_basis[Z][X] *= x;
-    m_basis[Z][Y] *= y;
-    m_basis[Z][Z] *= z;
+    T const* b = v.getBuffer();
+    m_basis[XX] *= b[0];
+    m_basis[XY] *= b[1];
+    m_basis[XZ] *= b[2];
+    m_basis[YX] *= b[0];
+    m_basis[YY] *= b[1];
+    m_basis[YZ] *= b[2];
+    m_basis[ZX] *= b[0];
+    m_basis[ZY] *= b[1];
+    m_basis[ZZ] *= b[2];
 } 
 
 
@@ -307,7 +321,7 @@ template <typename T>
 __HOSTDEVICE__
 void Transform3<T>::composeLeftByRotation( Quaternion<T> const& q ) 
 {
-    Matrix3<T> const& mm = m_basis; 
+    T const* b = m_basis.getBuffer(); 
     T qx = q[X], qy = q[Y], qz = q[Z], qw = q[W];
     T px, py, pz, pw;
   
@@ -315,14 +329,30 @@ void Transform3<T>::composeLeftByRotation( Quaternion<T> const& q )
     // M_rot(q) is the rotation matrix corresponding to the quaternion q
     for ( int i = 0; i < 3; ++i )
     {
-        px = qy * mm[Z][i] - qz * mm[Y][i] + qw * mm[X][i];
-        py = qz * mm[X][i] - qx * mm[Z][i] + qw * mm[Y][i];    
-        pz = qx * mm[Y][i] - qy * mm[X][i] + qw * mm[Z][i]; 
-        pw = - qx * mm[X][i] - qy * mm[Y][i] - qz * mm[Z][i];
-        m_basis[X][i] = qy * pz - qz * py - pw * qx + qw * px;
-        m_basis[Y][i] = qz * px - qx * pz - pw * qy + qw * py;          
-        m_basis[Z][i] = qx * py - qy * px - pw * qz + qw * pz;    
+        px = qy * b[6 + i] - qz * b[3 + i] + qw * b[i];
+        py = qz * b[i] - qx * b[6 + i] + qw * b[3 + i];    
+        pz = qx * b[3 + i] - qy * b[i] + qw * b[6 + i]; 
+        pw = - qx * b[i] - qy * b[3 + i] - qz * b[6 + i];
+        m_basis[i] = qy * pz - qz * py - pw * qx + qw * px;
+        m_basis[3 + i] = qz * px - qx * pz - pw * qy + qw * py;          
+        m_basis[6 + i] = qx * py - qy * px - pw * qz + qw * pz;    
     }
+    // Matrix3<T> const& mm = m_basis; 
+    // T qx = q[X], qy = q[Y], qz = q[Z], qw = q[W];
+    // T px, py, pz, pw;
+  
+    // // We compute below the matrix product M_rot(q).basis where
+    // // M_rot(q) is the rotation matrix corresponding to the quaternion q
+    // for ( int i = 0; i < 3; ++i )
+    // {
+    //     px = qy * mm[Z][i] - qz * mm[Y][i] + qw * mm[X][i];
+    //     py = qz * mm[X][i] - qx * mm[Z][i] + qw * mm[Y][i];    
+    //     pz = qx * mm[Y][i] - qy * mm[X][i] + qw * mm[Z][i]; 
+    //     pw = - qx * mm[X][i] - qy * mm[Y][i] - qz * mm[Z][i];
+    //     m_basis[X][i] = qy * pz - qz * py - pw * qx + qw * px;
+    //     m_basis[Y][i] = qz * px - qx * pz - pw * qy + qw * py;          
+    //     m_basis[Z][i] = qx * py - qy * px - pw * qz + qw * pz;    
+    // }
 }
 
 
@@ -403,9 +433,7 @@ template <typename T>
 __HOSTDEVICE__
 Vector3<T> Transform3<T>::operator () ( Vector3<T> const& v ) const 
 {
-    return ( Vector3<T>( m_basis[X] * v + m_origin[X], 
-                         m_basis[Y] * v + m_origin[Y], 
-                         m_basis[Z] * v + m_origin[Z] ) );
+    return ( Vector3<T>( m_basis * v + m_origin ) );
 }
 
 
@@ -440,7 +468,7 @@ Transform3<double>::operator Transform3<float> () const
                           (float) m[Y][X], (float) m[Y][Y], (float) m[Y][Z],
                           (float) m[Z][X], (float) m[Z][Y], (float) m[Z][Z],
                           (float) v[X]   , (float) v[Y]   , (float) v[X]    };
-    return ( Transform3<float> ( t ) );
+    return ( Transform3<float>( t ) );
 }
 
 

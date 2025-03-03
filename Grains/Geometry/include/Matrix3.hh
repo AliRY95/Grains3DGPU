@@ -18,7 +18,7 @@ class Matrix3
     protected:
         /**@name Parameters */
         //@{
-        T m_comp[3][3]; /**< 3x3 array containing the matrix components */
+        T m_comp[9]; /**< 3x3 array containing the matrix components */
         //@}
 
     public:
@@ -30,10 +30,11 @@ class Matrix3
         Matrix3();
 
         /** @brief Constructor with a 1D array of values as input
-        @param mat the 1D array of values containing the matrix components ordered as
-        0=Mxx, 1=Mxy, 2=Mxz, 3=Myx, 4=Myy, 5=Myz, 6=Mzx, 7=Mzy, 8=Mzz */
+        @param buffer the 1D array of values containing the matrix components 
+        ordered as 0=Mxx, 1=Mxy, 2=Mxz, 3=Myx, 4=Myy, 5=Myz, 6=Mzx, 7=Mzy, 8=Mzz 
+        */
         __HOSTDEVICE__
-        Matrix3( T const* mat );
+        Matrix3( T const* buffer );
 
         /** @brief Constructor with 9 components as inputs
         @param xx (1,1) coefficient
@@ -60,14 +61,22 @@ class Matrix3
         ~Matrix3();
         //@}
 
+        
+        /** @name Get methods */
+        //@{
+        /** @brief Gets the pointer to the buffer */
+        __HOSTDEVICE__
+        T const* getBuffer() const;
+        //@}
+
 
         /** @name Set methods */
         //@{
         /** @brief Sets the matrix to a 1D array of 9 values as input
-        @param mat the 1D array of values ordered as : 0=Mxx, 1=Mxy, 2=Mxz, 3=Myx,
-        4=Myy, 5=Myz, 6=Mzx, 7=Mzy, 8=Mzz */
+        @param buffer the 1D array of values ordered as: 
+        0=Mxx, 1=Mxy, 2=Mxz, 3=Myx, 4=Myy, 5=Myz, 6=Mzx, 7=Mzy, 8=Mzz */
         __HOSTDEVICE__ 
-        void setValue( T const* mat );
+        void setValue( T const* buffer );
 
         /** @brief Sets the matrix with all 9 components as inputs
         @param xx (1,1) coefficient
