@@ -94,7 +94,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // if the simulation is periodic
     DOMNode* nPeriodicity = ReaderXML::getNode( root, "Periodicity" );
-    if ( domain_periodicity )
+    if ( nPeriodicity )
     {
         int PX = ReaderXML::getNodeAttr_Int( nPeriodicity, "PX" );
         int PY = ReaderXML::getNodeAttr_Int( nPeriodicity, "PY" );

@@ -138,7 +138,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
   
     // Normal dissipative force  
     T avmass = m1 * m2 / ( m1 + m2 );
-    T omega0 = sqrt( k_n / avmass );
+    T omega0 = sqrt( m_kn / avmass );
     if ( avmass == T( 0 ) ) 
     {
         avmass = m2 == T( 0 ) ? T( 0.5 ) * m1 : T( 0.5 ) * m2;
