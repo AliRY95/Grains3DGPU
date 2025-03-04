@@ -19,21 +19,21 @@ __HOST__
 HODCContactForceModel<T>::HODCContactForceModel( DOMNode* root )
 {
     DOMNode* parameter;
-    parameter = ReaderXML::getNode( root, "stiff" );
-    m_stiff = T( ReaderXML::getNodeValue_Double( parameter ) );
-
-    parameter = ReaderXML::getNode( root, "muc" );
-    m_muec = T( ReaderXML::getNodeValue_Double( parameter ) ); 
+    parameter = ReaderXML::getNode( root, "kn" );
+    m_kn = T( ReaderXML::getNodeValue_Double( parameter ) );
 
     parameter = ReaderXML::getNode( root, "en" );
     m_en = T( ReaderXML::getNodeValue_Double( parameter ) );
     m_muen = log( m_en ) / sqrt( PI<T> * PI<T> + log( m_en ) * log( m_en ) );
+    
+    parameter = ReaderXML::getNode( root, "etat" );
+    m_etat = T( ReaderXML::getNodeValue_Double( parameter ) ); 
+    
+    parameter = ReaderXML::getNode( root, "muc" );
+    m_muc = T( ReaderXML::getNodeValue_Double( parameter ) ); 
 
-    parameter = ReaderXML::getNode( root, "mut" );
-    m_muet = T( ReaderXML::getNodeValue_Double( parameter ) ); 
-
-    parameter = ReaderXML::getNode( root, "kms" );
-    m_kms = T( ReaderXML::getNodeValue_Double( parameter ) ); 
+    parameter = ReaderXML::getNode( root, "kr" );
+    m_kr = T( ReaderXML::getNodeValue_Double( parameter ) ); 
 }
 
 
@@ -43,16 +43,16 @@ HODCContactForceModel<T>::HODCContactForceModel( DOMNode* root )
 // Constructor with five values as contact parameters
 template <typename T>
 __HOSTDEVICE__
-HODCContactForceModel<T>::HODCContactForceModel( T stiff,
+HODCContactForceModel<T>::HODCContactForceModel( T kn,
                                                  T en, 
-                                                 T muet, 
-                                                 T muec, 
-                                                 T kms )
-: m_stiff( stiff )
+                                                 T etat, 
+                                                 T muc, 
+                                                 T kr )
+: m_kn( kn )
 , m_en( en )
-, m_muet( muet )
-, m_muec( muec )
-, m_kms( kms )                                     
+, m_etat( etat )
+, m_muc( muc )
+, m_kr( kr )                                     
 {
     m_muen = log( m_en ) / sqrt( PI<T> * PI<T> + log( m_en ) * log( m_en ) );
 }
@@ -86,17 +86,17 @@ ContactForceModelType HODCContactForceModel<T>::getContactForceModelType() const
 // Gets the parameters of the HODC contact force model
 template <typename T>
 __HOSTDEVICE__
-void HODCContactForceModel<T>::getContactForceModelParameters( T& stiff,
+void HODCContactForceModel<T>::getContactForceModelParameters( T& kn,
                                                                T& en, 
-                                                               T& muet, 
-                                                               T& muec, 
-                                                               T& kms ) const
+                                                               T& etat, 
+                                                               T& muc, 
+                                                               T& kr ) const
 {
-    stiff = m_stiff;
+    kn = m_kn;
     en = m_en;
-    muet = m_muet;
-    muec = m_muec;
-    kms = m_kms;
+    etat = m_etat;
+    muc = m_muc;
+    kr = m_kr;
 }
 
 
@@ -121,7 +121,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
     
     // Normal linear elastic force
     // We do this here as we want to modify the penetration vector later
-    delFN = m_stiff * penetration;
+    delFN = m_kn * penetration;
 
     // Unit normal vector at contact point
     penetration /= norm( penetration );
@@ -138,27 +138,27 @@ void HODCContactForceModel<T>::performForcesCalculus(
   
     // Normal dissipative force  
     T avmass = m1 * m2 / ( m1 + m2 );
-    T omega0 = sqrt( m_stiff / avmass );
+    T omega0 = sqrt( k_n / avmass );
     if ( avmass == T( 0 ) ) 
     {
         avmass = m2 == T( 0 ) ? T( 0.5 ) * m1 : T( 0.5 ) * m2;
-        omega0 = T( 2 ) * sqrt( m_stiff / avmass );
+        omega0 = T( 2 ) * sqrt( m_kn / avmass );
     }
     T muen = - omega0 * m_muen;
     delFN += - T( 2 ) * muen * avmass * v_n;
     T normFN = norm( delFN );
   
     // Tangential dissipative force
-    delFT = ( -m_muet * T( 2 ) * avmass ) * v_t;  
+    delFT = ( -m_etat * T( 2 ) * avmass ) * v_t;  
 
     // Tangential Coulomb saturation
-    T fn = m_muec * normFN;
+    T fn = m_muc * normFN;
     T ft = norm( delFT );
     if ( fn < ft ) 
         delFT = ( -fn ) * tangent;
   
     // Rolling resistance moment
-    if ( m_kms )
+    if ( m_kr )
     {
         // Relative angular velocity at contact point
         Vector3<T> wn = ( relAngVelocity * penetration ) * penetration;
@@ -166,11 +166,11 @@ void HODCContactForceModel<T>::performForcesCalculus(
         T normwt = norm( wt );
 
         // Anti-spinning effect along the normal wn
-        delM = - m_kms * normFN * T( 0.001 ) * wn;
+        delM = - m_kr * normFN * T( 0.001 ) * wn;
         
         // Classical rolling resistance moment
         if ( normwt > EPS<T> )
-            delM -= m_kms * normFN * wt;
+            delM -= m_kr * normFN * wt;
     }
 }
 
@@ -203,7 +203,7 @@ void HODCContactForceModel<T>::computeForces(
 
     Vector3<T> geometricPointOfContact = contactInfos.getContactPoint();
     torce.addForce( delFN + delFT, geometricPointOfContact - trOrigin );
-    if ( m_kms )
+    if ( m_kr )
         torce.addTorque( delM );
 }
 

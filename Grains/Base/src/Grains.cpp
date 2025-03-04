@@ -77,23 +77,37 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // Domain size: origin, max coordinates and periodicity
-    DOMNode* domain = ReaderXML::getNode( root, "LinkedCell" );
+    DOMNode* nDomain = ReaderXML::getNode( root, "LinkedCell" );
     GrainsParameters<T>::m_maxCoordinate.setValue( 
-        T( ReaderXML::getNodeAttr_Double( domain, "MX" ) ),
-        T( ReaderXML::getNodeAttr_Double( domain, "MY" ) ),
-        T( ReaderXML::getNodeAttr_Double( domain, "MZ" ) ) );
+        T( ReaderXML::getNodeAttr_Double( nDomain, "MX" ) ),
+        T( ReaderXML::getNodeAttr_Double( nDomain, "MY" ) ),
+        T( ReaderXML::getNodeAttr_Double( nDomain, "MZ" ) ) );
 
-    DOMNode* domain_origin = ReaderXML::getNode( root, "Origin" );
-    if ( domain_origin )
+    DOMNode* nOrigin = ReaderXML::getNode( root, "Origin" );
+    if ( nOrigin )
         GrainsParameters<T>::m_origin.setValue( 
-            T( ReaderXML::getNodeAttr_Double( domain_origin, "OX" ) ),
-            T( ReaderXML::getNodeAttr_Double( domain_origin, "OY" ) ),
-            T( ReaderXML::getNodeAttr_Double( domain_origin, "OZ" ) ) );
+            T( ReaderXML::getNodeAttr_Double( nOrigin, "OX" ) ),
+            T( ReaderXML::getNodeAttr_Double( nOrigin, "OY" ) ),
+            T( ReaderXML::getNodeAttr_Double( nOrigin, "OZ" ) ) );
     else
         GrainsParameters<T>::m_origin.setValue( T( 0 ), T( 0 ), T( 0 ) );
 
     // if the simulation is periodic
-    GrainsParameters<T>::m_isPeriodic = false;
+    DOMNode* nPeriodicity = ReaderXML::getNode( root, "Periodicity" );
+    if ( domain_periodicity )
+    {
+        int PX = ReaderXML::getNodeAttr_Int( nPeriodicity, "PX" );
+        int PY = ReaderXML::getNodeAttr_Int( nPeriodicity, "PY" );
+        int PZ = ReaderXML::getNodeAttr_Int( nPeriodicity, "PZ" );
+        if ( PX * PY * PZ != 0 )
+        {
+            cout << shiftString0 
+                 << "Periodicity is not implemented!" 
+                 << endl;
+            exit( 1 );
+        }
+        GrainsParameters<T>::m_isPeriodic = false;
+    }
 
 
 

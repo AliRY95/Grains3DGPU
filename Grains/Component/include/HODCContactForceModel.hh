@@ -21,12 +21,12 @@ class HODCContactForceModel : public ContactForceModel<T>
     private:
         /**@name Parameter */
         //@{
-        T m_stiff; /**< Coefficient of elasticity */  
-        T m_en;    /**< Coefficient of restitution */
-        T m_muen;  /**< Coefficient of ??? */
-        T m_muet;  /**< Coefficient of tangential friction */
-        T m_muec;  /**< Coefficient of Coulomb friction */
-        T m_kms;   /**< Coefficient of rolling friction */
+        T m_kn;    /**< Normal stiffness coefficient */  
+        T m_en;    /**< Normal restitution coefficient */
+        T m_muen;  /**< log(m_en) / sqrt( PI * PI + log(m_en) * log(m_en) ) */
+        T m_etat;  /**< Tangential damping coefficient */
+        T m_muc;   /**< Tangential Coulomb friction coefficient */
+        T m_kr;    /**< Rolling resistance coefficient */
         //@}
     
     public:
@@ -42,17 +42,17 @@ class HODCContactForceModel : public ContactForceModel<T>
         HODCContactForceModel( DOMNode* root );
 
         /** @brief Constructor with five values as contact parameters
-        @param stiff coefficient of elasticity
-        @param en coefficient of restitution
-        @param muet coefficient of tangential friction
-        @param muec coefficient of Coulomb friction
-        @param kms coefficient of rolling friction */
+        @param kn normal stiffness coefficient
+        @param en normal restitution coefficient
+        @param etat tangential damping coefficient
+        @param muc tangential Coulomb friction coefficient
+        @param kr rolling resistance coefficient */
         __HOSTDEVICE__
-        HODCContactForceModel( T stiff,
+        HODCContactForceModel( T kn,
                                T en, 
-                               T muet, 
-                               T muec, 
-                               T kms ); 
+                               T etat, 
+                               T muc, 
+                               T kr ); 
 
         /** @brief Destructor */
         __HOSTDEVICE__
@@ -67,17 +67,17 @@ class HODCContactForceModel : public ContactForceModel<T>
         ContactForceModelType getContactForceModelType() const final;
 
         /** @brief Gets the parameters of the HODC contact force model
-        @param stiff coefficient of elasticity
-        @param en coefficient of restitution
-        @param muet coefficient of tangential friction
-        @param muec coefficient of Coulomb friction
-        @param kms coefficient of rolling friction */
+        @param kn normal stiffness coefficient
+        @param en normal restitution coefficient
+        @param etat tangential damping coefficient
+        @param muc tangential Coulomb friction coefficient
+        @param kr rolling resistance coefficient */
         __HOSTDEVICE__
-        void getContactForceModelParameters( T& stiff,
+        void getContactForceModelParameters( T& kn,
                                              T& en, 
-                                             T& muet, 
-                                             T& muec, 
-                                             T& kms ) const;
+                                             T& etat, 
+                                             T& muc, 
+                                             T& kr ) const;
         //@}
 
 
