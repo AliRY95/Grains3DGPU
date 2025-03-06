@@ -120,22 +120,16 @@ template <> constexpr float EPS<float> = float( 1.e-05 );
 /** \brief Low epsilon value */
 template <class T> constexpr T LOWEPS = T( 1.e-05 );
 template <> constexpr float LOWEPS<float> = float( 1.e-03 );
-// /** \brief Function to mimic tab in stderr */
-// constexpr std::string shiftString( int n )
-// {
-//     std::string out = "";
-//     for ( int i = 0; i < n; ++i )
-//         out += " ";
-//     return ( out );
-// }
-#define shiftString0   "" 
-#define shiftString1   " "
-#define shiftString2   "  "
-#define shiftString3   "   "
-#define shiftString6   "      "
-#define shiftString9   "         "
-#define shiftString12  "            "
-#define shiftString15  "               "
+
+
+// #define shiftString0   "" 
+// #define shiftString1   " "
+// #define shiftString2   "  "
+// #define shiftString3   "   "
+// #define shiftString6   "      "
+// #define shiftString9   "         "
+// #define shiftString12  "            "
+// #define shiftString15  "               "
 #define zeroVector3T   Vector3<T>( T( 0 ), T( 0 ), T( 0 ) )
 #define zeroVector3D   Vector3D( 0., 0., 0. )
 #define zeroVector3F   Vector3F( 0.f, 0.f, 0.f )

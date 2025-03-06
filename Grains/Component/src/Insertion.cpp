@@ -1,5 +1,6 @@
 #include <ctime>
 #include "Insertion.hh"
+#include "GrainsMisc.hh"
 
 
 /* ========================================================================== */
@@ -23,30 +24,24 @@ InsertionInfo<T> readDataRand( DOMNode* root )
             rgs = RGS_UDEF;
         else
         {
-            std::cout << "Seed value is not provided. Aborting Grains!" 
-                        << std::endl;
+            GrainsMisc<T>::cout( "Seed value is not provided. Aborting Grains!" );
             exit( 1 );
         }
-        std::cout << shiftString12
-                  << "Random initialization with "
-                  << val
-                  << " seed." 
-                  << std::endl;
+        GrainsMisc<T>::cout( "Random initialization with " +
+                             std::to_string( val ) +
+                             " seed.", 12 );
+                  
     }
     else if ( seedString == "Random" )
     {
         rgs = RGS_RANDOM;
-        std::cout << shiftString12
-                  << "Random initialization with random seed." 
-                  << std::endl;
+        GrainsMisc<T>::cout( "Random initialization with random seed.", 12 );
     }
     // if ( seedString == "Default" )
     else
     {
         rgs = RGS_DEFAULT;
-        std::cout << shiftString12
-                  << "Random initialization with default seed." 
-                  << std::endl;
+        GrainsMisc<T>::cout( "Random initialization with default seed.", 12 );
     }
     // srand
     // srand( static_cast<unsigned>( time( NULL ) ) );
@@ -83,15 +78,11 @@ InsertionInfo<T> readDataFile( DOMNode* root )
     // Check whether the file exists
     if ( file.good() )
     {
-        std::cout << shiftString12
-                  << "File initialization with path "
-                  << fileName
-                  << "." << std::endl;
+        GrainsMisc<T>::cout( "File initialization with path " + fileName + ".", 12 );
     }
     else
     {
-        std::cout << shiftString12
-                  << "File does not exist. Aborting Grains!" << std::endl;
+        GrainsMisc<T>::cout( "File does not exist. Aborting Grains!", 12 );
         exit( 1 );
     }
 
@@ -112,10 +103,8 @@ InsertionInfo<T> readDataCons( DOMNode* root )
     T yVal = T( ReaderXML::getNodeAttr_Double( root, "Y" ) );
     T zVal = T( ReaderXML::getNodeAttr_Double( root, "Z" ) );
     Vector3<T> vec( xVal, yVal, zVal );
-    std::cout << shiftString12
-              << "Constant initialization with ["
-              << vec
-              << "]." << std::endl;
+    GrainsMisc<T>::cout( "Constant initialization with " +
+                         GrainsMisc<T>::Vector3ToString( vec ) + ".", 12 );
     
     return ( vec );
 }
@@ -131,9 +120,7 @@ static INLINE
 InsertionInfo<T> readDataZero( DOMNode* root )
 {
     Vector3<T> vec( T( 0 ), T( 0 ), T( 0 ) );
-    std::cout << shiftString12
-              << "Zero initialization."
-              << std::endl;
+    GrainsMisc<T>::cout( "Zero initialization.", 12 );
     
     return ( vec );
 }
@@ -204,26 +191,18 @@ Insertion<T>::Insertion( DOMNode* dn )
 
 
     DOMNode* nIP = ReaderXML::getNode( dn, "InitialPosition" );
-    std::cout << shiftString9
-              << "Reading PositionInsertion Policy ..." 
-              << std::endl;
+    GrainsMisc<T>::cout( "Reading PositionInsertion Policy ...", 9 );
     read( nIP, m_positionType, m_positionInsertionInfo );
     
-    std::cout << shiftString9 
-              << "Reading OrientationInsertion Policy ..." 
-              << std::endl;
+    GrainsMisc<T>::cout( "Reading OrientationInsertion Policy ...", 9 );
     DOMNode* nIO = ReaderXML::getNode( dn, "InitialOrientation" );
     read( nIO, m_orientationType, m_orientationInsertionInfo );
     
-    std::cout << shiftString9
-              << "Reading VeclocityInsertion Policy ..." 
-              << std::endl;
+    GrainsMisc<T>::cout( "Reading VeclocityInsertion Policy ...", 9 );
     DOMNode* nIV = ReaderXML::getNode( dn, "InitialVelocity" );
     read( nIV, m_translationalVelType, m_translationalVelInsertionInfo );
     
-    std::cout << shiftString9
-              << "Reading AngularVeclocityInsertion Policy ..." 
-              << std::endl;
+    GrainsMisc<T>::cout( "Reading AngularVeclocityInsertion Policy ...", 9 );
     DOMNode* nIA = ReaderXML::getNode( dn, "InitialAngularVelocity" );
     read( nIA, m_angularVelType, m_angularVelInsertionInfo );
 }

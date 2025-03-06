@@ -37,9 +37,13 @@ void Grains<T>::initialize( DOMElement* rootElement )
     GrainsParameters<T>::m_isGPU = false;
 
     // Reading different blocks of the input XML
+    GrainsMisc<T>::cout( "Reading the input file ..." );
+    GrainsMisc<T>::cout( std::string( 80, '#' ) );
     Construction( rootElement );
     Forces( rootElement );
     AdditionalFeatures( rootElement );
+    GrainsMisc<T>::cout( std::string( 80, '#' ) );
+    GrainsMisc<T>::cout( "Reading the input file completed!" );
 }
 
 
@@ -54,13 +58,13 @@ template <typename T>
 void Grains<T>::Construction( DOMElement* rootElement )
 {
     // Output message
-    cout << shiftString3 << "Construction" << endl;
+    GrainsMisc<T>::cout( "Construction", 3 );
     // -------------------------------------------------------------------------
     // Checking if Construction node is available
     DOMNode* root = ReaderXML::getNode( rootElement, "Construction" );
     if ( !root )
     {
-        cout << shiftString0 << "Construction node is mandatory!" << endl;
+        GrainsMisc<T>::cout( "Construction node is mandatory!" );
         exit( 1 );
     }
 
@@ -93,9 +97,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
         int PZ = ReaderXML::getNodeAttr_Int( nPeriodicity, "PZ" );
         if ( PX * PY * PZ != 0 )
         {
-            cout << shiftString0 
-                 << "Periodicity is not implemented!" 
-                 << endl;
+            GrainsMisc<T>::cout( "Periodicity is not implemented!" );
             exit( 1 );
         }
         GrainsParameters<T>::m_isPeriodic = false;
@@ -127,7 +129,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
                         numUniqueParticles * sizeof( RigidBody<T, T>* ) );
     if ( particles )
     {
-        cout << shiftString6 << "Reading new particle types ..." << endl;
+        GrainsMisc<T>::cout( "Reading new particle types ...", 6 );
         
         // Populating the array with different kind of rigid bodies in the XML
         // file
@@ -150,7 +152,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
             particlesInitialTransform.push_back( Transform3<T>( nParticle ) );
         }
 
-        cout << shiftString6 << "Reading particle types completed!\n" << endl;
+        GrainsMisc<T>::cout( "Reading particle types completed!", 6, 1 );
     }
 
     
@@ -179,7 +181,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
                         numUniqueObstacles * sizeof( RigidBody<T, T>* ) );
     if ( obstacles )
     {
-        cout << shiftString6 << "Reading new obstacle types ..." << endl;
+        GrainsMisc<T>::cout( "Reading new obstacle types ...", 6 );
         
         // Populating the array with different kind of rigid bodies in the XML
         // file
@@ -202,7 +204,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
             obstaclesInitialTransform.push_back( Transform3<T>( nObstacle ) );
         }
 
-        cout << shiftString6 << "Reading obstacle types completed!\n" << endl;
+        GrainsMisc<T>::cout( "Reading obstacle types completed!", 6, 1 );
     }
 
 
@@ -210,7 +212,7 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
     // -------------------------------------------------------------------------
     // LinkedCell
-    cout << shiftString6 << "Constructing linked cell ..." << endl;
+    GrainsMisc<T>::cout( "Constructing linked cell ...", 6 );
     // Finding the size of each cell -- max circumscribed radius among all
     // particles. Note that we loop until numParticles, because we do not care
     // about the circumscribed radius of the obstacles.
@@ -227,7 +229,8 @@ void Grains<T>::Construction( DOMElement* rootElement )
       LC_coeff = T( ReaderXML::getNodeAttr_Double( nLC, "CellSizeFactor" ) );
     if ( LC_coeff < T( 1 ) ) 
         LC_coeff = T( 1 );
-    cout << shiftString9 << "Cell size factor = " << LC_coeff << endl;
+    GrainsMisc<T>::cout( "Cell size factor = " + 
+                         std::to_string( LC_coeff ), 9 );
 
     // Creating linked cell
     GrainsParameters<T>::m_sizeLC = LC_coeff * T( 2 ) * LCSize;
@@ -236,10 +239,10 @@ void Grains<T>::Construction( DOMElement* rootElement )
                                        GrainsParameters<T>::m_maxCoordinate, 
                                        GrainsParameters<T>::m_sizeLC );
     GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
-    cout << shiftString9 << "LinkedCell with "
-         << GrainsParameters<T>::m_numCells
-         << " cells is created on host." << endl;
-    cout << shiftString6 << "Constructing linked cell completed!\n" << endl;
+    GrainsMisc<T>::cout( "LinkedCell with " +
+                         std::to_string( GrainsParameters<T>::m_numCells ) + 
+                         " cells is created on host.", 9 );
+    GrainsMisc<T>::cout( "Constructing linked cell completed!", 6, 1 );
     
 
 
@@ -278,13 +281,9 @@ void Grains<T>::Construction( DOMElement* rootElement )
     DOMNode* contacts = ReaderXML::getNode( root, "ContactForceModels" );
     if ( contacts )
     {
-        cout << shiftString6 
-             << "Reading the contact force model ..." 
-             << endl;
+        GrainsMisc<T>::cout( "Reading the contact force model ..." , 6 );
         m_contactForce = ContactForceModelBuilderFactory<T>::create( rootElement );
-        cout << shiftString6 
-             << "Reading the contact force model completed!\n" 
-             << endl;
+        GrainsMisc<T>::cout( "Reading the contact force model completed!", 6, 1 );
     }
 
 
@@ -306,17 +305,13 @@ void Grains<T>::Construction( DOMElement* rootElement )
         DOMNode* nTI = ReaderXML::getNode( tempSetting, "TimeIntegration" );
         if ( nTI )
         {
-            cout << shiftString6 
-                 << "Reading the time integration model ..." 
-                 << endl;
+            GrainsMisc<T>::cout( "Reading the time integration model ...", 6 );
             m_timeIntegrator = ( TimeIntegrator<T>** ) 
                                 malloc( sizeof( TimeIntegrator<T>* ) );
             *m_timeIntegrator = TimeIntegratorBuilderFactory<T>::create( 
                                                     nTI, 
                                                     GrainsParameters<T>::m_dt );
-            cout << shiftString6 
-                 << "Reading the time integration model completed!\n" 
-                 << endl;
+            GrainsMisc<T>::cout( "Reading the time integration model completed!", 6, 1 ); 
         }
     }
 }
@@ -333,7 +328,7 @@ void Grains<T>::Forces( DOMElement* rootElement )
     DOMNode* root = ReaderXML::getNode( rootElement, "Forces" );
 
     // Output message
-    cout << shiftString3 << "Forces" << endl;
+    GrainsMisc<T>::cout( "Forces", 3 );
 
 
     // Read the forces
@@ -349,15 +344,14 @@ void Grains<T>::Forces( DOMElement* rootElement )
                 T( ReaderXML::getNodeAttr_Double( nGravity, "GY" ) );
             GrainsParameters<T>::m_gravity[Z] = 
                 T( ReaderXML::getNodeAttr_Double( nGravity, "GZ" ) );
-            cout << shiftString6 
-                    << "Gravity = " 
-                    << GrainsParameters<T>::m_gravity 
-                    << "\n"
-                    << endl;
+            GrainsMisc<T>::cout( "Gravity = " +
+                    std::to_string( GrainsParameters<T>::m_gravity[X] ) + " " +
+                    std::to_string( GrainsParameters<T>::m_gravity[Y] ) + " " +
+                    std::to_string( GrainsParameters<T>::m_gravity[Z] ), 6, 1 );
         }
         else
         {
-            cout << shiftString6 << "Gravity is mandatory!" << endl;
+            GrainsMisc<T>::cout( "Gravity is mandatory!", 6 );
             exit( 1 );
         }
     }
@@ -372,14 +366,14 @@ template <typename T>
 void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
 {
     // Output message
-    cout << shiftString3 << "Simulation" << endl;
+    GrainsMisc<T>::cout( "Simulation", 3 );
     // -------------------------------------------------------------------------
     // Checking if Construction node is available
     assert( rootElement != NULL );
     DOMNode* root = ReaderXML::getNode( rootElement, "Simulation" );
     if ( !root )
     {
-        cout << shiftString3 << "Simulation node is mandatory!" << endl;
+        GrainsMisc<T>::cout( "Simulation node is mandatory!" );
         exit( 1 );
     }
 
@@ -389,17 +383,15 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
     // -------------------------------------------------------------------------
     // Insertion policies
     DOMNode* nInsertion = ReaderXML::getNode( root, "ParticleInsertion" );
-    cout << shiftString6 << "Reading insertion policies ..." << endl;
+    GrainsMisc<T>::cout( "Reading insertion policies ...", 6 );
     if ( nInsertion )
         m_insertion = new Insertion<T>( nInsertion );
     else
     {
-        cout << shiftString9 
-             << "No policy found, setting the insertion policy to default" 
-             << endl;
+        GrainsMisc<T>::cout( "No policy found, setting the insertion policy to default", 9 );
         m_insertion = new Insertion<T>();
     }
-    cout << shiftString6 << "Reading insertion policies completed.\n" << endl;
+    GrainsMisc<T>::cout( "Reading insertion policies completed.", 6, 1 );
 
 
 
@@ -409,7 +401,7 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
     DOMNode* nPostProcessing = ReaderXML::getNode( root, "PostProcessing" );
     if ( nPostProcessing )
     {
-        cout << shiftString6 << "Post-processing" << endl;
+        GrainsMisc<T>::cout( "Post-processing", 3 );
         // Post-processing save time
         DOMNode* nTime = ReaderXML::getNode( nPostProcessing, "TimeSave" );
         T tStart = ReaderXML::getNodeAttr_Double( nTime, "Start" );
@@ -424,9 +416,7 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
         DOMNode* nWriters = ReaderXML::getNode( nPostProcessing, "Writers" );
         if ( nWriters )
         {
-            cout << shiftString6 
-                 << "Reading the post processing writers ..." 
-                 << endl;
+            GrainsMisc<T>::cout( "Reading the post processing writers ...", 6 );
             DOMNodeList* allPPW = ReaderXML::getNodes( nWriters );
             for ( XMLSize_t i = 0; i < allPPW->getLength(); i++ )
             {
@@ -435,19 +425,15 @@ void Grains<T>::AdditionalFeatures( DOMElement* rootElement )
                 m_postProcessor = PostProcessingWriterBuilderFactory<T>::create( nPPW );
                 if ( !ppw )
                 {
-                    cout << shiftString6 
-                         << "Unknown postprocessing writer in node <Writers>"
-                         << endl;
+                    GrainsMisc<T>::cout( "Unknown postprocessing writer in node <Writers>", 6 );
                     exit( 1 );
                 }
             }
-            cout << shiftString6 
-                 << "Reading the post processing writers completed!" 
-                 << endl;
+            GrainsMisc<T>::cout( "Reading the post processing writers completed!", 6 );
         }
     }
     else
-        cout << shiftString6 << "No postprocessing writer!" << endl;
+        GrainsMisc<T>::cout( "No postprocessing writer!", 6 );
 }
 
 

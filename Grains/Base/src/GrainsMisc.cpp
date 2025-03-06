@@ -52,16 +52,31 @@ std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format,
 
 
 // -----------------------------------------------------------------------------
+// Writes a Vector3 object in a string
+template <typename T>
+__HOST__
+std::string GrainsMisc<T>::Vector3ToString( Vector3<T> const& vec )
+{
+	std::ostringstream oss;
+    oss << vec;
+	
+	return ( "[" + oss.str() + "]" );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
 // Writes
 template <typename T>
 __HOST__
-void GrainsMisc<T>::GrainsCout( std::string message, 
-                                int numShift,
-								bool nextline )
+void GrainsMisc<T>::cout( std::string message, 
+                          int numShift,
+                          bool nextLine )
 {
     auto shift = []( int  n ) { return std::string( n, ' ' ); };
     auto nLine = []( bool b ) { return b ? '\n' : '\0'; };
-	std::cout << shift( numShift ) << message << nLine << std::endl;
+	std::cout << shift( numShift ) << message << nLine( nextLine ) << std::endl;
 }
 
 

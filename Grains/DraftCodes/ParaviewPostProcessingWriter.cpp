@@ -255,13 +255,13 @@ ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter( DOMNode* dn )
 	m_ParaviewFilename = ReaderXML::getNodeAttr_String( dn, "RootName" );
 	m_ParaviewFilename_dir = ReaderXML::getNodeAttr_String( dn, "Directory" );
   
-	cout << shiftString9 << "Type = Paraview" << endl;
-	cout << shiftString12 << "Output file root name = " 
-		 << m_ParaviewFilename << endl;
-	cout << shiftString12 << "Output file directory name = " 
-		 << m_ParaviewFilename_dir << endl;
-	cout << shiftString12 << "Writing mode = " 
-		 << ( m_binary ? "Binary" : "Text" ) << endl;
+	GrainsMisc<T>::cout( "Type = Paraview", 9 );
+	GrainsMisc<T>::cout( "Output file root name = " +
+		 				 m_ParaviewFilename, 12 );
+	GrainsMisc<T>::cout( "Output file directory name = " +
+		 				 m_ParaviewFilename_dir, 12 );
+	GrainsMisc<T>::cout( "Writing mode = " +
+		 				 ( m_binary ? "Binary" : "Text" ), 12 );
 }
 
 

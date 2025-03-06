@@ -2,6 +2,7 @@
 #define _GRAINSMISC_HH_
 
 #include "Basic.hh"
+#include "Vector3.hh"
 
 
 // =============================================================================
@@ -27,6 +28,7 @@ class GrainsMisc
         string
         @param figure the float number
         @param size number of digits */
+        __HOST__
         static std::string realToString( T const& figure, 
                                          int const& size );
 
@@ -35,17 +37,24 @@ class GrainsMisc
         @param format the format
         @param digits number of digits after the decimal point
         @param number the float number */
+        __HOST__
         static std::string realToString( std::ios_base::fmtflags format, 
                                          int digits,
                                          T const& number );
 
+        /** @brief Writes a vector3 object in a string
+        @param vec the vector3 object */
+        __HOST__
+        static std::string Vector3ToString( Vector3<T> const& vec );
+                                         
         /** @brief Writes a message to stdout
         @param message the output message
         @param numShift the number of shift characters at the beginning
         @param nextLine if going to the next line is required */
-        static void GrainsCout( std::string message, 
-                                int numShift = 0,
-                                bool nextline = false );
+        __HOST__
+        static void cout( std::string message, 
+                          int numShift = 0,
+                          bool nextLine = false );
         //@}
 };
 

@@ -38,9 +38,8 @@ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter( DOMNode* dn )
 : m_ndigits( 6 )  
 { 
 	m_filerootname = ReaderXML::getNodeAttr_String( dn, "Name" );
-	cout << shiftString9 << "Type = RawData" << endl;
-	cout << shiftString12 << "Output file name = " 
-		 << m_filerootname << endl;
+	GrainsMisc<T>::cout( "Type = RawData", 9 );
+	GrainsMisc<T>::cout( "Output file name = " + m_filerootname, 12 );
 }
 
 
