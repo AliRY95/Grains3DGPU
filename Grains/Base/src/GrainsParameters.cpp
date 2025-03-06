@@ -38,6 +38,8 @@ template <typename T>
 unsigned int GrainsParameters<T>::m_numObstacles = 0;
 template <typename T> 
 unsigned int GrainsParameters<T>::m_numCells = 0;
+template <typename T> 
+T GrainsParameters<T>::m_sizeLC = T( 0 );
 
 /* Physical */
 template <typename T> 

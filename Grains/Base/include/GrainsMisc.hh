@@ -38,6 +38,14 @@ class GrainsMisc
         static std::string realToString( std::ios_base::fmtflags format, 
                                          int digits,
                                          T const& number );
+
+        /** @brief Writes a message to stdout
+        @param message the output message
+        @param numShift the number of shift characters at the beginning
+        @param nextLine if going to the next line is required */
+        static void GrainsCout( std::string message, 
+                                int numShift = 0,
+                                bool nextline = false );
         //@}
 };
 

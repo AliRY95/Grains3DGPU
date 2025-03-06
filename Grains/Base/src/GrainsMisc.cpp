@@ -51,6 +51,22 @@ std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format,
 
 
 
+// -----------------------------------------------------------------------------
+// Writes
+template <typename T>
+__HOST__
+void GrainsMisc<T>::GrainsCout( std::string message, 
+                                int numShift,
+								bool nextline )
+{
+    auto shift = []( int  n ) { return std::string( n, ' ' ); };
+    auto nLine = []( bool b ) { return b ? '\n' : '\0'; };
+	std::cout << shift( numShift ) << message << nLine << std::endl;
+}
+
+
+
+
 // // -----------------------------------------------------------------------------
 // // Writes an integer in a string
 // string GrainsExec::intToString( int const& figure )

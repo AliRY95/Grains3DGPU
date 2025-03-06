@@ -41,6 +41,8 @@ class GrainsParameters
         static unsigned int m_numObstacles;
         /** @brief Number of cells in simulation */
         static unsigned int m_numCells;
+        /** @brief Size of cells in LinkedCell */
+        static T m_sizeLC;
 
         /* Simulation */
         /** \brief Gravity vector */

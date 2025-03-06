@@ -1,6 +1,4 @@
 #include "Grains.hh"
-#include "RigidBodyGPUWrapper.hh"
-#include "LinkedCellGPUWrapper.hh"
 #include "ContactForceModelBuilderFactory.hh"
 #include "TimeIntegratorBuilderFactory.hh"
 #include "PostProcessingWriterBuilderFactory.hh"
@@ -35,16 +33,10 @@ Grains<T>::~Grains()
 template <typename T>
 void Grains<T>::initialize( DOMElement* rootElement )
 {   
-    // Read the input file
-    // Type - CPU or GPU
-    string option = ReaderXML::getNodeAttr_String( rootElement, "Type" );
-    if ( option == "Standard" ) 
-        GrainsParameters<T>::m_isGPU = false;
-    else if ( option == "GPU" )
-        GrainsParameters<T>::m_isGPU = true;
-    
+    // Set the simulation type to default. It will be overridden later if needed
+    GrainsParameters<T>::m_isGPU = false;
 
-    /* */
+    // Reading different blocks of the input XML
     Construction( rootElement );
     Forces( rootElement );
     AdditionalFeatures( rootElement );
@@ -160,17 +152,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
         cout << shiftString6 << "Reading particle types completed!\n" << endl;
     }
-    // if it is a GPU simulation and we actually have rigid bodies in the
-    // simulation, we allocate memory on device as well.
-    if ( GrainsParameters<T>::m_isGPU && numUniqueParticles > 0 )
-    {
-        cudaErrCheck( cudaMalloc( (void**) &m_d_particleRigidBodyList,
-                      numUniqueParticles * sizeof( RigidBody<T, T>* ) ) );
-        RigidBodyCopyHostToDevice( m_particleRigidBodyList, 
-                                   m_d_particleRigidBodyList,
-                                   numUniqueParticles );
-        cudaDeviceSynchronize();
-    }
 
     
 
@@ -223,18 +204,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
 
         cout << shiftString6 << "Reading obstacle types completed!\n" << endl;
     }
-    // if it is a GPU simulation and we actually have rigid bodies in the
-    // simulation, we allocate memory on device as well.
-    if ( GrainsParameters<T>::m_isGPU && numUniqueObstacles > 0 )
-    {
-        cudaErrCheck( cudaMalloc( (void**) &m_d_obstacleRigidBodyList,
-                      numUniqueObstacles * sizeof( RigidBody<T, T>* ) ) );
-        RigidBodyCopyHostToDevice( m_obstacleRigidBodyList, 
-                                   m_d_obstacleRigidBodyList,
-                                   numUniqueObstacles );
-        cudaDeviceSynchronize();
-    }
-
 
 
 
@@ -261,29 +230,15 @@ void Grains<T>::Construction( DOMElement* rootElement )
     cout << shiftString9 << "Cell size factor = " << LC_coeff << endl;
 
     // Creating linked cell
+    GrainsParameters<T>::m_sizeLC = LC_coeff * T( 2 ) * LCSize;
     m_linkedCell = ( LinkedCell<T>** ) malloc( sizeof( LinkedCell<T>* ) );
     *m_linkedCell = new LinkedCell<T>( GrainsParameters<T>::m_origin,
                                        GrainsParameters<T>::m_maxCoordinate, 
-                                       LC_coeff * T( 2 ) * LCSize );
+                                       GrainsParameters<T>::m_sizeLC );
     GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
     cout << shiftString9 << "LinkedCell with "
          << GrainsParameters<T>::m_numCells
          << " cells is created on host." << endl;
-    if ( GrainsParameters<T>::m_isGPU )
-    {
-        cudaErrCheck( cudaMalloc( (void**)&m_d_linkedCell,
-                                   sizeof( LinkedCell<T>* ) ) );
-        int d_numCells = createLinkedCellOnDevice( 
-            GrainsParameters<T>::m_origin,
-            GrainsParameters<T>::m_maxCoordinate, 
-            LC_coeff * T( 2 ) * LCSize,
-            m_d_linkedCell );
-
-        GrainsParameters<T>::m_numCells = d_numCells;
-        cout << shiftString9 << "LinkedCell with "
-             << GrainsParameters<T>::m_numCells
-             << " cells is created on device." << endl;
-    }
     cout << shiftString6 << "Constructing linked cell completed!\n" << endl;
     
 
@@ -308,15 +263,6 @@ void Grains<T>::Construction( DOMElement* rootElement )
     if ( !numEachUniqueObstacle.empty() )
         m_components->initializeObstacles( numEachUniqueObstacle,
                                            obstaclesInitialTransform );
-    // In case of GPU simulation
-    if ( GrainsParameters<T>::m_isGPU )
-    {
-        m_d_components = 
-            new ComponentManagerGPU<T>( GrainsParameters<T>::m_numParticles,
-                                        GrainsParameters<T>::m_numObstacles,
-                                        GrainsParameters<T>::m_numCells );
-        m_d_components->copy( m_components );
-    }
 
     
 
@@ -336,19 +282,11 @@ void Grains<T>::Construction( DOMElement* rootElement )
              << "Reading the contact force model ..." 
              << endl;
         m_contactForce = ContactForceModelBuilderFactory<T>::create( rootElement );
-        if ( GrainsParameters<T>::m_isGPU )
-        {
-            cudaErrCheck( cudaMalloc( (void**)&m_d_contactForce,
-                                    GrainsParameters<T>::m_numContactPairs *
-                                    sizeof( ContactForceModel<T>* ) ) );
-            ContactForceModelBuilderFactory<T>::
-            ContactForceModelCopyHostToDevice( m_contactForce,
-                                               m_d_contactForce );
-        }
         cout << shiftString6 
              << "Reading the contact force model completed!\n" 
              << endl;
     }
+
 
 
 
@@ -373,17 +311,9 @@ void Grains<T>::Construction( DOMElement* rootElement )
                  << endl;
             m_timeIntegrator = ( TimeIntegrator<T>** ) 
                                 malloc( sizeof( TimeIntegrator<T>* ) );
-            *m_timeIntegrator = TimeIntegratorBuilderFactory<T>::create( nTI, 
-                                                                        tStep );
-            if ( GrainsParameters<T>::m_isGPU )
-            {
-                cudaErrCheck( cudaMalloc( (void**)&m_d_timeIntegrator,
-                                          sizeof( TimeIntegrator<T>* ) ) );
-                TimeIntegratorBuilderFactory<T>::createOnDevice( 
-                                                        nTI,
-                                                        tStep, 
-                                                        m_d_timeIntegrator );
-            }
+            *m_timeIntegrator = TimeIntegratorBuilderFactory<T>::create( 
+                                                    nTI, 
+                                                    GrainsParameters<T>::m_dt );
             cout << shiftString6 
                  << "Reading the time integration model completed!\n" 
                  << endl;
