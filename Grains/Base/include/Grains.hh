@@ -87,7 +87,11 @@ class Grains
         virtual void initialize( DOMElement* rootElement );
 
         /** @brief Runs the simulation over the prescribed time interval */
-        virtual void simulate() = 0; 
+        virtual void simulate() = 0;
+
+        /** @brief Performs post-processing
+        @param cm ComponentManager object, either host or device */
+        virtual void postProcess( ComponentManager<T> const* cm ) const;
 
         // /** @brief Tasks to perform after time-stepping */
         // virtual void finalize();

@@ -37,12 +37,12 @@ InsertionWindow<T>::InsertionWindow( DOMNode* dn,
         T xVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "X" ) );
         T yVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "Y" ) );
         T zVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "Z" ) );
-        m_v1 = Vector3<T>( xVal1, yVal1, zVal1 );
+        Vector3<T> m_v1( xVal1, yVal1, zVal1 );
         DOMNode* nP2 = ReaderXML::getNode( dn, "MaxPoint" );
         T xVal2 = T( ReaderXML::getNodeAttr_Double( nP2, "X" ) );
         T yVal2 = T( ReaderXML::getNodeAttr_Double( nP2, "Y" ) );
         T zVal2 = T( ReaderXML::getNodeAttr_Double( nP2, "Z" ) );
-        m_v2 = Vector3<T>( xVal2, yVal2, zVal2 );
+        Vector3<T> m_v2( xVal2, yVal2, zVal2 );
         GrainsMisc<T>::cout( "Box insertion window with min and max points " +
                              GrainsMisc<T>::Vector3ToString( m_v1 ) +
                              " and " +
@@ -56,12 +56,12 @@ InsertionWindow<T>::InsertionWindow( DOMNode* dn,
         T xVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "X" ) );
         T yVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "Y" ) );
         T zVal1 = T( ReaderXML::getNodeAttr_Double( nP1, "Z" ) );
-        m_v1 = Vector3<T>( xVal1, yVal1, zVal1 );
+        Vector3<T> m_v1( xVal1, yVal1, zVal1 );
         DOMNode* nP2 = ReaderXML::getNode( dn, "TopPoint" );
         T xVal2 = T( ReaderXML::getNodeAttr_Double( nP2, "X" ) );
         T yVal2 = T( ReaderXML::getNodeAttr_Double( nP2, "Y" ) );
         T zVal2 = T( ReaderXML::getNodeAttr_Double( nP2, "Z" ) );
-        m_v2 = Vector3<T>( xVal2, yVal2, zVal2 );
+        Vector3<T> m_v2( xVal2, yVal2, zVal2 );
         DOMNode* nR = ReaderXML::getNode( dn, "Radius" );
         m_iRad = T( ReaderXML::getNodeAttr_Double( nR, "Inner" ) );
         m_oRad = T( ReaderXML::getNodeAttr_Double( nR, "Outter" ) );
@@ -74,6 +74,11 @@ InsertionWindow<T>::InsertionWindow( DOMNode* dn,
                              ", and inner radius " +
                              std::to_string( m_iRad ) + ".", 15 );
         GrainsMisc<T>::cout( "Reading insertion window completed!", 12 );
+    }
+    else
+    {
+        GrainsMisc<T>::cout( "Insertion window type is not supported" );
+        exit ( 1 );
     }
 }
 

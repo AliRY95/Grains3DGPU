@@ -11,7 +11,11 @@
 // Default constructor
 template <typename T>
 Grains<T>::Grains()
-{}
+{
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
+    GrainsMisc<T>::cout( "Starting Grains3D ..." );
+    GrainsMisc<T>::cout( std::string( 80, '=' ), 0, 1 );
+}
 
 
 
@@ -37,13 +41,40 @@ void Grains<T>::initialize( DOMElement* rootElement )
     GrainsParameters<T>::m_isGPU = false;
 
     // Reading different blocks of the input XML
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
     GrainsMisc<T>::cout( "Reading the input file ..." );
-    GrainsMisc<T>::cout( std::string( 80, '#' ) );
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
     Construction( rootElement );
     Forces( rootElement );
     AdditionalFeatures( rootElement );
-    GrainsMisc<T>::cout( std::string( 80, '#' ) );
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
     GrainsMisc<T>::cout( "Reading the input file completed!" );
+    GrainsMisc<T>::cout( std::string( 80, '=' ), 0, 1 );
+}
+
+
+
+
+// -----------------------------------------------------------------------------
+// Performs post-processing
+template <typename T>
+void Grains<T>::postProcess( ComponentManager<T> const* cm ) const
+{   
+    if ( GrainsParameters<T>::m_tSave.front() - GrainsParameters<T>::m_time < 
+         0.01 * GrainsParameters<T>::m_dt )
+    {
+        GrainsParameters<T>::m_tSave.pop();
+        Grains<T>::m_postProcessor->PostProcessing( 
+                                            Grains<T>::m_particleRigidBodyList,
+                                            Grains<T>::m_obstacleRigidBodyList,
+                                            cm,
+                                            GrainsParameters<T>::m_time );
+    }
+    // In case we get past the saveTime, we need to remove it from the queue
+    if ( GrainsParameters<T>::m_time > GrainsParameters<T>::m_tSave.front() )
+    {
+        GrainsParameters<T>::m_tSave.pop();
+    }
 }
 
 

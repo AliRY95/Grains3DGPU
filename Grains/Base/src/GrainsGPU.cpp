@@ -41,13 +41,15 @@ void GrainsGPU<T>::initialize( DOMElement* rootElement )
     // Reading different blocks of the input XML
     // Note that most of the reading is done at Grains<T>::initialize
     // Herein, we initialize specifically for GPU
-    GrainsMisc<T>::cout( "\nSetting up the simulation on device ..." );
-    GrainsMisc<T>::cout( std::string( 80, '#' ) );
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
+    GrainsMisc<T>::cout( "Setting up the simulation on device ..." );
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
     Construction( rootElement );
     Forces( rootElement );
     AdditionalFeatures( rootElement );
-    GrainsMisc<T>::cout( std::string( 80, '#' ) );
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
     GrainsMisc<T>::cout( "Setting up the simulation on device completed!" );
+    GrainsMisc<T>::cout( std::string( 80, '=' ), 0, 1 );
 }
 
 
@@ -58,7 +60,9 @@ void GrainsGPU<T>::initialize( DOMElement* rootElement )
 template <typename T>
 void GrainsGPU<T>::simulate()
 {
-    cout << "\n\n\n\n\nStarting the simulation ..." << endl;
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
+    GrainsMisc<T>::cout( "Starting the simulation on GPU" );
+    GrainsMisc<T>::cout( std::string( 80, '=' ), 0, 1 );
     unsigned int N = GrainsParameters<T>::m_numParticles;
     int* h_collision = new int[N];
     // Zeroing out
@@ -109,17 +113,7 @@ void GrainsGPU<T>::simulate()
     //                                         Grains<T>::m_timeIntegrator );
         
     //     // Post-Processing
-    //     if ( fabs( GrainsParameters<T>::m_time - 
-    //                GrainsParameters<T>::m_tSave.front() ) < 
-    //                0.01 * GrainsParameters<T>::m_dt )
-    //     {
-    //         GrainsParameters<T>::m_tSave.pop();
-    //         Grains<T>::m_postProcessor->PostProcessing( 
-    //                                         Grains<T>::m_particleRigidBodyList,
-    //                                         Grains<T>::m_obstacleRigidBodyList,
-    //                                         Grains<T>::m_components,
-    //                                         GrainsParameters<T>::m_time );
-    //     }
+    //     Grains<T>::postProcess( Grains<T>::m_components );
     // }
     auto h_end = chrono::high_resolution_clock::now();
 
@@ -158,23 +152,7 @@ void GrainsGPU<T>::simulate()
                                        m_d_timeIntegrator );
         
         // Post-Processing
-        if ( fabs( GrainsParameters<T>::m_time - 
-                   GrainsParameters<T>::m_tSave.front() ) < 
-                   0.01 * GrainsParameters<T>::m_dt )
-        {
-            GrainsParameters<T>::m_tSave.pop();
-            Grains<T>::m_postProcessor->PostProcessing( 
-                                            Grains<T>::m_particleRigidBodyList,
-                                            Grains<T>::m_obstacleRigidBodyList,
-                                            m_d_components,
-                                            GrainsParameters<T>::m_time );
-        }
-        // In case we get past the saveTime, we need to remove it from the queue
-        if ( GrainsParameters<T>::m_time > 
-             GrainsParameters<T>::m_tSave.front() )
-        {
-            GrainsParameters<T>::m_tSave.pop();
-        }
+        Grains<T>::postProcess( m_d_components );
     }
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();

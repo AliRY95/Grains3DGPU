@@ -25,7 +25,7 @@ class LinkedCell
         Vector3<T> m_minCorner; /**< min corner point of the linked cell */
         Vector3<T> m_maxCorner; /**< max corner point of the linked cell */
         T m_cellExtent; /**< extent of each cell */
-        uint3 m_numCellsPerDir; /**< number of cells per each direction */
+        int3 m_numCellsPerDir; /**< number of cells per each direction */
         int m_numCells; /**< total number of cells */
         //@}
 
@@ -62,15 +62,25 @@ class LinkedCell
 
         /** @name Methods */
         //@{
+        /** @brief Checks if a cell Id is in range
+        @param id 3D Id */
+        __HOSTDEVICE__
+        void checkBound( int3 const& id ) const;
+
         /** @brief Returns the 3d Id of the cell which the point belongs to
         @param p point */
         __HOSTDEVICE__
-        uint3 computeCellId( Vector3<T> const& p ) const;
+        int3 computeCellId( Vector3<T> const& p ) const;
 
+        /** @brief Returns the linear cell hash value of a given point
+        @param p point */
+        __HOSTDEVICE__
+        int computeLinearCellHash( Vector3<T> const& p ) const;
+        
         /** @brief Returns the linear cell hash value from the 3d Id of the cell
         @param cellId 3d cell Id */
         __HOSTDEVICE__
-        int computeLinearCellHash( uint3 const& cellId ) const;
+        int computeLinearCellHash( int3 const& cellId ) const;
 
         /** @brief Returns the linear cell hash value from the 3d Id of the cell
         @param i position of the cell in the x-direction

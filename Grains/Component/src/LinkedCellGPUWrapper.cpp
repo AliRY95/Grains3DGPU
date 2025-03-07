@@ -75,8 +75,9 @@ void computeLinearLinkedCellHashGPU_kernel( LinkedCell<T> const* const* LC,
     if ( tid >= numComponents ) 
         return;
 
-    componentCellHash[tid] = 
-    (*LC)->computeLinearCellHash( (*LC)->computeCellId( tr[tid].getOrigin() ) );
+    // componentCellHash[tid] = 
+    // (*LC)->computeLinearCellHash( (*LC)->computeCellId( tr[tid].getOrigin() ) );
+    componentCellHash[tid] = (*LC)->computeLinearCellHash( tr[tid].getOrigin() );
 }
 
 

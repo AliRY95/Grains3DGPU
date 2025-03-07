@@ -182,9 +182,7 @@ Insertion<T>::Insertion( DOMNode* dn )
         }
         else
         {
-            std::cout << "Unknown Type in ParticleInsertion! "
-                      << "Aborting Grains!"
-                      << std::endl;
+            GrainsMisc<T>::cout( "Unknown Type in ParticleInsertion! Aborting Grains!" );
             exit( 1 );
         }
     };

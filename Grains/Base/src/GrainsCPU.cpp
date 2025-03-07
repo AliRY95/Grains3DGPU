@@ -30,7 +30,9 @@ GrainsCPU<T>::~GrainsCPU()
 template <typename T>
 void GrainsCPU<T>::simulate()
 {
-    cout << "\n\n\n\n\nStarting the simulation ..." << endl;
+    GrainsMisc<T>::cout( std::string( 80, '=' ) );
+    GrainsMisc<T>::cout( "Starting the simulation on CPU" );
+    GrainsMisc<T>::cout( std::string( 80, '=' ), 0, 1 );
     unsigned int N = GrainsParameters<T>::m_numParticles;
     int* h_collision = new int[N];
     // Zeroing out
@@ -75,23 +77,7 @@ void GrainsCPU<T>::simulate()
                                             Grains<T>::m_timeIntegrator );
         
         // Post-Processing
-        if ( GrainsParameters<T>::m_tSave.front() - 
-             GrainsParameters<T>::m_time < 
-             0.01 * GrainsParameters<T>::m_dt )
-        {
-            GrainsParameters<T>::m_tSave.pop();
-            Grains<T>::m_postProcessor->PostProcessing( 
-                                            Grains<T>::m_particleRigidBodyList,
-                                            Grains<T>::m_obstacleRigidBodyList,
-                                            Grains<T>::m_components,
-                                            GrainsParameters<T>::m_time );
-        }
-        // In case we get past the saveTime, we need to remove it from the queue
-        if ( GrainsParameters<T>::m_time > 
-             GrainsParameters<T>::m_tSave.front() )
-        {
-            GrainsParameters<T>::m_tSave.pop();
-        }
+        Grains<T>::postProcess( Grains<T>::m_components );
     }
     auto h_end = chrono::high_resolution_clock::now();
     Grains<T>::m_postProcessor->PostProcessing_end();
