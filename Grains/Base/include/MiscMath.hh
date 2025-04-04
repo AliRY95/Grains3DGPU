@@ -18,7 +18,8 @@ a given tolerance
 @param tol the tolerance */
 template <typename T>
 __HOSTDEVICE__
-static INLINE bool eqz( T x, T tol )
+static INLINE bool eqz( T x, 
+                        T tol ) noexcept
 { 
     return ( fabs(x) <= tol );
 }
@@ -34,7 +35,7 @@ numbers
 template <typename T>
 __HOSTDEVICE__
 static INLINE void set_min( T& x, 
-                            T y )
+                            T y ) noexcept
 { 
     if ( x > y ) 
         x = y;
@@ -51,7 +52,7 @@ numbers
 template <typename T>
 __HOSTDEVICE__
 static INLINE void set_max( T& x, 
-                            T y )
+                            T y ) noexcept
 { 
     if ( x < y ) 
         x = y; 
@@ -65,7 +66,7 @@ static INLINE void set_max( T& x,
 @param x angle in degrees */
 template <typename T>
 __HOSTDEVICE__
-static INLINE T rads( T x )
+static INLINE T rads( T x ) noexcept
 { 
     return ( x * RADS_PER_DEG<T> ); 
 }
@@ -78,7 +79,7 @@ static INLINE T rads( T x )
 @param x angle in radians */
 template <typename T>
 __HOSTDEVICE__
-static INLINE T degs( T x ) 
+static INLINE T degs( T x ) noexcept
 { 
     return ( x * DEGS_PER_RAD<T> );
 }
@@ -91,7 +92,7 @@ static INLINE T degs( T x )
 @param x the real number */
 template <typename T>
 __HOSTDEVICE__
-static INLINE int sgn( T x )
+static INLINE int sgn( T x ) noexcept
 {
     return ( ( T( 0 ) < x ) - ( x < T( 0 ) ) );
 }
@@ -109,7 +110,8 @@ code.
 @param y the second real number */
 template <typename T>
 __HOSTDEVICE__
-static INLINE T grainsBeta( T x, T y )
+static INLINE T grainsBeta( T x, 
+                            T y ) noexcept
 {
 #ifdef __CUDA_ARCH__
     return ( tgamma( x ) * tgamma( y ) / tgamma( x + y ) );
@@ -117,17 +119,6 @@ static INLINE T grainsBeta( T x, T y )
     return ( std::beta( x, y ) );
 #endif
 }
-
-
-
-
-// -----------------------------------------------------------------------------
-// /** @brief Returns a matrix that rotates vector src to vector dest,
-// i.e. dest = mat * src
-// @param src the source vector
-// @param dest the destination vector */
-// Matrix3<T> getRotationMatrix( Vector3 const& src, Vector3 const& dest );
-
 //@}
 
 
