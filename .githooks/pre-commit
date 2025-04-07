@@ -1,0 +1,41 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+echo -e "${GREEN}[Pre-commit] Checking C++ formatting with clang-format...${NC}"
+
+# Get staged C++ files only
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp|cc|cxx|h|hh)$')
+
+if [[ -z "$FILES" ]]; then
+    echo "[Pre-commit] No staged C++ files to check."
+    exit 0
+fi
+
+FAILED=0
+
+for file in $FILES; do
+    # Format check with the repo's .clang-format
+    clang-format --dry-run --Werror --style=file:"$REPO_ROOT/.clang-format" "$file"
+    if [[ $? -ne 0 ]]; then
+        echo -e "${RED}✗ $file is not properly formatted.${NC}"
+        FAILED=1
+
+        echo "Auto-formatting $file"
+        clang-format -i --style=file:"$REPO_ROOT/.clang-format" "$file"
+        git add "$file"
+    else
+        echo -e "$file is properly formatted.${NC}"
+    fi
+done
+
+if [[ $FAILED -ne 0 ]]; then
+    echo -e "${RED}[Pre-commit] Commit rejected. Please format the files above using clang-format.${NC}"
+    exit 1
+else
+    echo -e "${GREEN}[Pre-commit] All files passed formatting check.${NC}"
+    exit 0
+fi

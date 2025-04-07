@@ -1,5 +1,5 @@
-#ifndef _HODCCONTACTFORCEMODEL_HH_
-#define _HODCCONTACTFORCEMODEL_HH_
+#ifndef _HOOKECONTACTFORCEMODEL_HH_
+#define _HOOKECONTACTFORCEMODEL_HH_
 
 
 #include "ContactForceModel.hh"
@@ -7,7 +7,7 @@
 
 
 // =============================================================================
-/** @brief The class HODCContactForceModel.
+/** @brief The class HookeContactForceModel.
 
     Contact force model involving a normal Hookean spring, a normal Dashpot and
     a tangential Coulomb friction (HO-D-C) to compute the force and torque 
@@ -16,7 +16,7 @@
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
 template <typename T>
-class HODCContactForceModel : public ContactForceModel<T>
+class HookeContactForceModel : public ContactForceModel<T>
 {
     private:
         /**@name Parameter */
@@ -34,12 +34,12 @@ class HODCContactForceModel : public ContactForceModel<T>
         //@{
         /** @brief Default constructor */
         __HOSTDEVICE__
-        HODCContactForceModel();
+        HookeContactForceModel();
 
         /** @brief Constructor with an XML node
         @param root XML node */
         __HOST__
-        HODCContactForceModel( DOMNode* root );
+        HookeContactForceModel( DOMNode* root );
 
         /** @brief Constructor with five values as contact parameters
         @param kn normal stiffness coefficient
@@ -48,15 +48,15 @@ class HODCContactForceModel : public ContactForceModel<T>
         @param muc tangential Coulomb friction coefficient
         @param kr rolling resistance coefficient */
         __HOSTDEVICE__
-        HODCContactForceModel( T kn,
-                               T en, 
-                               T etat, 
-                               T muc, 
-                               T kr ); 
+        HookeContactForceModel( T kn,
+                                T en, 
+                                T etat, 
+                                T muc, 
+                                T kr ); 
 
         /** @brief Destructor */
         __HOSTDEVICE__
-        ~HODCContactForceModel();
+        ~HookeContactForceModel();
         //@}
 
 
@@ -66,7 +66,7 @@ class HODCContactForceModel : public ContactForceModel<T>
         __HOSTDEVICE__
         ContactForceModelType getContactForceModelType() const final;
 
-        /** @brief Gets the parameters of the HODC contact force model
+        /** @brief Gets the parameters of the Hooke contact force model
         @param kn normal stiffness coefficient
         @param en normal restitution coefficient
         @param etat tangential damping coefficient
@@ -122,8 +122,8 @@ class HODCContactForceModel : public ContactForceModel<T>
 };
 
 
-typedef HODCContactForceModel<float> HODCContactForceModelF;
-typedef HODCContactForceModel<double> HODCContactForceModelD;
+typedef HookeContactForceModel<float>  HookeContactForceModelF;
+typedef HookeContactForceModel<double> HookeContactForceModelD;
 
 
 #endif

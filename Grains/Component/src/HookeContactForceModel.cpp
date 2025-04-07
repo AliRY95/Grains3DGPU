@@ -1,4 +1,5 @@
-#include "HODCContactForceModel.hh"
+#include "HookeContactForceModel.hh"
+#include "GrainsUtils.hh"
 #include "VectorMath.hh"
 
 
@@ -6,7 +7,7 @@
 // Default constructor
 template <typename T>
 __HOSTDEVICE__
-HODCContactForceModel<T>::HODCContactForceModel()
+HookeContactForceModel<T>::HookeContactForceModel()
 {}
 
 
@@ -16,23 +17,33 @@ HODCContactForceModel<T>::HODCContactForceModel()
 // Constructor with an XML node
 template <typename T>
 __HOST__
-HODCContactForceModel<T>::HODCContactForceModel( DOMNode* root )
+HookeContactForceModel<T>::HookeContactForceModel( DOMNode* root )
 {
     DOMNode* parameter;
     parameter = ReaderXML::getNode( root, "kn" );
+    if ( !parameter )
+        Gout( 0, 9, "kn not defined!", "Aborting Grains!" );
     m_kn = T( ReaderXML::getNodeValue_Double( parameter ) );
 
     parameter = ReaderXML::getNode( root, "en" );
+    if ( !parameter )
+        Gout( 0, 9, "en not defined!", "Aborting Grains!" );
     m_en = T( ReaderXML::getNodeValue_Double( parameter ) );
     m_muen = log( m_en ) / sqrt( PI<T> * PI<T> + log( m_en ) * log( m_en ) );
     
     parameter = ReaderXML::getNode( root, "etat" );
+    if ( !parameter )
+        Gout( 0, 9, "etat not defined!", "Aborting Grains!" );
     m_etat = T( ReaderXML::getNodeValue_Double( parameter ) ); 
     
     parameter = ReaderXML::getNode( root, "muc" );
+    if ( !parameter )
+        Gout( 0, 9, "muc not defined!", "Aborting Grains!" );
     m_muc = T( ReaderXML::getNodeValue_Double( parameter ) ); 
 
     parameter = ReaderXML::getNode( root, "kr" );
+    if ( !parameter )
+        Gout( 0, 9, "kr not defined!", "Aborting Grains!" );
     m_kr = T( ReaderXML::getNodeValue_Double( parameter ) ); 
 }
 
@@ -43,11 +54,11 @@ HODCContactForceModel<T>::HODCContactForceModel( DOMNode* root )
 // Constructor with five values as contact parameters
 template <typename T>
 __HOSTDEVICE__
-HODCContactForceModel<T>::HODCContactForceModel( T kn,
-                                                 T en, 
-                                                 T etat, 
-                                                 T muc, 
-                                                 T kr )
+HookeContactForceModel<T>::HookeContactForceModel( T kn,
+                                                   T en, 
+                                                   T etat, 
+                                                   T muc, 
+                                                   T kr )
 : m_kn( kn )
 , m_en( en )
 , m_etat( etat )
@@ -64,7 +75,7 @@ HODCContactForceModel<T>::HODCContactForceModel( T kn,
 // Destructor
 template <typename T>
 __HOSTDEVICE__
-HODCContactForceModel<T>::~HODCContactForceModel()
+HookeContactForceModel<T>::~HookeContactForceModel()
 {}
 
 
@@ -74,23 +85,23 @@ HODCContactForceModel<T>::~HODCContactForceModel()
 // Gets the ContactForceModel type
 template <typename T>
 __HOSTDEVICE__
-ContactForceModelType HODCContactForceModel<T>::getContactForceModelType() const
+ContactForceModelType HookeContactForceModel<T>::getContactForceModelType() const
 {
-    return( HODC );
+    return( HOOKE );
 }
 
 
 
 
 // -----------------------------------------------------------------------------
-// Gets the parameters of the HODC contact force model
+// Gets the parameters of the Hooke contact force model
 template <typename T>
 __HOSTDEVICE__
-void HODCContactForceModel<T>::getContactForceModelParameters( T& kn,
-                                                               T& en, 
-                                                               T& etat, 
-                                                               T& muc, 
-                                                               T& kr ) const
+void HookeContactForceModel<T>::getContactForceModelParameters( T& kn,
+                                                                T& en, 
+                                                                T& etat, 
+                                                                T& muc, 
+                                                                T& kr ) const
 {
     kn = m_kn;
     en = m_en;
@@ -106,7 +117,7 @@ void HODCContactForceModel<T>::getContactForceModelParameters( T& kn,
 // Performs forces & torques computation
 template <typename T>
 __HOSTDEVICE__
-void HODCContactForceModel<T>::performForcesCalculus( 
+void HookeContactForceModel<T>::performForcesCalculus( 
                                         ContactInfo<T> const& contactInfos,
                                         Vector3<T> const& relVelocityAtContact,
                                         Vector3<T> const& relAngVelocity,
@@ -181,7 +192,7 @@ void HODCContactForceModel<T>::performForcesCalculus(
 // Returns a torce based on the contact information
 template <typename T>
 __HOSTDEVICE__
-void HODCContactForceModel<T>::computeForces( 
+void HookeContactForceModel<T>::computeForces( 
                                         ContactInfo<T> const& contactInfos,
                                         Vector3<T> const& relVelocityAtContact,
                                         Vector3<T> const& relAngVelocity,
@@ -212,5 +223,5 @@ void HODCContactForceModel<T>::computeForces(
 
 // -----------------------------------------------------------------------------
 // Explicit instantiation
-template class HODCContactForceModel<float>;
-template class HODCContactForceModel<double>;
+template class HookeContactForceModel<float>;
+template class HookeContactForceModel<double>;

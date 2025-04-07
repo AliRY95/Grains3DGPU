@@ -11,6 +11,20 @@ install: xerces createarch createdepend depend update dtd
 depend:
 	cd Grains ; make depend ; cd ..
 	cd Main/src ; make depend ; cd ../..
+
+# Rule to install the pre-commit hook
+HOOK_SOURCE = .githooks/pre-commit
+HOOK_DEST = .git/hooks/pre-commit
+install-githook:
+	@echo "Installing pre-commit hook..."
+	@if [ -f "$(HOOK_SOURCE)" ]; then \
+		cp "$(HOOK_SOURCE)" "$(HOOK_DEST)" && \
+		chmod +x "$(HOOK_DEST)" && \
+		echo "Pre-commit hook installed successfully."; \
+	else \
+		echo "No pre-commit hook found at $(HOOK_SOURCE)"; \
+		exit 1; \
+	fi
 	
 clean:
 	cd Main/src ; make clean ; cd ../..
