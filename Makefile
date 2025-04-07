@@ -25,6 +25,16 @@ install-githook:
 		echo "No pre-commit hook found at $(HOOK_SOURCE)"; \
 		exit 1; \
 	fi
+
+# Format all source files according to .clang-format configuration
+apply-clang-format:
+	@echo "Formatting all C++ source files according to .clang-format..."
+	if [ -f .clang-format ]; then \
+		find . -name "*.cpp" -o -name "*.hpp" -o -name "*.cc" -o -name "*.h" -o -name "*.hh" | xargs clang-format -i --style=file; \
+		echo "Formatting complete."; \
+	else \
+		echo "No .clang-format file found. Skipping formatting."; \
+	fi
 	
 clean:
 	cd Main/src ; make clean ; cd ../..

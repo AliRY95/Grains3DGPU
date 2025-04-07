@@ -1,9 +1,7 @@
 #ifndef _RIGIDBODYGPUWRAPPER_HH_
 #define _RIGIDBODYGPUWRAPPER_HH_
 
-
 #include "RigidBody.hh"
-
 
 // =============================================================================
 /** @brief Header for RigidBodyGPUWrapper.
@@ -24,11 +22,8 @@ h_rb which is an array of RigidBody objects on host
 @param d_rb host-side rigid body arrays
 @param numRigidBodies number of rigid bodies in the array */
 template <typename T, typename U>
-__HOST__
-void RigidBodyCopyHostToDevice( RigidBody<T, U>** h_rb,
-                                RigidBody<T, U>** d_rb,
-                                int numRigidBodies );
+__HOST__ void
+    RigidBodyCopyHostToDevice(RigidBody<T, U>** h_rb, RigidBody<T, U>** d_rb, int numRigidBodies);
 //@}
-
 
 #endif

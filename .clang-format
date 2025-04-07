@@ -5,7 +5,6 @@ IndentWidth:     4
 UseTab:          Never
 ColumnLimit: 100
 
----
 Language: Cpp
 
 DisableFormat:   false
@@ -111,4 +110,3 @@ SortIncludes: true
 ReflowComments: false
 
 #IncludeBlocks: Preserve
----

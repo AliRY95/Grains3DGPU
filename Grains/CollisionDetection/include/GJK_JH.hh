@@ -1,10 +1,8 @@
 #ifndef _GJK_JH_HH_
 #define _GJK_JH_HH_
 
-
-#include "Transform3.hh"
 #include "Convex.hh"
-
+#include "Transform3.hh"
 
 // =============================================================================
 /** @brief The header for the original GJK distance query algorithm.
@@ -26,11 +24,10 @@ frame
 @param b2w geometric tramsformation describing convex B in the world reference
 frame */
 template <typename T>
-__HOSTDEVICE__
-bool intersectGJK( Convex<T> const& a, 
-                   Convex<T> const& b,
-                   Transform3<T> const& a2w,
-                   Transform3<T> const& b2w );
+__HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
+                                 Convex<T> const&     b,
+                                 Transform3<T> const& a2w,
+                                 Transform3<T> const& b2w);
 
 /** @brief Returns whether 2 convex shapes intersect - relative transformation
 @param a convex shape A
@@ -38,10 +35,7 @@ bool intersectGJK( Convex<T> const& a,
 @param b2a geometric tramsformation describing convex B in the A's reference
 frame */
 template <typename T>
-__HOSTDEVICE__
-bool intersectGJK( Convex<T> const& a, 
-                   Convex<T> const& b,
-                   Transform3<T> const& b2a );
+__HOSTDEVICE__ bool intersectGJK(Convex<T> const& a, Convex<T> const& b, Transform3<T> const& b2a);
 
 /** @brief Returns the minimal distance between 2 convex shapes and a point per
 convex shape that represents the tips of the minimal distance segment
@@ -56,15 +50,13 @@ frame
 B
 @param nbIter number of iterations of GJK for convergence */
 template <typename T>
-__HOSTDEVICE__
-T computeClosestPoints_GJK_JH( Convex<T> const& a, 
-                               Convex<T> const& b, 
-                               Transform3<T> const& a2w,
-                               Transform3<T> const& b2w, 
-                               Vector3<T>& pa,
-                               Vector3<T>& pb,
-                               int& nbIter );
+__HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
+                                             Convex<T> const&     b,
+                                             Transform3<T> const& a2w,
+                                             Transform3<T> const& b2w,
+                                             Vector3<T>&          pa,
+                                             Vector3<T>&          pb,
+                                             int&                 nbIter);
 //@}
-
 
 #endif

@@ -1,10 +1,8 @@
 #ifndef _CONVEXBUILDERFACTORY_HH_
 #define _CONVEXBUILDERFACTORY_HH_
 
-
 #include "Convex.hh"
 #include "ReaderXML.hh"
-
 
 // =============================================================================
 /** @brief The class ConvexBuilderFactory.
@@ -21,44 +19,39 @@
 template <typename T>
 class ConvexBuilderFactory
 {
-    private:
-        /** @name Constructors */
-        //@{
-        /** @brief Constructor */
-        ConvexBuilderFactory();
-        
-        /** @brief Copy constructor */
-        ConvexBuilderFactory( ConvexBuilderFactory<T> const& cb );    
+private:
+    /** @name Constructors */
+    //@{
+    /** @brief Constructor */
+    ConvexBuilderFactory();
 
-        /** @brief Equal operator to another ConvexBuilderFactory object
+    /** @brief Copy constructor */
+    ConvexBuilderFactory(ConvexBuilderFactory<T> const& cb);
+
+    /** @brief Equal operator to another ConvexBuilderFactory object
         @param cb the other ConvexBuilderFactory object */
-        ConvexBuilderFactory<T>& operator = ( 
-                                            ConvexBuilderFactory<T> const& cb );
-        
-        /** @brief Destructor */
-        ~ConvexBuilderFactory();
-        //@}
+    ConvexBuilderFactory<T>& operator=(ConvexBuilderFactory<T> const& cb);
 
+    /** @brief Destructor */
+    ~ConvexBuilderFactory();
+    //@}
 
-    public:
-        /** @name Methods */
-        //@{
-        /** @brief Construct a convex with an XML node as an input parameter
+public:
+    /** @name Methods */
+    //@{
+    /** @brief Construct a convex with an XML node as an input parameter
         @param root XML node */
-        static Convex<T>* create( DOMNode *root );
+    static Convex<T>* create(DOMNode* root);
 
-        /** @brief Construct a convex with a type and a input stream as input 
+    /** @brief Construct a convex with a type and a input stream as input 
         parameters
         @param type convex type
         @param fileIn input stream */
-        static Convex<T>* create( string& type, 
-                                  std::istream& fileIn );
-        //@}
+    static Convex<T>* create(string& type, std::istream& fileIn);
+    //@}
 };
 
-
-typedef ConvexBuilderFactory<float> ConvexBuilderFactoryF;
+typedef ConvexBuilderFactory<float>  ConvexBuilderFactoryF;
 typedef ConvexBuilderFactory<double> ConvexBuilderFactoryD;
-
 
 #endif

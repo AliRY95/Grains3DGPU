@@ -1,10 +1,8 @@
 #ifndef _GJK_SV_HH_
 #define _GJK_SV_HH_
 
-
-#include "Transform3.hh"
 #include "Convex.hh"
-
+#include "Transform3.hh"
 
 // =============================================================================
 //                          / ____|    | | |/ /                               //
@@ -43,12 +41,12 @@
 //@{
 /** @brief Data structure for simplex */
 template <typename T>
-struct gkSimplex {
-	int nvrtx;      /**< Number of points defining the simplex */
-	T vrtx[4][3];   /**< Coordinates of the points of the simplex */
+struct gkSimplex
+{
+    int nvrtx; /**< Number of points defining the simplex */
+    T   vrtx[4][3]; /**< Coordinates of the points of the simplex */
 };
 //@}
-
 
 /** @name GJK_SV : External methods */
 //@{
@@ -65,15 +63,13 @@ frame
 B
 @param nbIter number of iterations of GJK for convergence */
 template <typename T>
-__HOSTDEVICE__
-T computeClosestPoints_GJK_SV( Convex<T> const& a, 
-                               Convex<T> const& b, 
-                               Transform3<T> const& a2w,
-                               Transform3<T> const& b2w, 
-                               Vector3<T>& pa,
-                               Vector3<T>& pb,
-                               int& nbIter );
+__HOSTDEVICE__ T computeClosestPoints_GJK_SV(Convex<T> const&     a,
+                                             Convex<T> const&     b,
+                                             Transform3<T> const& a2w,
+                                             Transform3<T> const& b2w,
+                                             Vector3<T>&          pa,
+                                             Vector3<T>&          pb,
+                                             int&                 nbIter);
 //@}
-
 
 #endif

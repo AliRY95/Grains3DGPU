@@ -1,9 +1,7 @@
 #ifndef _GRAINSTESTDEV_HH_
 #define _GRAINSTESTDEV_HH_
 
-
 #include "Grains.hh"
-
 
 // =============================================================================
 /** @brief The class GrainsTestDev.
@@ -15,23 +13,21 @@
 template <typename T>
 class GrainsTestDev : public Grains<T>
 {
-    public:
-        /** @name Contructors & Destructor */
-        //@{
-        /** @brief Default constructor */
-        GrainsTestDev();
+public:
+    /** @name Contructors & Destructor */
+    //@{
+    /** @brief Default constructor */
+    GrainsTestDev();
 
-        /** @brief Destructor */
-        ~GrainsTestDev();
-        //@}
+    /** @brief Destructor */
+    ~GrainsTestDev();
+    //@}
 
-
-        /** @name High-level methods */
-        //@{
-        /** @brief Runs the simulation over the prescribed time interval */
-        void simulate() final; 
-        //@}
+    /** @name High-level methods */
+    //@{
+    /** @brief Runs the simulation over the prescribed time interval */
+    void simulate() final;
+    //@}
 };
 
 #endif
-  

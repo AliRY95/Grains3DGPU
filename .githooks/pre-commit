@@ -21,7 +21,7 @@ for file in $FILES; do
     # Format check with the repo's .clang-format
     clang-format --dry-run --Werror --style=file:"$REPO_ROOT/.clang-format" "$file"
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}✗ $file is not properly formatted.${NC}"
+        echo -e "X $file is not properly formatted.${NC}"
         FAILED=1
 
         echo "Auto-formatting $file"
