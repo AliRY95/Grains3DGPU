@@ -48,7 +48,6 @@ XERCES-2.8.0/
 Grains/include/
 Grains/obj*
 Grains/lib*
-Grains/bin*
 Grains/DraftCodes/
 Main/obj*
 Main/bin*

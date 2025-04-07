@@ -8,7 +8,7 @@ ColumnLimit:  100
 Language: Cpp
 
 DisableFormat:   false
-Standard: Cpp17
+Standard: Cpp11
 
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
