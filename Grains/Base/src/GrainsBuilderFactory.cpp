@@ -4,7 +4,7 @@
 #include "GrainsGPU.hh"
 #include "GrainsTestDev.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Adds the path to the dtd files using the GRAINS_HOME variable to
 // a copy of the input file. Returns the name of this copy.
 // TODO: CLEAN
@@ -89,7 +89,7 @@ string GrainsBuilderFactory<T>::init(string const& filename)
     return (filename + ".tmp");
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Creates and returns a standard Grains application
 template <typename T>
 Grains<T>* GrainsBuilderFactory<T>::create(DOMElement* root)
@@ -123,7 +123,7 @@ Grains<T>* GrainsBuilderFactory<T>::create(DOMElement* root)
     return (grains);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsBuilderFactory<float>;
 template class GrainsBuilderFactory<double>;

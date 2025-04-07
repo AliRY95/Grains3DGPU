@@ -4,7 +4,7 @@
 // multiple of 4
 #define visuNodeNbOnPer 32
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with radius and height as input parameters
 template <typename T>
 __HOSTDEVICE__ Cone<T>::Cone(T r, T h)
@@ -14,7 +14,7 @@ __HOSTDEVICE__ Cone<T>::Cone(T r, T h)
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with an input stream
 template <typename T>
 __HOST__ Cone<T>::Cone(std::istream& fileIn)
@@ -22,7 +22,7 @@ __HOST__ Cone<T>::Cone(std::istream& fileIn)
     readConvex(fileIn);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with an XML node as an input parameter
 template <typename T>
 __HOST__ Cone<T>::Cone(DOMNode* root)
@@ -34,14 +34,14 @@ __HOST__ Cone<T>::Cone(DOMNode* root)
           / sqrt(m_bottomRadius * m_bottomRadius + T(16) * m_quarterHeight * m_quarterHeight);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ Cone<T>::~Cone()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the convex type
 template <typename T>
 __HOSTDEVICE__ ConvexType Cone<T>::getConvexType() const
@@ -49,7 +49,7 @@ __HOSTDEVICE__ ConvexType Cone<T>::getConvexType() const
     return (CONE);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the radius
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::getRadius() const
@@ -57,7 +57,7 @@ __HOSTDEVICE__ T Cone<T>::getRadius() const
     return (m_bottomRadius);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the height
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::getHeight() const
@@ -65,7 +65,7 @@ __HOSTDEVICE__ T Cone<T>::getHeight() const
     return (T(4) * m_quarterHeight);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns a clone of the cone
 template <typename T>
 __HOSTDEVICE__ Convex<T>* Cone<T>::clone() const
@@ -73,7 +73,7 @@ __HOSTDEVICE__ Convex<T>* Cone<T>::clone() const
     return (new Cone<T>(m_bottomRadius, T(4) * m_quarterHeight));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the volume of the cone
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::computeVolume() const
@@ -81,7 +81,7 @@ __HOSTDEVICE__ T Cone<T>::computeVolume() const
     return (T(4) * m_quarterHeight * PI<T> * m_bottomRadius * m_bottomRadius / T(3));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__ void Cone<T>::computeInertia(T (&inertia)[6], T (&inertia_1)[6]) const
@@ -97,7 +97,7 @@ __HOSTDEVICE__ void Cone<T>::computeInertia(T (&inertia)[6], T (&inertia_1)[6]) 
     inertia_1[3]                = T(1) / inertia[3];
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the circumscribed radius of the cone
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::computeCircumscribedRadius() const
@@ -106,7 +106,7 @@ __HOSTDEVICE__ T Cone<T>::computeCircumscribedRadius() const
                 T(3) * m_quarterHeight));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the bounding box to the cone
 // TODO: OBB should be shifted one unit to the right because of center of mass
 template <typename T>
@@ -115,7 +115,7 @@ __HOSTDEVICE__ Vector3<T> Cone<T>::computeBoundingBox() const
     return (Vector3<T>(m_bottomRadius, T(2) * m_quarterHeight, m_bottomRadius));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Cone support function, returns the support point P, i.e. the point on the
 // surface of the cone that satisfies max(P.v)
 template <typename T>
@@ -136,7 +136,7 @@ __HOSTDEVICE__ Vector3<T> Cone<T>::support(Vector3<T> const& v) const
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__ void Cone<T>::readConvex(std::istream& fileIn)
@@ -148,7 +148,7 @@ __HOST__ void Cone<T>::readConvex(std::istream& fileIn)
           / sqrt(m_bottomRadius * m_bottomRadius + T(16) * m_quarterHeight * m_quarterHeight);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Output operator
 template <typename T>
 __HOST__ void Cone<T>::writeConvex(std::ostream& fileOut) const
@@ -157,7 +157,7 @@ __HOST__ void Cone<T>::writeConvex(std::ostream& fileOut) const
             << ".\n";
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the number of points to write the cone in a Paraview format
 template <typename T>
 __HOST__ int Cone<T>::numberOfPoints_PARAVIEW() const
@@ -165,7 +165,7 @@ __HOST__ int Cone<T>::numberOfPoints_PARAVIEW() const
     return (visuNodeNbOnPer + 2);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the number of elementary polytopes to write the cone in a
 // Paraview format
 template <typename T>
@@ -174,7 +174,7 @@ __HOST__ int Cone<T>::numberOfCells_PARAVIEW() const
     return (visuNodeNbOnPer);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns a list of points describing the cone in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>> Cone<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
@@ -217,7 +217,7 @@ __HOST__ std::list<Vector3<T>> Cone<T>::writePoints_PARAVIEW(Transform3<T> const
     return (ParaviewPoints);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Writes the connectivity of the cone in a Paraview format
 template <typename T>
 __HOST__ void Cone<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
@@ -247,7 +247,7 @@ __HOST__ void Cone<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
     firstpoint_globalnumber += visuNodeNbOnPer + 2;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class Cone<float>;
 template class Cone<double>;

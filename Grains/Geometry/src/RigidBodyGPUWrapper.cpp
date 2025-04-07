@@ -135,7 +135,7 @@ __HOST__ void
     cudaDeviceSynchronize();
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T, U)                                       \
     template __HOST__ void RigidBodyCopyHostToDevice( \

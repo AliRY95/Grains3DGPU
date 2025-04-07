@@ -2,7 +2,7 @@
 #include "Vector3.hh"
 #include "VectorMath.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOSTDEVICE__ Kinematics<T>::Kinematics()
@@ -11,7 +11,7 @@ __HOSTDEVICE__ Kinematics<T>::Kinematics()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with two vectors as input parameters
 template <typename T>
 __HOSTDEVICE__ Kinematics<T>::Kinematics(Vector3<T> const& translational, Vector3<T> const& angular)
@@ -20,14 +20,14 @@ __HOSTDEVICE__ Kinematics<T>::Kinematics(Vector3<T> const& translational, Vector
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ Kinematics<T>::~Kinematics()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Kinematics<T>::getTranslationalComponent() const
@@ -35,7 +35,7 @@ __HOSTDEVICE__ Vector3<T> Kinematics<T>::getTranslationalComponent() const
     return (m_translational);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Kinematics<T>::getAngularComponent() const
@@ -43,7 +43,7 @@ __HOSTDEVICE__ Vector3<T> Kinematics<T>::getAngularComponent() const
     return (m_angular);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void Kinematics<T>::setTranslationalComponent(Vector3<T> const& translational)
@@ -51,7 +51,7 @@ __HOSTDEVICE__ void Kinematics<T>::setTranslationalComponent(Vector3<T> const& t
     m_translational = translational;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void Kinematics<T>::setAngularComponent(Vector3<T> const& angular)
@@ -59,7 +59,7 @@ __HOSTDEVICE__ void Kinematics<T>::setAngularComponent(Vector3<T> const& angular
     m_angular = angular;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Adds a vector to the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void Kinematics<T>::addToTranslationalComponent(Vector3<T> const& translational)
@@ -67,7 +67,7 @@ __HOSTDEVICE__ void Kinematics<T>::addToTranslationalComponent(Vector3<T> const&
     m_translational += translational;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Adds a vector to the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void Kinematics<T>::addToAngularComponent(Vector3<T> const& omega)
@@ -75,7 +75,7 @@ __HOSTDEVICE__ void Kinematics<T>::addToAngularComponent(Vector3<T> const& omega
     m_angular += omega;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the total velocity U + om x R given R
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Kinematics<T>::kinematicsAtPoint(Vector3<T> const& R) const
@@ -84,7 +84,7 @@ __HOSTDEVICE__ Vector3<T> Kinematics<T>::kinematicsAtPoint(Vector3<T> const& R) 
     // return ( m_translational );
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Output operator
 template <typename T>
 __HOST__ std::ostream& operator<<(std::ostream& fileOut, Kinematics<T> const& k)
@@ -93,7 +93,7 @@ __HOST__ std::ostream& operator<<(std::ostream& fileOut, Kinematics<T> const& k)
     return (fileOut);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__ std::istream& operator>>(std::istream& fileIn, Kinematics<T>& k)
@@ -106,7 +106,7 @@ __HOST__ std::istream& operator>>(std::istream& fileIn, Kinematics<T>& k)
     return (fileIn);
 }
 
-// -----------------------------------------------------------------------------// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class Kinematics<float>;
 template class Kinematics<double>;

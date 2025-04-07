@@ -206,7 +206,7 @@ __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
     f.close();
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Writes data at one physical time
 template <typename T>
 __HOST__ void one_output(std::vector<RigidBody<T, T>> const* rb,
@@ -245,14 +245,14 @@ __HOST__ void one_output(std::vector<RigidBody<T, T>> const* rb,
                             PostProcessingWriter::m_bPPWindow[m_rank]);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOST__ ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with XML node, rank and number of processes as input parameters
 template <typename T>
 __HOST__ ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter(DOMNode* dn)
@@ -266,7 +266,7 @@ __HOST__ ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter(DOMNode* 
     GrainsMisc<T>::cout("Writing mode = " + (m_binary ? "Binary" : "Text"), 12);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ ParaviewPostProcessingWriter<T>::~ParaviewPostProcessingWriter()
@@ -282,7 +282,7 @@ __HOST__ PostProcessingWriterType
     return (PARAVIEW);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Initializes the post-processing writer
 template <typename T>
 __HOST__ void
@@ -317,7 +317,7 @@ __HOST__ void
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Writes data
 template <typename T>
 __HOST__ void

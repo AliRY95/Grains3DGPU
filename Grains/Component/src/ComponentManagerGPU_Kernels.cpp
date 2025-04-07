@@ -9,7 +9,7 @@
 #include "LinkedCellGPUWrapper.hh"
 #include "VectorMath.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Zeros out the array
 __GLOBAL__
 void zeroOutArray_kernel(unsigned int* array, unsigned int numElements)
@@ -22,7 +22,7 @@ void zeroOutArray_kernel(unsigned int* array, unsigned int numElements)
     array[tid] = 0;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the start Id for each hash value in cellStart
 __GLOBAL__
 void sortComponentsAndFindCellStart_kernel(unsigned int const* componentCellHash,
@@ -73,7 +73,7 @@ void sortComponentsAndFindCellStart_kernel(unsigned int const* componentCellHash
     // sortedVel[index] = vel;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between particles and components
 template <typename T, typename U>
 __GLOBAL__ void
@@ -125,7 +125,7 @@ __GLOBAL__ void
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between particles and particles
 template <typename T, typename U>
 __GLOBAL__ void
@@ -207,7 +207,7 @@ __GLOBAL__ void
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Adds external forces such as gravity
 template <typename T, typename U>
 __GLOBAL__ void addExternalForces_kernel(RigidBody<T, U> const* const* particleRB,
@@ -232,7 +232,7 @@ __GLOBAL__ void addExternalForces_kernel(RigidBody<T, U> const* const* particleR
     // torce[ pId ].addForce( mass * Vector3<T>( gX, gY, gZ ) );
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Updates the position and velocities of particles
 // TODO: CLEAN -- A LOT OF THINGS
 template <typename T, typename U>
@@ -273,7 +273,7 @@ __GLOBAL__ void moveParticles_kernel(RigidBody<T, U> const* const*   RB,
     // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T, U)                                                                                  \
     template __GLOBAL__ void detectCollisionAndComputeContactForcesObstacles_kernel(             \

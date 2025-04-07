@@ -50,7 +50,7 @@ __HOST__ TimeIntegrator<T>* TimeIntegratorBuilderFactory<T>::create(DOMNode* roo
     return (TI);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructs a TimeIntegrator object on device.
 // It is assumed that appropriate memory is allocated to d_ti.
 template <typename T>
@@ -76,7 +76,7 @@ __HOST__ void
     cudaDeviceSynchronize();
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class TimeIntegratorBuilderFactory<float>;
 template class TimeIntegratorBuilderFactory<double>;

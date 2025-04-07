@@ -7,7 +7,7 @@
 #include "Sphere.hh"
 #include "Superquadric.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Construct a convex with an XML node as an input parameter
 template <typename T>
 Convex<T>* ConvexBuilderFactory<T>::create(DOMNode* root)
@@ -37,7 +37,7 @@ Convex<T>* ConvexBuilderFactory<T>::create(DOMNode* root)
     return (convex); // returns the host-side pointer to convex object
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Construct a convex with a type and a input stream as input parameters
 template <typename T>
 Convex<T>* ConvexBuilderFactory<T>::create(string& type, istream& fileIn)
@@ -64,7 +64,7 @@ Convex<T>* ConvexBuilderFactory<T>::create(string& type, istream& fileIn)
     return (convex);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class ConvexBuilderFactory<float>;
 template class ConvexBuilderFactory<double>;

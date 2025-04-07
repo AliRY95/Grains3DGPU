@@ -28,7 +28,7 @@ __HOSTDEVICE__ static INLINE T determinant(Matrix3<T> const& m) noexcept
     return (out0 + out1 + out2);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Returns the transposed matrix
 @param m the matrix */
 template <typename T>
@@ -46,7 +46,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> transpose(Matrix3<T> const& m) noexcept
                        buffer[ZZ]));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Returns the inverse of the matrix
 @param m the matrix */
 template <typename T>
@@ -73,7 +73,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> inverse(Matrix3<T> const& m) noexcept
     return (Matrix3<T>(out));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Matrices addition
 @param m1 first matrix
 @param m2 second matrix */
@@ -89,7 +89,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator+(Matrix3<T> const& m1,
     return (Matrix3<T>(out));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Matrices subtraction
 @param m1 first matrix
 @param m2 second matrix */
@@ -105,7 +105,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator-(Matrix3<T> const& m1,
     return (Matrix3<T>(out));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Scalar-matrix product
 @param c the scalar
 @param m the matrix */
@@ -119,7 +119,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator*(T c, Matrix3<T> const& m) noex
     return (Matrix3<T>(out));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Matrix-vector product
 @param m the matrix
 @param v the vector */
@@ -135,7 +135,7 @@ __HOSTDEVICE__ static INLINE Vector3<T> operator*(Matrix3<T> const& m, Vector3<T
     return (Vector3<T>(out));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Vector-matrix product
 @param v the vector
 @param m the matrix */
@@ -151,7 +151,7 @@ __HOSTDEVICE__ static INLINE Vector3<T> operator*(Vector3<T> const& v, Matrix3<T
     return (Vector3<T>(out));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Matrix-matrix product
 @param m right matrix */
 template <typename T>

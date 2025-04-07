@@ -39,7 +39,7 @@ __HOST__ int createLinkedCellOnDevice(Vector3<T> min, Vector3<T> max, T size, Li
     return (h_numCells);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Kernel for computing the linear linked cell hash values for all components
 template <typename T>
 __GLOBAL__ void computeLinearLinkedCellHashGPU_kernel(LinkedCell<T> const* const* LC,
@@ -56,7 +56,7 @@ __GLOBAL__ void computeLinearLinkedCellHashGPU_kernel(LinkedCell<T> const* const
     componentCellHash[tid] = (*LC)->computeLinearCellHash(tr[tid].getOrigin());
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T)                                                         \
     template __HOST__ int createLinkedCellOnDevice(                  \

@@ -1,7 +1,7 @@
 #include "Transform3.hh"
 #include "MatrixMath.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Default constructor. Origin is def and matrix is identity
 template <typename T>
 __HOSTDEVICE__ Transform3<T>::Transform3(T def)
@@ -10,7 +10,7 @@ __HOSTDEVICE__ Transform3<T>::Transform3(T def)
     m_origin.setValue(def, def, def);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with origin coordinates as inputs and matrix is identity
 template <typename T>
 __HOSTDEVICE__ Transform3<T>::Transform3(T x, T y, T z)
@@ -19,7 +19,7 @@ __HOSTDEVICE__ Transform3<T>::Transform3(T x, T y, T z)
     m_origin.setValue(x, y, z);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with a 1D array of 12 values as inputs containing the
 // rotation matrix coefficients following by the origin coordinates
 template <typename T>
@@ -28,7 +28,7 @@ __HOSTDEVICE__ Transform3<T>::Transform3(T const* buffer)
     setValue(buffer);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with a two transformations such that 'this = b2w o inv(a2w) = b2a'
 template <typename T>
 __HOSTDEVICE__ Transform3<T>::Transform3(Transform3<T> const& a2w, Transform3<T> const& b2w)
@@ -37,7 +37,7 @@ __HOSTDEVICE__ Transform3<T>::Transform3(Transform3<T> const& a2w, Transform3<T>
     this->relativeToTransform(a2w);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor using an XML node
 template <typename T>
 __HOST__ Transform3<T>::Transform3(DOMNode* root)
@@ -93,7 +93,7 @@ __HOST__ Transform3<T>::Transform3(DOMNode* root)
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
 __HOSTDEVICE__ Transform3<T>::Transform3(Transform3<T> const& t)
@@ -102,14 +102,14 @@ __HOSTDEVICE__ Transform3<T>::Transform3(Transform3<T> const& t)
     m_origin = t.m_origin;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ Transform3<T>::~Transform3()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the orientation of the transformation
 template <typename T>
 __HOSTDEVICE__ Matrix3<T> Transform3<T>::getBasis() const
@@ -117,7 +117,7 @@ __HOSTDEVICE__ Matrix3<T> Transform3<T>::getBasis() const
     return (m_basis);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the origin of the transformation
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Transform3<T>::getOrigin() const
@@ -125,7 +125,7 @@ __HOSTDEVICE__ Vector3<T> Transform3<T>::getOrigin() const
     return (m_origin);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the transformation with an 1D array of 12 values as inputs
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::setValue(T const* buffer)
@@ -134,7 +134,7 @@ __HOSTDEVICE__ void Transform3<T>::setValue(T const* buffer)
     m_origin.setValue(buffer + 9);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the matrix part of the transformation
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::setBasis(Matrix3<T> const& m)
@@ -142,7 +142,7 @@ __HOSTDEVICE__ void Transform3<T>::setBasis(Matrix3<T> const& m)
     m_basis = m;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the matrix part of the transformation with specified rotations around
 // each principal axis
 template <typename T>
@@ -159,7 +159,7 @@ __HOSTDEVICE__ void Transform3<T>::setBasis(T aX, T aY, T aZ)
                          cos(aY) * cos(aX));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the origin of the transformation
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::setOrigin(Vector3<T> const& v)
@@ -167,7 +167,7 @@ __HOSTDEVICE__ void Transform3<T>::setOrigin(Vector3<T> const& v)
     m_origin = v;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the transformation to the identity
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::setIdentity()
@@ -176,7 +176,7 @@ __HOSTDEVICE__ void Transform3<T>::setIdentity()
     m_origin.setValue(T(0), T(0), T(0));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Set the transformation to the inverse of another transformation t
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::setToInverseTransform(Transform3<T> const& t, bool isRotation)
@@ -188,7 +188,7 @@ __HOSTDEVICE__ void Transform3<T>::setToInverseTransform(Transform3<T> const& t,
     m_origin.setValue((-m_basis * t.m_origin).getBuffer());
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Composition of affine transformations: this = t2 o t1 (t1 first
 // followed by t2)
 template <typename T>
@@ -199,7 +199,7 @@ __HOSTDEVICE__ void Transform3<T>::setToTransformsComposition(Transform3<T> cons
     m_origin = t2(t1.m_origin);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Composition with a scaling transformation: this = this o scaling
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::composeWithScaling(Vector3<T> const& v)
@@ -216,7 +216,7 @@ __HOSTDEVICE__ void Transform3<T>::composeWithScaling(Vector3<T> const& v)
     m_basis[ZZ] *= b[2];
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Composition on the left by a rotation described by a transform:
 // this = rot o this (this first followed by rot)
 // This composition leaves the origin unchanged but does not check that rot
@@ -227,7 +227,7 @@ __HOSTDEVICE__ void Transform3<T>::composeLeftByRotation(Transform3<T> const& t)
     m_basis = t.m_basis * m_basis;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Composition on the left by a rotation described by a quaternion:
 // this = rot( quaternion ) o this ( this first followed by rot( quaternion ) )
 template <typename T>
@@ -267,7 +267,7 @@ __HOSTDEVICE__ void Transform3<T>::composeLeftByRotation(Quaternion<T> const& q)
     // }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Composition on the left by a translation:
 // this = trans(vector) o this (this first followed by trans(vector))
 template <typename T>
@@ -276,7 +276,7 @@ __HOSTDEVICE__ void Transform3<T>::composeLeftByTranslation(Vector3<T> const& v)
     m_origin += v;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Composition on the left by another affine transformation:
 // this = t o this (this first followed by t)
 template <typename T>
@@ -286,7 +286,7 @@ __HOSTDEVICE__ void Transform3<T>::composeLeftByTransform(Transform3<T> const& t
     m_basis  = t.m_basis * m_basis;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Composition on the right by another affine transformation:
 // this = this o t (t first followed by this)
 template <typename T>
@@ -296,7 +296,7 @@ __HOSTDEVICE__ void Transform3<T>::composeRightByTransform(Transform3<T> const& 
     m_basis *= t.m_basis;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Relative transformation with respect to t
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::relativeToTransform(Transform3<T> const& t)
@@ -306,7 +306,7 @@ __HOSTDEVICE__ void Transform3<T>::relativeToTransform(Transform3<T> const& t)
     m_origin                         = inverseRotation * (m_origin - t.m_origin);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Updates the transformation with a displacement and a rotation
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::updateTransform(Vector3<T> const&    transMotion,
@@ -316,7 +316,7 @@ __HOSTDEVICE__ void Transform3<T>::updateTransform(Vector3<T> const&    transMot
     this->composeLeftByRotation(rotMotion);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the result of applying the transformation to the input vector
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Transform3<T>::operator()(Vector3<T> const& v) const
@@ -324,7 +324,7 @@ __HOSTDEVICE__ Vector3<T> Transform3<T>::operator()(Vector3<T> const& v) const
     return (Vector3<T>(m_basis * v + m_origin));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Equal operator to another Transform object
 template <typename T>
 __HOSTDEVICE__ Transform3<T>& Transform3<T>::operator=(Transform3<T> const& t)
@@ -337,7 +337,7 @@ __HOSTDEVICE__ Transform3<T>& Transform3<T>::operator=(Transform3<T> const& t)
     return (*this);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Conversion operator to float
 template <>
 __HOSTDEVICE__ Transform3<double>::operator Transform3<float>() const
@@ -359,7 +359,7 @@ __HOSTDEVICE__ Transform3<double>::operator Transform3<float>() const
     return (Transform3<float>(t));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Output operator
 template <typename T>
 __HOST__ std::ostream& operator<<(std::ostream& fileOut, Transform3<T> const& t)
@@ -371,7 +371,7 @@ __HOST__ std::ostream& operator<<(std::ostream& fileOut, Transform3<T> const& t)
     return (fileOut);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__ std::istream& operator>>(std::istream& fileIn, Transform3<T>& t)
@@ -388,7 +388,7 @@ __HOST__ std::istream& operator>>(std::istream& fileIn, Transform3<T>& t)
     return (fileIn);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class Transform3<float>;
 template class Transform3<double>;

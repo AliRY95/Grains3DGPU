@@ -56,7 +56,7 @@ __HOSTDEVICE__ static INLINE void computeDet(unsigned int const bits,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE bool
     valid(unsigned int const s, unsigned int const all_bits, T const det[16][4])
@@ -77,7 +77,7 @@ __HOSTDEVICE__ static INLINE bool
     return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits_,
                                                 Vector3<T> const   y[4],
@@ -97,7 +97,7 @@ __HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits_,
     v *= T(1) / sum;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits_,
                                                 T const            det[16][4],
@@ -123,7 +123,7 @@ __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits_,
     p2 *= s;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE bool proper(unsigned int const s, T const det[16][4])
 {
@@ -133,7 +133,7 @@ __HOSTDEVICE__ static INLINE bool proper(unsigned int const s, T const det[16][4
     return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE bool closest(unsigned int&      bits,
                                           unsigned int const last,
@@ -187,7 +187,7 @@ __HOSTDEVICE__ static INLINE bool closest(unsigned int&      bits,
     return (false);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
 template <typename T>
@@ -200,7 +200,7 @@ __HOSTDEVICE__ static INLINE bool
     return (false);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // For num_iterations > 1000
 __HOSTDEVICE__
 void catch_me()
@@ -253,7 +253,7 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
     return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns whether 2 convex shapes intersect using the GJK algorithm - relative
 // transformation
 template <typename T>
@@ -294,7 +294,7 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const& a, Convex<T> const& b, Transfo
     return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the minimal distance between 2 convex shapes and a point per convex
 // shape that represents the tips of the minimal distance segment
 template <typename T>
@@ -381,7 +381,7 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
     return (dist);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // // Returns the minimal distance between 2 convex shapes and a point per convex
 // // shape that represents the tips of the minimal distance segment - relative
 // // transformation
@@ -442,7 +442,7 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
 //     return ( dist );
 // }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T)                                                                        \
     template __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,               \

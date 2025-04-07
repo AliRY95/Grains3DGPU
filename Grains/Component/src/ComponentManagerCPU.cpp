@@ -8,14 +8,14 @@
 #include "QuaternionMath.hh"
 #include "VectorMath.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 ComponentManagerCPU<T>::ComponentManagerCPU()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with the number of particles, number of obstacles, and number of
 // cells with all other data members initialized as default.
 template <typename T>
@@ -64,14 +64,14 @@ ComponentManagerCPU<T>::ComponentManagerCPU(unsigned int nParticles,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 ComponentManagerCPU<T>::~ComponentManagerCPU()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets particles rigid body Ids
 template <typename T>
 std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
@@ -79,7 +79,7 @@ std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
     return (m_rigidBodyId);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets obstacles rigid body Ids
 template <typename T>
 std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyIdObstacles() const
@@ -87,7 +87,7 @@ std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyIdObstacles() cons
     return (m_obstacleRigidBodyId);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets particles transformations
 template <typename T>
 std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
@@ -95,7 +95,7 @@ std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransform() const
     return (m_transform);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets obstacles transformations
 template <typename T>
 std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransformObstacles() const
@@ -103,7 +103,7 @@ std::vector<Transform3<T>> ComponentManagerCPU<T>::getTransformObstacles() const
     return (m_obstacleTransform);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets particles velocities
 template <typename T>
 std::vector<Kinematics<T>> ComponentManagerCPU<T>::getVelocity() const
@@ -111,7 +111,7 @@ std::vector<Kinematics<T>> ComponentManagerCPU<T>::getVelocity() const
     return (m_velocity);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets particles torces
 template <typename T>
 std::vector<Torce<T>> ComponentManagerCPU<T>::getTorce() const
@@ -119,7 +119,7 @@ std::vector<Torce<T>> ComponentManagerCPU<T>::getTorce() const
     return (m_torce);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the array of particle Ids
 template <typename T>
 std::vector<unsigned int> ComponentManagerCPU<T>::getParticleId() const
@@ -127,7 +127,7 @@ std::vector<unsigned int> ComponentManagerCPU<T>::getParticleId() const
     return (m_particleId);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the number of particles in manager
 template <typename T>
 unsigned int ComponentManagerCPU<T>::getNumberOfParticles() const
@@ -135,7 +135,7 @@ unsigned int ComponentManagerCPU<T>::getNumberOfParticles() const
     return (m_nParticles);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the number of obstacles in manager
 template <typename T>
 unsigned int ComponentManagerCPU<T>::getNumberOfObstacles() const
@@ -143,7 +143,7 @@ unsigned int ComponentManagerCPU<T>::getNumberOfObstacles() const
     return (m_nObstacles);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the number of cells in manager
 template <typename T>
 unsigned int ComponentManagerCPU<T>::getNumberOfCells() const
@@ -151,7 +151,7 @@ unsigned int ComponentManagerCPU<T>::getNumberOfCells() const
     return (m_nCells);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the array of particles rigid body Ids
 template <typename T>
 void ComponentManagerCPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
@@ -159,7 +159,7 @@ void ComponentManagerCPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
     m_rigidBodyId = id;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the array of obstacles rigid body Ids
 template <typename T>
 void ComponentManagerCPU<T>::setRigidBodyIdObstacles(std::vector<unsigned int> const& id)
@@ -167,7 +167,7 @@ void ComponentManagerCPU<T>::setRigidBodyIdObstacles(std::vector<unsigned int> c
     m_obstacleRigidBodyId = id;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets particles transformations
 template <typename T>
 void ComponentManagerCPU<T>::setTransform(std::vector<Transform3<T>> const& t)
@@ -175,7 +175,7 @@ void ComponentManagerCPU<T>::setTransform(std::vector<Transform3<T>> const& t)
     m_transform = t;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets obstacles transformations
 template <typename T>
 void ComponentManagerCPU<T>::setTransformObstacles(std::vector<Transform3<T>> const& t)
@@ -183,7 +183,7 @@ void ComponentManagerCPU<T>::setTransformObstacles(std::vector<Transform3<T>> co
     m_obstacleTransform = t;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets particles velocities
 template <typename T>
 void ComponentManagerCPU<T>::setVelocity(std::vector<Kinematics<T>> const& v)
@@ -191,7 +191,7 @@ void ComponentManagerCPU<T>::setVelocity(std::vector<Kinematics<T>> const& v)
     m_velocity = v;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets particles torces
 template <typename T>
 void ComponentManagerCPU<T>::setTorce(std::vector<Torce<T>> const& t)
@@ -199,7 +199,7 @@ void ComponentManagerCPU<T>::setTorce(std::vector<Torce<T>> const& t)
     m_torce = t;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the array of particle Ids
 template <typename T>
 void ComponentManagerCPU<T>::setParticleId(std::vector<unsigned int> const& id)
@@ -207,7 +207,7 @@ void ComponentManagerCPU<T>::setParticleId(std::vector<unsigned int> const& id)
     m_particleId = id;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Initializes the RigidBody IDs and transformations of the obstacles
 template <typename T>
 void ComponentManagerCPU<T>::initializeObstacles(std::vector<unsigned int>  numEachUniqueObstacles,
@@ -232,7 +232,7 @@ void ComponentManagerCPU<T>::initializeObstacles(std::vector<unsigned int>  numE
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Initializes the RigidBody IDs and transformations of the particles
 template <typename T>
 void ComponentManagerCPU<T>::initializeParticles(std::vector<uint>          numEachUniqueParticles,
@@ -257,7 +257,7 @@ void ComponentManagerCPU<T>::initializeParticles(std::vector<uint>          numE
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Inserts particles according to a given insertion policy
 template <typename T>
 void ComponentManagerCPU<T>::insertParticles(Insertion<T>* ins)
@@ -278,7 +278,7 @@ void ComponentManagerCPU<T>::insertParticles(Insertion<T>* ins)
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Updates links between components and linked cell
 template <typename T>
 void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
@@ -299,7 +299,7 @@ void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between particles and obstacles
 template <typename T>
 void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
@@ -345,7 +345,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between particles and particles
 template <typename T>
 void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
@@ -418,7 +418,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between all components
 template <typename T>
 void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
@@ -438,7 +438,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
     detectCollisionAndComputeContactForcesObstacles(particleRB, obstacleRB, CF);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Adds external forces such as gravity
 template <typename T>
 void ComponentManagerCPU<T>::addExternalForces(RigidBody<T, T> const* const* particleRB,
@@ -456,7 +456,7 @@ void ComponentManagerCPU<T>::addExternalForces(RigidBody<T, T> const* const* par
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Updates the position and velocities of particles
 template <typename T>
 void ComponentManagerCPU<T>::moveParticles(RigidBody<T, T> const* const*   particleRB,
@@ -496,7 +496,7 @@ void ComponentManagerCPU<T>::moveParticles(RigidBody<T, T> const* const*   parti
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class ComponentManagerCPU<float>;
 template class ComponentManagerCPU<double>;

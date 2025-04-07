@@ -20,7 +20,7 @@ Grains<T>::Grains()
     Gout(std::string(80, '='));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 Grains<T>::~Grains()
@@ -29,7 +29,7 @@ Grains<T>::~Grains()
     delete m_insertion;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Initializes the simulation using the XML input
 template <typename T>
 void Grains<T>::initialize(DOMElement* rootElement)
@@ -49,7 +49,7 @@ void Grains<T>::initialize(DOMElement* rootElement)
     Gout(std::string(80, '='));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Performs post-processing
 template <typename T>
 void Grains<T>::postProcess(ComponentManager<T> const* cm) const
@@ -305,7 +305,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // External force definition
 template <typename T>
 void Grains<T>::Forces(DOMElement* rootElement)
@@ -336,7 +336,7 @@ void Grains<T>::Forces(DOMElement* rootElement)
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Additional features of the simulation: insertion, post-processing
 template <typename T>
 void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
@@ -406,7 +406,7 @@ void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
         Gout(0, 6, "No postprocessing writer!");
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class Grains<float>;
 template class Grains<double>;

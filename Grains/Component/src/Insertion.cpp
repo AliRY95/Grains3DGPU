@@ -57,7 +57,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
     return (insertionWindows);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Reads if the root is of type File
 template <typename T>
 __HOST__ static INLINE InsertionInfo<T> readDataFile(DOMNode* root)
@@ -78,7 +78,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataFile(DOMNode* root)
     return (file);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Reads if the root is of type Constant
 template <typename T>
 __HOST__ static INLINE InsertionInfo<T> readDataCons(DOMNode* root)
@@ -93,7 +93,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataCons(DOMNode* root)
     return (vec);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Reads if the root is of type Zero
 template <typename T>
 __HOST__ static INLINE InsertionInfo<T> readDataZero(DOMNode* root)
@@ -121,7 +121,7 @@ __HOST__ Insertion<T>::Insertion()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with XML node
 template <typename T>
 __HOST__ Insertion<T>::Insertion(DOMNode* dn)
@@ -173,7 +173,7 @@ __HOST__ Insertion<T>::Insertion(DOMNode* dn)
     read(nIA, m_angularVelType, m_angularVelInsertionInfo);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ Insertion<T>::~Insertion()
@@ -188,7 +188,7 @@ __HOST__ Insertion<T>::~Insertion()
         (std::get<std::ifstream>(m_angularVelInsertionInfo)).close();
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns a vector of Vector3 accroding to type and data
 template <typename T>
 __HOST__ Vector3<T> Insertion<T>::fetchInsertionDataForEach(InsertionType const type,
@@ -223,7 +223,7 @@ __HOST__ Vector3<T> Insertion<T>::fetchInsertionDataForEach(InsertionType const 
         return (Vector3<T>());
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns all required data members to insert components as a vector
 template <typename T>
 __HOST__ std::pair<Transform3<T>, Kinematics<T>> Insertion<T>::fetchInsertionData()
@@ -253,7 +253,7 @@ __HOST__ std::pair<Transform3<T>, Kinematics<T>> Insertion<T>::fetchInsertionDat
     return (std::make_pair(tr, k));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class Insertion<float>;
 template class Insertion<double>;

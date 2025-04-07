@@ -19,7 +19,7 @@ __HOSTDEVICE__ static INLINE bool
     return (dist2 < radiiSum * radiiSum);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the contact information (if any) for 2 rigid bodies of spherical
 // shape
 template <typename T, typename U>
@@ -45,7 +45,7 @@ __HOSTDEVICE__ static INLINE ContactInfo<T> closestPointsSpheres(RigidBody<T, U>
         return (noContact);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the contact information (if any) for 2 rigid bodies if the SECOND ONE
 // is a rectangle
 template <typename T, typename U>
@@ -127,7 +127,7 @@ __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
     return (false);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns whether 2 rigid bodies intersect using the GJK algorithm - relative
 // transformation
 template <typename T, typename U>
@@ -166,7 +166,7 @@ __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
     return (false);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the contact information (if any) for 2 rigid bodies
 template <typename T, typename U>
 __HOSTDEVICE__ ContactInfo<T> closestPointsRigidBodies(RigidBody<T, U> const& rbA,
@@ -270,7 +270,7 @@ __HOSTDEVICE__ ContactInfo<T> closestPointsRigidBodies(RigidBody<T, U> const& rb
     return (noContact);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the distance between 2 rigid bodies
 template <typename T, typename U>
 __HOSTDEVICE__ T distanceRigidBodies(RigidBody<T, U> const& rbA,
@@ -312,7 +312,7 @@ __HOSTDEVICE__ T distanceRigidBodies(RigidBody<T, U> const& rbA,
     return (distance);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T, U)                                                                                 \
     template __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,               \

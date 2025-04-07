@@ -8,7 +8,7 @@
 #include "LinkedCell.hh"
 #include "LinkedCellGPUWrapper.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Zeros out the array
 __GLOBAL__
 void zeroOutArray(unsigned int* array, unsigned int numElements)
@@ -21,7 +21,7 @@ void zeroOutArray(unsigned int* array, unsigned int numElements)
     array[tid] = 0;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the start Id for each hash value in cellStart
 __GLOBAL__
 void sortComponentsAndFindCellStart_kernel(unsigned int const* componentCellHash,
@@ -72,7 +72,7 @@ void sortComponentsAndFindCellStart_kernel(unsigned int const* componentCellHash
     // sortedVel[index] = vel;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // N-squared collision detection kernel using a thread-per-particle policy
 // TODO: REMOVE LATER
 template <typename T, typename U>
@@ -94,7 +94,7 @@ __GLOBAL__ void collisionDetectionN2(RigidBody<T, U> const* const* a,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // N-squared collision detection kernel with relative transformation
 // TODO: REMOVE LATER
 template <typename T, typename U>
@@ -116,7 +116,7 @@ __GLOBAL__ void collisionDetectionRelativeN2(RigidBody<T, U> const* const* a,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // LinkedCell collision detection kernel
 // TODO: CLEAN -- A LOT OF THINGS
 template <typename T, typename U>
@@ -195,7 +195,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(LinkedCell<T> cons
     // m_torce[compId].addForce( massA * GrainsParameters<T>::m_gravity );
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T, U)                                                                                \
     template __GLOBAL__ void collisionDetectionN2(RigidBody<T, U> const* const* a,             \

@@ -9,21 +9,21 @@
 #include "GrainsUtils.hh"
 #include "TimeIntegratorBuilderFactory.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 GrainsGPU<T>::GrainsGPU()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 GrainsGPU<T>::~GrainsGPU()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Initializes the simulation using the XML input
 template <typename T>
 void GrainsGPU<T>::initialize(DOMElement* rootElement)
@@ -48,7 +48,7 @@ void GrainsGPU<T>::initialize(DOMElement* rootElement)
     Gout(std::string(80, '='));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Runs the simulation over the prescribed time interval
 template <typename T>
 void GrainsGPU<T>::simulate()
@@ -253,21 +253,21 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     GrainsMisc<T>::cout("Copying time integration scheme to device completed!", 6);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // External force definition
 template <typename T>
 void GrainsGPU<T>::Forces(DOMElement* rootElement)
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Additional features of the simulation: insertion, post-processing
 template <typename T>
 void GrainsGPU<T>::AdditionalFeatures(DOMElement* rootElement)
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsGPU<float>;
 template class GrainsGPU<double>;

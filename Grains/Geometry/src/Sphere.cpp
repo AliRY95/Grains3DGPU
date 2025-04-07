@@ -3,7 +3,7 @@
 
 #define visuNodeNbPerQar 8
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with radius
 template <typename T>
 __HOSTDEVICE__ Sphere<T>::Sphere(T r)
@@ -11,7 +11,7 @@ __HOSTDEVICE__ Sphere<T>::Sphere(T r)
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with an input stream
 template <typename T>
 __HOST__ Sphere<T>::Sphere(std::istream& fileIn)
@@ -19,7 +19,7 @@ __HOST__ Sphere<T>::Sphere(std::istream& fileIn)
     readConvex(fileIn);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with an XML node as an input parameter
 template <typename T>
 __HOST__ Sphere<T>::Sphere(DOMNode* root)
@@ -27,14 +27,14 @@ __HOST__ Sphere<T>::Sphere(DOMNode* root)
     m_radius = T(ReaderXML::getNodeAttr_Double(root, "Radius"));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ Sphere<T>::~Sphere()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the convex type
 template <typename T>
 __HOSTDEVICE__ ConvexType Sphere<T>::getConvexType() const
@@ -42,7 +42,7 @@ __HOSTDEVICE__ ConvexType Sphere<T>::getConvexType() const
     return (SPHERE);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the radius
 template <typename T>
 __HOSTDEVICE__ T Sphere<T>::getRadius() const
@@ -50,7 +50,7 @@ __HOSTDEVICE__ T Sphere<T>::getRadius() const
     return (m_radius);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the radius
 template <typename T>
 __HOSTDEVICE__ void Sphere<T>::setRadius(T r)
@@ -58,7 +58,7 @@ __HOSTDEVICE__ void Sphere<T>::setRadius(T r)
     m_radius = r;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns a clone of the sphere
 template <typename T>
 __HOSTDEVICE__ Convex<T>* Sphere<T>::clone() const
@@ -66,7 +66,7 @@ __HOSTDEVICE__ Convex<T>* Sphere<T>::clone() const
     return (new Sphere<T>(m_radius));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the volume of the Sphere
 template <typename T>
 __HOSTDEVICE__ T Sphere<T>::computeVolume() const
@@ -74,7 +74,7 @@ __HOSTDEVICE__ T Sphere<T>::computeVolume() const
     return (T(4) * PI<T> * m_radius * m_radius * m_radius / T(3));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__ void Sphere<T>::computeInertia(T (&inertia)[6], T (&inertia_1)[6]) const
@@ -87,7 +87,7 @@ __HOSTDEVICE__ void Sphere<T>::computeInertia(T (&inertia)[6], T (&inertia_1)[6]
     inertia_1[5] = inertia_1[3] = inertia_1[0] = T(1) / inertia[0];
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the circumscribed radius of the Sphere
 template <typename T>
 __HOSTDEVICE__ T Sphere<T>::computeCircumscribedRadius() const
@@ -95,7 +95,7 @@ __HOSTDEVICE__ T Sphere<T>::computeCircumscribedRadius() const
     return (m_radius);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the bounding box to Sphere
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Sphere<T>::computeBoundingBox() const
@@ -103,7 +103,7 @@ __HOSTDEVICE__ Vector3<T> Sphere<T>::computeBoundingBox() const
     return (Vector3<T>(m_radius, m_radius, m_radius));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sphere support function, returns the support point P, i.e. the point on the
 // surface of the Sphere that satisfies max(P.v)
 template <typename T>
@@ -112,7 +112,7 @@ __HOSTDEVICE__ Vector3<T> Sphere<T>::support(Vector3<T> const& v) const
     return (m_radius * v.normalized());
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__ void Sphere<T>::readConvex(std::istream& fileIn)
@@ -120,7 +120,7 @@ __HOST__ void Sphere<T>::readConvex(std::istream& fileIn)
     fileIn >> m_radius;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Output operator
 template <typename T>
 __HOST__ void Sphere<T>::writeConvex(std::ostream& fileOut) const
@@ -128,7 +128,7 @@ __HOST__ void Sphere<T>::writeConvex(std::ostream& fileOut) const
     fileOut << "Sphere with radius " << m_radius << ".\n";
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the number of points to write the sphere in a Paraview format
 template <typename T>
 __HOST__ int Sphere<T>::numberOfPoints_PARAVIEW() const
@@ -136,7 +136,7 @@ __HOST__ int Sphere<T>::numberOfPoints_PARAVIEW() const
     return (4 * visuNodeNbPerQar * (2 * visuNodeNbPerQar - 1) + 3);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the number of elementary polytopes to write the sphere in a Paraview
 // format
 template <typename T>
@@ -145,7 +145,7 @@ __HOST__ int Sphere<T>::numberOfCells_PARAVIEW() const
     return (8 * visuNodeNbPerQar * visuNodeNbPerQar);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns a list of points describing the sphere in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>> Sphere<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
@@ -200,7 +200,7 @@ __HOST__ std::list<Vector3<T>> Sphere<T>::writePoints_PARAVIEW(Transform3<T> con
     return (ParaviewPoints);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Writes the connectivity of the sphere in a Paraview format
 template <typename T>
 __HOST__ void Sphere<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
@@ -282,7 +282,7 @@ __HOST__ void Sphere<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
     firstpoint_globalnumber += 4 * visuNodeNbPerQar * (2 * visuNodeNbPerQar - 1) + 3;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class Sphere<float>;
 template class Sphere<double>;

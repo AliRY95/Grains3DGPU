@@ -23,7 +23,7 @@ __HOSTDEVICE__ static INLINE T norm(Quaternion<T> const& q)
     return (sqrt(norm2(q.getVector) + q.getScalar() * q.getScalar()));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Returns the norm squared of the quaternion
 @param q the quaternion */
 template <typename T>
@@ -32,7 +32,7 @@ __HOSTDEVICE__ static INLINE T norm2(Quaternion<T> const& q)
     return (norm2(q.getVector) + q.getScalar() * q.getScalar());
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Returns the conjugate of the quaternion
 @param q the quaternion */
 template <typename T>
@@ -41,7 +41,7 @@ __HOSTDEVICE__ static INLINE Quaternion<T> conjugate(Quaternion<T> const& q)
     return (Quaternion<T>(-q.getVector(), q.getScalar));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Returns the inverse of the quaternion
 @param q the quaternion */
 template <typename T>
@@ -50,7 +50,7 @@ __HOSTDEVICE__ static INLINE Quaternion<T> inverse(Quaternion<T> const& q)
     return ((T(1) / norm(q)) * conjugate(q));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Sum of 2 quaternions, i.e., q1 + q2
 @param q1 1st quaternion 
 @param q2 2nd quaternion */
@@ -61,7 +61,7 @@ __HOSTDEVICE__ static INLINE Quaternion<T> operator+(Quaternion<T> const& q1,
     return (Quaternion<T>(q1[0] + q2[0], q1[1] + q2[1], q1[2] + q2[2], q1[3] + q2[3]));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 /** @brief Subtraction of 2 quaternions, i.e., q1 - q2
 @param q1 1st quaternion
 @param q2 2nd quaternion */

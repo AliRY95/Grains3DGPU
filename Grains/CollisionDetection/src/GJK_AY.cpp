@@ -11,7 +11,7 @@ __HOSTDEVICE__ static INLINE unsigned int compareSigns(T a, T b)
     return static_cast<unsigned int>(!((a > 0) ^ (b > 0)));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void s1d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
 {
@@ -82,7 +82,7 @@ __HOSTDEVICE__ static INLINE void s1d(Vector3<T> const y[4], unsigned int& bits,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void s2d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
 {
@@ -204,7 +204,7 @@ __HOSTDEVICE__ static INLINE void s2d(Vector3<T> const y[4], unsigned int& bits,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void s3d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
 {
@@ -278,7 +278,7 @@ __HOSTDEVICE__ static INLINE void s3d(Vector3<T> const y[4], unsigned int& bits,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void
     computeVector(unsigned int const bits, Vector3<T> const y[4], T const lambdas[4], Vector3<T>& v)
@@ -291,7 +291,7 @@ __HOSTDEVICE__ static INLINE void
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits,
                                                 Vector3<T> const   p[4],
@@ -312,7 +312,7 @@ __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits,
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void
     sv_subalgorithm(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4], Vector3<T>& v)
@@ -344,7 +344,7 @@ __HOSTDEVICE__ static INLINE void
     computeVector(bits, y, lambdas, v);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
 template <typename T>
@@ -442,7 +442,7 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,
     return (dist);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T)                                                                        \
     template __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,   \

@@ -88,7 +88,7 @@ __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
     return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns whether the bounding boxes are in contact using OBB test - relative
 // transformation
 template <typename T>
@@ -149,7 +149,7 @@ __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
     return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns whether the bounding boxes are in contact using AABB test
 template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
@@ -173,7 +173,7 @@ __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
         return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns whether the bounding boxes are in contact using AABB test - relative
 // transformation
 template <typename T>
@@ -196,13 +196,13 @@ __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
         return (true);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Undefining the low-level methods
 #undef TESTCASE1
 #undef TESTCASE2
 #undef TESTCASE3
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 #define X(T)                                                                               \
     template __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,   \

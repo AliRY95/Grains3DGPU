@@ -23,7 +23,7 @@ __HOST__ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with XML node
 template <typename T>
 __HOST__ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter(DOMNode* dn)
@@ -34,14 +34,14 @@ __HOST__ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter(DOMNode* dn
     GrainsMisc<T>::cout("Output file name = " + m_filerootname, 12);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ RawDataPostProcessingWriter<T>::~RawDataPostProcessingWriter()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the post-processing writer type
 template <typename T>
 __HOST__ PostProcessingWriterType
@@ -50,7 +50,7 @@ __HOST__ PostProcessingWriterType
     return (RAW);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Initializes the post-processing writer
 template <typename T>
 __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_start()
@@ -62,7 +62,7 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_start()
     prepareResultFiles(mode);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Writes data -- Particles come first, followed by obtacles
 template <typename T>
 __HOST__ void
@@ -192,7 +192,7 @@ __HOST__ void
     m_particle_class.close();
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Finalizes writing data
 template <typename T>
 __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_end()
@@ -210,7 +210,7 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_end()
     m_particle_class.close();
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Creates output files and open streams
 template <typename T>
 __HOST__ void RawDataPostProcessingWriter<T>::prepareResultFiles(ios_base::openmode mode)
@@ -241,7 +241,7 @@ __HOST__ void RawDataPostProcessingWriter<T>::prepareResultFiles(ios_base::openm
     m_coordination_number.open(file.c_str(), mode);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class RawDataPostProcessingWriter<float>;
 template class RawDataPostProcessingWriter<double>;

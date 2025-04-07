@@ -1,28 +1,28 @@
 #include "TimeIntegrator.hh"
 #include "VectorMath.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOSTDEVICE__ TimeIntegrator<T>::TimeIntegrator()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
 __HOSTDEVICE__ TimeIntegrator<T>::TimeIntegrator(TimeIntegrator<T> const& ti)
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ TimeIntegrator<T>::~TimeIntegrator()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Computes the quaternion change over the time step
 template <typename T>
 __HOSTDEVICE__ Quaternion<T>
@@ -43,7 +43,7 @@ __HOSTDEVICE__ Quaternion<T>
         return (Quaternion<T>(T(0), T(1)));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class TimeIntegrator<float>;
 template class TimeIntegrator<double>;

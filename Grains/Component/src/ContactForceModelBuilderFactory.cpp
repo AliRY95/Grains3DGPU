@@ -64,7 +64,7 @@ __HOST__ ContactForceModel<T>** ContactForceModelBuilderFactory<T>::create(DOMEl
     return (CF);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Hash function to map a pair of material IDs x and y to a single ID to access
 // the proper contact force model between them.
 // We DO NOT CHECK the inputs. We TRUST the user on this. However, inproper
@@ -95,7 +95,7 @@ __HOSTDEVICE__ unsigned int ContactForceModelBuilderFactory<T>::computeHash(unsi
     // }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructs a ContactForceModel object on device.
 // It is assumed that appropriate memory is allocated to d_cf.
 template <typename T>
@@ -126,7 +126,7 @@ __HOST__ void ContactForceModelBuilderFactory<T>::ContactForceModelCopyHostToDev
     cudaDeviceSynchronize();
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class ContactForceModelBuilderFactory<float>;
 template class ContactForceModelBuilderFactory<double>;

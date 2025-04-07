@@ -4,7 +4,7 @@
 // multiple of 4
 #define visuNodeNbOnPer 16
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with half edge length as input parameters
 template <typename T>
 __HOSTDEVICE__ Superquadric<T>::Superquadric(T a, T b, T c, T n1, T n2)
@@ -16,7 +16,7 @@ __HOSTDEVICE__ Superquadric<T>::Superquadric(T a, T b, T c, T n1, T n2)
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with an input stream
 template <typename T>
 __HOST__ Superquadric<T>::Superquadric(std::istream& fileIn)
@@ -24,7 +24,7 @@ __HOST__ Superquadric<T>::Superquadric(std::istream& fileIn)
     readConvex(fileIn);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with an XML node as an input parameter
 template <typename T>
 __HOST__ Superquadric<T>::Superquadric(DOMNode* root)
@@ -36,14 +36,14 @@ __HOST__ Superquadric<T>::Superquadric(DOMNode* root)
     m_n2 = T(ReaderXML::getNodeAttr_Double(root, "n2"));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ Superquadric<T>::~Superquadric()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the convex type
 template <typename T>
 __HOSTDEVICE__ ConvexType Superquadric<T>::getConvexType() const
@@ -51,7 +51,7 @@ __HOSTDEVICE__ ConvexType Superquadric<T>::getConvexType() const
     return (SUPERQUADRIC);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the extent in a Vector3 format
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Superquadric<T>::getExtent() const
@@ -59,7 +59,7 @@ __HOSTDEVICE__ Vector3<T> Superquadric<T>::getExtent() const
     return (Vector3<T>(m_a, m_b, m_c));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the exponents (blockiness) in a Vector3 format with Z = 0
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Superquadric<T>::getExponent() const
@@ -67,7 +67,7 @@ __HOSTDEVICE__ Vector3<T> Superquadric<T>::getExponent() const
     return (Vector3<T>(m_n1, m_n2, T(0)));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns a clone of the superquadric
 template <typename T>
 __HOSTDEVICE__ Convex<T>* Superquadric<T>::clone() const
@@ -75,7 +75,7 @@ __HOSTDEVICE__ Convex<T>* Superquadric<T>::clone() const
     return (new Superquadric<T>(m_a, m_b, m_c, m_n1, m_n2));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the volume of the Superquadric
 template <typename T>
 __HOSTDEVICE__ T Superquadric<T>::computeVolume() const
@@ -89,7 +89,7 @@ __HOSTDEVICE__ T Superquadric<T>::computeVolume() const
             * grainsBeta(T(0.5) * eps2, T(0.5) * eps2));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
 __HOSTDEVICE__ void Superquadric<T>::computeInertia(T (&inertia)[6], T (&inertia_1)[6]) const
@@ -115,7 +115,7 @@ __HOSTDEVICE__ void Superquadric<T>::computeInertia(T (&inertia)[6], T (&inertia
     inertia_1[5]                               = T(1) / inertia[5];
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the circumscribed radius of the Superquadric
 template <typename T>
 __HOSTDEVICE__ T Superquadric<T>::computeCircumscribedRadius() const
@@ -148,7 +148,7 @@ __HOSTDEVICE__ T Superquadric<T>::computeCircumscribedRadius() const
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the bounding box to Superquadric
 template <typename T>
 __HOSTDEVICE__ Vector3<T> Superquadric<T>::computeBoundingBox() const
@@ -156,7 +156,7 @@ __HOSTDEVICE__ Vector3<T> Superquadric<T>::computeBoundingBox() const
     return (Vector3<T>(m_a, m_b, m_c));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Superquadric support function, returns the support point P, i.e. the point on
 // the surface of the Superquadric that satisfies max(P.v)
 template <typename T>
@@ -193,7 +193,7 @@ __HOSTDEVICE__ Vector3<T> Superquadric<T>::support(Vector3<T> const& v) const
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__ void Superquadric<T>::readConvex(std::istream& fileIn)
@@ -203,7 +203,7 @@ __HOST__ void Superquadric<T>::readConvex(std::istream& fileIn)
     exit(3);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Output operator
 template <typename T>
 __HOST__ void Superquadric<T>::writeConvex(std::ostream& fileOut) const
@@ -212,7 +212,7 @@ __HOST__ void Superquadric<T>::writeConvex(std::ostream& fileOut) const
             << ", and exponents " << m_n1 << ", " << m_n2 << ".\n";
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the number of points to write the superquadric in a Paraview format
 template <typename T>
 __HOST__ int Superquadric<T>::numberOfPoints_PARAVIEW() const
@@ -220,7 +220,7 @@ __HOST__ int Superquadric<T>::numberOfPoints_PARAVIEW() const
     return (visuNodeNbOnPer * (visuNodeNbOnPer - 1) + 3);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns the number of elementary polytopes to write the superquadric in a
 // Paraview format
 template <typename T>
@@ -229,7 +229,7 @@ __HOST__ int Superquadric<T>::numberOfCells_PARAVIEW() const
     return (visuNodeNbOnPer * visuNodeNbOnPer);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Returns a list of points describing the superquadric in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>>
@@ -313,7 +313,7 @@ __HOST__ std::list<Vector3<T>>
     return (ParaviewPoints);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Writes the connectivity of the superquadric in a Paraview format
 template <typename T>
 __HOST__ void Superquadric<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
@@ -411,7 +411,7 @@ __HOST__ void Superquadric<T>::writeConnection_PARAVIEW(std::list<int>& connecti
     firstpoint_globalnumber += visuNodeNbOnPer * (visuNodeNbOnPer - 1) + 3;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class Superquadric<float>;
 template class Superquadric<double>;

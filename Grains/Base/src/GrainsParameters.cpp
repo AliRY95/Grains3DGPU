@@ -1,6 +1,6 @@
 #include "GrainsParameters.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Static variables
 /* GPU */
 template <typename T>
@@ -57,7 +57,7 @@ std::queue<T> GrainsParameters<T>::m_tSave;
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsParameters<float>;
 template class GrainsParameters<double>;

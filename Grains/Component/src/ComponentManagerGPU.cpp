@@ -9,7 +9,7 @@
 #include "ComponentManagerGPU_Kernels.hh"
 #include "LinkedCellGPUWrapper.hh"
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with the number of particles, number of obstacles, and number of
 // cells. We only allocate memory in the constructor. Filling out the data
 // members must be done separately.
@@ -34,7 +34,7 @@ ComponentManagerGPU<T>::ComponentManagerGPU(unsigned int nParticles,
     cudaErrCheck(cudaMalloc((void**)&m_cellHashEnd, (m_nCells + 1) * sizeof(unsigned int)));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 ComponentManagerGPU<T>::~ComponentManagerGPU()
@@ -53,7 +53,7 @@ ComponentManagerGPU<T>::~ComponentManagerGPU()
     // cudaFree( m_neighborsId );
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the array of particles rigid body Ids
 template <typename T>
 std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyId() const
@@ -66,7 +66,7 @@ std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyId() const
     return (h_rigidBodyId);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the array of obstacles rigid body Ids
 template <typename T>
 std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyIdObstacles() const
@@ -79,7 +79,7 @@ std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyIdObstacles() cons
     return (h_obstaclesRigidBodyId);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets particles transformations
 template <typename T>
 std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransform() const
@@ -92,7 +92,7 @@ std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransform() const
     return (h_transform);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets obstacles transformations
 template <typename T>
 std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransformObstacles() const
@@ -105,7 +105,7 @@ std::vector<Transform3<T>> ComponentManagerGPU<T>::getTransformObstacles() const
     return (h_obstacleTransform);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets particles velocities
 template <typename T>
 std::vector<Kinematics<T>> ComponentManagerGPU<T>::getVelocity() const
@@ -118,7 +118,7 @@ std::vector<Kinematics<T>> ComponentManagerGPU<T>::getVelocity() const
     return (h_velocity);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets particles torces
 template <typename T>
 std::vector<Torce<T>> ComponentManagerGPU<T>::getTorce() const
@@ -129,7 +129,7 @@ std::vector<Torce<T>> ComponentManagerGPU<T>::getTorce() const
     return (h_torce);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the array of particles Ids
 template <typename T>
 std::vector<unsigned int> ComponentManagerGPU<T>::getParticleId() const
@@ -142,7 +142,7 @@ std::vector<unsigned int> ComponentManagerGPU<T>::getParticleId() const
     return (h_particleId);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the number of particles in manager
 template <typename T>
 unsigned int ComponentManagerGPU<T>::getNumberOfParticles() const
@@ -150,7 +150,7 @@ unsigned int ComponentManagerGPU<T>::getNumberOfParticles() const
     return (m_nParticles);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the number of obstacles in manager
 template <typename T>
 unsigned int ComponentManagerGPU<T>::getNumberOfObstacles() const
@@ -158,7 +158,7 @@ unsigned int ComponentManagerGPU<T>::getNumberOfObstacles() const
     return (m_nObstacles);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Gets the number of cells in manager
 template <typename T>
 unsigned int ComponentManagerGPU<T>::getNumberOfCells() const
@@ -166,7 +166,7 @@ unsigned int ComponentManagerGPU<T>::getNumberOfCells() const
     return (m_nCells);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the array of particles rigid body Ids
 template <typename T>
 void ComponentManagerGPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
@@ -175,7 +175,7 @@ void ComponentManagerGPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
         m_rigidBodyId, id.data(), m_nParticles * sizeof(unsigned int), cudaMemcpyHostToDevice));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the array of obstacles rigid body Ids
 template <typename T>
 void ComponentManagerGPU<T>::setRigidBodyIdObstacles(std::vector<unsigned int> const& id)
@@ -186,7 +186,7 @@ void ComponentManagerGPU<T>::setRigidBodyIdObstacles(std::vector<unsigned int> c
                             cudaMemcpyHostToDevice));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets particles transformations
 template <typename T>
 void ComponentManagerGPU<T>::setTransform(std::vector<Transform3<T>> const& t)
@@ -195,7 +195,7 @@ void ComponentManagerGPU<T>::setTransform(std::vector<Transform3<T>> const& t)
         m_transform, t.data(), m_nParticles * sizeof(Transform3<T>), cudaMemcpyHostToDevice));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets obstacles transformations
 template <typename T>
 void ComponentManagerGPU<T>::setTransformObstacles(std::vector<Transform3<T>> const& t)
@@ -206,7 +206,7 @@ void ComponentManagerGPU<T>::setTransformObstacles(std::vector<Transform3<T>> co
                             cudaMemcpyHostToDevice));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets particles velocities
 template <typename T>
 void ComponentManagerGPU<T>::setVelocity(std::vector<Kinematics<T>> const& v)
@@ -215,7 +215,7 @@ void ComponentManagerGPU<T>::setVelocity(std::vector<Kinematics<T>> const& v)
         m_velocity, v.data(), m_nParticles * sizeof(Kinematics<T>), cudaMemcpyHostToDevice));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets particles torces
 template <typename T>
 void ComponentManagerGPU<T>::setTorce(std::vector<Torce<T>> const& t)
@@ -224,7 +224,7 @@ void ComponentManagerGPU<T>::setTorce(std::vector<Torce<T>> const& t)
         cudaMemcpy(m_torce, t.data(), m_nParticles * sizeof(Torce<T>), cudaMemcpyHostToDevice));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Sets the array of particles Ids
 template <typename T>
 void ComponentManagerGPU<T>::setParticleId(std::vector<unsigned int> const& id)
@@ -233,7 +233,7 @@ void ComponentManagerGPU<T>::setParticleId(std::vector<unsigned int> const& id)
         m_particleId, id.data(), m_nParticles * sizeof(unsigned int), cudaMemcpyHostToDevice));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Updates links between particles and linked cell
 template <typename T>
 void ComponentManagerGPU<T>::updateLinks(LinkedCell<T> const* const* LC)
@@ -262,7 +262,7 @@ void ComponentManagerGPU<T>::updateLinks(LinkedCell<T> const* const* LC)
         m_particleCellHash, m_nParticles, m_cellHashStart, m_cellHashEnd);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between particles and obstacles
 template <typename T>
 void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesObstacles(
@@ -289,7 +289,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesObstacles(
         m_nObstacles);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between particles and particles
 template <typename T>
 void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesParticles(
@@ -319,7 +319,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesParticles(
         result);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Detects collision and computes forces between all components
 template <typename T>
 void ComponentManagerGPU<T>::detectCollisionAndComputeContactForces(
@@ -339,7 +339,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForces(
     detectCollisionAndComputeContactForcesObstacles(particleRB, obstacleRB, CF);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Adds external forces such as gravity
 template <typename T>
 void ComponentManagerGPU<T>::addExternalForces(RigidBody<T, T> const* const* particleRB,
@@ -358,7 +358,7 @@ void ComponentManagerGPU<T>::addExternalForces(RigidBody<T, T> const* const* par
         particleRB, m_rigidBodyId, m_torce, gX, gY, gZ, m_nParticles);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Updates the position and velocities of particles
 template <typename T>
 void ComponentManagerGPU<T>::moveParticles(RigidBody<T, T> const* const*   RB,
@@ -373,7 +373,7 @@ void ComponentManagerGPU<T>::moveParticles(RigidBody<T, T> const* const*   RB,
         RB, TI, m_rigidBodyId, m_transform, m_velocity, m_torce, m_nParticles);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class ComponentManagerGPU<float>;
 template class ComponentManagerGPU<double>;

@@ -28,7 +28,7 @@ install-githook:
 
 # Format all source files according to .clang-format configuration
 apply-clang-format:
-	@echo "Formatting all C++ source files according to .clang-format..."
+	@echo "Formatting all C++ source files according to .clang-format ..."
 	if [ -f .clang-format ]; then \
 		find . -name "*.cpp" -o -name "*.hpp" -o -name "*.cc" -o -name "*.h" -o -name "*.hh" | xargs clang-format -i --style=file; \
 		echo "Formatting complete."; \

@@ -1,14 +1,14 @@
 # Common settings
-BasedOnStyle:  WebKit
-TabWidth:        4
-IndentWidth:     4
-UseTab:          Never
-ColumnLimit: 100
+BasedOnStyle: WebKit
+TabWidth:     4
+IndentWidth:  4
+UseTab:       Never
+ColumnLimit:  100
 
 Language: Cpp
 
 DisableFormat:   false
-Standard: Cpp11
+Standard: Cpp17
 
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align

@@ -3,14 +3,14 @@
 #include "VectorMath.hh"
 #include <ctime>
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOST__ InsertionWindow<T>::InsertionWindow()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constructor with XML node and the type of the seed
 template <typename T>
 __HOST__ InsertionWindow<T>::InsertionWindow(DOMNode* dn, RandomGeneratorSeed seed)
@@ -73,14 +73,14 @@ __HOST__ InsertionWindow<T>::InsertionWindow(DOMNode* dn, RandomGeneratorSeed se
     }
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ InsertionWindow<T>::~InsertionWindow()
 {
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Generates a random number with uniform distribution in window
 template <typename T>
 __HOST__ Vector3<T> InsertionWindow<T>::generateRandomPoint()
@@ -111,7 +111,7 @@ __HOST__ Vector3<T> InsertionWindow<T>::generateRandomPoint()
     return (out);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Explicit instantiation
 template class InsertionWindow<float>;
 template class InsertionWindow<double>;
