@@ -53,7 +53,7 @@ void GrainsGPU<T>::initialize(DOMElement* rootElement)
 template <typename T>
 void GrainsGPU<T>::simulate()
 {
-    Gout(1, 0, std::string(80, '='));
+    Gout(std::string(80, '='));
     Gout("Starting the simulation on GPU");
     Gout(std::string(80, '='));
     unsigned int N           = GrainsParameters<T>::m_numParticles;

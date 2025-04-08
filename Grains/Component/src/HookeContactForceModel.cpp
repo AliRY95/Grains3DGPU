@@ -17,28 +17,28 @@ __HOST__ HookeContactForceModel<T>::HookeContactForceModel(DOMNode* root)
     DOMNode* parameter;
     parameter = ReaderXML::getNode(root, "kn");
     if(!parameter)
-        Gout(0, 9, "kn not defined!", "Aborting Grains!");
+        GoutWI(9, "kn not defined!", "Aborting Grains!");
     m_kn = T(ReaderXML::getNodeValue_Double(parameter));
 
     parameter = ReaderXML::getNode(root, "en");
     if(!parameter)
-        Gout(0, 9, "en not defined!", "Aborting Grains!");
+        GoutWI(9, "en not defined!", "Aborting Grains!");
     m_en   = T(ReaderXML::getNodeValue_Double(parameter));
     m_muen = log(m_en) / sqrt(PI<T> * PI<T> + log(m_en) * log(m_en));
 
     parameter = ReaderXML::getNode(root, "etat");
     if(!parameter)
-        Gout(0, 9, "etat not defined!", "Aborting Grains!");
+        GoutWI(9, "etat not defined!", "Aborting Grains!");
     m_etat = T(ReaderXML::getNodeValue_Double(parameter));
 
     parameter = ReaderXML::getNode(root, "muc");
     if(!parameter)
-        Gout(0, 9, "muc not defined!", "Aborting Grains!");
+        GoutWI(9, "muc not defined!", "Aborting Grains!");
     m_muc = T(ReaderXML::getNodeValue_Double(parameter));
 
     parameter = ReaderXML::getNode(root, "kr");
     if(!parameter)
-        Gout(0, 9, "kr not defined!", "Aborting Grains!");
+        GoutWI(9, "kr not defined!", "Aborting Grains!");
     m_kr = T(ReaderXML::getNodeValue_Double(parameter));
 }
 

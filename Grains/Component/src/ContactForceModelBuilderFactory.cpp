@@ -59,7 +59,7 @@ __HOST__ ContactForceModel<T>**
             CF[index] = new HookeContactForceModel<T>(parameters);
         else
         {
-            Gout(0, 9, "Contact force model is not known.", "Aborting Grains!");
+            GoutWI(9, "Contact force model is not known.", "Aborting Grains!");
             exit(1);
         }
     }
@@ -132,10 +132,9 @@ __HOST__ void
         }
         else
         {
-            Gout(0,
-                 9,
-                 "Contact force model is not implemented for GPU!",
-                 "Aborting Grains!");
+            GoutWI(9,
+                   "Contact force model is not implemented for GPU!",
+                   "Aborting Grains!");
             exit(1);
         }
     }

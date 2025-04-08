@@ -66,20 +66,16 @@ __HOST__ static constexpr INLINE void Gout(const Args&... args)
 }
 
 // -----------------------------------------------------------------------------
-/** @brief Writes a message to stdout
+/** @brief Writes a message to stdout with Indent (WI)
+ @param numShift the number of shift characters at the beginning
 @param nextLine if going to the next line is required
-@param numShift the number of shift characters at the beginning
 @param args the output messages */
 template <typename... Args>
-__HOST__ static constexpr INLINE void
-    Gout(const bool nextLine, const int numShift, const Args&... args)
+__HOST__ INLINE void GoutWI(const int numShift, const Args&... args)
 {
-    // write to nextline
-    auto nLine = [](bool b) { return b ? '\n' : '\0'; };
     // indent
     auto shift = [](int n) { return std::string(n, ' '); };
 
-    std::cout << nLine(nextLine);
     std::cout << shift(numShift);
     ((std::cout << args << " "), ...);
     std::cout << std::endl;

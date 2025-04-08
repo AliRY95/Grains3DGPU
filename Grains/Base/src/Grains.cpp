@@ -80,13 +80,13 @@ template <typename T>
 void Grains<T>::Construction(DOMElement* rootElement)
 {
     // Output message
-    Gout(0, 3, "Construction");
+    GoutWI(3, "Construction");
     // -------------------------------------------------------------------------
     // Checking if Construction node is available
     DOMNode* root = ReaderXML::getNode(rootElement, "Construction");
     if(!root)
     {
-        Gout(0, 0, "Construction node is mandatory!");
+        Gout("Construction node is mandatory!");
         exit(1);
     }
 
@@ -116,7 +116,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
         int PZ = ReaderXML::getNodeAttr_Int(nPeriodicity, "PZ");
         if(PX * PY * PZ != 0)
         {
-            Gout(0, 0, "Periodicity is not implemented!");
+            Gout("Periodicity is not implemented!");
             exit(1);
         }
         GrainsParameters<T>::m_isPeriodic = false;
@@ -153,7 +153,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
         = (RigidBody<T, T>**)malloc(numParticles * sizeof(RigidBody<T, T>*));
     if(numParticles)
     {
-        Gout(0, 6, "Reading new particle types ...");
+        GoutWI(6, "Reading new particle types ...");
         // Populating the array with different kind of rigid bodies in the XML
         // file
         uint startId = 0;
@@ -173,7 +173,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
             }
             startId += numEachUniqueParticle[i];
         }
-        Gout(0, 6, "Reading particle types completed!");
+        GoutWI(6, "Reading particle types completed!");
     }
 
     // -------------------------------------------------------------------------
@@ -198,7 +198,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
         numUniqueObstacles * sizeof(RigidBody<T, T>*));
     if(obstacles)
     {
-        Gout(1, 6, "Reading new obstacle types ...");
+        GoutWI(6, "Reading new obstacle types ...");
 
         // Populating the array with different kind of rigid bodies in the XML
         // file
@@ -221,12 +221,12 @@ void Grains<T>::Construction(DOMElement* rootElement)
             obstaclesInitialTransform.push_back(Transform3<T>(nObstacle));
         }
 
-        Gout(0, 6, "Reading obstacle types completed!");
+        GoutWI(6, "Reading obstacle types completed!");
     }
 
     // -------------------------------------------------------------------------
     // LinkedCell
-    Gout(1, 6, "Constructing linked cell ...");
+    GoutWI(6, "Constructing linked cell ...");
     // Finding the size of each cell -- max circumscribed radius among all
     // particles. Note that we loop until numParticles, because we do not care
     // about the circumscribed radius of the obstacles.
@@ -252,12 +252,11 @@ void Grains<T>::Construction(DOMElement* rootElement)
                                       GrainsParameters<T>::m_maxCoordinate,
                                       GrainsParameters<T>::m_sizeLC);
     GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
-    Gout(0,
-         9,
-         "LinkedCell with",
-         GrainsParameters<T>::m_numCells,
-         "cells is created on host.");
-    Gout(0, 6, "Constructing linked cell completed!");
+    GoutWI(9,
+           "LinkedCell with",
+           GrainsParameters<T>::m_numCells,
+           "cells is created on host.");
+    GoutWI(6, "Constructing linked cell completed!");
 
     // -------------------------------------------------------------------------
     // Setting up the component managers
@@ -290,10 +289,10 @@ void Grains<T>::Construction(DOMElement* rootElement)
     DOMNode* contacts = ReaderXML::getNode(root, "ContactForceModels");
     if(contacts)
     {
-        Gout(1, 6, "Reading the contact force model ...");
+        GoutWI(6, "Reading the contact force model ...");
         m_contactForce
             = ContactForceModelBuilderFactory<T>::create(rootElement);
-        Gout(0, 6, "Reading the contact force model completed!");
+        GoutWI(6, "Reading the contact force model completed!");
     }
 
     // -------------------------------------------------------------------------
@@ -311,13 +310,13 @@ void Grains<T>::Construction(DOMElement* rootElement)
         DOMNode* nTI = ReaderXML::getNode(tempSetting, "TimeIntegration");
         if(nTI)
         {
-            Gout(1, 6, "Reading the time integration model ...");
+            GoutWI(6, "Reading the time integration model ...");
             m_timeIntegrator
                 = (TimeIntegrator<T>**)malloc(sizeof(TimeIntegrator<T>*));
             *m_timeIntegrator = TimeIntegratorBuilderFactory<T>::create(
                 nTI,
                 GrainsParameters<T>::m_dt);
-            Gout(0, 6, "Reading the time integration model completed!");
+            GoutWI(6, "Reading the time integration model completed!");
         }
     }
 }
@@ -331,7 +330,7 @@ void Grains<T>::Forces(DOMElement* rootElement)
     DOMNode* root = ReaderXML::getNode(rootElement, "Forces");
 
     // Output message
-    Gout(1, 3, "Forces");
+    GoutWI(3, "Forces");
 
     // Read the forces
     if(root)
@@ -346,14 +345,13 @@ void Grains<T>::Forces(DOMElement* rootElement)
                 = T(ReaderXML::getNodeAttr_Double(nGravity, "GY"));
             GrainsParameters<T>::m_gravity[Z]
                 = T(ReaderXML::getNodeAttr_Double(nGravity, "GZ"));
-            Gout(0,
-                 6,
-                 "Gravity =",
-                 Vector3ToString(GrainsParameters<T>::m_gravity));
+            GoutWI(6,
+                   "Gravity =",
+                   Vector3ToString(GrainsParameters<T>::m_gravity));
         }
         else
         {
-            Gout(0, 6, "Gravity is mandatory!");
+            GoutWI(6, "Gravity is mandatory!");
             exit(1);
         }
     }
@@ -365,36 +363,36 @@ template <typename T>
 void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
 {
     // Output message
-    Gout(1, 3, "Simulation");
+    GoutWI(3, "Simulation");
     // -------------------------------------------------------------------------
     // Checking if Construction node is available
     assert(rootElement != NULL);
     DOMNode* root = ReaderXML::getNode(rootElement, "Simulation");
     if(!root)
     {
-        Gout(0, 6, "Simulation node is mandatory!");
+        GoutWI(6, "Simulation node is mandatory!");
         exit(1);
     }
 
     // -------------------------------------------------------------------------
     // Insertion policies
     DOMNode* nInsertion = ReaderXML::getNode(root, "ParticleInsertion");
-    Gout(0, 6, "Reading insertion policies ...");
+    GoutWI(6, "Reading insertion policies ...");
     if(nInsertion)
         m_insertion = new Insertion<T>(nInsertion);
     else
     {
-        Gout(0, 9, "No policy found, setting the insertion policy to default");
+        GoutWI(9, "No policy found, setting the insertion policy to default");
         m_insertion = new Insertion<T>();
     }
-    Gout(0, 6, "Reading insertion policies completed.");
+    GoutWI(6, "Reading insertion policies completed.");
 
     // -------------------------------------------------------------------------
     // Post-processing writers
     DOMNode* nPostProcessing = ReaderXML::getNode(root, "PostProcessing");
     if(nPostProcessing)
     {
-        Gout(1, 3, "Post-processing");
+        GoutWI(3, "Post-processing");
         // Post-processing save time
         DOMNode* nTime  = ReaderXML::getNode(nPostProcessing, "TimeSave");
         T        tStart = ReaderXML::getNodeAttr_Double(nTime, "Start");
@@ -409,7 +407,7 @@ void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
         DOMNode* nWriters = ReaderXML::getNode(nPostProcessing, "Writers");
         if(nWriters)
         {
-            Gout(0, 6, "Reading the post processing writers ...");
+            GoutWI(6, "Reading the post processing writers ...");
             DOMNodeList* allPPW = ReaderXML::getNodes(nWriters);
             for(XMLSize_t i = 0; i < allPPW->getLength(); i++)
             {
@@ -418,18 +416,17 @@ void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
                     = PostProcessingWriterBuilderFactory<T>::create(nPPW);
                 if(!ppw)
                 {
-                    Gout(0,
-                         6,
-                         "Unknown postprocessing writer in "
-                         "node <Writers>");
+                    GoutWI(6,
+                           "Unknown postprocessing writer in "
+                           "node <Writers>");
                     exit(1);
                 }
             }
-            Gout(0, 6, "Reading the post processing writers completed!");
+            GoutWI(6, "Reading the post processing writers completed!");
         }
     }
     else
-        Gout(0, 6, "No postprocessing writer!");
+        GoutWI(6, "No postprocessing writer!");
 }
 
 // -----------------------------------------------------------------------------
