@@ -26,7 +26,8 @@ DOMElement* WriterXML::initialize(string const& root)
     XMLPlatformUtils::Initialize();
 
     static const XMLCh gLS[] = {chLatin_L, chLatin_S, chNull};
-    DOMImplementation* impl  = DOMImplementationRegistry::getDOMImplementation(gLS);
+    DOMImplementation* impl
+        = DOMImplementationRegistry::getDOMImplementation(gLS);
 
     XMLCh* name  = XMLString::transcode(root.c_str());
     m_document   = impl->createDocument(0, name, 0);
@@ -85,7 +86,9 @@ DOMElement* WriterXML::createNode(DOMElement* root, string const& name)
 
 // ----------------------------------------------------------------------------
 // Creates a node attribute with a string value to be later written
-void WriterXML::createNodeAttr(DOMElement* root, string const& attr, string const& value)
+void WriterXML::createNodeAttr(DOMElement*   root,
+                               string const& attr,
+                               string const& value)
 {
     XMLCh* dataAttr  = XMLString::transcode(attr.c_str());
     XMLCh* dataValue = XMLString::transcode(value.c_str());
@@ -94,7 +97,9 @@ void WriterXML::createNodeAttr(DOMElement* root, string const& attr, string cons
 
 // ----------------------------------------------------------------------------
 // Creates a node attribute with a scalar value to be later written
-void WriterXML::createNodeAttr(DOMElement* root, string const& attr, double value)
+void WriterXML::createNodeAttr(DOMElement*   root,
+                               string const& attr,
+                               double        value)
 {
     ostringstream strValue;
     strValue << value;

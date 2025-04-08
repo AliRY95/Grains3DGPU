@@ -13,7 +13,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
     // We also set the seed with srand. We use it for to randomly pick an
     // insertion window
     RandomGeneratorSeed rgs;
-    std::string         seedString = ReaderXML::getNodeAttr_String(root, "Seed");
+    std::string seedString = ReaderXML::getNodeAttr_String(root, "Seed");
     if(seedString == "UserDefined")
     {
         unsigned int val = ReaderXML::getNodeAttr_Int(root, "Value");
@@ -24,7 +24,9 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
             GrainsMisc<T>::cout("Seed value is not provided. Aborting Grains!");
             exit(1);
         }
-        GrainsMisc<T>::cout("Random initialization with " + std::to_string(val) + " seed.", 12);
+        GrainsMisc<T>::cout("Random initialization with " + std::to_string(val)
+                                + " seed.",
+                            12);
     }
     else if(seedString == "Random")
     {
@@ -41,7 +43,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
     // srand( static_cast<unsigned>( time( NULL ) ) );
 
     // Insertion window
-    DOMNode*                        nWindows = ReaderXML::getNode(root, "Windows");
+    DOMNode* nWindows = ReaderXML::getNode(root, "Windows");
     std::vector<InsertionWindow<T>> insertionWindows;
     if(nWindows)
     {
@@ -57,7 +59,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
     return (insertionWindows);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Reads if the root is of type File
 template <typename T>
 __HOST__ static INLINE InsertionInfo<T> readDataFile(DOMNode* root)
@@ -67,7 +69,8 @@ __HOST__ static INLINE InsertionInfo<T> readDataFile(DOMNode* root)
     // Check whether the file exists
     if(file.good())
     {
-        GrainsMisc<T>::cout("File initialization with path " + fileName + ".", 12);
+        GrainsMisc<T>::cout("File initialization with path " + fileName + ".",
+                            12);
     }
     else
     {
@@ -78,7 +81,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataFile(DOMNode* root)
     return (file);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Reads if the root is of type Constant
 template <typename T>
 __HOST__ static INLINE InsertionInfo<T> readDataCons(DOMNode* root)
@@ -87,13 +90,14 @@ __HOST__ static INLINE InsertionInfo<T> readDataCons(DOMNode* root)
     T          yVal = T(ReaderXML::getNodeAttr_Double(root, "Y"));
     T          zVal = T(ReaderXML::getNodeAttr_Double(root, "Z"));
     Vector3<T> vec(xVal, yVal, zVal);
-    GrainsMisc<T>::cout("Constant initialization with " + GrainsMisc<T>::Vector3ToString(vec) + ".",
+    GrainsMisc<T>::cout("Constant initialization with "
+                            + GrainsMisc<T>::Vector3ToString(vec) + ".",
                         12);
 
     return (vec);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Reads if the root is of type Zero
 template <typename T>
 __HOST__ static INLINE InsertionInfo<T> readDataZero(DOMNode* root)
@@ -105,7 +109,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataZero(DOMNode* root)
 }
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 // Default constructor
 template <typename T>
@@ -121,7 +125,7 @@ __HOST__ Insertion<T>::Insertion()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with XML node
 template <typename T>
 __HOST__ Insertion<T>::Insertion(DOMNode* dn)
@@ -151,7 +155,8 @@ __HOST__ Insertion<T>::Insertion(DOMNode* dn)
         }
         else
         {
-            GrainsMisc<T>::cout("Unknown Type in ParticleInsertion! Aborting Grains!");
+            GrainsMisc<T>::cout(
+                "Unknown Type in ParticleInsertion! Aborting Grains!");
             exit(1);
         }
     };
@@ -173,7 +178,7 @@ __HOST__ Insertion<T>::Insertion(DOMNode* dn)
     read(nIA, m_angularVelType, m_angularVelInsertionInfo);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ Insertion<T>::~Insertion()
@@ -188,11 +193,12 @@ __HOST__ Insertion<T>::~Insertion()
         (std::get<std::ifstream>(m_angularVelInsertionInfo)).close();
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns a vector of Vector3 accroding to type and data
 template <typename T>
-__HOST__ Vector3<T> Insertion<T>::fetchInsertionDataForEach(InsertionType const type,
-                                                            InsertionInfo<T>&   data)
+__HOST__ Vector3<T>
+         Insertion<T>::fetchInsertionDataForEach(InsertionType const type,
+                                            InsertionInfo<T>&   data)
 {
     // We only return a vector3. It is clear how it works for position, and
     // kinematics. However, for orientation, it returns the vector3 of rotation
@@ -208,7 +214,8 @@ __HOST__ Vector3<T> Insertion<T>::fetchInsertionDataForEach(InsertionType const 
         // output = IWs[random_IW].generateRandomPoint();
         // output = IWs[0].generateRandomPoint();
         Vector3<T> output;
-        output = std::get<std::vector<InsertionWindow<T>>>(data)[0].generateRandomPoint();
+        output = std::get<std::vector<InsertionWindow<T>>>(data)[0]
+                     .generateRandomPoint();
         return (output);
     }
     else if(type == FILEINSERTION)
@@ -223,24 +230,28 @@ __HOST__ Vector3<T> Insertion<T>::fetchInsertionDataForEach(InsertionType const 
         return (Vector3<T>());
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns all required data members to insert components as a vector
 template <typename T>
-__HOST__ std::pair<Transform3<T>, Kinematics<T>> Insertion<T>::fetchInsertionData()
+__HOST__ std::pair<Transform3<T>, Kinematics<T>>
+         Insertion<T>::fetchInsertionData()
 {
     // Position
-    Vector3<T> pos = fetchInsertionDataForEach(m_positionType, m_positionInsertionInfo);
+    Vector3<T> pos
+        = fetchInsertionDataForEach(m_positionType, m_positionInsertionInfo);
 
     // Orientation angles. These are not matrices, so we have to compute the
     // rotation matrices.
-    Vector3<T> ori = fetchInsertionDataForEach(m_orientationType, m_orientationInsertionInfo);
+    Vector3<T> ori = fetchInsertionDataForEach(m_orientationType,
+                                               m_orientationInsertionInfo);
 
     // Velocity
-    Vector3<T> vel
-        = fetchInsertionDataForEach(m_translationalVelType, m_translationalVelInsertionInfo);
+    Vector3<T> vel = fetchInsertionDataForEach(m_translationalVelType,
+                                               m_translationalVelInsertionInfo);
 
     // Angular velocity
-    Vector3<T> ang = fetchInsertionDataForEach(m_angularVelType, m_angularVelInsertionInfo);
+    Vector3<T> ang = fetchInsertionDataForEach(m_angularVelType,
+                                               m_angularVelInsertionInfo);
 
     // Transformation
     Transform3<T> tr;
@@ -253,7 +264,7 @@ __HOST__ std::pair<Transform3<T>, Kinematics<T>> Insertion<T>::fetchInsertionDat
     return (std::make_pair(tr, k));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Insertion<float>;
 template class Insertion<double>;

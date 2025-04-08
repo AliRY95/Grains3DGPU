@@ -46,7 +46,8 @@ int main(int argc, char* argv[])
             cin >> np;
 
             if(np < 3)
-                cout << "Wrong choice, number of edges > 2, enter again" << endl;
+                cout << "Wrong choice, number of edges > 2, enter again"
+                     << endl;
             else
                 good_choice = true;
         }
@@ -178,7 +179,8 @@ int main(int argc, char* argv[])
         fileOUT.close();
 
         cout << "   Volume-equivalent sphere radius = "
-             << pow(3. * longueur * largeur * hauteur / (4. * pi), 1. / 3.) << endl;
+             << pow(3. * longueur * largeur * hauteur / (4. * pi), 1. / 3.)
+             << endl;
         break;
 
     case 3:
@@ -251,8 +253,10 @@ int main(int argc, char* argv[])
 
         fileOUT << "3" << endl << "4" << endl;
         fileOUT << l << " " << "0." << " " << -h << endl;
-        fileOUT << l * cos(2. * pi / 3.) << " " << l * sin(2. * pi / 3.) << " " << -h << endl;
-        fileOUT << l * cos(4. * pi / 3.) << " " << l * sin(4. * pi / 3.) << " " << -h << endl;
+        fileOUT << l * cos(2. * pi / 3.) << " " << l * sin(2. * pi / 3.) << " "
+                << -h << endl;
+        fileOUT << l * cos(4. * pi / 3.) << " " << l * sin(4. * pi / 3.) << " "
+                << -h << endl;
         fileOUT << "0. 0. " << rcirc << endl;
         fileOUT << endl << "4" << endl;
         fileOUT << "0 1 2" << endl;
@@ -275,7 +279,8 @@ int main(int argc, char* argv[])
             else
                 good_choice = true;
         }
-        arete      = pow(48. * pi / (15. * (3. + sqrt(5.))), 0.3333333333) * rayon_sphere;
+        arete = pow(48. * pi / (15. * (3. + sqrt(5.))), 0.3333333333)
+                * rayon_sphere;
         half_arete = 0.5 * arete;
 
         cout << "Icosahedron" << endl;
@@ -288,14 +293,22 @@ int main(int argc, char* argv[])
         fileOUT.precision(8);
 
         fileOUT << "3" << endl << "12" << endl;
-        fileOUT << -golden_number * half_arete << " " << -half_arete << " 0." << endl;
-        fileOUT << golden_number * half_arete << " " << -half_arete << " 0." << endl;
-        fileOUT << golden_number * half_arete << " " << half_arete << " 0." << endl;
-        fileOUT << -golden_number * half_arete << " " << half_arete << " 0." << endl;
-        fileOUT << "0. " << -golden_number * half_arete << " " << -half_arete << endl;
-        fileOUT << "0. " << golden_number * half_arete << " " << -half_arete << endl;
-        fileOUT << "0. " << golden_number * half_arete << " " << half_arete << endl;
-        fileOUT << "0. " << -golden_number * half_arete << " " << half_arete << endl;
+        fileOUT << -golden_number * half_arete << " " << -half_arete << " 0."
+                << endl;
+        fileOUT << golden_number * half_arete << " " << -half_arete << " 0."
+                << endl;
+        fileOUT << golden_number * half_arete << " " << half_arete << " 0."
+                << endl;
+        fileOUT << -golden_number * half_arete << " " << half_arete << " 0."
+                << endl;
+        fileOUT << "0. " << -golden_number * half_arete << " " << -half_arete
+                << endl;
+        fileOUT << "0. " << golden_number * half_arete << " " << -half_arete
+                << endl;
+        fileOUT << "0. " << golden_number * half_arete << " " << half_arete
+                << endl;
+        fileOUT << "0. " << -golden_number * half_arete << " " << half_arete
+                << endl;
         fileOUT << -half_arete << " 0. " << -golden_number * half_arete << endl;
         fileOUT << -half_arete << " 0. " << golden_number * half_arete << endl;
         fileOUT << half_arete << " 0. " << golden_number * half_arete << endl;

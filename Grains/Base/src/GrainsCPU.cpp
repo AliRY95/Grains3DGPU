@@ -6,21 +6,21 @@
 
 #include "ConvexBuilderFactory.hh"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 GrainsCPU<T>::GrainsCPU()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 GrainsCPU<T>::~GrainsCPU()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Runs the simulation over the prescribed time interval
 template <typename T>
 void GrainsCPU<T>::simulate()
@@ -51,7 +51,8 @@ void GrainsCPU<T>::simulate()
         ostringstream oss;
         oss.width(10);
         oss << left << GrainsParameters<T>::m_time;
-        std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd << std::flush;
+        std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd
+                  << std::flush;
 
         Grains<T>::m_components->detectCollisionAndComputeContactForces(
             Grains<T>::m_particleRigidBodyList,
@@ -59,10 +60,12 @@ void GrainsCPU<T>::simulate()
             Grains<T>::m_linkedCell,
             Grains<T>::m_contactForce,
             h_collision);
-        Grains<T>::m_components->addExternalForces(Grains<T>::m_particleRigidBodyList,
-                                                   GrainsParameters<T>::m_gravity);
-        Grains<T>::m_components->moveParticles(Grains<T>::m_particleRigidBodyList,
-                                               Grains<T>::m_timeIntegrator);
+        Grains<T>::m_components->addExternalForces(
+            Grains<T>::m_particleRigidBodyList,
+            GrainsParameters<T>::m_gravity);
+        Grains<T>::m_components->moveParticles(
+            Grains<T>::m_particleRigidBodyList,
+            Grains<T>::m_timeIntegrator);
 
         // Post-Processing
         Grains<T>::postProcess(Grains<T>::m_components);
@@ -80,10 +83,11 @@ void GrainsCPU<T>::simulate()
     {
         trueHostCount += h_collision[i];
     }
-    cout << N << " Particles, " << trueHostCount << " Collision on host. " << endl;
+    cout << N << " Particles, " << trueHostCount << " Collision on host. "
+         << endl;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsCPU<float>;
 template class GrainsCPU<double>;

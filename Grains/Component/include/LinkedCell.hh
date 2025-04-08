@@ -89,16 +89,20 @@ public:
         @param j relative position of the neighboring cell in the y-direction
         @param k relative position of the neighboring cell in the z-direction */
     __HOSTDEVICE__
-    int computeNeighboringCellLinearHash(int cellHash, int i, int j, int k) const;
+    int computeNeighboringCellLinearHash(int cellHash,
+                                         int i,
+                                         int j,
+                                         int k) const;
 
     /** @brief Computes and stores the linear cell hash values in 
         componentCellHash for all components using CPU
         @param pos position of components
         @param numComponents number of components
         @param componentCellHash hash values for particles */
-    void computeLinearLinkedCellHashCPU(std::vector<Transform3<T>> const& tr,
-                                        unsigned int                      numComponents,
-                                        std::vector<unsigned int>&        componentCellHash) const;
+    void computeLinearLinkedCellHashCPU(
+        std::vector<Transform3<T>> const& tr,
+        unsigned int                      numComponents,
+        std::vector<unsigned int>&        componentCellHash) const;
 
     /** @brief Computes and stores the linear cell hash values in 
         componentCellHash for all components using GPU - Wrapper
@@ -107,7 +111,7 @@ public:
         @param componentCellHash hash values for particles */
     void computeLinearLinkedCellHashGPU(Transform3<T> const* pos,
                                         unsigned int         numComponents,
-                                        unsigned int*        componentCellHash) const;
+                                        unsigned int* componentCellHash) const;
 
     /** @brief Returns the Morton cell hash value from the 3d Id of the cell
         // @param cellId 3d cell Id */

@@ -3,17 +3,19 @@
 #include "Transform3.hh"
 #include "VectorMath.hh"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOSTDEVICE__ LinkedCell<T>::LinkedCell()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with min and max points along with extent of each cell
 template <typename T>
-__HOSTDEVICE__ LinkedCell<T>::LinkedCell(Vector3<T> const& min, Vector3<T> const& max, T extent)
+__HOSTDEVICE__ LinkedCell<T>::LinkedCell(Vector3<T> const& min,
+                                         Vector3<T> const& max,
+                                         T                 extent)
     : m_minCorner(min)
     , m_maxCorner(max)
     , m_cellExtent(extent)
@@ -24,17 +26,17 @@ __HOSTDEVICE__ LinkedCell<T>::LinkedCell(Vector3<T> const& min, Vector3<T> const
     m_numCellsPerDir.x = int(numCellsPerDir[X]);
     m_numCellsPerDir.y = int(numCellsPerDir[Y]);
     m_numCellsPerDir.z = int(numCellsPerDir[Z]);
-    m_numCells         = m_numCellsPerDir.x * m_numCellsPerDir.y * m_numCellsPerDir.z;
+    m_numCells = m_numCellsPerDir.x * m_numCellsPerDir.y * m_numCellsPerDir.z;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ LinkedCell<T>::~LinkedCell()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Gets the number of cells
 template <typename T>
 __HOSTDEVICE__ int LinkedCell<T>::getNumCells() const
@@ -42,13 +44,14 @@ __HOSTDEVICE__ int LinkedCell<T>::getNumCells() const
     return (m_numCells);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Checks if a cell Id is in range
 template <typename T>
 __HOSTDEVICE__ void LinkedCell<T>::checkBound(int3 const& id) const
 {
-    assert(id.x > 0 && id.x < m_numCellsPerDir.x && id.y > 0 && id.y < m_numCellsPerDir.y
-           && id.z > 0 && id.z < m_numCellsPerDir.z);
+    assert(id.x > 0 && id.x < m_numCellsPerDir.x && id.y > 0
+           && id.y < m_numCellsPerDir.y && id.z > 0
+           && id.z < m_numCellsPerDir.z);
     // if ( id.x < 0 || id.x >= m_numCellsPerDir.x ||
     //      id.y < 0 || id.y >= m_numCellsPerDir.y ||
     //      id.z < 0 || id.z >= m_numCellsPerDir.z )
@@ -58,7 +61,7 @@ __HOSTDEVICE__ void LinkedCell<T>::checkBound(int3 const& id) const
     // }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the 3d Id of the cell which the point belongs to
 template <typename T>
 __HOSTDEVICE__ int3 LinkedCell<T>::computeCellId(Vector3<T> const& p) const
@@ -76,37 +79,43 @@ __HOSTDEVICE__ int3 LinkedCell<T>::computeCellId(Vector3<T> const& p) const
     return (cellId);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the linear cell hash value of a given point
 template <typename T>
-__HOSTDEVICE__ int LinkedCell<T>::computeLinearCellHash(Vector3<T> const& p) const
+__HOSTDEVICE__ int
+    LinkedCell<T>::computeLinearCellHash(Vector3<T> const& p) const
 {
     return (computeLinearCellHash(computeCellId(p)));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the linear cell hash value from the 3d Id of the cell
 template <typename T>
-__HOSTDEVICE__ int LinkedCell<T>::computeLinearCellHash(int3 const& cellId) const
+__HOSTDEVICE__ int
+    LinkedCell<T>::computeLinearCellHash(int3 const& cellId) const
 {
-    return ((cellId.z * m_numCellsPerDir.y + cellId.y) * m_numCellsPerDir.x + cellId.x + 1);
+    return ((cellId.z * m_numCellsPerDir.y + cellId.y) * m_numCellsPerDir.x
+            + cellId.x + 1);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the linear cell hash value from the Id along each axis
 template <typename T>
-__HOSTDEVICE__ int LinkedCell<T>::computeLinearCellHash(int i, int j, int k) const
+__HOSTDEVICE__ int
+    LinkedCell<T>::computeLinearCellHash(int i, int j, int k) const
 {
     return ((k * m_numCellsPerDir.y + j) * m_numCellsPerDir.x + i + 1);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the linear cell hash value for a neighboring cell in the direction
 // given by (i, j, k)
 // TODO: performance check!
 template <typename T>
-__HOSTDEVICE__ int
-    LinkedCell<T>::computeNeighboringCellLinearHash(int cellHash, int i, int j, int k) const
+__HOSTDEVICE__ int LinkedCell<T>::computeNeighboringCellLinearHash(int cellHash,
+                                                                   int i,
+                                                                   int j,
+                                                                   int k) const
 {
     cellHash--;
     int z = cellHash / (m_numCellsPerDir.x * m_numCellsPerDir.y);
@@ -115,7 +124,7 @@ __HOSTDEVICE__ int
     return (computeLinearCellHash(x + i, y + j, z + k));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Computes and stores the linear cell hash values in componentCellHash for all
 // components using CPU
 template <typename T>
@@ -128,14 +137,15 @@ void LinkedCell<T>::computeLinearLinkedCellHashCPU(
         componentCellHash[i] = computeLinearCellHash(tr[i].getOrigin());
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Computes and stores the linear cell hash values in componentCellHash for all
 // components using GPU
 // TODO: cudaMaxOccupancy -- function for numBlocks
 template <typename T>
-void LinkedCell<T>::computeLinearLinkedCellHashGPU(Transform3<T> const* tr,
-                                                   unsigned int         numComponents,
-                                                   unsigned int*        componentCellHash) const
+void LinkedCell<T>::computeLinearLinkedCellHashGPU(
+    Transform3<T> const* tr,
+    unsigned int         numComponents,
+    unsigned int*        componentCellHash) const
 {
     unsigned int numThreads = 256;
     unsigned int numBlocks  = (numComponents + numThreads - 1) / numThreads;
@@ -146,7 +156,7 @@ void LinkedCell<T>::computeLinearLinkedCellHashGPU(Transform3<T> const* tr,
     //                                                         componentCellHash );
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class LinkedCell<float>;
 template class LinkedCell<double>;

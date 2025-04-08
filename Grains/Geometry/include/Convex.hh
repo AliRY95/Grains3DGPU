@@ -110,8 +110,9 @@ public:
         @param transform geometric transformation
         @param translation additional center of mass translation */
     __HOST__
-    virtual std::list<Vector3<T>> writePoints_PARAVIEW(Transform3<T> const& transform,
-                                                       Vector3<T> const*    translation) const
+    virtual std::list<Vector3<T>>
+        writePoints_PARAVIEW(Transform3<T> const& transform,
+                             Vector3<T> const*    translation) const
         = 0;
 
     /** @brief Writes the connectivity of the convex in a Paraview format
@@ -124,8 +125,8 @@ public:
     virtual void writeConnection_PARAVIEW(std::list<int>& connectivity,
                                           std::list<int>& offsets,
                                           std::list<int>& cellstype,
-                                          int&            firstpoint_globalnumber,
-                                          int&            last_offset) const
+                                          int& firstpoint_globalnumber,
+                                          int& last_offset) const
         = 0;
     //@}
 

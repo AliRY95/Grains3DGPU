@@ -79,7 +79,8 @@ public:
     virtual void setRigidBodyId(std::vector<unsigned int> const& id) = 0;
 
     /** @brief Sets the array of obstacles rigid body Ids */
-    virtual void setRigidBodyIdObstacles(std::vector<unsigned int> const& id) = 0;
+    virtual void setRigidBodyIdObstacles(std::vector<unsigned int> const& id)
+        = 0;
 
     /** @brief Sets particles transformations */
     virtual void setTransform(std::vector<Transform3<T>> const& t) = 0;
@@ -114,16 +115,18 @@ public:
         @param numEachUniqueObstacles accumulating vector for number of 
         different RB 
         @param initTr initial transformation of obstacles */
-    virtual void initializeObstacles(std::vector<unsigned int>  numEachUniqueObstacles,
-                                     std::vector<Transform3<T>> initTr);
+    virtual void
+        initializeObstacles(std::vector<unsigned int>  numEachUniqueObstacles,
+                            std::vector<Transform3<T>> initTr);
 
     /** @brief Initializes the RigidBody IDs and transformations for 
         // particles in the simulation
         @param numEachUniqueParticles accumulating vector for number of 
         different RB 
         @param initTr initial transformation of particles */
-    virtual void initializeParticles(std::vector<unsigned int>  numEachUniqueParticles,
-                                     std::vector<Transform3<T>> initTr);
+    virtual void
+        initializeParticles(std::vector<unsigned int>  numEachUniqueParticles,
+                            std::vector<Transform3<T>> initTr);
 
     /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */
@@ -144,10 +147,10 @@ public:
         @param particleRB array of rigid bodies for particles
         @param obstacleRB array of rigid bodies for obstacles
         @param CF array of all contact force models */
-    virtual void
-        detectCollisionAndComputeContactForcesObstacles(RigidBody<T, T> const* const* particleRB,
-                                                        RigidBody<T, T> const* const* obstacleRB,
-                                                        ContactForceModel<T> const* const* CF)
+    virtual void detectCollisionAndComputeContactForcesObstacles(
+        RigidBody<T, T> const* const*      particleRB,
+        RigidBody<T, T> const* const*      obstacleRB,
+        ContactForceModel<T> const* const* CF)
         = 0;
 
     /** @brief Detects collision between particles and particles and 
@@ -155,11 +158,11 @@ public:
         @param particleRB array of rigid bodies for particles
         @param LC linked cell
         @param CF array of all contact force models */
-    virtual void
-        detectCollisionAndComputeContactForcesParticles(RigidBody<T, T> const* const* particleRB,
-                                                        LinkedCell<T> const* const*   LC,
-                                                        ContactForceModel<T> const* const* CF,
-                                                        int*                               result)
+    virtual void detectCollisionAndComputeContactForcesParticles(
+        RigidBody<T, T> const* const*      particleRB,
+        LinkedCell<T> const* const*        LC,
+        ContactForceModel<T> const* const* CF,
+        int*                               result)
         = 0;
 
     /** @brief Detects collision between components and computes forces
@@ -167,17 +170,19 @@ public:
         @param obstacleRB array of rigid bodies for obstacles
         @param LC linked cell
         @param CF array of all contact force models */
-    virtual void detectCollisionAndComputeContactForces(RigidBody<T, T> const* const* particleRB,
-                                                        RigidBody<T, T> const* const* obstacleRB,
-                                                        LinkedCell<T> const* const*   LC,
-                                                        ContactForceModel<T> const* const* CF,
-                                                        int*                               result)
+    virtual void detectCollisionAndComputeContactForces(
+        RigidBody<T, T> const* const*      particleRB,
+        RigidBody<T, T> const* const*      obstacleRB,
+        LinkedCell<T> const* const*        LC,
+        ContactForceModel<T> const* const* CF,
+        int*                               result)
         = 0;
 
     /** @brief Adds external forces such as gravity
         @param particleRB array of rigid bodies for particles
         @param g gravity field */
-    virtual void addExternalForces(RigidBody<T, T> const* const* particleRB, Vector3<T> const& g)
+    virtual void addExternalForces(RigidBody<T, T> const* const* particleRB,
+                                   Vector3<T> const&             g)
         = 0;
 
     /** @brief Updates the position and velocities of particles

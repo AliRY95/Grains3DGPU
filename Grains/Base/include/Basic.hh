@@ -54,11 +54,16 @@
     }
 
 /** @brief Returns CUDA error */
-static INLINE void cudaAssert(cudaError_t code, const char* file, int line, bool abort = false)
+static INLINE void
+    cudaAssert(cudaError_t code, const char* file, int line, bool abort = false)
 {
     if(code != cudaSuccess)
     {
-        fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+        fprintf(stderr,
+                "GPUassert: %s %s %d\n",
+                cudaGetErrorString(code),
+                file,
+                line);
         if(abort)
             exit(code);
     }

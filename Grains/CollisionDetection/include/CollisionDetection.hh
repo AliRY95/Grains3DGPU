@@ -45,10 +45,11 @@ __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
  @param b2w geometric tramsformation describing convex B in the world reference
  frame */
 template <typename T, typename U>
-__HOSTDEVICE__ ContactInfo<T> closestPointsRigidBodies(RigidBody<T, U> const& rbA,
-                                                       RigidBody<T, U> const& rbB,
-                                                       Transform3<T> const&   a2w,
-                                                       Transform3<T> const&   b2w);
+__HOSTDEVICE__ ContactInfo<T>
+               closestPointsRigidBodies(RigidBody<T, U> const& rbA,
+                                        RigidBody<T, U> const& rbB,
+                                        Transform3<T> const&   a2w,
+                                        Transform3<T> const&   b2w);
 
 // TODO: LATER
 // /** @brief Returns the contact information (if any) for 2 rigid bodies -

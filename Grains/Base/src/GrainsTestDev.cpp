@@ -23,13 +23,14 @@ namespace GrainsCPU
     {
         for(int i = 0; i < N; i++)
         {
-            dist[i] = distanceRigidBodies(*(rb[0]), *(rb[1]), t1[i], t2[i], method);
+            dist[i]
+                = distanceRigidBodies(*(rb[0]), *(rb[1]), t1[i], t2[i], method);
             // dist[i] = norm( t1[i].getOrigin() + t2[i].getOrigin() );
         }
     };
 } // GrainsCPU namespace end
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // ...
 namespace GrainsGPU
 {
@@ -44,29 +45,31 @@ namespace GrainsGPU
                               int const                     method,
                               int const                     N)
     {
-        int bid = gridDim.x * gridDim.y * blockIdx.z + blockIdx.y * gridDim.x + blockIdx.x;
+        int bid = gridDim.x * gridDim.y * blockIdx.z + blockIdx.y * gridDim.x
+                  + blockIdx.x;
         int tid = bid * blockDim.x + threadIdx.x;
 
-        dist[tid] = distanceRigidBodies(*(rb[0]), *(rb[1]), t1[tid], t2[tid], method);
+        dist[tid]
+            = distanceRigidBodies(*(rb[0]), *(rb[1]), t1[tid], t2[tid], method);
         // dist[tid] = norm( t1[tid].getOrigin() + t2[tid].getOrigin() );
     };
 } // GrainsGPU namespace end
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 GrainsTestDev<T>::GrainsTestDev()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 GrainsTestDev<T>::~GrainsTestDev()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Runs the simulation over the prescribed time interval
 template <typename T>
 void GrainsTestDev<T>::simulate()
@@ -98,17 +101,29 @@ void GrainsTestDev<T>::simulate()
     // Randomize array on host
     for(int i = 0; i < N; i++)
     {
-        h_tr1[i].setBasis(rotation(generator), rotation(generator), rotation(generator));
-        h_tr1[i].setOrigin(Vector3<T>(
-            distribution1(generator), distribution1(generator), distribution1(generator)));
-        h_tr2[i].setBasis(rotation(generator), rotation(generator), rotation(generator));
-        h_tr2[i].setOrigin(Vector3<T>(
-            distribution2(generator), distribution2(generator), distribution2(generator)));
+        h_tr1[i].setBasis(rotation(generator),
+                          rotation(generator),
+                          rotation(generator));
+        h_tr1[i].setOrigin(Vector3<T>(distribution1(generator),
+                                      distribution1(generator),
+                                      distribution1(generator)));
+        h_tr2[i].setBasis(rotation(generator),
+                          rotation(generator),
+                          rotation(generator));
+        h_tr2[i].setOrigin(Vector3<T>(distribution2(generator),
+                                      distribution2(generator),
+                                      distribution2(generator)));
     }
 
     // Copying the arrays from host to device
-    cudaErrCheck(cudaMemcpy(d_tr1, h_tr1, N * sizeof(Transform3<T>), cudaMemcpyHostToDevice));
-    cudaErrCheck(cudaMemcpy(d_tr2, h_tr2, N * sizeof(Transform3<T>), cudaMemcpyHostToDevice));
+    cudaErrCheck(cudaMemcpy(d_tr1,
+                            h_tr1,
+                            N * sizeof(Transform3<T>),
+                            cudaMemcpyHostToDevice));
+    cudaErrCheck(cudaMemcpy(d_tr2,
+                            h_tr2,
+                            N * sizeof(Transform3<T>),
+                            cudaMemcpyHostToDevice));
 
     /* ====================================================================== */
     /* Creating Particles                                                     */
@@ -120,9 +135,10 @@ void GrainsTestDev<T>::simulate()
     // Convex<T> *h_convex2 = new Cylinder<T>( r1, r2 );
     Convex<T>*        h_convex1 = new Superquadric<T>(r1, r2, r3, T(3.), T(3));
     Convex<T>*        h_convex2 = new Superquadric<T>(r1, r2, r3, T(3), T(3));
-    RigidBody<T, T>** h_rb      = (RigidBody<T, T>**)malloc(2 * sizeof(RigidBody<T, T>*));
-    h_rb[0]                     = new RigidBody<T, T>(h_convex1, T(0), 0, 1);
-    h_rb[1]                     = new RigidBody<T, T>(h_convex2, T(0), 0, 1);
+    RigidBody<T, T>** h_rb
+        = (RigidBody<T, T>**)malloc(2 * sizeof(RigidBody<T, T>*));
+    h_rb[0] = new RigidBody<T, T>(h_convex1, T(0), 0, 1);
+    h_rb[1] = new RigidBody<T, T>(h_convex2, T(0), 0, 1);
 
     RigidBody<T, T>** d_rb;
     cudaErrCheck(cudaMalloc((void**)&d_rb, 2 * sizeof(RigidBody<T, T>*)));
@@ -140,21 +156,33 @@ void GrainsTestDev<T>::simulate()
     }
     T* d_collision;
     cudaErrCheck(cudaMalloc((void**)&d_collision, N * sizeof(T)));
-    cudaErrCheck(cudaMemcpy(d_collision, h_collision, N * sizeof(T), cudaMemcpyHostToDevice));
+    cudaErrCheck(cudaMemcpy(d_collision,
+                            h_collision,
+                            N * sizeof(T),
+                            cudaMemcpyHostToDevice));
 
     // Collision detection on host
     Vector3<T> pa, pb;
     int        nbIter;
     auto       h_start = chrono::high_resolution_clock::now();
-    GrainsCPU::collisionDetectionGJK<T>(h_rb, h_tr1, h_tr2, h_collision, method, N);
+    GrainsCPU::collisionDetectionGJK<T>(h_rb,
+                                        h_tr1,
+                                        h_tr2,
+                                        h_collision,
+                                        method,
+                                        N);
     auto h_end = chrono::high_resolution_clock::now();
 
     // Collision detection on device
     dim3 dimBlock(256, 1, 1);
     dim3 dimGrid(N / 256, 1, 1);
     auto d_start = chrono::high_resolution_clock::now();
-    GrainsGPU::collisionDetectionGJK<<<dimGrid, dimBlock>>>(
-        d_rb, d_tr1, d_tr2, d_collision, method, N);
+    GrainsGPU::collisionDetectionGJK<<<dimGrid, dimBlock>>>(d_rb,
+                                                            d_tr1,
+                                                            d_tr2,
+                                                            d_collision,
+                                                            method,
+                                                            N);
     cudaErrCheck(cudaDeviceSynchronize());
     auto d_end = chrono::high_resolution_clock::now();
 
@@ -169,7 +197,10 @@ void GrainsTestDev<T>::simulate()
 
     // accuracy
     T* h_d_collision = new T[N];
-    cudaErrCheck(cudaMemcpy(h_d_collision, d_collision, N * sizeof(T), cudaMemcpyDeviceToHost));
+    cudaErrCheck(cudaMemcpy(h_d_collision,
+                            d_collision,
+                            N * sizeof(T),
+                            cudaMemcpyDeviceToHost));
 
     int trueCount = 0;
     for(int i = 0; i < N; i++)
@@ -177,8 +208,8 @@ void GrainsTestDev<T>::simulate()
         if(fabs(h_collision[i] - h_d_collision[i]) < 1.e-6)
             trueCount++;
     }
-    cout << N << " Particles, " << trueCount << " Consistent collisions on host and device."
-         << endl;
+    cout << N << " Particles, " << trueCount
+         << " Consistent collisions on host and device." << endl;
 
     delete[] h_tr1;
     delete[] h_tr2;
@@ -189,7 +220,7 @@ void GrainsTestDev<T>::simulate()
     cudaFree(d_collision);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsTestDev<float>;
 template class GrainsTestDev<double>;

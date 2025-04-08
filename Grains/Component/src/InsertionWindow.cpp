@@ -3,17 +3,18 @@
 #include "VectorMath.hh"
 #include <ctime>
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOST__ InsertionWindow<T>::InsertionWindow()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with XML node and the type of the seed
 template <typename T>
-__HOST__ InsertionWindow<T>::InsertionWindow(DOMNode* dn, RandomGeneratorSeed seed)
+__HOST__ InsertionWindow<T>::InsertionWindow(DOMNode*            dn,
+                                             RandomGeneratorSeed seed)
 {
     GrainsMisc<T>::cout("Reading insertion window ...", 12);
 
@@ -60,9 +61,11 @@ __HOST__ InsertionWindow<T>::InsertionWindow(DOMNode* dn, RandomGeneratorSeed se
         m_iRad        = T(ReaderXML::getNodeAttr_Double(nR, "Inner"));
         m_oRad        = T(ReaderXML::getNodeAttr_Double(nR, "Outter"));
         GrainsMisc<T>::cout(
-            "Annulus insertion window with bottom point " + GrainsMisc<T>::Vector3ToString(m_v1)
-                + ", direction " + GrainsMisc<T>::Vector3ToString(m_v2) + ", outter radius "
-                + std::to_string(m_oRad) + ", and inner radius " + std::to_string(m_iRad) + ".",
+            "Annulus insertion window with bottom point "
+                + GrainsMisc<T>::Vector3ToString(m_v1) + ", direction "
+                + GrainsMisc<T>::Vector3ToString(m_v2) + ", outter radius "
+                + std::to_string(m_oRad) + ", and inner radius "
+                + std::to_string(m_iRad) + ".",
             15);
         GrainsMisc<T>::cout("Reading insertion window completed!", 12);
     }
@@ -73,14 +76,14 @@ __HOST__ InsertionWindow<T>::InsertionWindow(DOMNode* dn, RandomGeneratorSeed se
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ InsertionWindow<T>::~InsertionWindow()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Generates a random number with uniform distribution in window
 template <typename T>
 __HOST__ Vector3<T> InsertionWindow<T>::generateRandomPoint()
@@ -88,9 +91,10 @@ __HOST__ Vector3<T> InsertionWindow<T>::generateRandomPoint()
     Vector3<T> out;
     if(m_type == BOXWINDOW)
     {
-        out = Vector3<T>(m_v1[X] + m_dist(m_randGenerator) * (m_v2[X] - m_v1[X]),
-                         m_v1[Y] + m_dist(m_randGenerator) * (m_v2[Y] - m_v1[Y]),
-                         m_v1[Z] + m_dist(m_randGenerator) * (m_v2[Z] - m_v1[Z]));
+        out = Vector3<T>(
+            m_v1[X] + m_dist(m_randGenerator) * (m_v2[X] - m_v1[X]),
+            m_v1[Y] + m_dist(m_randGenerator) * (m_v2[Y] - m_v1[Y]),
+            m_v1[Z] + m_dist(m_randGenerator) * (m_v2[Z] - m_v1[Z]));
     }
     else if(m_type == ANNULUSWINDOW)
     {
@@ -111,7 +115,7 @@ __HOST__ Vector3<T> InsertionWindow<T>::generateRandomPoint()
     return (out);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class InsertionWindow<float>;
 template class InsertionWindow<double>;

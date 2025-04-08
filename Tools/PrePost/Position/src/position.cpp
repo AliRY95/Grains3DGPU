@@ -15,11 +15,11 @@ double random_value(const double& min, const double& max)
 int main(int argc, char* argv[])
 {
     string       tline;
-    unsigned int nx = 0, ny = 1, nz = 1, nxmax, nymax, nzmax = 1, n, ncalc, nmax, i, j, k, ipart,
-                 buf;
-    double lx, ly, lz = 1., radius, ry, rz, hx, hy, hz, posx, posy, posz, origx, origy, origz,
-                   deltax, deltay, deltaz, magnitude = 1.1, particle_measure = 0.,
-                   equivol_radius = 0.;
+    unsigned int nx = 0, ny = 1, nz = 1, nxmax, nymax, nzmax = 1, n, ncalc,
+                 nmax, i, j, k, ipart, buf;
+    double lx, ly, lz = 1., radius, ry, rz, hx, hy, hz, posx, posy, posz, origx,
+                   origy, origz, deltax, deltay, deltaz, magnitude = 1.1,
+                   particle_measure = 0., equivol_radius = 0.;
     istringstream iss;
     bool          is_3D = false, random = false;
     string        output_file, random_keyword, filling_mode;
@@ -130,7 +130,8 @@ int main(int argc, char* argv[])
         ry = ly / lx;
         if(is_3D)
             rz = lz / lx;
-        cout << "Number of particles to be inserted as an array = " << n << endl;
+        cout << "Number of particles to be inserted as an array = " << n
+             << endl;
         ncalc = 0;
         while(ncalc < n)
         {
@@ -219,7 +220,8 @@ int main(int argc, char* argv[])
                             posy += random_value(-deltay, deltay);
                             posz = origz + (k + 0.5) * hz;
                             posz += random_value(-deltaz, deltaz);
-                            file_OUT << posx << "\t" << posy << "\t" << posz << endl;
+                            file_OUT << posx << "\t" << posy << "\t" << posz
+                                     << endl;
                             ++j;
                             ++ipart;
                         }
@@ -251,7 +253,8 @@ int main(int argc, char* argv[])
         }
         else
         {
-            cout << "!!! Number of particles to be inserted as a structured array"
+            cout << "!!! Number of particles to be inserted as a "
+                    "structured array"
                  << " is too high !!!" << endl;
         }
     }
@@ -260,19 +263,22 @@ int main(int argc, char* argv[])
         bool goon = true;
         if(nx > nxmax)
         {
-            cout << "!!! Number of particles to be inserted in the x direction"
+            cout << "!!! Number of particles to be inserted in the x "
+                    "direction"
                  << " is too high !!!" << endl;
             goon = false;
         }
         else if(ny > nymax)
         {
-            cout << "!!! Number of particles to be inserted in the y direction"
+            cout << "!!! Number of particles to be inserted in the y "
+                    "direction"
                  << " is too high !!!" << endl;
             goon = false;
         }
         else if(nz > nzmax)
         {
-            cout << "!!! Number of particles to be inserted in the z direction"
+            cout << "!!! Number of particles to be inserted in the z "
+                    "direction"
                  << " is too high !!!" << endl;
             goon = false;
         }
@@ -289,8 +295,12 @@ int main(int argc, char* argv[])
             hy        = ly / ny;
             if(random)
             {
-                deltax = hx / 2. - magnitude * radius > 0. ? hx / 2. - magnitude * radius : 0.;
-                deltay = hy / 2. - magnitude * radius > 0. ? hy / 2. - magnitude * radius : 0.;
+                deltax = hx / 2. - magnitude * radius > 0.
+                             ? hx / 2. - magnitude * radius
+                             : 0.;
+                deltay = hy / 2. - magnitude * radius > 0.
+                             ? hy / 2. - magnitude * radius
+                             : 0.;
             }
             else
                 deltax = deltay = 0.;
@@ -298,8 +308,11 @@ int main(int argc, char* argv[])
             {
                 hz = lz / nz;
                 if(random)
-                    deltaz = hz / 2. - magnitude * radius > 0. ? hz / 2. - magnitude * radius : 0.;
-                particle_measure = (4. / 3.) * acos(-1.) * pow(equivol_radius, 3.);
+                    deltaz = hz / 2. - magnitude * radius > 0.
+                                 ? hz / 2. - magnitude * radius
+                                 : 0.;
+                particle_measure
+                    = (4. / 3.) * acos(-1.) * pow(equivol_radius, 3.);
             }
             else
                 particle_measure = acos(-1.) * pow(equivol_radius, 2.);
@@ -312,24 +325,31 @@ int main(int argc, char* argv[])
                     for(j = 0; j < ny; ++j)
                         for(k = 0; k < nz; ++k)
                         {
-                            posx = origx + (i + 0.5) * hx + random_value(-deltax, deltax);
-                            posy = origy + (j + 0.5) * hy + random_value(-deltay, deltay);
-                            posz = origz + (k + 0.5) * hz + random_value(-deltaz, deltaz);
-                            file_OUT << posx << "\t" << posy << "\t" << posz << endl;
+                            posx = origx + (i + 0.5) * hx
+                                   + random_value(-deltax, deltax);
+                            posy = origy + (j + 0.5) * hy
+                                   + random_value(-deltay, deltay);
+                            posz = origz + (k + 0.5) * hz
+                                   + random_value(-deltaz, deltaz);
+                            file_OUT << posx << "\t" << posy << "\t" << posz
+                                     << endl;
                         }
             else
                 for(i = 0; i < nx; ++i)
                     for(j = 0; j < ny; ++j)
                     {
-                        posx = origx + (i + 0.5) * hx + random_value(-deltax, deltax);
-                        posy = origy + (j + 0.5) * hy + random_value(-deltay, deltay);
+                        posx = origx + (i + 0.5) * hx
+                               + random_value(-deltax, deltax);
+                        posy = origy + (j + 0.5) * hy
+                               + random_value(-deltay, deltay);
                         file_OUT << posx << "\t" << posy << "\t 0." << endl;
                     }
 
             file_OUT.close();
             n = nx * ny * nz;
             cout << "Total number of particles inserted = " << n << endl;
-            cout << "Solid fraction = " << n * particle_measure / (lx * ly * lz) << endl;
+            cout << "Solid fraction = " << n * particle_measure / (lx * ly * lz)
+                 << endl;
         }
     }
 

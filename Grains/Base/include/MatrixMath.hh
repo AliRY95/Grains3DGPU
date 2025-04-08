@@ -22,13 +22,13 @@ template <typename T>
 __HOSTDEVICE__ static INLINE T determinant(Matrix3<T> const& m) noexcept
 {
     T const* __RESTRICT__ buffer = m.getBuffer();
-    T                     out0   = buffer[XX] * (buffer[YY] * buffer[ZZ] - buffer[YZ] * buffer[ZY]);
-    T                     out1   = buffer[XY] * (buffer[YZ] * buffer[ZX] - buffer[YX] * buffer[ZZ]);
-    T                     out2   = buffer[XZ] * (buffer[YX] * buffer[ZY] - buffer[YY] * buffer[ZX]);
+    T out0 = buffer[XX] * (buffer[YY] * buffer[ZZ] - buffer[YZ] * buffer[ZY]);
+    T out1 = buffer[XY] * (buffer[YZ] * buffer[ZX] - buffer[YX] * buffer[ZZ]);
+    T out2 = buffer[XZ] * (buffer[YX] * buffer[ZY] - buffer[YY] * buffer[ZX]);
     return (out0 + out1 + out2);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Returns the transposed matrix
 @param m the matrix */
 template <typename T>
@@ -46,7 +46,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> transpose(Matrix3<T> const& m) noexcept
                        buffer[ZZ]));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Returns the inverse of the matrix
 @param m the matrix */
 template <typename T>
@@ -57,7 +57,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> inverse(Matrix3<T> const& m) noexcept
     out[XX] = (buffer[YY] * buffer[ZZ] - buffer[YZ] * buffer[ZY]);
     out[YX] = (buffer[YZ] * buffer[ZX] - buffer[YX] * buffer[ZZ]);
     out[ZX] = (buffer[YX] * buffer[ZY] - buffer[YY] * buffer[ZX]);
-    T det   = buffer[XX] * out[XX] + buffer[XY] * out[YX] + buffer[XZ] * out[ZX];
+    T det = buffer[XX] * out[XX] + buffer[XY] * out[YX] + buffer[XZ] * out[ZX];
     if(fabs(det) < HIGHEPS<T>)
         printf("Matrix is not inversible!\n");
     T s     = T(1) / det;
@@ -73,7 +73,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> inverse(Matrix3<T> const& m) noexcept
     return (Matrix3<T>(out));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Matrices addition
 @param m1 first matrix
 @param m2 second matrix */
@@ -89,7 +89,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator+(Matrix3<T> const& m1,
     return (Matrix3<T>(out));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Matrices subtraction
 @param m1 first matrix
 @param m2 second matrix */
@@ -105,12 +105,13 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator-(Matrix3<T> const& m1,
     return (Matrix3<T>(out));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Scalar-matrix product
 @param c the scalar
 @param m the matrix */
 template <typename T>
-__HOSTDEVICE__ static INLINE Matrix3<T> operator*(T c, Matrix3<T> const& m) noexcept
+__HOSTDEVICE__ static INLINE Matrix3<T> operator*(T                 c,
+                                                  Matrix3<T> const& m) noexcept
 {
     T const* __RESTRICT__ buffer = m.getBuffer();
     T __RESTRICT__        out[9];
@@ -119,12 +120,13 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator*(T c, Matrix3<T> const& m) noex
     return (Matrix3<T>(out));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Matrix-vector product
 @param m the matrix
 @param v the vector */
 template <typename T>
-__HOSTDEVICE__ static INLINE Vector3<T> operator*(Matrix3<T> const& m, Vector3<T> const& v) noexcept
+__HOSTDEVICE__ static INLINE Vector3<T> operator*(Matrix3<T> const& m,
+                                                  Vector3<T> const& v) noexcept
 {
     T const* __RESTRICT__ bufferM = m.getBuffer();
     T const* __RESTRICT__ bufferV = v.getBuffer();
@@ -135,23 +137,24 @@ __HOSTDEVICE__ static INLINE Vector3<T> operator*(Matrix3<T> const& m, Vector3<T
     return (Vector3<T>(out));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Vector-matrix product
 @param v the vector
 @param m the matrix */
 template <typename T>
-__HOSTDEVICE__ static INLINE Vector3<T> operator*(Vector3<T> const& v, Matrix3<T> const& m) noexcept
+__HOSTDEVICE__ static INLINE Vector3<T> operator*(Vector3<T> const& v,
+                                                  Matrix3<T> const& m) noexcept
 {
     T const* __RESTRICT__ bufferV = v.getBuffer();
     T const* __RESTRICT__ bufferM = m.getBuffer();
     T __RESTRICT__        out[3];
     for(unsigned int i = 0; i < 3; ++i)
-        out[i]
-            = bufferM[i] * bufferV[0] + bufferM[i + 3] * bufferV[1] + bufferM[i + 6] * bufferV[2];
+        out[i] = bufferM[i] * bufferV[0] + bufferM[i + 3] * bufferV[1]
+                 + bufferM[i + 6] * bufferV[2];
     return (Vector3<T>(out));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Matrix-matrix product
 @param m right matrix */
 template <typename T>

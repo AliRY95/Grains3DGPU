@@ -64,14 +64,15 @@ __GLOBAL__ void createRigidBodyKernel(RigidBody<T, U>** rb,
 }
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 // Constructs a RigidBody object on device identical to a RigidBody object on
 // the host memory.
 // It is assumed that appropriate memory is allocated to d_rb.
 template <typename T, typename U>
-__HOST__ void
-    RigidBodyCopyHostToDevice(RigidBody<T, U>** h_rb, RigidBody<T, U>** d_rb, int numRigidBodies)
+__HOST__ void RigidBodyCopyHostToDevice(RigidBody<T, U>** h_rb,
+                                        RigidBody<T, U>** d_rb,
+                                        int               numRigidBodies)
 {
     for(int index = 0; index < numRigidBodies; index++)
     {
@@ -88,58 +89,103 @@ __HOST__ void
         {
             Sphere<T>* c = dynamic_cast<Sphere<T>*>(convex);
             T          r = c->getRadius();
-            createRigidBodyKernel<<<1, 1>>>(d_rb, index, ct, material, density, SPHERE, r);
+            createRigidBodyKernel<<<1, 1>>>(d_rb,
+                                            index,
+                                            ct,
+                                            material,
+                                            density,
+                                            SPHERE,
+                                            r);
         }
         else if(cvxType == BOX)
         {
             Box<T>*    c = dynamic_cast<Box<T>*>(convex);
             Vector3<T> L = c->getExtent();
-            createRigidBodyKernel<<<1, 1>>>(
-                d_rb, index, ct, material, density, BOX, L[X], L[Y], L[Z]);
+            createRigidBodyKernel<<<1, 1>>>(d_rb,
+                                            index,
+                                            ct,
+                                            material,
+                                            density,
+                                            BOX,
+                                            L[X],
+                                            L[Y],
+                                            L[Z]);
         }
         else if(cvxType == CYLINDER)
         {
             Cylinder<T>* c = dynamic_cast<Cylinder<T>*>(convex);
             T            r = c->getRadius();
             T            h = c->getHeight();
-            createRigidBodyKernel<<<1, 1>>>(d_rb, index, ct, material, density, CYLINDER, r, h);
+            createRigidBodyKernel<<<1, 1>>>(d_rb,
+                                            index,
+                                            ct,
+                                            material,
+                                            density,
+                                            CYLINDER,
+                                            r,
+                                            h);
         }
         else if(cvxType == CONE)
         {
             Cone<T>* c = dynamic_cast<Cone<T>*>(convex);
             T        r = c->getRadius();
             T        h = c->getHeight();
-            createRigidBodyKernel<<<1, 1>>>(d_rb, index, ct, material, density, CONE, r, h);
+            createRigidBodyKernel<<<1, 1>>>(d_rb,
+                                            index,
+                                            ct,
+                                            material,
+                                            density,
+                                            CONE,
+                                            r,
+                                            h);
         }
         else if(cvxType == SUPERQUADRIC)
         {
             Superquadric<T>* c = dynamic_cast<Superquadric<T>*>(convex);
             Vector3<T>       L = c->getExtent();
             Vector3<T>       N = c->getExponent();
-            createRigidBodyKernel<<<1, 1>>>(
-                d_rb, index, ct, material, density, SUPERQUADRIC, L[X], L[Y], L[Z], N[X], N[Y]);
+            createRigidBodyKernel<<<1, 1>>>(d_rb,
+                                            index,
+                                            ct,
+                                            material,
+                                            density,
+                                            SUPERQUADRIC,
+                                            L[X],
+                                            L[Y],
+                                            L[Z],
+                                            N[X],
+                                            N[Y]);
         }
         else if(cvxType == RECTANGLE)
         {
             Rectangle<T>* c = dynamic_cast<Rectangle<T>*>(convex);
             Vector3<T>    L = c->getExtent();
-            createRigidBodyKernel<<<1, 1>>>(
-                d_rb, index, ct, material, density, RECTANGLE, L[X], L[Y]);
+            createRigidBodyKernel<<<1, 1>>>(d_rb,
+                                            index,
+                                            ct,
+                                            material,
+                                            density,
+                                            RECTANGLE,
+                                            L[X],
+                                            L[Y]);
         }
         else
         {
-            cout << "Convex type is not implemented for GPU! Aborting Grains!" << endl;
+            cout << "Convex type is not implemented for GPU! Aborting "
+                    "Grains!"
+                 << endl;
             exit(1);
         }
     }
     cudaDeviceSynchronize();
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
-#define X(T, U)                                       \
-    template __HOST__ void RigidBodyCopyHostToDevice( \
-        RigidBody<T, U>** h_rb, RigidBody<T, U>** d_rb, int numRigidBodies);
+#define X(T, U)                                                              \
+    template __HOST__ void RigidBodyCopyHostToDevice(RigidBody<T, U>** h_rb, \
+                                                     RigidBody<T, U>** d_rb, \
+                                                     int numRigidBodies);
 X(float, float)
 X(double, float)
 X(double, double)

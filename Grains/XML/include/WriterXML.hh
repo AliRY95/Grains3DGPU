@@ -43,13 +43,16 @@ public:
     @param root root node
     @param attr attribute name
     @param value string value of the attribute */
-    static void createNodeAttr(DOMElement* root, string const& attr, string const& value);
+    static void createNodeAttr(DOMElement*   root,
+                               string const& attr,
+                               string const& value);
 
     /** @brief Creates a node attribute with a scalar value to be later written
     @param root root node
     @param attr attribute name
     @param value scalar value of the attribute */
-    static void createNodeAttr(DOMElement* root, string const& attr, double value);
+    static void
+        createNodeAttr(DOMElement* root, string const& attr, double value);
 
     /** @brief Creates a string node value to be later written
     @param root node

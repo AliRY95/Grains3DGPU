@@ -126,7 +126,8 @@ public:
     //@}
 };
 
-typedef ContactForceModelBuilderFactory<float>  ContactForceModelBuilderFactoryF;
-typedef ContactForceModelBuilderFactory<double> ContactForceModelBuilderFactoryD;
+typedef ContactForceModelBuilderFactory<float> ContactForceModelBuilderFactoryF;
+typedef ContactForceModelBuilderFactory<double>
+    ContactForceModelBuilderFactoryD;
 
 #endif

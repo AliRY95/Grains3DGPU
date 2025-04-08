@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
         // Creates the Grains application
         ReaderXML::initialize();
         DOMElement* rootNode = ReaderXML::getRoot(filename_exe);
-        string      prc      = ReaderXML::getNodeAttr_String(rootNode, "Precision");
+        string      prc = ReaderXML::getNodeAttr_String(rootNode, "Precision");
         if(prc == "Single")
         {
             Grains<float>* grains = nullptr;
-            grains                = GrainsBuilderFactory<float>::create(rootNode);
+            grains = GrainsBuilderFactory<float>::create(rootNode);
 
             // Initial output message
             // grains->initialOutputMessage();
@@ -69,12 +69,13 @@ int main(int argc, char* argv[])
         {
             if(prc != "Double")
             {
-                std::cout << "Invalid precision! Creating Grains in double " << "precision!"
-                          << endl;
+                std::cout << "Invalid precision! Creating Grains "
+                             "in double "
+                          << "precision!" << endl;
             }
 
             Grains<double>* grains = nullptr;
-            grains                 = GrainsBuilderFactory<double>::create(rootNode);
+            grains = GrainsBuilderFactory<double>::create(rootNode);
 
             // Initial output message
             // grains->initialOutputMessage();

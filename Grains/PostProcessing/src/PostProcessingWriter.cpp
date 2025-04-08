@@ -14,7 +14,7 @@ __HOST__ PostProcessingWriter<T>::~PostProcessingWriter()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class PostProcessingWriter<float>;
 template class PostProcessingWriter<double>;

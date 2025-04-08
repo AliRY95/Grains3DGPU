@@ -35,9 +35,11 @@ __HOSTDEVICE__ static INLINE void computeDet(unsigned int const bits,
                     det[s3][k] = det[s2][j] * (dp[j][j] - dp[j][k])
                                  + det[s2][last] * (dp[last][j] - dp[last][k]);
                     det[s3][j] = det[sk | last_bit][k] * (dp[k][k] - dp[k][j])
-                                 + det[sk | last_bit][last] * (dp[last][k] - dp[last][j]);
-                    det[s3][last] = det[sk | sj][k] * (dp[k][k] - dp[k][last])
-                                    + det[sk | sj][j] * (dp[j][k] - dp[j][last]);
+                                 + det[sk | last_bit][last]
+                                       * (dp[last][k] - dp[last][j]);
+                    det[s3][last]
+                        = det[sk | sj][k] * (dp[k][k] - dp[k][last])
+                          + det[sk | sj][j] * (dp[j][k] - dp[j][last]);
                 }
             }
         }
@@ -45,18 +47,22 @@ __HOSTDEVICE__ static INLINE void computeDet(unsigned int const bits,
 
     if(all_bits == 15)
     {
-        det[15][0] = det[14][1] * (dp[1][1] - dp[1][0]) + det[14][2] * (dp[2][1] - dp[2][0])
+        det[15][0] = det[14][1] * (dp[1][1] - dp[1][0])
+                     + det[14][2] * (dp[2][1] - dp[2][0])
                      + det[14][3] * (dp[3][1] - dp[3][0]);
-        det[15][1] = det[13][0] * (dp[0][0] - dp[0][1]) + det[13][2] * (dp[2][0] - dp[2][1])
+        det[15][1] = det[13][0] * (dp[0][0] - dp[0][1])
+                     + det[13][2] * (dp[2][0] - dp[2][1])
                      + det[13][3] * (dp[3][0] - dp[3][1]);
-        det[15][2] = det[11][0] * (dp[0][0] - dp[0][2]) + det[11][1] * (dp[1][0] - dp[1][2])
+        det[15][2] = det[11][0] * (dp[0][0] - dp[0][2])
+                     + det[11][1] * (dp[1][0] - dp[1][2])
                      + det[11][3] * (dp[3][0] - dp[3][2]);
-        det[15][3] = det[7][0] * (dp[0][0] - dp[0][3]) + det[7][1] * (dp[1][0] - dp[1][3])
+        det[15][3] = det[7][0] * (dp[0][0] - dp[0][3])
+                     + det[7][1] * (dp[1][0] - dp[1][3])
                      + det[7][2] * (dp[2][0] - dp[2][3]);
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE bool
     valid(unsigned int const s, unsigned int const all_bits, T const det[16][4])
@@ -77,7 +83,7 @@ __HOSTDEVICE__ static INLINE bool
     return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits_,
                                                 Vector3<T> const   y[4],
@@ -97,7 +103,7 @@ __HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits_,
     v *= T(1) / sum;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits_,
                                                 T const            det[16][4],
@@ -123,9 +129,10 @@ __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits_,
     p2 *= s;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE bool proper(unsigned int const s, T const det[16][4])
+__HOSTDEVICE__ static INLINE bool proper(unsigned int const s,
+                                         T const            det[16][4])
 {
     for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
         if((s & bit) && det[s][i] <= EPS<T>)
@@ -133,7 +140,7 @@ __HOSTDEVICE__ static INLINE bool proper(unsigned int const s, T const det[16][4
     return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE bool closest(unsigned int&      bits,
                                           unsigned int const last,
@@ -187,12 +194,13 @@ __HOSTDEVICE__ static INLINE bool closest(unsigned int&      bits,
     return (false);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
 template <typename T>
-__HOSTDEVICE__ static INLINE bool
-    degenerate(unsigned int const all_bits, Vector3<T> const y[4], Vector3<T> const& w)
+__HOSTDEVICE__ static INLINE bool degenerate(unsigned int const all_bits,
+                                             Vector3<T> const   y[4],
+                                             Vector3<T> const&  w)
 {
     for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
         if((all_bits & bit) && y[i] == w)
@@ -200,7 +208,7 @@ __HOSTDEVICE__ static INLINE bool
     return (false);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // For num_iterations > 1000
 __HOSTDEVICE__
 void catch_me()
@@ -209,7 +217,7 @@ void catch_me()
 }
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 // Returns whether 2 convex shapes intersect using the GJK algorithm
 template <typename T>
@@ -239,7 +247,8 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
             ++last;
             last_bit <<= 1;
         }
-        w    = a2w(a.support((-v) * a2w.getBasis())) - b2w(b.support(v * b2w.getBasis()));
+        w = a2w(a.support((-v) * a2w.getBasis()))
+            - b2w(b.support(v * b2w.getBasis()));
         prod = v * w;
         if(prod > T(0) || fabs(prod) < HIGHEPS<T>)
             return (false);
@@ -253,11 +262,13 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
     return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns whether 2 convex shapes intersect using the GJK algorithm - relative
 // transformation
 template <typename T>
-__HOSTDEVICE__ bool intersectGJK(Convex<T> const& a, Convex<T> const& b, Transform3<T> const& b2a)
+__HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
+                                 Convex<T> const&     b,
+                                 Transform3<T> const& b2a)
 {
     unsigned int bits     = 0; // identifies current simplex
     unsigned int last     = 0; // identifies last found support point
@@ -294,7 +305,7 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const& a, Convex<T> const& b, Transfo
     return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the minimal distance between 2 convex shapes and a point per convex
 // shape that represents the tips of the minimal distance segment
 template <typename T>
@@ -381,7 +392,7 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
     return (dist);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // // Returns the minimal distance between 2 convex shapes and a point per convex
 // // shape that represents the tips of the minimal distance segment - relative
 // // transformation
@@ -442,21 +453,22 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
 //     return ( dist );
 // }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
-#define X(T)                                                                        \
-    template __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,               \
-                                              Convex<T> const&     b,               \
-                                              Transform3<T> const& a2w,             \
-                                              Transform3<T> const& b2w);            \
-                                                                                    \
-    template __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,   \
-                                                          Convex<T> const&     b,   \
-                                                          Transform3<T> const& a2w, \
-                                                          Transform3<T> const& b2w, \
-                                                          Vector3<T>&          pa,  \
-                                                          Vector3<T>&          pb,  \
-                                                          int&                 nbIter);
+#define X(T)                                                             \
+    template __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,    \
+                                              Convex<T> const&     b,    \
+                                              Transform3<T> const& a2w,  \
+                                              Transform3<T> const& b2w); \
+                                                                         \
+    template __HOSTDEVICE__ T computeClosestPoints_GJK_JH(               \
+        Convex<T> const&     a,                                          \
+        Convex<T> const&     b,                                          \
+        Transform3<T> const& a2w,                                        \
+        Transform3<T> const& b2w,                                        \
+        Vector3<T>&          pa,                                         \
+        Vector3<T>&          pb,                                         \
+        int&                 nbIter);
 X(float)
 X(double)
 #undef X

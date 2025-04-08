@@ -8,7 +8,7 @@
 #include "LinkedCell.hh"
 #include "LinkedCellGPUWrapper.hh"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Zeros out the array
 __GLOBAL__
 void zeroOutArray(unsigned int* array, unsigned int numElements)
@@ -21,18 +21,20 @@ void zeroOutArray(unsigned int* array, unsigned int numElements)
     array[tid] = 0;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the start Id for each hash value in cellStart
 __GLOBAL__
-void sortComponentsAndFindCellStart_kernel(unsigned int const* componentCellHash,
-                                           unsigned int        numComponents,
-                                           unsigned int*       cellStart,
-                                           unsigned int*       cellEnd)
+void sortComponentsAndFindCellStart_kernel(
+    unsigned int const* componentCellHash,
+    unsigned int        numComponents,
+    unsigned int*       cellStart,
+    unsigned int*       cellEnd)
 {
     // Handle to thread block group
-    cooperative_groups::thread_block cta = cooperative_groups::this_thread_block();
-    extern __shared__ unsigned int   sharedHash[]; // blockSize + 1 elements
-    unsigned int                     tid = blockIdx.x * blockDim.x + threadIdx.x;
+    cooperative_groups::thread_block cta
+        = cooperative_groups::this_thread_block();
+    extern __shared__ unsigned int sharedHash[]; // blockSize + 1 elements
+    unsigned int                   tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     unsigned int hash;
     if(tid < numComponents)
@@ -72,14 +74,14 @@ void sortComponentsAndFindCellStart_kernel(unsigned int const* componentCellHash
     // sortedVel[index] = vel;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // N-squared collision detection kernel using a thread-per-particle policy
 // TODO: REMOVE LATER
 template <typename T, typename U>
 __GLOBAL__ void collisionDetectionN2(RigidBody<T, U> const* const* a,
                                      Transform3<T> const*          tr3d,
-                                     int                           numComponents,
-                                     int*                          result)
+                                     int  numComponents,
+                                     int* result)
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -94,14 +96,14 @@ __GLOBAL__ void collisionDetectionN2(RigidBody<T, U> const* const* a,
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // N-squared collision detection kernel with relative transformation
 // TODO: REMOVE LATER
 template <typename T, typename U>
 __GLOBAL__ void collisionDetectionRelativeN2(RigidBody<T, U> const* const* a,
                                              Transform3<T> const*          tr3d,
-                                             int                           numComponents,
-                                             int*                          result)
+                                             int  numComponents,
+                                             int* result)
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -116,22 +118,23 @@ __GLOBAL__ void collisionDetectionRelativeN2(RigidBody<T, U> const* const* a,
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // LinkedCell collision detection kernel
 // TODO: CLEAN -- A LOT OF THINGS
 template <typename T, typename U>
-__GLOBAL__ void detectCollisionAndComputeContactForces_kernel(LinkedCell<T> const* const*        LC,
-                                                              RigidBody<T, U> const* const*      RB,
-                                                              ContactForceModel<T> const* const* CF,
-                                                              unsigned int*        m_rigidBodyId,
-                                                              Transform3<T> const* tr3d,
-                                                              Torce<T>*            m_torce,
-                                                              int*                 m_compId,
-                                                              unsigned int* m_componentCellHash,
-                                                              unsigned int* m_cellHashStart,
-                                                              unsigned int* m_cellHashEnd,
-                                                              int           numComponents,
-                                                              int*          result)
+__GLOBAL__ void detectCollisionAndComputeContactForces_kernel(
+    LinkedCell<T> const* const*        LC,
+    RigidBody<T, U> const* const*      RB,
+    ContactForceModel<T> const* const* CF,
+    unsigned int*                      m_rigidBodyId,
+    Transform3<T> const*               tr3d,
+    Torce<T>*                          m_torce,
+    int*                               m_compId,
+    unsigned int*                      m_componentCellHash,
+    unsigned int*                      m_cellHashStart,
+    unsigned int*                      m_cellHashEnd,
+    int                                numComponents,
+    int*                               result)
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -152,7 +155,10 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(LinkedCell<T> cons
             for(int i = -1; i < 2; i++)
             {
                 int neighboringCellHash
-                    = (*LC)->computeNeighboringCellLinearHash(cellHash, i, j, k);
+                    = (*LC)->computeNeighboringCellLinearHash(cellHash,
+                                                              i,
+                                                              j,
+                                                              k);
                 int startId = m_cellHashStart[neighboringCellHash];
                 int endId   = m_cellHashEnd[neighboringCellHash];
                 for(int id = startId; id < endId; id++)
@@ -161,13 +167,15 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(LinkedCell<T> cons
                     // To skip the self-collision
                     if(secondaryId == compId)
                         continue;
-                    RigidBody<T, U> const& rbB = *(RB[m_rigidBodyId[secondaryId]]);
-                    Transform3<T> const&   trB = tr3d[secondaryId];
+                    RigidBody<T, U> const& rbB
+                        = *(RB[m_rigidBodyId[secondaryId]]);
+                    Transform3<T> const& trB = tr3d[secondaryId];
                     // result[compId] += intersectRigidBodies( rigidBodyA,
                     //                                      rigidBodyA,
                     //                                      transformA,
                     //                                      transformB );
-                    ContactInfo<T> ci = closestPointsRigidBodies(rbA, rbB, trA, trB);
+                    ContactInfo<T> ci
+                        = closestPointsRigidBodies(rbA, rbB, trA, trB);
                     if(ci.getOverlapDistance() < T(0))
                     {
                         unsigned int contactForceID = 0;
@@ -195,25 +203,26 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(LinkedCell<T> cons
     // m_torce[compId].addForce( massA * GrainsParameters<T>::m_gravity );
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
-#define X(T, U)                                                                                \
-    template __GLOBAL__ void collisionDetectionN2(RigidBody<T, U> const* const* a,             \
-                                                  Transform3<T> const*          tr3d,          \
-                                                  int                           numComponents, \
-                                                  int*                          result);                                \
-    template __GLOBAL__ void detectCollisionAndComputeConatactForces_kernel(                   \
-        LinkedCell<T> const* const*        LC,                                                 \
-        RigidBody<T, U> const* const*      RB,                                                 \
-        ContactForceModel<T> const* const* CF,                                                 \
-        unsigned int*                      m_rigidBodyId,                                      \
-        Transform3<T> const*               tr3d,                                               \
-        Torce<T>*                          m_torce,                                            \
-        int*                               m_compId,                                           \
-        unsigned int*                      m_componentCellHash,                                \
-        unsigned int*                      m_cellHashStart,                                    \
-        unsigned int*                      m_cellHashEnd,                                      \
-        int                                numComponents,                                      \
+#define X(T, U)                                                              \
+    template __GLOBAL__ void collisionDetectionN2(                           \
+        RigidBody<T, U> const* const* a,                                     \
+        Transform3<T> const*          tr3d,                                  \
+        int                           numComponents,                         \
+        int*                          result);                                                        \
+    template __GLOBAL__ void detectCollisionAndComputeConatactForces_kernel( \
+        LinkedCell<T> const* const*        LC,                               \
+        RigidBody<T, U> const* const*      RB,                               \
+        ContactForceModel<T> const* const* CF,                               \
+        unsigned int*                      m_rigidBodyId,                    \
+        Transform3<T> const*               tr3d,                             \
+        Torce<T>*                          m_torce,                          \
+        int*                               m_compId,                         \
+        unsigned int*                      m_componentCellHash,              \
+        unsigned int*                      m_cellHashStart,                  \
+        unsigned int*                      m_cellHashEnd,                    \
+        int                                numComponents,                    \
         int*                               result);
 X(float, float)
 X(double, float)

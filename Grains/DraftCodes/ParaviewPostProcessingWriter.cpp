@@ -5,17 +5,20 @@
 /* ========================================================================== */
 // Writes particles data
 template <typename T>
-__HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
-                                      std::vector<unsigned int> const*    rigidBodyID,
-                                      std::vector<Transform3<T>> const*   t,
-                                      std::vector<Kinematics<T>> const*   k)
+__HOST__ void
+    writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
+                            std::vector<unsigned int> const*    rigidBodyID,
+                            std::vector<Transform3<T>> const*   t,
+                            std::vector<Kinematics<T>> const*   k)
 {
     list<Particle*>::const_iterator particle;
     unsigned int                    numParticles = rigidBodyID->size();
 
-    std::ofstream f((m_ParaviewFilename_dir + "/" + partFilename).c_str(), ios::out);
+    std::ofstream f((m_ParaviewFilename_dir + "/" + partFilename).c_str(),
+                    ios::out);
 
-    f << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" " << "byte_order=\"LittleEndian\" ";
+    f << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" "
+      << "byte_order=\"LittleEndian\" ";
     if(m_binary)
         f << "compressor=\"vtkZLibDataCompressor\"";
     f << ">" << endl;
@@ -27,8 +30,8 @@ __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
         nbpts += rb[i].getConvex()->numberOfPoints_PARAVIEW();
         nbcells += rb[i].getConvex()->numberOfCells_PARAVIEW();
     }
-    f << "<Piece NumberOfPoints=\"" << nbpts << "\"" << " NumberOfCells=\"" << nbcells << "\">"
-      << endl;
+    f << "<Piece NumberOfPoints=\"" << nbpts << "\"" << " NumberOfCells=\""
+      << nbcells << "\">" << endl;
 
     f << "<Points>" << endl;
     f << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" ";
@@ -49,9 +52,13 @@ __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
     list<int>::iterator ii;
     int                 firstpoint_globalnumber = 0, last_offset = 0;
     for(particle = particles->begin(); particle != particles->end(); particle++)
-        if((*particle)->getActivity() == COMPUTE && ((*particle)->getTag() != 2 || forceForAllTag))
-            (*particle)->write_polygonsStr_PARAVIEW(
-                connectivity, offsets, cellstype, firstpoint_globalnumber, last_offset);
+        if((*particle)->getActivity() == COMPUTE
+           && ((*particle)->getTag() != 2 || forceForAllTag))
+            (*particle)->write_polygonsStr_PARAVIEW(connectivity,
+                                                    offsets,
+                                                    cellstype,
+                                                    firstpoint_globalnumber,
+                                                    last_offset);
     f << "<Cells>" << endl;
     f << "<DataArray type=\"Int32\" Name=\"connectivity\" ";
     if(m_binary)
@@ -122,7 +129,8 @@ __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
     if(m_binary)
         start_output_binary(sizeof_Float32, int(cellstype.size()));
     for(particle = particles->begin(); particle != particles->end(); particle++)
-        if((*particle)->getActivity() == COMPUTE && ((*particle)->getTag() != 2 || forceForAllTag))
+        if((*particle)->getActivity() == COMPUTE
+           && ((*particle)->getTag() != 2 || forceForAllTag))
         {
             double normU = Norm(*(*particle)->getTranslationalVelocity());
             int    nc    = (*particle)->numberOfCells_PARAVIEW();
@@ -147,7 +155,8 @@ __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
     if(m_binary)
         start_output_binary(sizeof_Float32, int(cellstype.size()));
     for(particle = particles->begin(); particle != particles->end(); particle++)
-        if((*particle)->getActivity() == COMPUTE && ((*particle)->getTag() != 2 || forceForAllTag))
+        if((*particle)->getActivity() == COMPUTE
+           && ((*particle)->getTag() != 2 || forceForAllTag))
         {
             double normOm = Norm(*(*particle)->getAngularVelocity());
             int    nc     = (*particle)->numberOfCells_PARAVIEW();
@@ -172,7 +181,8 @@ __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
     if(m_binary)
         start_output_binary(sizeof_Float32, int(cellstype.size()));
     for(particle = particles->begin(); particle != particles->end(); particle++)
-        if((*particle)->getActivity() == COMPUTE && ((*particle)->getTag() != 2 || forceForAllTag))
+        if((*particle)->getActivity() == COMPUTE
+           && ((*particle)->getTag() != 2 || forceForAllTag))
         {
             double coordNum = double((*particle)->getCoordinationNumber());
             int    nc       = (*particle)->numberOfCells_PARAVIEW();
@@ -206,7 +216,7 @@ __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
     f.close();
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes data at one physical time
 template <typename T>
 __HOST__ void one_output(std::vector<RigidBody<T, T>> const* rb,
@@ -226,11 +236,14 @@ __HOST__ void one_output(std::vector<RigidBody<T, T>> const* rb,
     if(numRigidBodyTypes == 1)
     {
         string partFilename = m_ParaviewFilename + "_Particles_T";
-        *m_Paraview_saveParticles_pvd[0] << "<DataSet timestep=\"" << time << "\" "
-                                         << "group=\"\" part=\"0\" file=\"" << partFilename
-                                         << ".vtu\"/>" << endl;
+        *m_Paraview_saveParticles_pvd[0]
+            << "<DataSet timestep=\"" << time << "\" "
+            << "group=\"\" part=\"0\" file=\"" << partFilename << ".vtu\"/>"
+            << endl;
 
-        ofstream g((m_ParaviewFilename_dir + "/" + m_ParaviewFilename + "_Particles.pvd").c_str(),
+        ofstream g((m_ParaviewFilename_dir + "/" + m_ParaviewFilename
+                    + "_Particles.pvd")
+                       .c_str(),
                    ios::out);
         g << m_Paraview_saveParticles_pvd[0]->str();
         g << "</Collection>" << endl;
@@ -239,34 +252,38 @@ __HOST__ void one_output(std::vector<RigidBody<T, T>> const* rb,
     }
 
     // VTU files
-    writeParticles_Paraview(particles,
-                            partFilename + (m_nprocs > 1 ? "_" + ossRK.str() : "") + ".vtu",
-                            false,
-                            PostProcessingWriter::m_bPPWindow[m_rank]);
+    writeParticles_Paraview(
+        particles,
+        partFilename + (m_nprocs > 1 ? "_" + ossRK.str() : "") + ".vtu",
+        false,
+        PostProcessingWriter::m_bPPWindow[m_rank]);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOST__ ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with XML node, rank and number of processes as input parameters
 template <typename T>
-__HOST__ ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter(DOMNode* dn)
+__HOST__
+    ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter(DOMNode* dn)
 {
     m_ParaviewFilename     = ReaderXML::getNodeAttr_String(dn, "RootName");
     m_ParaviewFilename_dir = ReaderXML::getNodeAttr_String(dn, "Directory");
 
     GrainsMisc<T>::cout("Type = Paraview", 9);
     GrainsMisc<T>::cout("Output file root name = " + m_ParaviewFilename, 12);
-    GrainsMisc<T>::cout("Output file directory name = " + m_ParaviewFilename_dir, 12);
+    GrainsMisc<T>::cout("Output file directory name = "
+                            + m_ParaviewFilename_dir,
+                        12);
     GrainsMisc<T>::cout("Writing mode = " + (m_binary ? "Binary" : "Text"), 12);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ ParaviewPostProcessingWriter<T>::~ParaviewPostProcessingWriter()
@@ -282,11 +299,11 @@ __HOST__ PostProcessingWriterType
     return (PARAVIEW);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Initializes the post-processing writer
 template <typename T>
-__HOST__ void
-    ParaviewPostProcessingWriter<T>::PostProcessing_start(std::vector<RigidBody<T, T>> const* rb)
+__HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing_start(
+    std::vector<RigidBody<T, T>> const* rb)
 {
     // No. different rigid bodies for writing.
     size_t numRigidBodyTypes = m_pertype ? rb->size() : 1;
@@ -304,12 +321,14 @@ __HOST__ void
     for(size_t i = 0; i < numRigidBodyTypes; ++i)
     {
         *m_Paraview_saveParticles_pvd[i] << "<?xml version=\"1.0\"?>" << endl;
-        *m_Paraview_saveParticles_pvd[i] << "<VTKFile type=\"Collection\" version=\"0.1\""
-                                         << " byte_order=\"LittleEndian\"";
+        *m_Paraview_saveParticles_pvd[i]
+            << "<VTKFile type=\"Collection\" version=\"0.1\""
+            << " byte_order=\"LittleEndian\"";
 
         if(m_binary)
         {
-            *m_Paraview_saveParticles_pvd[i] << " compressor=\"vtkZLibDataCompressor\"";
+            *m_Paraview_saveParticles_pvd[i]
+                << " compressor=\"vtkZLibDataCompressor\"";
         }
 
         *m_Paraview_saveParticles_pvd[i] << ">" << endl;
@@ -317,16 +336,22 @@ __HOST__ void
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes data
 template <typename T>
-__HOST__ void
-    ParaviewPostProcessingWriter<T>::PostProcessing(std::vector<RigidBody<T, T>> const* rb,
-                                                    std::vector<unsigned int>           rigidBodyID,
-                                                    std::vector<Transform3<T>> const*   t,
-                                                    std::vector<Kinematics<T>> const*   k)
+__HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing(
+    std::vector<RigidBody<T, T>> const* rb,
+    std::vector<unsigned int>           rigidBodyID,
+    std::vector<Transform3<T>> const*   t,
+    std::vector<Kinematics<T>> const*   k)
 {
-    one_output(time, dt, particles, periodic_clones, referenceParticles, obstacle, LC);
+    one_output(time,
+               dt,
+               particles,
+               periodic_clones,
+               referenceParticles,
+               obstacle,
+               LC);
 }
 
 // ----------------------------------------------------------------------------
@@ -339,28 +364,35 @@ __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing_end()
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // Writes a pvtu file
-void ParaviewPostProcessingWriter::writePVTU_Paraview(string const&       filename,
-                                                      list<string> const* pointVector,
-                                                      list<string> const* pointScalar,
-                                                      list<string> const* cellScalar)
+void ParaviewPostProcessingWriter::writePVTU_Paraview(
+    string const&       filename,
+    list<string> const* pointVector,
+    list<string> const* pointScalar,
+    list<string> const* cellScalar)
 {
     list<string>::const_iterator il;
 
-    ofstream f((m_ParaviewFilename_dir + "/" + filename + ".pvtu").c_str(), ios::out);
+    ofstream f((m_ParaviewFilename_dir + "/" + filename + ".pvtu").c_str(),
+               ios::out);
     f << "<?xml version=\"1.0\"?>" << endl;
-    f << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" " << "byte_order=\"LittleEndian\" ";
+    f << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" "
+      << "byte_order=\"LittleEndian\" ";
     if(m_binary)
         f << "compressor=\"vtkZLibDataCompressor\"";
     f << ">" << endl;
     f << "<PUnstructuredGrid GhostLevel=\"0\">" << endl;
     f << "<PPoints>" << endl;
-    f << "<PDataArray NumberOfComponents=\"3\" type=\"Float32\" format=\"ascii\">" << endl;
+    f << "<PDataArray NumberOfComponents=\"3\" type=\"Float32\" "
+         "format=\"ascii\">"
+      << endl;
     f << "</PDataArray>" << endl;
     f << "</PPoints>" << endl;
     f << "<PCells>" << endl;
-    f << "<PDataArray Name=\"connectivity\" type=\"Int32\" format=\"ascii\">" << endl;
+    f << "<PDataArray Name=\"connectivity\" type=\"Int32\" format=\"ascii\">"
+      << endl;
     f << "</PDataArray>" << endl;
-    f << "<PDataArray Name=\"offsets\" type=\"Int32\" format=\"ascii\">" << endl;
+    f << "<PDataArray Name=\"offsets\" type=\"Int32\" format=\"ascii\">"
+      << endl;
     f << "</PDataArray>" << endl;
     f << "<PDataArray Name=\"types\" type=\"Int32\" format=\"ascii\">" << endl;
     f << "</PDataArray>" << endl;
@@ -389,13 +421,15 @@ void ParaviewPostProcessingWriter::writePVTU_Paraview(string const&       filena
         f << ">" << endl;
         for(il = pointVector->begin(); il != pointVector->end(); il++)
         {
-            f << "<PDataArray Name=\"" << *il << "\" NumberOfComponents=\"3\" type=\"Float32\""
+            f << "<PDataArray Name=\"" << *il
+              << "\" NumberOfComponents=\"3\" type=\"Float32\""
               << " format=\"ascii\">" << endl;
             f << "</PDataArray>" << endl;
         }
         for(il = pointScalar->begin(); il != pointScalar->end(); il++)
         {
-            f << "<PDataArray Name=\"" << *il << "\" type=\"Float32\" format=\"ascii\">" << endl;
+            f << "<PDataArray Name=\"" << *il
+              << "\" type=\"Float32\" format=\"ascii\">" << endl;
             f << "</PDataArray>" << endl;
         }
         f << "</PPointData>" << endl;
@@ -411,8 +445,8 @@ void ParaviewPostProcessingWriter::writePVTU_Paraview(string const&       filena
         f << "\">";
         for(il = cellScalar->begin(); il != cellScalar->end(); il++)
         {
-            f << "<PDataArray Name=\"" << *il << "\" type=\"Float32\"" << " format=\"ascii\">"
-              << endl;
+            f << "<PDataArray Name=\"" << *il << "\" type=\"Float32\""
+              << " format=\"ascii\">" << endl;
             f << "</PDataArray>" << endl;
         }
         f << "</PCellData>" << endl;
@@ -422,7 +456,8 @@ void ParaviewPostProcessingWriter::writePVTU_Paraview(string const&       filena
         // Does this processor have to write down outputs ?
         if(PostProcessingWriter::m_bPPWindow[i])
         {
-            f << "<Piece Source=\"" << filename << "_" << i << ".vtu\">" << endl;
+            f << "<Piece Source=\"" << filename << "_" << i << ".vtu\">"
+              << endl;
             f << "</Piece>" << endl;
         }
     }
@@ -449,7 +484,8 @@ void ParaviewPostProcessingWriter::start_output_binary(int size, int number)
     int current_output_size = size * number;
     //   unsigned long ncomp = current_output_size + (current_output_size+999)/1000
     //   	+ 12 + sizeof_Int32 ;
-    int ncomp = current_output_size + (current_output_size + 999) / 1000 + 12 + sizeof_Int32;
+    int ncomp = current_output_size + (current_output_size + 999) / 1000 + 12
+                + sizeof_Int32;
     check_allocated_binary(ncomp);
     CURRENT_LENGTH = store_int_binary(current_output_size);
 }
@@ -493,13 +529,15 @@ void ParaviewPostProcessingWriter::check_allocated_binary(int size)
     }
 }
 
-void ParaviewPostProcessingWriter::flush_binary(std::ofstream& file, string const& calling)
+void ParaviewPostProcessingWriter::flush_binary(std::ofstream& file,
+                                                string const&  calling)
 {
     compress_segment_binary(CURRENT_LENGTH, calling);
     //  file << endl ;
 }
 
-void ParaviewPostProcessingWriter::compress_segment_binary(int seg, string const& calling)
+void ParaviewPostProcessingWriter::compress_segment_binary(
+    int seg, string const& calling)
 {
     static int BlockSize = 32768;
     int        size      = (int)(*((int*)&BUFFER[seg]));
@@ -521,19 +559,24 @@ void ParaviewPostProcessingWriter::compress_segment_binary(int seg, string const
     for(int block = 0; block < numBlocks; block++)
     {
         int buffer_start = seg + sizeof_Int32 + block * BlockSize;
-        int length       = (block + 1 < numBlocks || !lastBlockSize ? BlockSize : lastBlockSize);
+        int length       = (block + 1 < numBlocks || !lastBlockSize ? BlockSize
+                                                                    : lastBlockSize);
         unsigned char* to_encode = (unsigned char*)(&BUFFER[buffer_start]);
         unsigned char* encoded   = &encoded_buff[encoded_offset];
         unsigned long  ncomp     = encoded_buff_size - encoded_offset;
 
-        if(compress2(
-               (Bytef*)encoded, &ncomp, (const Bytef*)to_encode, length, Z_DEFAULT_COMPRESSION)
+        if(compress2((Bytef*)encoded,
+                     &ncomp,
+                     (const Bytef*)to_encode,
+                     length,
+                     Z_DEFAULT_COMPRESSION)
            != Z_OK)
         {
             cout << "Zlib error while compressing data." << endl;
             cout << "from " << calling << endl;
-            cout << "Details : block = " << block << "  numBlocks = " << numBlocks
-                 << "  length = " << length << "  ncomp = " << ncomp << endl;
+            cout << "Details : block = " << block
+                 << "  numBlocks = " << numBlocks << "  length = " << length
+                 << "  ncomp = " << ncomp << endl;
             exit(0);
         }
         CompressionHeader[3 + block] = int(ncomp);

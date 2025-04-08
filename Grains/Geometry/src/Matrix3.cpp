@@ -1,7 +1,7 @@
 #include "Matrix3.hh"
 #include "VectorMath.hh"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor. Matrix is initialized to the identity matrix
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>::Matrix3()
@@ -9,7 +9,7 @@ __HOSTDEVICE__ Matrix3<T>::Matrix3()
     setValue(T(1), T(0), T(0), T(0), T(1), T(0), T(0), T(0), T(1));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with a 1D array of values as input
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>::Matrix3(T const* buffer)
@@ -17,15 +17,16 @@ __HOSTDEVICE__ Matrix3<T>::Matrix3(T const* buffer)
     setValue(buffer);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with 9 components as inputs
 template <typename T>
-__HOSTDEVICE__ Matrix3<T>::Matrix3(T xx, T xy, T xz, T yx, T yy, T yz, T zx, T zy, T zz)
+__HOSTDEVICE__
+    Matrix3<T>::Matrix3(T xx, T xy, T xz, T yx, T yy, T yz, T zx, T zy, T zz)
 {
     setValue(xx, xy, xz, yx, yy, yz, zx, zy, zz);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>::Matrix3(Matrix3<T> const& mat)
@@ -33,14 +34,14 @@ __HOSTDEVICE__ Matrix3<T>::Matrix3(Matrix3<T> const& mat)
     setValue(mat.getBuffer());
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>::~Matrix3()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /* Gets the pointer to the buffer */
 template <typename T>
 __HOSTDEVICE__ T const* Matrix3<T>::getBuffer() const
@@ -48,7 +49,7 @@ __HOSTDEVICE__ T const* Matrix3<T>::getBuffer() const
     return (m_comp);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Sets the matrix to a 1D array of 9 values as input
 template <typename T>
 __HOSTDEVICE__ void Matrix3<T>::setValue(T const* buffer)
@@ -64,10 +65,11 @@ __HOSTDEVICE__ void Matrix3<T>::setValue(T const* buffer)
     m_comp[ZZ] = buffer[ZZ];
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Sets the matrix with all 9 components as inputs
 template <typename T>
-__HOSTDEVICE__ void Matrix3<T>::setValue(T xx, T xy, T xz, T yx, T yy, T yz, T zx, T zy, T zz)
+__HOSTDEVICE__ void
+    Matrix3<T>::setValue(T xx, T xy, T xz, T yx, T yy, T yz, T zx, T zy, T zz)
 {
     m_comp[XX] = xx;
     m_comp[XY] = xy;
@@ -80,7 +82,7 @@ __HOSTDEVICE__ void Matrix3<T>::setValue(T xx, T xy, T xz, T yx, T yy, T yz, T z
     m_comp[ZZ] = zz;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns a matrix with positive components
 template <typename T>
 __HOSTDEVICE__ Matrix3<T> Matrix3<T>::absolute() const
@@ -96,7 +98,7 @@ __HOSTDEVICE__ Matrix3<T> Matrix3<T>::absolute() const
                        fabs(m_comp[ZZ])));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the determinant of the matrix
 template <typename T>
 __HOSTDEVICE__ T Matrix3<T>::determinant() const
@@ -106,7 +108,7 @@ __HOSTDEVICE__ T Matrix3<T>::determinant() const
             + m_comp[XZ] * (m_comp[YX] * m_comp[ZY] - m_comp[YY] * m_comp[ZX]));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the inverse of the matrix
 template <typename T>
 __HOSTDEVICE__ Matrix3<T> Matrix3<T>::inverse() const
@@ -115,7 +117,7 @@ __HOSTDEVICE__ Matrix3<T> Matrix3<T>::inverse() const
     out[XX] = (m_comp[YY] * m_comp[ZZ] - m_comp[YZ] * m_comp[ZY]);
     out[YX] = (m_comp[YZ] * m_comp[ZX] - m_comp[YX] * m_comp[ZZ]);
     out[ZX] = (m_comp[YX] * m_comp[ZY] - m_comp[YY] * m_comp[ZX]);
-    T det   = m_comp[XX] * out[XX] + m_comp[XY] * out[YX] + m_comp[XZ] * out[ZX];
+    T det = m_comp[XX] * out[XX] + m_comp[XY] * out[YX] + m_comp[XZ] * out[ZX];
     if(fabs(det) < HIGHEPS<T>)
         printf("Matrix is not inversible!\n");
     T s     = T(1) / det;
@@ -131,7 +133,7 @@ __HOSTDEVICE__ Matrix3<T> Matrix3<T>::inverse() const
     return (Matrix3<T>(out));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the transposed matrix
 template <typename T>
 __HOSTDEVICE__ Matrix3<T> Matrix3<T>::transpose() const
@@ -147,7 +149,7 @@ __HOSTDEVICE__ Matrix3<T> Matrix3<T>::transpose() const
                        m_comp[ZZ]));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator+=(Matrix3<T> const& m)
@@ -165,7 +167,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator+=(Matrix3<T> const& m)
     return (*this);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Operator -=
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator-=(Matrix3<T> const& m)
@@ -183,7 +185,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator-=(Matrix3<T> const& m)
     return (*this);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Operator *= by a scalar
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(T d)
@@ -200,7 +202,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(T d)
     return (*this);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Operator *= by a matrix
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(Matrix3<T> const& m)
@@ -218,7 +220,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(Matrix3<T> const& m)
     return (*this);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // i-th row accessor
 template <typename T>
 __HOSTDEVICE__ Vector3<T>& Matrix3<T>::operator[](unsigned int i) const
@@ -226,7 +228,7 @@ __HOSTDEVICE__ Vector3<T>& Matrix3<T>::operator[](unsigned int i) const
     return (*(Vector3<T>*)(m_comp + 3 * i));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Assign operator to another matrix
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator=(Matrix3<T> const& m)
@@ -236,7 +238,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator=(Matrix3<T> const& m)
     return (*this);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Unitary operator -
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator-()
@@ -253,7 +255,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator-()
     return (*this);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Output operator
 template <typename T>
 __HOST__ std::ostream& operator<<(std::ostream& fileOut, Matrix3<T> const& m)
@@ -262,7 +264,7 @@ __HOST__ std::ostream& operator<<(std::ostream& fileOut, Matrix3<T> const& m)
     return (fileOut);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__ std::istream& operator>>(std::istream& fileIn, Matrix3<T>& m)
@@ -271,15 +273,17 @@ __HOST__ std::istream& operator>>(std::istream& fileIn, Matrix3<T>& m)
     return (fileIn);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Matrix3<float>;
 template class Matrix3<double>;
 
-#define X(T)                                                                            \
-    template std::ostream& operator<< <T>(std::ostream & fileOut, Matrix3<T> const& m); \
-                                                                                        \
-    template std::istream& operator>> <T>(std::istream & fileIn, Matrix3<T> & m);
+#define X(T)                                                      \
+    template std::ostream& operator<< <T>(std::ostream & fileOut, \
+                                          Matrix3<T> const& m);   \
+                                                                  \
+    template std::istream& operator>> <T>(std::istream & fileIn,  \
+                                          Matrix3<T> & m);
 X(float)
 X(double)
 #undef X

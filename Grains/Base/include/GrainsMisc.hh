@@ -36,7 +36,9 @@ public:
         @param digits number of digits after the decimal point
         @param number the float number */
     __HOST__
-    static std::string realToString(std::ios_base::fmtflags format, int digits, T const& number);
+    static std::string realToString(std::ios_base::fmtflags format,
+                                    int                     digits,
+                                    T const&                number);
 
     /** @brief Writes a vector3 object in a string
         @param vec the vector3 object */
@@ -48,7 +50,8 @@ public:
         @param numShift the number of shift characters at the beginning
         @param nextLine if going to the next line is required */
     __HOST__
-    static void cout(std::string message, int numShift = 0, bool nextLine = false);
+    static void
+        cout(std::string message, int numShift = 0, bool nextLine = false);
     //@}
 };
 

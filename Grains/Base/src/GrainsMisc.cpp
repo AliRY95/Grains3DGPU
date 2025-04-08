@@ -2,17 +2,18 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Static variables
 template <typename T>
 std::string GrainsMisc<T>::m_grainsHome = ".";
 template <typename T>
 int GrainsMisc<T>::m_returnSysCmd = 0;
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes a real number with a given number of digits
 template <typename T>
-__HOST__ std::string GrainsMisc<T>::realToString(T const& figure, int const& size)
+__HOST__ std::string GrainsMisc<T>::realToString(T const&   figure,
+                                                 int const& size)
 {
     std::ostringstream oss;
     oss.width(size);
@@ -20,12 +21,13 @@ __HOST__ std::string GrainsMisc<T>::realToString(T const& figure, int const& siz
     return (oss.str());
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes a float number with a prescribed format and a prescribed
 // number of digits after the decimal point
 template <typename T>
-__HOST__ std::string
-         GrainsMisc<T>::realToString(std::ios_base::fmtflags format, int digits, T const& number)
+__HOST__ std::string GrainsMisc<T>::realToString(std::ios_base::fmtflags format,
+                                                 int                     digits,
+                                                 T const&                number)
 {
     std::ostringstream oss;
     if(number != T(0))
@@ -37,7 +39,7 @@ __HOST__ std::string
     return (oss.str());
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes a Vector3 object in a string
 template <typename T>
 __HOST__ std::string GrainsMisc<T>::Vector3ToString(Vector3<T> const& vec)
@@ -48,17 +50,18 @@ __HOST__ std::string GrainsMisc<T>::Vector3ToString(Vector3<T> const& vec)
     return ("[" + oss.str() + "]");
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes
 template <typename T>
-__HOST__ void GrainsMisc<T>::cout(std::string message, int numShift, bool nextLine)
+__HOST__ void
+    GrainsMisc<T>::cout(std::string message, int numShift, bool nextLine)
 {
     auto shift = [](int n) { return std::string(n, ' '); };
     auto nLine = [](bool b) { return b ? '\n' : '\0'; };
     std::cout << shift(numShift) << message << nLine(nextLine) << std::endl;
 }
 
-// // -------------------------------------------------------------------------------------------------
+// // -----------------------------------------------------------------------------
 // // Writes an integer in a string
 // string GrainsExec::intToString( int const& figure )
 // {
@@ -166,7 +169,7 @@ __HOST__ void GrainsMisc<T>::cout(std::string message, int numShift, bool nextLi
 //   return( vec );
 // }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsMisc<float>;
 template class GrainsMisc<double>;

@@ -3,7 +3,7 @@ BasedOnStyle: WebKit
 TabWidth:     4
 IndentWidth:  4
 UseTab:       Never
-ColumnLimit:  100
+ColumnLimit:  80
 
 Language: Cpp
 
@@ -17,7 +17,7 @@ AlignConsecutiveDeclarations: true
 AlignEscapedNewlines: Left
 AlignOperands:   true
 AlignTrailingComments: false
-AllowAllArgumentsOnNextLine: true
+AllowAllArgumentsOnNextLine: false
 AllowAllConstructorInitializersOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: false

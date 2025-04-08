@@ -9,7 +9,7 @@
 #include "VectorMath.hh"
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 // Default constructor
 template <typename T>
@@ -20,7 +20,7 @@ Grains<T>::Grains()
     Gout(std::string(80, '='));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 Grains<T>::~Grains()
@@ -29,7 +29,7 @@ Grains<T>::~Grains()
     delete m_insertion;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Initializes the simulation using the XML input
 template <typename T>
 void Grains<T>::initialize(DOMElement* rootElement)
@@ -49,7 +49,7 @@ void Grains<T>::initialize(DOMElement* rootElement)
     Gout(std::string(80, '='));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Performs post-processing
 template <typename T>
 void Grains<T>::postProcess(ComponentManager<T> const* cm) const
@@ -58,10 +58,11 @@ void Grains<T>::postProcess(ComponentManager<T> const* cm) const
        < 0.01 * GrainsParameters<T>::m_dt)
     {
         GrainsParameters<T>::m_tSave.pop();
-        Grains<T>::m_postProcessor->PostProcessing(Grains<T>::m_particleRigidBodyList,
-                                                   Grains<T>::m_obstacleRigidBodyList,
-                                                   cm,
-                                                   GrainsParameters<T>::m_time);
+        Grains<T>::m_postProcessor->PostProcessing(
+            Grains<T>::m_particleRigidBodyList,
+            Grains<T>::m_obstacleRigidBodyList,
+            cm,
+            GrainsParameters<T>::m_time);
     }
     // In case we get past the saveTime, we need to remove it from the queue
     if(GrainsParameters<T>::m_time > GrainsParameters<T>::m_tSave.front())
@@ -92,15 +93,17 @@ void Grains<T>::Construction(DOMElement* rootElement)
     // -------------------------------------------------------------------------
     // Domain size: origin, max coordinates and periodicity
     DOMNode* nDomain = ReaderXML::getNode(root, "LinkedCell");
-    GrainsParameters<T>::m_maxCoordinate.setValue(T(ReaderXML::getNodeAttr_Double(nDomain, "MX")),
-                                                  T(ReaderXML::getNodeAttr_Double(nDomain, "MY")),
-                                                  T(ReaderXML::getNodeAttr_Double(nDomain, "MZ")));
+    GrainsParameters<T>::m_maxCoordinate.setValue(
+        T(ReaderXML::getNodeAttr_Double(nDomain, "MX")),
+        T(ReaderXML::getNodeAttr_Double(nDomain, "MY")),
+        T(ReaderXML::getNodeAttr_Double(nDomain, "MZ")));
 
     DOMNode* nOrigin = ReaderXML::getNode(root, "Origin");
     if(nOrigin)
-        GrainsParameters<T>::m_origin.setValue(T(ReaderXML::getNodeAttr_Double(nOrigin, "OX")),
-                                               T(ReaderXML::getNodeAttr_Double(nOrigin, "OY")),
-                                               T(ReaderXML::getNodeAttr_Double(nOrigin, "OZ")));
+        GrainsParameters<T>::m_origin.setValue(
+            T(ReaderXML::getNodeAttr_Double(nOrigin, "OX")),
+            T(ReaderXML::getNodeAttr_Double(nOrigin, "OY")),
+            T(ReaderXML::getNodeAttr_Double(nOrigin, "OZ")));
     else
         GrainsParameters<T>::m_origin.setValue(T(0), T(0), T(0));
 
@@ -131,21 +134,23 @@ void Grains<T>::Construction(DOMElement* rootElement)
     {
         for(int i = 0; i < numUniqueParticles; i++)
         {
-            DOMNode* nParticle = allParticles->item(i);
-            numEachUniqueParticle[i]
-                = static_cast<uint>(ReaderXML::getNodeAttr_Int(nParticle, "Number"));
+            DOMNode* nParticle       = allParticles->item(i);
+            numEachUniqueParticle[i] = static_cast<uint>(
+                ReaderXML::getNodeAttr_Int(nParticle, "Number"));
         }
     }
     // Total number of particles in the simulation
-    uint numParticles
-        = std::accumulate(numEachUniqueParticle.begin(), numEachUniqueParticle.end(), 0);
+    uint numParticles = std::accumulate(numEachUniqueParticle.begin(),
+                                        numEachUniqueParticle.end(),
+                                        0);
     // We also store the initial transformations of the rigid bodies to pass to
     // the ComponentManager to create particles with the initial transformation
     // required.
     std::vector<Transform3<T>> particlesInitialTransform(numParticles);
     // Memory allocation for m_rigidBodyList with respect to the number of
     // shapes in the simulation.
-    m_particleRigidBodyList = (RigidBody<T, T>**)malloc(numParticles * sizeof(RigidBody<T, T>*));
+    m_particleRigidBodyList
+        = (RigidBody<T, T>**)malloc(numParticles * sizeof(RigidBody<T, T>*));
     if(numParticles)
     {
         Gout(0, 6, "Reading new particle types ...");
@@ -158,7 +163,8 @@ void Grains<T>::Construction(DOMElement* rootElement)
             for(uint j = 0; j < numEachUniqueParticle[i]; j++)
             {
                 // Create the Rigid Body
-                m_particleRigidBodyList[startId + j] = new RigidBody<T, T>(nParticle);
+                m_particleRigidBodyList[startId + j]
+                    = new RigidBody<T, T>(nParticle);
                 // Initial transformation of the rigid body
                 // One draw back is we might end up with the same rigid body shape,
                 // but with different initial transformation.
@@ -188,8 +194,8 @@ void Grains<T>::Construction(DOMElement* rootElement)
     obstaclesInitialTransform.reserve(numUniqueObstacles);
     // Memory allocation for m_rigidBodyList with respect to the number of
     // shapes in the simulation.
-    m_obstacleRigidBodyList
-        = (RigidBody<T, T>**)malloc(numUniqueObstacles * sizeof(RigidBody<T, T>*));
+    m_obstacleRigidBodyList = (RigidBody<T, T>**)malloc(
+        numUniqueObstacles * sizeof(RigidBody<T, T>*));
     if(obstacles)
     {
         Gout(1, 6, "Reading new obstacle types ...");
@@ -240,13 +246,17 @@ void Grains<T>::Construction(DOMElement* rootElement)
     GrainsMisc<T>::cout("Cell size factor = " + std::to_string(LC_coeff), 9);
 
     // Creating linked cell
-    GrainsParameters<T>::m_sizeLC   = LC_coeff * T(2) * LCSize;
-    m_linkedCell                    = (LinkedCell<T>**)malloc(sizeof(LinkedCell<T>*));
-    *m_linkedCell                   = new LinkedCell<T>(GrainsParameters<T>::m_origin,
+    GrainsParameters<T>::m_sizeLC = LC_coeff * T(2) * LCSize;
+    m_linkedCell  = (LinkedCell<T>**)malloc(sizeof(LinkedCell<T>*));
+    *m_linkedCell = new LinkedCell<T>(GrainsParameters<T>::m_origin,
                                       GrainsParameters<T>::m_maxCoordinate,
                                       GrainsParameters<T>::m_sizeLC);
     GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
-    Gout(0, 9, "LinkedCell with", GrainsParameters<T>::m_numCells, "cells is created on host.");
+    Gout(0,
+         9,
+         "LinkedCell with",
+         GrainsParameters<T>::m_numCells,
+         "cells is created on host.");
     Gout(0, 6, "Constructing linked cell completed!");
 
     // -------------------------------------------------------------------------
@@ -257,27 +267,32 @@ void Grains<T>::Construction(DOMElement* rootElement)
         GrainsParameters<T>::m_numParticles = numParticles;
     if(!numEachUniqueObstacle.empty())
         GrainsParameters<T>::m_numObstacles = numEachUniqueObstacle.back();
-    m_components = new ComponentManagerCPU<T>(GrainsParameters<T>::m_numParticles,
-                                              GrainsParameters<T>::m_numObstacles,
-                                              GrainsParameters<T>::m_numCells);
+    m_components
+        = new ComponentManagerCPU<T>(GrainsParameters<T>::m_numParticles,
+                                     GrainsParameters<T>::m_numObstacles,
+                                     GrainsParameters<T>::m_numCells);
     // Initialize the particles and obstacles
     if(!numEachUniqueParticle.empty())
-        m_components->initializeParticles(numEachUniqueParticle, particlesInitialTransform);
+        m_components->initializeParticles(numEachUniqueParticle,
+                                          particlesInitialTransform);
     if(!numEachUniqueObstacle.empty())
-        m_components->initializeObstacles(numEachUniqueObstacle, obstaclesInitialTransform);
+        m_components->initializeObstacles(numEachUniqueObstacle,
+                                          obstaclesInitialTransform);
 
     // -------------------------------------------------------------------------
     // Contact force models
     // Calculating the proper array size for the contact force array
     // We might need to redute it by removing the obstacle-obstacle pairs,
     // but it should be fine by now
-    unsigned int numMaterials              = GrainsParameters<T>::m_materialMap.size();
-    GrainsParameters<T>::m_numContactPairs = numMaterials * (numMaterials + 1) / 2;
-    DOMNode* contacts                      = ReaderXML::getNode(root, "ContactForceModels");
+    unsigned int numMaterials = GrainsParameters<T>::m_materialMap.size();
+    GrainsParameters<T>::m_numContactPairs
+        = numMaterials * (numMaterials + 1) / 2;
+    DOMNode* contacts = ReaderXML::getNode(root, "ContactForceModels");
     if(contacts)
     {
         Gout(1, 6, "Reading the contact force model ...");
-        m_contactForce = ContactForceModelBuilderFactory<T>::create(rootElement);
+        m_contactForce
+            = ContactForceModelBuilderFactory<T>::create(rootElement);
         Gout(0, 6, "Reading the contact force model completed!");
     }
 
@@ -286,26 +301,28 @@ void Grains<T>::Construction(DOMElement* rootElement)
     DOMNode* tempSetting = ReaderXML::getNode(root, "TemporalSetting");
     if(tempSetting)
     {
-        DOMNode* nTime                = ReaderXML::getNode(tempSetting, "TimeInterval");
-        T        tStart               = ReaderXML::getNodeAttr_Double(nTime, "Start");
-        T        tEnd                 = ReaderXML::getNodeAttr_Double(nTime, "End");
-        T        tStep                = ReaderXML::getNodeAttr_Double(nTime, "dt");
+        DOMNode* nTime  = ReaderXML::getNode(tempSetting, "TimeInterval");
+        T        tStart = ReaderXML::getNodeAttr_Double(nTime, "Start");
+        T        tEnd   = ReaderXML::getNodeAttr_Double(nTime, "End");
+        T        tStep  = ReaderXML::getNodeAttr_Double(nTime, "dt");
         GrainsParameters<T>::m_tStart = tStart;
         GrainsParameters<T>::m_tEnd   = tEnd + HIGHEPS<T>;
         GrainsParameters<T>::m_dt     = tStep;
-        DOMNode* nTI                  = ReaderXML::getNode(tempSetting, "TimeIntegration");
+        DOMNode* nTI = ReaderXML::getNode(tempSetting, "TimeIntegration");
         if(nTI)
         {
             Gout(1, 6, "Reading the time integration model ...");
-            m_timeIntegrator = (TimeIntegrator<T>**)malloc(sizeof(TimeIntegrator<T>*));
-            *m_timeIntegrator
-                = TimeIntegratorBuilderFactory<T>::create(nTI, GrainsParameters<T>::m_dt);
+            m_timeIntegrator
+                = (TimeIntegrator<T>**)malloc(sizeof(TimeIntegrator<T>*));
+            *m_timeIntegrator = TimeIntegratorBuilderFactory<T>::create(
+                nTI,
+                GrainsParameters<T>::m_dt);
             Gout(0, 6, "Reading the time integration model completed!");
         }
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External force definition
 template <typename T>
 void Grains<T>::Forces(DOMElement* rootElement)
@@ -323,10 +340,16 @@ void Grains<T>::Forces(DOMElement* rootElement)
         DOMNode* nGravity = ReaderXML::getNode(root, "Gravity");
         if(nGravity)
         {
-            GrainsParameters<T>::m_gravity[X] = T(ReaderXML::getNodeAttr_Double(nGravity, "GX"));
-            GrainsParameters<T>::m_gravity[Y] = T(ReaderXML::getNodeAttr_Double(nGravity, "GY"));
-            GrainsParameters<T>::m_gravity[Z] = T(ReaderXML::getNodeAttr_Double(nGravity, "GZ"));
-            Gout(0, 6, "Gravity =", Vector3ToString(GrainsParameters<T>::m_gravity));
+            GrainsParameters<T>::m_gravity[X]
+                = T(ReaderXML::getNodeAttr_Double(nGravity, "GX"));
+            GrainsParameters<T>::m_gravity[Y]
+                = T(ReaderXML::getNodeAttr_Double(nGravity, "GY"));
+            GrainsParameters<T>::m_gravity[Z]
+                = T(ReaderXML::getNodeAttr_Double(nGravity, "GZ"));
+            Gout(0,
+                 6,
+                 "Gravity =",
+                 Vector3ToString(GrainsParameters<T>::m_gravity));
         }
         else
         {
@@ -336,7 +359,7 @@ void Grains<T>::Forces(DOMElement* rootElement)
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Additional features of the simulation: insertion, post-processing
 template <typename T>
 void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
@@ -395,7 +418,10 @@ void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
                     = PostProcessingWriterBuilderFactory<T>::create(nPPW);
                 if(!ppw)
                 {
-                    Gout(0, 6, "Unknown postprocessing writer in node <Writers>");
+                    Gout(0,
+                         6,
+                         "Unknown postprocessing writer in "
+                         "node <Writers>");
                     exit(1);
                 }
             }
@@ -406,7 +432,7 @@ void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
         Gout(0, 6, "No postprocessing writer!");
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Grains<float>;
 template class Grains<double>;

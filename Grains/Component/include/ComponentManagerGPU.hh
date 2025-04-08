@@ -53,7 +53,9 @@ public:
     //@{
     /** @brief Constructor with the number of particles, obstacles, and
         cells. All other data members are set to default. */
-    ComponentManagerGPU(unsigned int nParticles, unsigned int nObstacles, unsigned int nCells);
+    ComponentManagerGPU(unsigned int nParticles,
+                        unsigned int nObstacles,
+                        unsigned int nCells);
 
     /** @brief Destructor */
     ~ComponentManagerGPU();
@@ -155,26 +157,29 @@ public:
         @param particleRB array of rigid bodies for particles
         @param LC linked cell
         @param CF array of all contact force models */
-    void detectCollisionAndComputeContactForcesParticles(RigidBody<T, T> const* const* particleRB,
-                                                         LinkedCell<T> const* const*   LC,
-                                                         ContactForceModel<T> const* const* CF,
-                                                         int* result) final;
+    void detectCollisionAndComputeContactForcesParticles(
+        RigidBody<T, T> const* const*      particleRB,
+        LinkedCell<T> const* const*        LC,
+        ContactForceModel<T> const* const* CF,
+        int*                               result) final;
 
     /** @brief Detects collision between components and computes forces
         @param particleRB array of rigid bodies for particles
         @param obstacleRB array of rigid bodies for obstacles
         @param LC linked cell
         @param CF array of all contact force models */
-    void detectCollisionAndComputeContactForces(RigidBody<T, T> const* const*      particleRB,
-                                                RigidBody<T, T> const* const*      obstacleRB,
-                                                LinkedCell<T> const* const*        LC,
-                                                ContactForceModel<T> const* const* CF,
-                                                int*                               result) final;
+    void detectCollisionAndComputeContactForces(
+        RigidBody<T, T> const* const*      particleRB,
+        RigidBody<T, T> const* const*      obstacleRB,
+        LinkedCell<T> const* const*        LC,
+        ContactForceModel<T> const* const* CF,
+        int*                               result) final;
 
     /** @brief Adds external forces such as gravity
         @param particleRB array of rigid bodies for particles
         @param g gravity field */
-    void addExternalForces(RigidBody<T, T> const* const* particleRB, Vector3<T> const& g) final;
+    void addExternalForces(RigidBody<T, T> const* const* particleRB,
+                           Vector3<T> const&             g) final;
 
     /** @brief Updates the position and velocities of particles
         @param particleRB array of rigid bodies for particles

@@ -9,21 +9,21 @@
 #include "GrainsUtils.hh"
 #include "TimeIntegratorBuilderFactory.hh"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 GrainsGPU<T>::GrainsGPU()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 GrainsGPU<T>::~GrainsGPU()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Initializes the simulation using the XML input
 template <typename T>
 void GrainsGPU<T>::initialize(DOMElement* rootElement)
@@ -48,7 +48,7 @@ void GrainsGPU<T>::initialize(DOMElement* rootElement)
     Gout(std::string(80, '='));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Runs the simulation over the prescribed time interval
 template <typename T>
 void GrainsGPU<T>::simulate()
@@ -64,7 +64,10 @@ void GrainsGPU<T>::simulate()
 
     int* d_collision;
     cudaErrCheck(cudaMalloc((void**)&d_collision, N * sizeof(int)));
-    cudaErrCheck(cudaMemcpy(d_collision, h_collision, N * sizeof(int), cudaMemcpyHostToDevice));
+    cudaErrCheck(cudaMemcpy(d_collision,
+                            h_collision,
+                            N * sizeof(int),
+                            cudaMemcpyHostToDevice));
 
     // Collision detection on host
     // first, inserting partilces
@@ -121,16 +124,19 @@ void GrainsGPU<T>::simulate()
         ostringstream oss;
         oss.width(10);
         oss << left << GrainsParameters<T>::m_time;
-        std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd << std::flush;
+        std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd
+                  << std::flush;
 
-        m_d_components->detectCollisionAndComputeContactForces(m_d_particleRigidBodyList,
-                                                               m_d_obstacleRigidBodyList,
-                                                               m_d_linkedCell,
-                                                               m_d_contactForce,
-                                                               d_collision);
+        m_d_components->detectCollisionAndComputeContactForces(
+            m_d_particleRigidBodyList,
+            m_d_obstacleRigidBodyList,
+            m_d_linkedCell,
+            m_d_contactForce,
+            d_collision);
         m_d_components->addExternalForces(m_d_particleRigidBodyList,
                                           GrainsParameters<T>::m_gravity);
-        m_d_components->moveParticles(m_d_particleRigidBodyList, m_d_timeIntegrator);
+        m_d_components->moveParticles(m_d_particleRigidBodyList,
+                                      m_d_timeIntegrator);
 
         // Post-Processing
         Grains<T>::postProcess(m_d_components);
@@ -145,7 +151,10 @@ void GrainsGPU<T>::simulate()
     std::cout << "\nCPU: " << h_time.count() << endl;
     std::cout << "GPU: " << d_time.count() << endl;
     int* h_d_collision = new int[N];
-    cudaErrCheck(cudaMemcpy(h_d_collision, d_collision, N * sizeof(int), cudaMemcpyDeviceToHost));
+    cudaErrCheck(cudaMemcpy(h_d_collision,
+                            d_collision,
+                            N * sizeof(int),
+                            cudaMemcpyDeviceToHost));
     // accuracy
     int hCount = 0, dCount = 0;
     for(int i = 0; i < N; i++)
@@ -153,8 +162,8 @@ void GrainsGPU<T>::simulate()
         hCount += h_collision[i];
         dCount += h_d_collision[i];
     }
-    cout << N << " Particles, " << hCount << " collisions on CPU, and " << dCount
-         << " collisions on GPU. " << endl;
+    cout << N << " Particles, " << hCount << " collisions on CPU, and "
+         << dCount << " collisions on GPU. " << endl;
 }
 
 /* ========================================================================== */
@@ -182,8 +191,9 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     {
         cudaErrCheck(cudaMalloc((void**)&m_d_particleRigidBodyList,
                                 numUniqueParticles * sizeof(RigidBody<T, T>*)));
-        RigidBodyCopyHostToDevice(
-            Grains<T>::m_particleRigidBodyList, m_d_particleRigidBodyList, numUniqueParticles);
+        RigidBodyCopyHostToDevice(Grains<T>::m_particleRigidBodyList,
+                                  m_d_particleRigidBodyList,
+                                  numUniqueParticles);
         cudaDeviceSynchronize();
     }
     GrainsMisc<T>::cout("Copying particle types to device completed!", 6, 1);
@@ -201,8 +211,9 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     {
         cudaErrCheck(cudaMalloc((void**)&m_d_obstacleRigidBodyList,
                                 numUniqueObstacles * sizeof(RigidBody<T, T>*)));
-        RigidBodyCopyHostToDevice(
-            Grains<T>::m_obstacleRigidBodyList, m_d_obstacleRigidBodyList, numUniqueObstacles);
+        RigidBodyCopyHostToDevice(Grains<T>::m_obstacleRigidBodyList,
+                                  m_d_obstacleRigidBodyList,
+                                  numUniqueObstacles);
         cudaDeviceSynchronize();
     }
     GrainsMisc<T>::cout("Copying obstacle types to device completed!", 6, 1);
@@ -211,21 +222,24 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     // LinkedCell
     GrainsMisc<T>::cout("Constructing linked cell on device ...", 6);
     cudaErrCheck(cudaMalloc((void**)&m_d_linkedCell, sizeof(LinkedCell<T>*)));
-    int d_numCells                  = createLinkedCellOnDevice(GrainsParameters<T>::m_origin,
-                                              GrainsParameters<T>::m_maxCoordinate,
-                                              GrainsParameters<T>::m_sizeLC,
-                                              m_d_linkedCell);
+    int d_numCells
+        = createLinkedCellOnDevice(GrainsParameters<T>::m_origin,
+                                   GrainsParameters<T>::m_maxCoordinate,
+                                   GrainsParameters<T>::m_sizeLC,
+                                   m_d_linkedCell);
     GrainsParameters<T>::m_numCells = d_numCells;
-    GrainsMisc<T>::cout("LinkedCell with " + std::to_string(GrainsParameters<T>::m_numCells)
+    GrainsMisc<T>::cout("LinkedCell with "
+                            + std::to_string(GrainsParameters<T>::m_numCells)
                             + " cells is created on device.",
                         9);
     GrainsMisc<T>::cout("Constructing linked cell on device completed!", 6, 1);
 
     // -------------------------------------------------------------------------
     // Setting up the component managers
-    m_d_components = new ComponentManagerGPU<T>(GrainsParameters<T>::m_numParticles,
-                                                GrainsParameters<T>::m_numObstacles,
-                                                GrainsParameters<T>::m_numCells);
+    m_d_components
+        = new ComponentManagerGPU<T>(GrainsParameters<T>::m_numParticles,
+                                     GrainsParameters<T>::m_numObstacles,
+                                     GrainsParameters<T>::m_numCells);
     m_d_components->copy(Grains<T>::m_components);
 
     // -------------------------------------------------------------------------
@@ -233,12 +247,15 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     // It is a GPU simulation, and we have already read contact force models
     // on the host. We allocate memory on device and copy the models over.
     GrainsMisc<T>::cout("Copying contact force models to device ...", 6);
-    cudaErrCheck(
-        cudaMalloc((void**)&m_d_contactForce,
-                   GrainsParameters<T>::m_numContactPairs * sizeof(ContactForceModel<T>*)));
-    ContactForceModelBuilderFactory<T>::ContactForceModelCopyHostToDevice(Grains<T>::m_contactForce,
-                                                                          m_d_contactForce);
-    GrainsMisc<T>::cout("Copying contact force models to device completed!", 6, 1);
+    cudaErrCheck(cudaMalloc((void**)&m_d_contactForce,
+                            GrainsParameters<T>::m_numContactPairs
+                                * sizeof(ContactForceModel<T>*)));
+    ContactForceModelBuilderFactory<T>::ContactForceModelCopyHostToDevice(
+        Grains<T>::m_contactForce,
+        m_d_contactForce);
+    GrainsMisc<T>::cout("Copying contact force models to device completed!",
+                        6,
+                        1);
 
     // -------------------------------------------------------------------------
     // Temporal setting and time integration
@@ -247,27 +264,30 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     // It is a GPU simulation, and we have already read time integration on the
     // host. We allocate memory on device and copy the scheme over.
     GrainsMisc<T>::cout("Copying time integration scheme to device ...", 6);
-    cudaErrCheck(cudaMalloc((void**)&m_d_timeIntegrator, sizeof(TimeIntegrator<T>*)));
-    TimeIntegratorBuilderFactory<T>::createOnDevice(
-        nTI, GrainsParameters<T>::m_dt, m_d_timeIntegrator);
-    GrainsMisc<T>::cout("Copying time integration scheme to device completed!", 6);
+    cudaErrCheck(
+        cudaMalloc((void**)&m_d_timeIntegrator, sizeof(TimeIntegrator<T>*)));
+    TimeIntegratorBuilderFactory<T>::createOnDevice(nTI,
+                                                    GrainsParameters<T>::m_dt,
+                                                    m_d_timeIntegrator);
+    GrainsMisc<T>::cout("Copying time integration scheme to device completed!",
+                        6);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External force definition
 template <typename T>
 void GrainsGPU<T>::Forces(DOMElement* rootElement)
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Additional features of the simulation: insertion, post-processing
 template <typename T>
 void GrainsGPU<T>::AdditionalFeatures(DOMElement* rootElement)
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsGPU<float>;
 template class GrainsGPU<double>;

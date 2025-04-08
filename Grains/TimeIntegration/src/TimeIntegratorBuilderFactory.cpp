@@ -11,7 +11,9 @@
 // This kernel is not declared in any header file since we directly use it below
 // It helps to NOT explicitly instantiate it.
 template <typename T>
-__GLOBAL__ void createTimeIntegratorKernel(TimeIntegratorType tiType, T dt, TimeIntegrator<T>** TI)
+__GLOBAL__ void createTimeIntegratorKernel(TimeIntegratorType  tiType,
+                                           T                   dt,
+                                           TimeIntegrator<T>** TI)
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid > 0)
@@ -24,11 +26,12 @@ __GLOBAL__ void createTimeIntegratorKernel(TimeIntegratorType tiType, T dt, Time
 }
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 // Creates and returns the time integration scheme
 template <typename T>
-__HOST__ TimeIntegrator<T>* TimeIntegratorBuilderFactory<T>::create(DOMNode* root, T dt)
+__HOST__ TimeIntegrator<T>*
+         TimeIntegratorBuilderFactory<T>::create(DOMNode* root, T dt)
 {
     TimeIntegrator<T>* TI;
 
@@ -50,12 +53,12 @@ __HOST__ TimeIntegrator<T>* TimeIntegratorBuilderFactory<T>::create(DOMNode* roo
     return (TI);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructs a TimeIntegrator object on device.
 // It is assumed that appropriate memory is allocated to d_ti.
 template <typename T>
-__HOST__ void
-    TimeIntegratorBuilderFactory<T>::createOnDevice(DOMNode* root, T dt, TimeIntegrator<T>** d_TI)
+__HOST__ void TimeIntegratorBuilderFactory<T>::createOnDevice(
+    DOMNode* root, T dt, TimeIntegrator<T>** d_TI)
 {
     string             type = ReaderXML::getNodeAttr_String(root, "Type");
     TimeIntegratorType tiType;
@@ -76,7 +79,7 @@ __HOST__ void
     cudaDeviceSynchronize();
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class TimeIntegratorBuilderFactory<float>;
 template class TimeIntegratorBuilderFactory<double>;

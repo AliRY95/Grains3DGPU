@@ -14,7 +14,8 @@
 @param figure the float number
 @param size number of digits */
 template <typename T>
-__HOST__ static constexpr INLINE std::string realToString(const T& figure, const int size)
+__HOST__ static constexpr INLINE std::string realToString(const T&  figure,
+                                                          const int size)
 {
     std::ostringstream oss;
     oss.width(size);
@@ -22,15 +23,15 @@ __HOST__ static constexpr INLINE std::string realToString(const T& figure, const
     return (oss.str());
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Writes a float number with a prescribed format and a prescribed 
 number of digits after the decimal point in a string
 @param format the format
 @param digits number of digits after the decimal point
 @param number the float number */
 template <typename T>
-__HOST__ static constexpr INLINE std::string
-    realToString(std::ios_base::fmtflags format, const int digits, const T& number)
+__HOST__ static constexpr INLINE std::string realToString(
+    std::ios_base::fmtflags format, const int digits, const T& number)
 {
     std::ostringstream oss;
     if(number != T(0))
@@ -42,18 +43,19 @@ __HOST__ static constexpr INLINE std::string
     return (oss.str());
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Writes a vector3 object in a string
 @param vec the vector3 object */
 template <typename T>
-__HOST__ static constexpr INLINE std::string Vector3ToString(Vector3<T> const& vec)
+__HOST__ static constexpr INLINE std::string
+                                 Vector3ToString(Vector3<T> const& vec)
 {
     std::ostringstream oss;
     oss << vec;
     return ("[" + oss.str() + "]");
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Writes a message to stdout
 @param args the output messages */
 template <typename... Args>
@@ -63,7 +65,7 @@ __HOST__ static constexpr INLINE void Gout(const Args&... args)
     std::cout << std::endl;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** @brief Writes a message to stdout
 @param nextLine if going to the next line is required
 @param numShift the number of shift characters at the beginning

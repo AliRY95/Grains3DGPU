@@ -6,17 +6,17 @@
 /* ========================================================================== */
 #define norm2(a) (a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define dotProduct(a, b) (a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define S3Dregion1234() \
     v[0]     = 0;       \
     v[1]     = 0;       \
     v[2]     = 0;       \
     s->nvrtx = 4;
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define select_1ik()                   \
     s->nvrtx = 3;                      \
     for(t = 0; t < 3; t++)             \
@@ -26,7 +26,7 @@
     for(t = 0; t < 3; t++)             \
         s->vrtx[0][t] = sk[t];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define select_1ij()                   \
     s->nvrtx = 3;                      \
     for(t = 0; t < 3; t++)             \
@@ -36,7 +36,7 @@
     for(t = 0; t < 3; t++)             \
         s->vrtx[0][t] = sj[t];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define select_1jk()                   \
     s->nvrtx = 3;                      \
     for(t = 0; t < 3; t++)             \
@@ -46,7 +46,7 @@
     for(t = 0; t < 3; t++)             \
         s->vrtx[0][t] = sk[t];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define select_1i()                    \
     s->nvrtx = 2;                      \
     for(t = 0; t < 3; t++)             \
@@ -54,7 +54,7 @@
     for(t = 0; t < 3; t++)             \
         s->vrtx[0][t] = si[t];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define select_1j()                    \
     s->nvrtx = 2;                      \
     for(t = 0; t < 3; t++)             \
@@ -62,7 +62,7 @@
     for(t = 0; t < 3; t++)             \
         s->vrtx[0][t] = sj[t];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define select_1k()                    \
     s->nvrtx = 2;                      \
     for(t = 0; t < 3; t++)             \
@@ -70,19 +70,19 @@
     for(t = 0; t < 3; t++)             \
         s->vrtx[0][t] = sk[t];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define getvrtx(point, location)     \
     point[0] = s->vrtx[location][0]; \
     point[1] = s->vrtx[location][1]; \
     point[2] = s->vrtx[location][2];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define calculateEdgeVector(p1p2, p2) \
     p1p2[0] = p2[0] - s->vrtx[3][0];  \
     p1p2[1] = p2[1] - s->vrtx[3][1];  \
     p1p2[2] = p2[2] - s->vrtx[3][2];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define S1Dregion1()               \
     v[0]          = s->vrtx[1][0]; \
     v[1]          = s->vrtx[1][1]; \
@@ -92,7 +92,7 @@
     s->vrtx[0][1] = s->vrtx[1][1]; \
     s->vrtx[0][2] = s->vrtx[1][2];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define S2Dregion1()               \
     v[0]          = s->vrtx[2][0]; \
     v[1]          = s->vrtx[2][1]; \
@@ -102,21 +102,21 @@
     s->vrtx[0][1] = s->vrtx[2][1]; \
     s->vrtx[0][2] = s->vrtx[2][2];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define S2Dregion12()              \
     s->nvrtx      = 2;             \
     s->vrtx[0][0] = s->vrtx[2][0]; \
     s->vrtx[0][1] = s->vrtx[2][1]; \
     s->vrtx[0][2] = s->vrtx[2][2];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define S2Dregion13()              \
     s->nvrtx      = 2;             \
     s->vrtx[1][0] = s->vrtx[2][0]; \
     s->vrtx[1][1] = s->vrtx[2][1]; \
     s->vrtx[1][2] = s->vrtx[2][2];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 #define S3Dregion1()       \
     v[0]          = s1[0]; \
     v[1]          = s1[1]; \
@@ -126,30 +126,33 @@
     s->vrtx[0][1] = s1[1]; \
     s->vrtx[0][2] = s1[2];
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE T determinant(const T* __restrict__ p,
                                            const T* __restrict__ q,
                                            const T* __restrict__ r)
 {
-    return (p[0] * ((q[1] * r[2]) - (r[1] * q[2])) - p[1] * (q[0] * r[2] - r[0] * q[2])
+    return (p[0] * ((q[1] * r[2]) - (r[1] * q[2]))
+            - p[1] * (q[0] * r[2] - r[0] * q[2])
             + p[2] * (q[0] * r[1] - r[0] * q[1]));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void
-    crossProduct(const T* __restrict__ a, const T* __restrict__ b, T* __restrict__ c)
+__HOSTDEVICE__ static INLINE void crossProduct(const T* __restrict__ a,
+                                               const T* __restrict__ b,
+                                               T* __restrict__ c)
 {
     c[0] = a[1] * b[2] - a[2] * b[1];
     c[1] = a[2] * b[0] - a[0] * b[2];
     c[2] = a[0] * b[1] - a[1] * b[0];
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void
-    projectOnLine(const T* __restrict__ p, const T* __restrict__ q, T* __restrict__ v)
+__HOSTDEVICE__ static INLINE void projectOnLine(const T* __restrict__ p,
+                                                const T* __restrict__ q,
+                                                T* __restrict__ v)
 {
     T pq[3];
     pq[0] = p[0] - q[0];
@@ -162,7 +165,7 @@ __HOSTDEVICE__ static INLINE void
         v[i] = p[i] - pq[i] * tmp;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void projectOnPlane(const T* __restrict__ p,
                                                  const T* __restrict__ q,
@@ -187,9 +190,10 @@ __HOSTDEVICE__ static INLINE void projectOnPlane(const T* __restrict__ p,
         v[i] = n[i] * tmp;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE int hff1(const T* __restrict__ p, const T* __restrict__ q)
+__HOSTDEVICE__ static INLINE int hff1(const T* __restrict__ p,
+                                      const T* __restrict__ q)
 {
     T tmp = 0;
     for(int i = 0; i < 3; i++)
@@ -201,10 +205,11 @@ __HOSTDEVICE__ static INLINE int hff1(const T* __restrict__ p, const T* __restri
     return (0);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE int
-    hff2(const T* __restrict__ p, const T* __restrict__ q, const T* __restrict__ r)
+__HOSTDEVICE__ static INLINE int hff2(const T* __restrict__ p,
+                                      const T* __restrict__ q,
+                                      const T* __restrict__ r)
 {
     T ntmp[3];
     T n[3], pq[3], pr[3];
@@ -221,10 +226,11 @@ __HOSTDEVICE__ static INLINE int
     return (dotProduct(p, n) < 0); // Discard r if true
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE int
-    hff3(const T* __restrict__ p, const T* __restrict__ q, const T* __restrict__ r)
+__HOSTDEVICE__ static INLINE int hff3(const T* __restrict__ p,
+                                      const T* __restrict__ q,
+                                      const T* __restrict__ r)
 {
     T n[3], pq[3], pr[3];
 
@@ -238,7 +244,7 @@ __HOSTDEVICE__ static INLINE int
     return (dotProduct(p, n) <= 0); // discard s if true
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void S1D(gkSimplex<T>* s, T* v)
 {
@@ -257,7 +263,7 @@ __HOSTDEVICE__ static INLINE void S1D(gkSimplex<T>* s, T* v)
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void S2D(gkSimplex<T>* s, T* v)
 {
@@ -277,7 +283,10 @@ __HOSTDEVICE__ static INLINE void S2D(gkSimplex<T>* s, T* v)
                 const int hff2f_32 = !hff2(s1p, s3p, s2p);
                 if(hff2f_32)
                 {
-                    projectOnPlane(s1p, s2p, s3p, v); // Update s, no need to update c
+                    projectOnPlane(s1p,
+                                   s2p,
+                                   s3p,
+                                   v); // Update s, no need to update c
                     return; // Return V{1,2,3}
                 }
                 else
@@ -289,7 +298,10 @@ __HOSTDEVICE__ static INLINE void S2D(gkSimplex<T>* s, T* v)
             }
             else
             {
-                projectOnPlane(s1p, s2p, s3p, v); // Update s, no need to update c
+                projectOnPlane(s1p,
+                               s2p,
+                               s3p,
+                               v); // Update s, no need to update c
                 return; // Return V{1,2,3}
             }
         }
@@ -305,7 +317,8 @@ __HOSTDEVICE__ static INLINE void S2D(gkSimplex<T>* s, T* v)
         const int hff2f_32 = !hff2(s1p, s3p, s2p);
         if(hff2f_32)
         {
-            projectOnPlane(s1p, s2p, s3p, v); // Update s, no need to update v
+            projectOnPlane(s1p, s2p, s3p,
+                           v); // Update s, no need to update v
             return; // Return V{1,2,3}
         }
         else
@@ -322,13 +335,14 @@ __HOSTDEVICE__ static INLINE void S2D(gkSimplex<T>* s, T* v)
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void S3D(gkSimplex<T>* s, T* v)
 {
     T   s1[3], s2[3], s3[3], s4[3], s1s2[3], s1s3[3], s1s4[3];
     T   si[3], sj[3], sk[3];
-    int testLineThree, testLineFour, testPlaneTwo, testPlaneThree, testPlaneFour, dotTotal;
+    int testLineThree, testLineFour, testPlaneTwo, testPlaneThree,
+        testPlaneFour, dotTotal;
     int i, j, k, t;
 
     getvrtx(s1, 3);
@@ -715,7 +729,7 @@ __HOSTDEVICE__ static INLINE void S3D(gkSimplex<T>* s, T* v)
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void subalgorithm(gkSimplex<T>* s, T* v)
 {
@@ -736,7 +750,7 @@ __HOSTDEVICE__ static INLINE void subalgorithm(gkSimplex<T>* s, T* v)
 }
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 template <typename T>
 __HOSTDEVICE__ T computeClosestPoints_GJK_SV(Convex<T> const&     a,
@@ -780,7 +794,8 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_SV(Convex<T> const&     a,
     do
     {
         numIterations++;
-        wVec = a2w(a.support((-vVec) * a2w.getBasis())) - b2w(b.support((vVec)*b2w.getBasis()));
+        wVec = a2w(a.support((-vVec) * a2w.getBasis()))
+               - b2w(b.support((vVec)*b2w.getBasis()));
 
         // termination criteria
         mu = dist - vVec * wVec / dist;
@@ -798,7 +813,8 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_SV(Convex<T> const&     a,
         vVec.setValue(v[0], v[1], v[2]);
         dist = norm(vVec);
 
-    } while((s.nvrtx != 4) && (numIterations != maxNumIterations) && (dist > HIGHEPS<T>));
+    } while((s.nvrtx != 4) && (numIterations != maxNumIterations)
+            && (dist > HIGHEPS<T>));
     /* Outputs: witness points and nbIter */
     // It is not the best way to return the witness points.
     // It seems to be inconsistent with the way that it has been done in the
@@ -811,16 +827,17 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_SV(Convex<T> const&     a,
     return (dist);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
-#define X(T)                                                                        \
-    template __HOSTDEVICE__ T computeClosestPoints_GJK_SV(Convex<T> const&     a,   \
-                                                          Convex<T> const&     b,   \
-                                                          Transform3<T> const& a2w, \
-                                                          Transform3<T> const& b2w, \
-                                                          Vector3<T>&          pa,  \
-                                                          Vector3<T>&          pb,  \
-                                                          int&                 nbIter);
+#define X(T)                                               \
+    template __HOSTDEVICE__ T computeClosestPoints_GJK_SV( \
+        Convex<T> const&     a,                            \
+        Convex<T> const&     b,                            \
+        Transform3<T> const& a2w,                          \
+        Transform3<T> const& b2w,                          \
+        Vector3<T>&          pa,                           \
+        Vector3<T>&          pb,                           \
+        int&                 nbIter);
 X(float)
 X(double)
 #undef X

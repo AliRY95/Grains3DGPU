@@ -2,14 +2,14 @@
 #include "GrainsUtils.hh"
 #include "VectorMath.hh"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOSTDEVICE__ HookeContactForceModel<T>::HookeContactForceModel()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with an XML node
 template <typename T>
 __HOST__ HookeContactForceModel<T>::HookeContactForceModel(DOMNode* root)
@@ -42,10 +42,11 @@ __HOST__ HookeContactForceModel<T>::HookeContactForceModel(DOMNode* root)
     m_kr = T(ReaderXML::getNodeValue_Double(parameter));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with five values as contact parameters
 template <typename T>
-__HOSTDEVICE__ HookeContactForceModel<T>::HookeContactForceModel(T kn, T en, T etat, T muc, T kr)
+__HOSTDEVICE__ HookeContactForceModel<T>::HookeContactForceModel(
+    T kn, T en, T etat, T muc, T kr)
     : m_kn(kn)
     , m_en(en)
     , m_etat(etat)
@@ -55,22 +56,23 @@ __HOSTDEVICE__ HookeContactForceModel<T>::HookeContactForceModel(T kn, T en, T e
     m_muen = log(m_en) / sqrt(PI<T> * PI<T> + log(m_en) * log(m_en));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ HookeContactForceModel<T>::~HookeContactForceModel()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Gets the ContactForceModel type
 template <typename T>
-__HOSTDEVICE__ ContactForceModelType HookeContactForceModel<T>::getContactForceModelType() const
+__HOSTDEVICE__ ContactForceModelType
+    HookeContactForceModel<T>::getContactForceModelType() const
 {
     return (HOOKE);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Gets the parameters of the Hooke contact force model
 template <typename T>
 __HOSTDEVICE__ void HookeContactForceModel<T>::getContactForceModelParameters(
@@ -83,18 +85,18 @@ __HOSTDEVICE__ void HookeContactForceModel<T>::getContactForceModelParameters(
     kr   = m_kr;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Performs forces & torques computation
 template <typename T>
-__HOSTDEVICE__ void
-    HookeContactForceModel<T>::performForcesCalculus(ContactInfo<T> const& contactInfos,
-                                                     Vector3<T> const&     relVelocityAtContact,
-                                                     Vector3<T> const&     relAngVelocity,
-                                                     T                     m1,
-                                                     T                     m2,
-                                                     Vector3<T>&           delFN,
-                                                     Vector3<T>&           delFT,
-                                                     Vector3<T>&           delM) const
+__HOSTDEVICE__ void HookeContactForceModel<T>::performForcesCalculus(
+    ContactInfo<T> const& contactInfos,
+    Vector3<T> const&     relVelocityAtContact,
+    Vector3<T> const&     relAngVelocity,
+    T                     m1,
+    T                     m2,
+    Vector3<T>&           delFN,
+    Vector3<T>&           delFT,
+    Vector3<T>&           delM) const
 {
     Vector3<T> geometricPointOfContact = contactInfos.getContactPoint();
     Vector3<T> penetration             = contactInfos.getContactVector();
@@ -154,21 +156,28 @@ __HOSTDEVICE__ void
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns a torce based on the contact information
 template <typename T>
-__HOSTDEVICE__ void HookeContactForceModel<T>::computeForces(ContactInfo<T> const& contactInfos,
-                                                             Vector3<T> const& relVelocityAtContact,
-                                                             Vector3<T> const& relAngVelocity,
-                                                             T                 m1,
-                                                             T                 m2,
-                                                             Vector3<T> const& trOrigin,
-                                                             Torce<T>&         torce) const
+__HOSTDEVICE__ void HookeContactForceModel<T>::computeForces(
+    ContactInfo<T> const& contactInfos,
+    Vector3<T> const&     relVelocityAtContact,
+    Vector3<T> const&     relAngVelocity,
+    T                     m1,
+    T                     m2,
+    Vector3<T> const&     trOrigin,
+    Torce<T>&             torce) const
 {
     // Compute contact force and torque
     Vector3<T> delFN, delFT, delM;
-    performForcesCalculus(
-        contactInfos, relVelocityAtContact, relAngVelocity, m1, m2, delFN, delFT, delM);
+    performForcesCalculus(contactInfos,
+                          relVelocityAtContact,
+                          relAngVelocity,
+                          m1,
+                          m2,
+                          delFN,
+                          delFT,
+                          delM);
 
     Vector3<T> geometricPointOfContact = contactInfos.getContactPoint();
     torce.addForce(delFN + delFT, geometricPointOfContact - trOrigin);
@@ -176,7 +185,7 @@ __HOSTDEVICE__ void HookeContactForceModel<T>::computeForces(ContactInfo<T> cons
         torce.addTorque(delM);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class HookeContactForceModel<float>;
 template class HookeContactForceModel<double>;

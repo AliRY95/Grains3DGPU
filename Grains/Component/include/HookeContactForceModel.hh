@@ -66,7 +66,8 @@ public:
         @param muc tangential Coulomb friction coefficient
         @param kr rolling resistance coefficient */
     __HOSTDEVICE__
-    void getContactForceModelParameters(T& kn, T& en, T& etat, T& muc, T& kr) const;
+    void getContactForceModelParameters(
+        T& kn, T& en, T& etat, T& muc, T& kr) const;
     //@}
 
     /**@name Methods */

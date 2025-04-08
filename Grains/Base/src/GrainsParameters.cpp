@@ -1,6 +1,6 @@
 #include "GrainsParameters.hh"
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Static variables
 /* GPU */
 template <typename T>
@@ -46,7 +46,8 @@ Vector3<T> GrainsParameters<T>::m_gravity = zeroVector3T;
 
 /* Material */
 template <typename T>
-std::unordered_map<std::string, unsigned int> GrainsParameters<T>::m_materialMap;
+std::unordered_map<std::string, unsigned int>
+    GrainsParameters<T>::m_materialMap;
 template <typename T>
 unsigned int GrainsParameters<T>::m_numContactPairs = 0;
 
@@ -57,7 +58,7 @@ std::queue<T> GrainsParameters<T>::m_tSave;
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class GrainsParameters<float>;
 template class GrainsParameters<double>;

@@ -23,10 +23,11 @@ __HOST__ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with XML node
 template <typename T>
-__HOST__ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter(DOMNode* dn)
+__HOST__
+    RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter(DOMNode* dn)
     : m_ndigits(6)
 {
     m_filerootname = ReaderXML::getNodeAttr_String(dn, "Name");
@@ -34,14 +35,14 @@ __HOST__ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter(DOMNode* dn
     GrainsMisc<T>::cout("Output file name = " + m_filerootname, 12);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOST__ RawDataPostProcessingWriter<T>::~RawDataPostProcessingWriter()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Gets the post-processing writer type
 template <typename T>
 __HOST__ PostProcessingWriterType
@@ -50,7 +51,7 @@ __HOST__ PostProcessingWriterType
     return (RAW);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Initializes the post-processing writer
 template <typename T>
 __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_start()
@@ -62,14 +63,14 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_start()
     prepareResultFiles(mode);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes data -- Particles come first, followed by obtacles
 template <typename T>
-__HOST__ void
-    RawDataPostProcessingWriter<T>::PostProcessing(RigidBody<T, T> const* const* particleRB,
-                                                   RigidBody<T, T> const* const* obstacleRB,
-                                                   ComponentManager<T> const*    cm,
-                                                   T                             currentTime)
+__HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
+    RigidBody<T, T> const* const* particleRB,
+    RigidBody<T, T> const* const* obstacleRB,
+    ComponentManager<T> const*    cm,
+    T                             currentTime)
 {
     // Particles
     unsigned int               numParticles = cm->getNumberOfParticles();
@@ -87,10 +88,12 @@ __HOST__ void
     Vector3<T>   velT;
     Vector3<T>   velR;
     unsigned int type;
-    m_particle_class.open((m_filerootname + "_particleType.dat").c_str(), ios::out);
+    m_particle_class.open((m_filerootname + "_particleType.dat").c_str(),
+                          ios::out);
 
     // Writing current time at the beginning of each line
-    std::string stime = GrainsMisc<T>::realToString(ios::scientific, 6, currentTime);
+    std::string stime
+        = GrainsMisc<T>::realToString(ios::scientific, 6, currentTime);
     m_gc_coordinates_x << stime;
     m_gc_coordinates_y << stime;
     m_gc_coordinates_z << stime;
@@ -107,29 +110,41 @@ __HOST__ void
         // Center of mass position
         centre = tParticle[i].getOrigin();
         m_gc_coordinates_x << " "
-                           << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, centre[X]);
+                           << GrainsMisc<T>::realToString(ios::scientific,
+                                                          m_ndigits,
+                                                          centre[X]);
         m_gc_coordinates_y << " "
-                           << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, centre[Y]);
+                           << GrainsMisc<T>::realToString(ios::scientific,
+                                                          m_ndigits,
+                                                          centre[Y]);
         m_gc_coordinates_z << " "
-                           << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, centre[Z]);
+                           << GrainsMisc<T>::realToString(ios::scientific,
+                                                          m_ndigits,
+                                                          centre[Z]);
 
         // Translational velocity
         velT = kParticle[i].getTranslationalComponent();
         m_translational_velocity_x
-            << " " << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[X]);
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[X]);
         m_translational_velocity_y
-            << " " << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Y]);
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Y]);
         m_translational_velocity_z
-            << " " << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Z]);
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Z]);
 
         // Angular velocity
         velR = kParticle[i].getAngularComponent();
-        m_angular_velocity_x << " "
-                             << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[X]);
-        m_angular_velocity_y << " "
-                             << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Y]);
-        m_angular_velocity_z << " "
-                             << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Z]);
+        m_angular_velocity_x
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[X]);
+        m_angular_velocity_y
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Y]);
+        m_angular_velocity_z
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Z]);
 
         // // Number of contacts
         // m_coordination_number << " " << pp->getCoordinationNumber();
@@ -145,29 +160,41 @@ __HOST__ void
         // Center of mass position
         centre = tObstacle[i].getOrigin();
         m_gc_coordinates_x << " "
-                           << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, centre[X]);
+                           << GrainsMisc<T>::realToString(ios::scientific,
+                                                          m_ndigits,
+                                                          centre[X]);
         m_gc_coordinates_y << " "
-                           << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, centre[Y]);
+                           << GrainsMisc<T>::realToString(ios::scientific,
+                                                          m_ndigits,
+                                                          centre[Y]);
         m_gc_coordinates_z << " "
-                           << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, centre[Z]);
+                           << GrainsMisc<T>::realToString(ios::scientific,
+                                                          m_ndigits,
+                                                          centre[Z]);
 
         // Translational velocity
         velT = kObstacle[i].getTranslationalComponent();
         m_translational_velocity_x
-            << " " << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[X]);
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[X]);
         m_translational_velocity_y
-            << " " << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Y]);
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Y]);
         m_translational_velocity_z
-            << " " << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Z]);
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Z]);
 
         // Angular velocity
         velR = kObstacle[i].getAngularComponent();
-        m_angular_velocity_x << " "
-                             << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[X]);
-        m_angular_velocity_y << " "
-                             << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Y]);
-        m_angular_velocity_z << " "
-                             << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Z]);
+        m_angular_velocity_x
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[X]);
+        m_angular_velocity_y
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Y]);
+        m_angular_velocity_z
+            << " "
+            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Z]);
 
         // // Number of contacts
         // m_coordination_number << " " << pp->getCoordinationNumber();
@@ -192,7 +219,7 @@ __HOST__ void
     m_particle_class.close();
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Finalizes writing data
 template <typename T>
 __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_end()
@@ -210,10 +237,11 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_end()
     m_particle_class.close();
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Creates output files and open streams
 template <typename T>
-__HOST__ void RawDataPostProcessingWriter<T>::prepareResultFiles(ios_base::openmode mode)
+__HOST__ void
+    RawDataPostProcessingWriter<T>::prepareResultFiles(ios_base::openmode mode)
 {
     string file;
     file = m_filerootname + "_position_x.dat";
@@ -241,7 +269,7 @@ __HOST__ void RawDataPostProcessingWriter<T>::prepareResultFiles(ios_base::openm
     m_coordination_number.open(file.c_str(), mode);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class RawDataPostProcessingWriter<float>;
 template class RawDataPostProcessingWriter<double>;

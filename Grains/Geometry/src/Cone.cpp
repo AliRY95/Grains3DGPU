@@ -4,7 +4,7 @@
 // multiple of 4
 #define visuNodeNbOnPer 32
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with radius and height as input parameters
 template <typename T>
 __HOSTDEVICE__ Cone<T>::Cone(T r, T h)
@@ -14,7 +14,7 @@ __HOSTDEVICE__ Cone<T>::Cone(T r, T h)
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with an input stream
 template <typename T>
 __HOST__ Cone<T>::Cone(std::istream& fileIn)
@@ -22,26 +22,26 @@ __HOST__ Cone<T>::Cone(std::istream& fileIn)
     readConvex(fileIn);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor with an XML node as an input parameter
 template <typename T>
 __HOST__ Cone<T>::Cone(DOMNode* root)
 {
     m_bottomRadius  = T(ReaderXML::getNodeAttr_Double(root, "Radius"));
     m_quarterHeight = T(ReaderXML::getNodeAttr_Double(root, "Height")) / T(4);
-    m_sinAngle
-        = m_bottomRadius
-          / sqrt(m_bottomRadius * m_bottomRadius + T(16) * m_quarterHeight * m_quarterHeight);
+    m_sinAngle      = m_bottomRadius
+                 / sqrt(m_bottomRadius * m_bottomRadius
+                        + T(16) * m_quarterHeight * m_quarterHeight);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
 template <typename T>
 __HOSTDEVICE__ Cone<T>::~Cone()
 {
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the convex type
 template <typename T>
 __HOSTDEVICE__ ConvexType Cone<T>::getConvexType() const
@@ -49,7 +49,7 @@ __HOSTDEVICE__ ConvexType Cone<T>::getConvexType() const
     return (CONE);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the radius
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::getRadius() const
@@ -57,7 +57,7 @@ __HOSTDEVICE__ T Cone<T>::getRadius() const
     return (m_bottomRadius);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the height
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::getHeight() const
@@ -65,7 +65,7 @@ __HOSTDEVICE__ T Cone<T>::getHeight() const
     return (T(4) * m_quarterHeight);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns a clone of the cone
 template <typename T>
 __HOSTDEVICE__ Convex<T>* Cone<T>::clone() const
@@ -73,40 +73,44 @@ __HOSTDEVICE__ Convex<T>* Cone<T>::clone() const
     return (new Cone<T>(m_bottomRadius, T(4) * m_quarterHeight));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the volume of the cone
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::computeVolume() const
 {
-    return (T(4) * m_quarterHeight * PI<T> * m_bottomRadius * m_bottomRadius / T(3));
+    return (T(4) * m_quarterHeight * PI<T>
+            * m_bottomRadius * m_bottomRadius / T(3));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Computes the inertia tensor and the inverse of the inertia tensor
 template <typename T>
-__HOSTDEVICE__ void Cone<T>::computeInertia(T (&inertia)[6], T (&inertia_1)[6]) const
+__HOSTDEVICE__ void Cone<T>::computeInertia(T (&inertia)[6],
+                                            T (&inertia_1)[6]) const
 {
     T r2       = m_bottomRadius * m_bottomRadius;
     T c        = T(.2) * PI<T> * m_quarterHeight * r2;
     inertia[1] = inertia[2] = inertia[4] = T(0);
-    inertia[0] = inertia[5] = c * (T(4) * m_quarterHeight * m_quarterHeight + r2);
-    inertia[3]              = T(2) * c * r2;
+    inertia[0]                           = inertia[5]
+        = c * (T(4) * m_quarterHeight * m_quarterHeight + r2);
+    inertia[3] = T(2) * c * r2;
 
     inertia_1[1] = inertia_1[2] = inertia_1[4] = T(0);
     inertia_1[5] = inertia_1[0] = T(1) / inertia[0];
     inertia_1[3]                = T(1) / inertia[3];
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the circumscribed radius of the cone
 template <typename T>
 __HOSTDEVICE__ T Cone<T>::computeCircumscribedRadius() const
 {
-    return (max(sqrt(m_bottomRadius * m_bottomRadius + m_quarterHeight * m_quarterHeight),
+    return (max(sqrt(m_bottomRadius * m_bottomRadius
+                     + m_quarterHeight * m_quarterHeight),
                 T(3) * m_quarterHeight));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the bounding box to the cone
 // TODO: OBB should be shifted one unit to the right because of center of mass
 template <typename T>
@@ -115,7 +119,7 @@ __HOSTDEVICE__ Vector3<T> Cone<T>::computeBoundingBox() const
     return (Vector3<T>(m_bottomRadius, T(2) * m_quarterHeight, m_bottomRadius));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Cone support function, returns the support point P, i.e. the point on the
 // surface of the cone that satisfies max(P.v)
 template <typename T>
@@ -136,28 +140,28 @@ __HOSTDEVICE__ Vector3<T> Cone<T>::support(Vector3<T> const& v) const
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Input operator
 template <typename T>
 __HOST__ void Cone<T>::readConvex(std::istream& fileIn)
 {
     fileIn >> m_bottomRadius >> m_quarterHeight;
     m_quarterHeight /= T(4);
-    m_sinAngle
-        = m_bottomRadius
-          / sqrt(m_bottomRadius * m_bottomRadius + T(16) * m_quarterHeight * m_quarterHeight);
+    m_sinAngle = m_bottomRadius
+                 / sqrt(m_bottomRadius * m_bottomRadius
+                        + T(16) * m_quarterHeight * m_quarterHeight);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Output operator
 template <typename T>
 __HOST__ void Cone<T>::writeConvex(std::ostream& fileOut) const
 {
-    fileOut << "Cone with radius " << m_bottomRadius << ", and height " << T(4) * m_quarterHeight
-            << ".\n";
+    fileOut << "Cone with radius " << m_bottomRadius << ", and height "
+            << T(4) * m_quarterHeight << ".\n";
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the number of points to write the cone in a Paraview format
 template <typename T>
 __HOST__ int Cone<T>::numberOfPoints_PARAVIEW() const
@@ -165,7 +169,7 @@ __HOST__ int Cone<T>::numberOfPoints_PARAVIEW() const
     return (visuNodeNbOnPer + 2);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns the number of elementary polytopes to write the cone in a
 // Paraview format
 template <typename T>
@@ -174,11 +178,12 @@ __HOST__ int Cone<T>::numberOfCells_PARAVIEW() const
     return (visuNodeNbOnPer);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns a list of points describing the cone in a Paraview format
 template <typename T>
-__HOST__ std::list<Vector3<T>> Cone<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
-                                                             Vector3<T> const*    translation) const
+__HOST__ std::list<Vector3<T>>
+         Cone<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
+                                  Vector3<T> const*    translation) const
 {
     list<Vector3<T>> ParaviewPoints;
     Vector3<T>       pp, p;
@@ -217,14 +222,14 @@ __HOST__ std::list<Vector3<T>> Cone<T>::writePoints_PARAVIEW(Transform3<T> const
     return (ParaviewPoints);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Writes the connectivity of the cone in a Paraview format
 template <typename T>
 __HOST__ void Cone<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
                                                 std::list<int>& offsets,
                                                 std::list<int>& cellstype,
-                                                int&            firstpoint_globalnumber,
-                                                int&            last_offset) const
+                                                int& firstpoint_globalnumber,
+                                                int& last_offset) const
 {
     for(int i = 0; i < visuNodeNbOnPer - 1; ++i)
     {
@@ -247,7 +252,7 @@ __HOST__ void Cone<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
     firstpoint_globalnumber += visuNodeNbOnPer + 2;
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
 template class Cone<float>;
 template class Cone<double>;

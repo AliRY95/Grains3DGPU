@@ -28,27 +28,29 @@ void zeroOutArray_kernel(unsigned int* array, unsigned int numElements);
 @param numComponents number of components
 @param cellStartAndEnd start and end indices as s1, e1, s2, e2, ... */
 __GLOBAL__
-void sortComponentsAndFindCellStart_kernel(unsigned int const* componentCellHash,
-                                           unsigned int        numComponents,
-                                           unsigned int*       cellStart,
-                                           unsigned int*       cellEnd);
+void sortComponentsAndFindCellStart_kernel(
+    unsigned int const* componentCellHash,
+    unsigned int        numComponents,
+    unsigned int*       cellStart,
+    unsigned int*       cellEnd);
 
 /** @brief Returns the collisions for all given components using LinkedCell and
 a thread-per-particle policy
 @param fix later */
 template <typename T, typename U>
-__GLOBAL__ void detectCollisionAndComputeContactForces_kernel(LinkedCell<T> const* const*        LC,
-                                                              RigidBody<T, U> const* const*      RB,
-                                                              ContactForceModel<T> const* const* CF,
-                                                              unsigned int*        m_rigidBodyId,
-                                                              Transform3<T> const* tr3d,
-                                                              Torce<T>*            m_torce,
-                                                              int*                 m_compId,
-                                                              unsigned int* m_componentCellHash,
-                                                              unsigned int* m_cellHashStart,
-                                                              unsigned int* m_cellHashEnd,
-                                                              int           numComponents,
-                                                              int*          result);
+__GLOBAL__ void detectCollisionAndComputeContactForces_kernel(
+    LinkedCell<T> const* const*        LC,
+    RigidBody<T, U> const* const*      RB,
+    ContactForceModel<T> const* const* CF,
+    unsigned int*                      m_rigidBodyId,
+    Transform3<T> const*               tr3d,
+    Torce<T>*                          m_torce,
+    int*                               m_compId,
+    unsigned int*                      m_componentCellHash,
+    unsigned int*                      m_cellHashStart,
+    unsigned int*                      m_cellHashEnd,
+    int                                numComponents,
+    int*                               result);
 //@}
 
 #endif

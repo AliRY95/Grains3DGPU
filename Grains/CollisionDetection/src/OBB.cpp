@@ -7,20 +7,25 @@
 /*                            Low-Level Methods                               */
 /* ========================================================================== */
 // Low-level methods for OBB as macros in double precision
-#define TESTCASE1(i) \
-    (fabs(cen[i]) > (a[i] + b[0] * oriAbs[i][0] + b[1] * oriAbs[i][1] + b[2] * oriAbs[i][2]))
+#define TESTCASE1(i)                                                  \
+    (fabs(cen[i]) > (a[i] + b[0] * oriAbs[i][0] + b[1] * oriAbs[i][1] \
+                     + b[2] * oriAbs[i][2]))
 
 #define TESTCASE2(i)                                                    \
     (fabs(cen[0] * ori[0][i] + cen[1] * ori[1][i] + cen[2] * ori[2][i]) \
-     > (b[i] + a[0] * oriAbs[0][i] + a[1] * oriAbs[1][i] + a[2] * oriAbs[2][i]))
+     > (b[i] + a[0] * oriAbs[0][i] + a[1] * oriAbs[1][i]                \
+        + a[2] * oriAbs[2][i]))
 
-#define TESTCASE3(i, j)                                                                    \
-    (fabs(cen[(i + 2) % 3] * ori[(i + 1) % 3][j] - cen[(i + 1) % 3] * ori[(i + 2) % 3][j]) \
-     > (a[(i + 1) % 3] * oriAbs[(i + 2) % 3][j] + a[(i + 2) % 3] * oriAbs[(i + 1) % 3][j]  \
-        + b[(j + 1) % 3] * oriAbs[i][(j + 2) % 3] + b[(j + 2) % 3] * oriAbs[i][(j + 1) % 3]))
+#define TESTCASE3(i, j)                             \
+    (fabs(cen[(i + 2) % 3] * ori[(i + 1) % 3][j]    \
+          - cen[(i + 1) % 3] * ori[(i + 2) % 3][j]) \
+     > (a[(i + 1) % 3] * oriAbs[(i + 2) % 3][j]     \
+        + a[(i + 2) % 3] * oriAbs[(i + 1) % 3][j]   \
+        + b[(j + 1) % 3] * oriAbs[i][(j + 2) % 3]   \
+        + b[(j + 2) % 3] * oriAbs[i][(j + 1) % 3]))
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 // Returns whether the bounding boxes are in contact using OBB test
 template <typename T>
@@ -88,7 +93,7 @@ __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
     return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns whether the bounding boxes are in contact using OBB test - relative
 // transformation
 template <typename T>
@@ -149,7 +154,7 @@ __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
     return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns whether the bounding boxes are in contact using AABB test
 template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
@@ -173,7 +178,7 @@ __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
         return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Returns whether the bounding boxes are in contact using AABB test - relative
 // transformation
 template <typename T>
@@ -196,19 +201,20 @@ __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
         return (true);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Undefining the low-level methods
 #undef TESTCASE1
 #undef TESTCASE2
 #undef TESTCASE3
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
-#define X(T)                                                                               \
-    template __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,   \
-                                                              BoundingBox<T> const& bbB,   \
-                                                              Transform3<T> const&  trA2W, \
-                                                              Transform3<T> const&  trB2W);
+#define X(T)                                                   \
+    template __HOSTDEVICE__ bool intersectOrientedBoundingBox( \
+        BoundingBox<T> const& bbA,                             \
+        BoundingBox<T> const& bbB,                             \
+        Transform3<T> const&  trA2W,                           \
+        Transform3<T> const&  trB2W);
 X(float)
 X(double)
 #undef X

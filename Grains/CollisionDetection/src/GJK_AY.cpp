@@ -11,9 +11,10 @@ __HOSTDEVICE__ static INLINE unsigned int compareSigns(T a, T b)
     return static_cast<unsigned int>(!((a > 0) ^ (b > 0)));
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void s1d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
+__HOSTDEVICE__ static INLINE void
+    s1d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
 {
     // Identify the appropriate indices
     bool         s1_set = false;
@@ -56,8 +57,9 @@ __HOSTDEVICE__ static INLINE void s1d(Vector3<T> const y[4], unsigned int& bits,
 
     // Identify the signed volume resulting from replacing each point by the
     // origin.
-    T            C[2]                = {-y[i2][I] + pI, y[i1][I] - pI};
-    unsigned int sign_comparisons[2] = {compareSigns(neg_tI, C[0]), compareSigns(neg_tI, C[1])};
+    T            C[2] = {-y[i2][I] + pI, y[i1][I] - pI};
+    unsigned int sign_comparisons[2]
+        = {compareSigns(neg_tI, C[0]), compareSigns(neg_tI, C[1])};
 
     // If all signed volumes are identical, the origin lies inside the simplex.
     if(sign_comparisons[0] + sign_comparisons[1] == 2)
@@ -82,9 +84,10 @@ __HOSTDEVICE__ static INLINE void s1d(Vector3<T> const y[4], unsigned int& bits,
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void s2d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
+__HOSTDEVICE__ static INLINE void
+    s2d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
 {
     unsigned int counter = 0, point0_idx = 0, point1_idx = 0, point2_idx = 0;
     for(unsigned int i = 0; i < 4; ++i)
@@ -101,7 +104,8 @@ __HOSTDEVICE__ static INLINE void s2d(Vector3<T> const y[4], unsigned int& bits,
         }
     }
 
-    Vector3<T> n  = (y[point1_idx] - y[point0_idx]) ^ (y[point2_idx] - y[point0_idx]);
+    Vector3<T> n
+        = (y[point1_idx] - y[point0_idx]) ^ (y[point2_idx] - y[point0_idx]);
     Vector3<T> p0 = (y[point0_idx] * n / norm2(n)) * n;
 
     // Choose maximum area plane to project onto.
@@ -110,23 +114,32 @@ __HOSTDEVICE__ static INLINE void s2d(Vector3<T> const y[4], unsigned int& bits,
     // an initial area of zero, an extra abs, etc)
     unsigned int idx_x  = 1;
     unsigned int idx_y  = 2;
-    T            mu_max = (y[point1_idx][1] * y[point2_idx][2] + y[point0_idx][1] * y[point1_idx][2]
-                + y[point2_idx][1] * y[point0_idx][2] - y[point1_idx][1] * y[point0_idx][2]
-                - y[point2_idx][1] * y[point1_idx][2] - y[point0_idx][1] * y[point2_idx][2]);
+    T            mu_max = (y[point1_idx][1] * y[point2_idx][2]
+                + y[point0_idx][1] * y[point1_idx][2]
+                + y[point2_idx][1] * y[point0_idx][2]
+                - y[point1_idx][1] * y[point0_idx][2]
+                - y[point2_idx][1] * y[point1_idx][2]
+                - y[point0_idx][1] * y[point2_idx][2]);
 
     // This term is multiplied by -1.
-    T mu = (y[point1_idx][2] * y[point0_idx][0] + y[point2_idx][2] * y[point1_idx][0]
-            + y[point0_idx][2] * y[point2_idx][0] - y[point1_idx][2] * y[point2_idx][0]
-            - y[point0_idx][2] * y[point1_idx][0] - y[point2_idx][2] * y[point0_idx][0]);
+    T mu = (y[point1_idx][2] * y[point0_idx][0]
+            + y[point2_idx][2] * y[point1_idx][0]
+            + y[point0_idx][2] * y[point2_idx][0]
+            - y[point1_idx][2] * y[point2_idx][0]
+            - y[point0_idx][2] * y[point1_idx][0]
+            - y[point2_idx][2] * y[point0_idx][0]);
     if(fabs(mu) > fabs(mu_max))
     {
         mu_max = mu;
         idx_x  = 0;
     }
 
-    mu = (y[point1_idx][0] * y[point2_idx][1] + y[point0_idx][0] * y[point1_idx][1]
-          + y[point2_idx][0] * y[point0_idx][1] - y[point1_idx][0] * y[point0_idx][1]
-          - y[point2_idx][0] * y[point1_idx][1] - y[point0_idx][0] * y[point2_idx][1]);
+    mu = (y[point1_idx][0] * y[point2_idx][1]
+          + y[point0_idx][0] * y[point1_idx][1]
+          + y[point2_idx][0] * y[point0_idx][1]
+          - y[point1_idx][0] * y[point0_idx][1]
+          - y[point2_idx][0] * y[point1_idx][1]
+          - y[point0_idx][0] * y[point2_idx][1]);
     if(fabs(mu) > fabs(mu_max))
     {
         mu_max = mu;
@@ -139,19 +152,25 @@ __HOSTDEVICE__ static INLINE void s2d(Vector3<T> const y[4], unsigned int& bits,
     T    C[3]                = {T(0)};
     bool sign_comparisons[3] = {false};
 
-    C[0]                = (p0[idx_x] * y[point1_idx][idx_y] + p0[idx_y] * y[point2_idx][idx_x]
-            + y[point1_idx][idx_x] * y[point2_idx][idx_y] - p0[idx_x] * y[point2_idx][idx_y]
-            - p0[idx_y] * y[point1_idx][idx_x] - y[point2_idx][idx_x] * y[point1_idx][idx_y]);
+    C[0]
+        = (p0[idx_x] * y[point1_idx][idx_y] + p0[idx_y] * y[point2_idx][idx_x]
+           + y[point1_idx][idx_x] * y[point2_idx][idx_y]
+           - p0[idx_x] * y[point2_idx][idx_y] - p0[idx_y] * y[point1_idx][idx_x]
+           - y[point2_idx][idx_x] * y[point1_idx][idx_y]);
     sign_comparisons[0] = compareSigns(mu_max, C[0]);
 
-    C[1]                = (p0[idx_x] * y[point2_idx][idx_y] + p0[idx_y] * y[point0_idx][idx_x]
-            + y[point2_idx][idx_x] * y[point0_idx][idx_y] - p0[idx_x] * y[point0_idx][idx_y]
-            - p0[idx_y] * y[point2_idx][idx_x] - y[point0_idx][idx_x] * y[point2_idx][idx_y]);
+    C[1]
+        = (p0[idx_x] * y[point2_idx][idx_y] + p0[idx_y] * y[point0_idx][idx_x]
+           + y[point2_idx][idx_x] * y[point0_idx][idx_y]
+           - p0[idx_x] * y[point0_idx][idx_y] - p0[idx_y] * y[point2_idx][idx_x]
+           - y[point0_idx][idx_x] * y[point2_idx][idx_y]);
     sign_comparisons[1] = compareSigns(mu_max, C[1]);
 
-    C[2]                = (p0[idx_x] * y[point0_idx][idx_y] + p0[idx_y] * y[point1_idx][idx_x]
-            + y[point0_idx][idx_x] * y[point1_idx][idx_y] - p0[idx_x] * y[point1_idx][idx_y]
-            - p0[idx_y] * y[point0_idx][idx_x] - y[point1_idx][idx_x] * y[point0_idx][idx_y]);
+    C[2]
+        = (p0[idx_x] * y[point0_idx][idx_y] + p0[idx_y] * y[point1_idx][idx_x]
+           + y[point0_idx][idx_x] * y[point1_idx][idx_y]
+           - p0[idx_x] * y[point1_idx][idx_y] - p0[idx_y] * y[point0_idx][idx_x]
+           - y[point1_idx][idx_x] * y[point0_idx][idx_y]);
     sign_comparisons[2] = compareSigns(mu_max, C[2]);
 
     if(sign_comparisons[0] + sign_comparisons[1] + sign_comparisons[2] == 3)
@@ -204,9 +223,10 @@ __HOSTDEVICE__ static INLINE void s2d(Vector3<T> const y[4], unsigned int& bits,
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void s3d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
+__HOSTDEVICE__ static INLINE void
+    s3d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
 {
     T C[4] = {0.};
 
@@ -217,18 +237,18 @@ __HOSTDEVICE__ static INLINE void s3d(Vector3<T> const y[4], unsigned int& bits,
     // computations are done directly rather than with a loop.
     // C[0] and C[2] are negated due to the (-1)^(i+j+1) prefactor,
     // where i is always 4 because we're expanding about the 4th row.
-    C[0] = y[3][0] * y[2][1] * y[1][2] + y[2][0] * y[1][1] * y[3][2] + y[1][0] * y[3][1] * y[2][2]
-           - y[1][0] * y[2][1] * y[3][2] - y[2][0] * y[3][1] * y[1][2]
-           - y[3][0] * y[1][1] * y[2][2];
-    C[1] = y[0][0] * y[2][1] * y[3][2] + y[2][0] * y[3][1] * y[0][2] + y[3][0] * y[0][1] * y[2][2]
-           - y[3][0] * y[2][1] * y[0][2] - y[2][0] * y[0][1] * y[3][2]
-           - y[0][0] * y[3][1] * y[2][2];
-    C[2] = y[3][0] * y[1][1] * y[0][2] + y[1][0] * y[0][1] * y[3][2] + y[0][0] * y[3][1] * y[1][2]
-           - y[0][0] * y[1][1] * y[3][2] - y[1][0] * y[3][1] * y[0][2]
-           - y[3][0] * y[0][1] * y[1][2];
-    C[3] = y[0][0] * y[1][1] * y[2][2] + y[1][0] * y[2][1] * y[0][2] + y[2][0] * y[0][1] * y[1][2]
-           - y[2][0] * y[1][1] * y[0][2] - y[1][0] * y[0][1] * y[2][2]
-           - y[0][0] * y[2][1] * y[1][2];
+    C[0] = y[3][0] * y[2][1] * y[1][2] + y[2][0] * y[1][1] * y[3][2]
+           + y[1][0] * y[3][1] * y[2][2] - y[1][0] * y[2][1] * y[3][2]
+           - y[2][0] * y[3][1] * y[1][2] - y[3][0] * y[1][1] * y[2][2];
+    C[1] = y[0][0] * y[2][1] * y[3][2] + y[2][0] * y[3][1] * y[0][2]
+           + y[3][0] * y[0][1] * y[2][2] - y[3][0] * y[2][1] * y[0][2]
+           - y[2][0] * y[0][1] * y[3][2] - y[0][0] * y[3][1] * y[2][2];
+    C[2] = y[3][0] * y[1][1] * y[0][2] + y[1][0] * y[0][1] * y[3][2]
+           + y[0][0] * y[3][1] * y[1][2] - y[0][0] * y[1][1] * y[3][2]
+           - y[1][0] * y[3][1] * y[0][2] - y[3][0] * y[0][1] * y[1][2];
+    C[3] = y[0][0] * y[1][1] * y[2][2] + y[1][0] * y[2][1] * y[0][2]
+           + y[2][0] * y[0][1] * y[1][2] - y[2][0] * y[1][1] * y[0][2]
+           - y[1][0] * y[0][1] * y[2][2] - y[0][0] * y[2][1] * y[1][2];
     T dM = C[0] + C[1] + C[2] + C[3];
 
     unsigned int sign_comparisons[4] = {0};
@@ -237,7 +257,9 @@ __HOSTDEVICE__ static INLINE void s3d(Vector3<T> const y[4], unsigned int& bits,
     sign_comparisons[2]              = compareSigns(dM, C[2]);
     sign_comparisons[3]              = compareSigns(dM, C[3]);
 
-    if((sign_comparisons[0] + sign_comparisons[1] + sign_comparisons[2] + sign_comparisons[3]) == 4)
+    if((sign_comparisons[0] + sign_comparisons[1] + sign_comparisons[2]
+        + sign_comparisons[3])
+       == 4)
     {
         for(unsigned int i = 0; i < 4; ++i)
             lambdas[i] = C[i] / dM;
@@ -278,10 +300,12 @@ __HOSTDEVICE__ static INLINE void s3d(Vector3<T> const y[4], unsigned int& bits,
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void
-    computeVector(unsigned int const bits, Vector3<T> const y[4], T const lambdas[4], Vector3<T>& v)
+__HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits,
+                                                Vector3<T> const   y[4],
+                                                T const            lambdas[4],
+                                                Vector3<T>&        v)
 {
     v.setValue(T(0), T(0), T(0));
     for(unsigned int i = 0; i < 4; ++i)
@@ -291,7 +315,7 @@ __HOSTDEVICE__ static INLINE void
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits,
                                                 Vector3<T> const   p[4],
@@ -312,10 +336,12 @@ __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits,
     }
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void
-    sv_subalgorithm(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4], Vector3<T>& v)
+__HOSTDEVICE__ static INLINE void sv_subalgorithm(Vector3<T> const y[4],
+                                                  unsigned int&    bits,
+                                                  T (&lambdas)[4],
+                                                  Vector3<T>& v)
 {
     // The y array is never modified by this function.  The bits may be
     // modified if necessary, and the lambdas will be updated.  All the other
@@ -344,12 +370,13 @@ __HOSTDEVICE__ static INLINE void
     computeVector(bits, y, lambdas, v);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
 template <typename T>
-__HOSTDEVICE__ static INLINE bool
-    degenerate(unsigned int const bits, Vector3<T> const y[4], Vector3<T> const& w)
+__HOSTDEVICE__ static INLINE bool degenerate(unsigned int const bits,
+                                             Vector3<T> const   y[4],
+                                             Vector3<T> const&  w)
 {
     for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
     {
@@ -360,7 +387,7 @@ __HOSTDEVICE__ static INLINE bool
 }
 
 /* ========================================================================== */
-/*                            High-Level Methods                              */
+/*                             High-Level Methods                             */
 /* ========================================================================== */
 template <typename T>
 __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,
@@ -442,16 +469,17 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,
     return (dist);
 }
 
-// -------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Explicit instantiation
-#define X(T)                                                                        \
-    template __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,   \
-                                                          Convex<T> const&     b,   \
-                                                          Transform3<T> const& a2w, \
-                                                          Transform3<T> const& b2w, \
-                                                          Vector3<T>&          pa,  \
-                                                          Vector3<T>&          pb,  \
-                                                          int&                 nbIter);
+#define X(T)                                               \
+    template __HOSTDEVICE__ T computeClosestPoints_GJK_AY( \
+        Convex<T> const&     a,                            \
+        Convex<T> const&     b,                            \
+        Transform3<T> const& a2w,                          \
+        Transform3<T> const& b2w,                          \
+        Vector3<T>&          pa,                           \
+        Vector3<T>&          pb,                           \
+        int&                 nbIter);
 X(float)
 X(double)
 #undef X

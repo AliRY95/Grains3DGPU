@@ -122,8 +122,9 @@ public:
         @param transform geometric transformation
         @param translation additional center of mass translation */
     __HOST__
-    std::list<Vector3<T>> writePoints_PARAVIEW(Transform3<T> const& transform,
-                                               Vector3<T> const*    translation) const final;
+    std::list<Vector3<T>>
+        writePoints_PARAVIEW(Transform3<T> const& transform,
+                             Vector3<T> const*    translation) const final;
 
     /** @brief Writes the connectivity of the sphere in a Paraview format
         @param connectivity connectivity of Paraview polytopes

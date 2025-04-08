@@ -22,15 +22,17 @@ void ReaderXML::initialize()
     XMLPlatformUtils::Initialize();
 
     static const XMLCh gLS[] = {chLatin_L, chLatin_S, chNull};
-    DOMImplementation* impl  = DOMImplementationRegistry::getDOMImplementation(gLS);
-    m_parser                 = impl->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
+    DOMImplementation* impl
+        = DOMImplementationRegistry::getDOMImplementation(gLS);
+    m_parser = impl->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0);
 
     bool doNamespaces       = false;
     bool doSchema           = false;
     bool schemaFullChecking = false;
     m_parser->setFeature(XMLUni::fgDOMNamespaces, doNamespaces);
     m_parser->setFeature(XMLUni::fgXercesSchema, doSchema);
-    m_parser->setFeature(XMLUni::fgXercesSchemaFullChecking, schemaFullChecking);
+    m_parser->setFeature(XMLUni::fgXercesSchemaFullChecking,
+                         schemaFullChecking);
 
     m_parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true);
 }
@@ -46,7 +48,8 @@ void ReaderXML::terminate()
 // Returns a node from its name and the root node
 DOMNode* ReaderXML::getNode(DOMElement* root, string const& name)
 {
-    return (root->getElementsByTagName(XMLString::transcode(name.c_str()))->item(0));
+    return (root->getElementsByTagName(XMLString::transcode(name.c_str()))
+                ->item(0));
 }
 
 // ----------------------------------------------------------------------------
@@ -68,7 +71,8 @@ DOMNode* ReaderXML::getNode(DOMNode* root, string const& name)
 double ReaderXML::getNodeAttr_Double(DOMNode* root, string const& name)
 {
     DOMNamedNodeMap* nodeValues = root->getAttributes();
-    DOMNode*         value      = nodeValues->getNamedItem(XMLString::transcode(name.c_str()));
+    DOMNode*         value
+        = nodeValues->getNamedItem(XMLString::transcode(name.c_str()));
     return (atof(XMLString::transcode(value->getNodeValue())));
 }
 
@@ -169,8 +173,9 @@ DOMElement* ReaderXML::getRoot(string const& xmlFile)
     }
     catch(const DOMException& e)
     {
-        XERCES_STD_QUALIFIER cerr << "XML exception " << e.code << XERCES_STD_QUALIFIER  endl
-                                  << XMLString::transcode(e.msg) << XERCES_STD_QUALIFIER endl;
+        XERCES_STD_QUALIFIER                                       cerr
+            << "XML exception " << e.code << XERCES_STD_QUALIFIER  endl
+            << XMLString::transcode(e.msg) << XERCES_STD_QUALIFIER endl;
     }
     return (root);
 }

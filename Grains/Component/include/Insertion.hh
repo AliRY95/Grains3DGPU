@@ -37,7 +37,8 @@ string (std::string) that is used as the pathToFile, a 3d vector (vector3<T>)
 for constant values, and a value (0) in case the default insertion option is 
 desired. */
 template <typename T>
-using InsertionInfo = std::variant<std::vector<InsertionWindow<T>>, std::ifstream, Vector3<T>>;
+using InsertionInfo
+    = std::variant<std::vector<InsertionWindow<T>>, std::ifstream, Vector3<T>>;
 //@}
 
 // =============================================================================
@@ -105,7 +106,8 @@ public:
         @param type insertion type
         @param data insertion info */
     __HOST__
-    Vector3<T> fetchInsertionDataForEach(InsertionType const type, InsertionInfo<T>& data);
+    Vector3<T> fetchInsertionDataForEach(InsertionType const type,
+                                         InsertionInfo<T>&   data);
 
     /** @brief Returns all required data members to insert components as a 
         vector */

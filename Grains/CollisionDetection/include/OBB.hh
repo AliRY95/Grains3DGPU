@@ -47,7 +47,7 @@ template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
                                                     BoundingBox<T> const& bbB,
                                                     Transform3<T> const&  trA2W,
-                                                    Transform3<T> const&  trB2W);
+                                                    Transform3<T> const& trB2W);
 
 /** @brief Returns whether the bounding boxes are in contact using AABB test - 
 relative transformation
@@ -58,7 +58,7 @@ box */
 template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
                                                     BoundingBox<T> const& bbB,
-                                                    Transform3<T> const&  trB2A);
+                                                    Transform3<T> const& trB2A);
 //@}
 
 #endif

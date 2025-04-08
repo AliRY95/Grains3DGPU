@@ -125,7 +125,8 @@ public:
         @param t1 1st affine transformation
         @param t2 2nd affine transformation */
     __HOSTDEVICE__
-    void setToTransformsComposition(Transform3<T> const& t1, Transform3<T> const& t2);
+    void setToTransformsComposition(Transform3<T> const& t1,
+                                    Transform3<T> const& t2);
     //@}
 
     /**@name Methods */
@@ -181,7 +182,8 @@ public:
         @param transMotion displacement vector
         @param rotMotion rotation quaternion */
     __HOSTDEVICE__
-    void updateTransform(Vector3<T> const& transMotion, Quaternion<T> const& rotMotion);
+    void updateTransform(Vector3<T> const&    transMotion,
+                         Quaternion<T> const& rotMotion);
     //@}
 
     /**@name Operators */
@@ -215,7 +217,8 @@ __HOST__ std::istream& operator>>(std::istream& fileIn, Transform3<T>& t);
 @param fileOut output stream
 @param v vector */
 template <typename T>
-__HOST__ std::ostream& operator<<(std::ostream& fileOut, Transform3<T> const& t);
+__HOST__ std::ostream& operator<<(std::ostream&        fileOut,
+                                  Transform3<T> const& t);
 //@}
 
 typedef Transform3<float>  Tr3F;

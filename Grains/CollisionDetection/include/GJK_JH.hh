@@ -35,7 +35,9 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
 @param b2a geometric tramsformation describing convex B in the A's reference
 frame */
 template <typename T>
-__HOSTDEVICE__ bool intersectGJK(Convex<T> const& a, Convex<T> const& b, Transform3<T> const& b2a);
+__HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
+                                 Convex<T> const&     b,
+                                 Transform3<T> const& b2a);
 
 /** @brief Returns the minimal distance between 2 convex shapes and a point per
 convex shape that represents the tips of the minimal distance segment

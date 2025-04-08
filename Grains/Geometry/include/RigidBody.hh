@@ -154,7 +154,8 @@ public:
         @param omega angular velocity in the body-fixed coordinate system
         @param t imposed torce in the body-fixed coordinate system */
     __HOSTDEVICE__
-    Kinematics<T> computeMomentum(Vector3<T> const& omega, Torce<T> const& t) const;
+    Kinematics<T> computeMomentum(Vector3<T> const& omega,
+                                  Torce<T> const&   t) const;
 
     /** @brief Computes the acceleration of the rigid body as a kinematics
         object after imposing a torce (Torque + Force). The assumption is that
@@ -163,8 +164,9 @@ public:
         @param t imposed torce in the space-fixed coordinate system
         @param q quaternion of rotation from space to body coordinate systems */
     __HOSTDEVICE__
-    Kinematics<T>
-        computeMomentum(Vector3<T> const& omega, Torce<T> const& t, Quaternion<T> const& q) const;
+    Kinematics<T> computeMomentum(Vector3<T> const&    omega,
+                                  Torce<T> const&      t,
+                                  Quaternion<T> const& q) const;
     //@}
 };
 
