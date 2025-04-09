@@ -50,7 +50,7 @@ public:
     /** @brief Copy constructor
         @param mat the copied matrix */
     __HOSTDEVICE__
-    Matrix3(Matrix3<T> const& mat);
+    Matrix3(const Matrix3<T>& mat);
 
     /** @brief Destructor */
     __HOSTDEVICE__
@@ -110,12 +110,12 @@ public:
     /** @brief Operator +=
         @param mat 2nd Matrix3 object */
     __HOSTDEVICE__
-    Matrix3<T>& operator+=(Matrix3<T> const& mat);
+    Matrix3<T>& operator+=(const Matrix3<T>& mat);
 
     /** @brief Operator -=
         @param mat 2nd Matrix3 object */
     __HOSTDEVICE__
-    Matrix3<T>& operator-=(Matrix3<T> const& mat);
+    Matrix3<T>& operator-=(const Matrix3<T>& mat);
 
     /** @brief Unitary operator *= by a scalar
         @param d multiplication factor */
@@ -125,7 +125,7 @@ public:
     /** @brief Operator *= by a matrix
         @param mat 2nd Matrix3 object */
     __HOSTDEVICE__
-    Matrix3<T>& operator*=(Matrix3<T> const& mat);
+    Matrix3<T>& operator*=(const Matrix3<T>& mat);
 
     /** @brief i-th row accessor
         @param i row number */
@@ -135,7 +135,7 @@ public:
     /** @brief Assign operator to another matrix
         @param mat rhs Matrix3 object */
     __HOSTDEVICE__
-    Matrix3<T>& operator=(Matrix3<T> const& mat);
+    Matrix3<T>& operator=(const Matrix3<T>& mat);
 
     /** @brief Unitary operator -. Returns an object with negative 
         components */
@@ -155,7 +155,7 @@ __HOST__ std::istream& operator>>(std::istream& fileIn, Matrix3<T>& m);
 @param fileOut output stream
 @param v vector */
 template <typename T>
-__HOST__ std::ostream& operator<<(std::ostream& fileOut, Matrix3<T> const& m);
+__HOST__ std::ostream& operator<<(std::ostream& fileOut, const Matrix3<T>& m);
 //@}
 
 typedef Matrix3<float>  Mat3F;

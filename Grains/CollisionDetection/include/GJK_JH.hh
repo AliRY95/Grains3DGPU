@@ -26,8 +26,8 @@ frame */
 template <typename T>
 __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
                                  Convex<T> const&     b,
-                                 Transform3<T> const& a2w,
-                                 Transform3<T> const& b2w);
+                                 const Transform3<T>& a2w,
+                                 const Transform3<T>& b2w);
 
 /** @brief Returns whether 2 convex shapes intersect - relative transformation
 @param a convex shape A
@@ -37,7 +37,7 @@ frame */
 template <typename T>
 __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
                                  Convex<T> const&     b,
-                                 Transform3<T> const& b2a);
+                                 const Transform3<T>& b2a);
 
 /** @brief Returns the minimal distance between 2 convex shapes and a point per
 convex shape that represents the tips of the minimal distance segment
@@ -54,8 +54,8 @@ B
 template <typename T>
 __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
                                              Convex<T> const&     b,
-                                             Transform3<T> const& a2w,
-                                             Transform3<T> const& b2w,
+                                             const Transform3<T>& a2w,
+                                             const Transform3<T>& b2w,
                                              Vector3<T>&          pa,
                                              Vector3<T>&          pb,
                                              int&                 nbIter);

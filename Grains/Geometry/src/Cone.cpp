@@ -123,7 +123,7 @@ __HOSTDEVICE__ Vector3<T> Cone<T>::computeBoundingBox() const
 // Cone support function, returns the support point P, i.e. the point on the
 // surface of the cone that satisfies max(P.v)
 template <typename T>
-__HOSTDEVICE__ Vector3<T> Cone<T>::support(Vector3<T> const& v) const
+__HOSTDEVICE__ Vector3<T> Cone<T>::support(const Vector3<T>& v) const
 {
     if(v[Y] > norm(v) * m_sinAngle)
         return (Vector3<T>(T(0), T(3) * m_quarterHeight, T(0)));
@@ -182,7 +182,7 @@ __HOST__ int Cone<T>::numberOfCells_PARAVIEW() const
 // Returns a list of points describing the cone in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>>
-         Cone<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
+         Cone<T>::writePoints_PARAVIEW(const Transform3<T>& transform,
                                   Vector3<T> const*    translation) const
 {
     list<Vector3<T>> ParaviewPoints;

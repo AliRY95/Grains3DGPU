@@ -80,7 +80,7 @@ public:
         the point on the surface of the convex shape that satisfies max(P.v)
         @param v direction vector */
     __HOSTDEVICE__
-    virtual Vector3<T> support(Vector3<T> const& v) const = 0;
+    virtual Vector3<T> support(const Vector3<T>& v) const = 0;
     //@}
 
     /** @name I/O methods */
@@ -111,7 +111,7 @@ public:
         @param translation additional center of mass translation */
     __HOST__
     virtual std::list<Vector3<T>>
-        writePoints_PARAVIEW(Transform3<T> const& transform,
+        writePoints_PARAVIEW(const Transform3<T>& transform,
                              Vector3<T> const*    translation) const
         = 0;
 

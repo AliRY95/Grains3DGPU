@@ -83,8 +83,8 @@ public:
         @param delM torque */
     __HOSTDEVICE__
     void performForcesCalculus(ContactInfo<T> const& contactInfos,
-                               Vector3<T> const&     relVelocityAtContact,
-                               Vector3<T> const&     relAngVelocity,
+                               const Vector3<T>&     relVelocityAtContact,
+                               const Vector3<T>&     relAngVelocity,
                                T                     m1,
                                T                     m2,
                                Vector3<T>&           delFN,
@@ -101,11 +101,11 @@ public:
     // @param nbContact number of contact points for composite particles */
     __HOSTDEVICE__
     void computeForces(ContactInfo<T> const& contactInfos,
-                       Vector3<T> const&     relVelocityAtContact,
-                       Vector3<T> const&     relAngVelocity,
+                       const Vector3<T>&     relVelocityAtContact,
+                       const Vector3<T>&     relAngVelocity,
                        T                     m1,
                        T                     m2,
-                       Vector3<T> const&     trOrigin,
+                       const Vector3<T>&     trOrigin,
                        Torce<T>&             torce) const final;
     //@}
 };

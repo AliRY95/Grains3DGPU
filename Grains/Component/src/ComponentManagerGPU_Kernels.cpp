@@ -97,14 +97,14 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesObstacles_kernel(
         return;
 
     RigidBody<T, U> const& rbA   = *(particleRB[rigidBodyId[pId]]);
-    Transform3<T> const&   trA   = transform[pId];
+    const Transform3<T>&   trA   = transform[pId];
     T                      massA = rbA.getMass();
     unsigned int           matA  = rbA.getMaterial();
 
     for(int oId = 0; oId < nObstacles; oId++)
     {
         RigidBody<T, U> const& rbB = *(obstacleRB[obstacleRigidBodyId[oId]]);
-        Transform3<T> const&   trB = obstacleTransform[oId];
+        const Transform3<T>&   trB = obstacleTransform[oId];
         ContactInfo<T> ci = closestPointsRigidBodies(rbA, rbB, trA, trB);
         if(ci.getOverlapDistance() < T(0))
         {
@@ -162,7 +162,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
     unsigned int const     primaryId = particleId[pId];
     unsigned int const     cellHash  = particleCellHash[pId];
     RigidBody<T, U> const& rbA       = *(particleRB[rigidBodyId[primaryId]]);
-    Transform3<T> const&   trA       = transform[primaryId];
+    const Transform3<T>&   trA       = transform[primaryId];
     T                      massA     = rbA.getMass();
     unsigned int           matA      = rbA.getMaterial();
 
@@ -187,7 +187,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
                         continue;
                     RigidBody<T, U> const& rbB
                         = *(particleRB[rigidBodyId[secondaryId]]);
-                    Transform3<T> const& trB = transform[secondaryId];
+                    const Transform3<T>& trB = transform[secondaryId];
                     // result[compId] += intersectRigidBodies( rigidBodyA,
                     //                                      rigidBodyA,
                     //                                      transformA,

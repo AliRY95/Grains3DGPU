@@ -200,7 +200,7 @@ __HOSTDEVICE__ static INLINE bool closest(unsigned int&      bits,
 template <typename T>
 __HOSTDEVICE__ static INLINE bool degenerate(unsigned int const all_bits,
                                              Vector3<T> const   y[4],
-                                             Vector3<T> const&  w)
+                                             const Vector3<T>&  w)
 {
     for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
         if((all_bits & bit) && y[i] == w)
@@ -223,8 +223,8 @@ void catch_me()
 template <typename T>
 __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
                                  Convex<T> const&     b,
-                                 Transform3<T> const& a2w,
-                                 Transform3<T> const& b2w)
+                                 const Transform3<T>& a2w,
+                                 const Transform3<T>& b2w)
 {
     unsigned int bits     = 0; // identifies current simplex
     unsigned int last     = 0; // identifies last found support point
@@ -268,7 +268,7 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
 template <typename T>
 __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
                                  Convex<T> const&     b,
-                                 Transform3<T> const& b2a)
+                                 const Transform3<T>& b2a)
 {
     unsigned int bits     = 0; // identifies current simplex
     unsigned int last     = 0; // identifies last found support point
@@ -311,8 +311,8 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
 template <typename T>
 __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
                                              Convex<T> const&     b,
-                                             Transform3<T> const& a2w,
-                                             Transform3<T> const& b2w,
+                                             const Transform3<T>& a2w,
+                                             const Transform3<T>& b2w,
                                              Vector3<T>&          pa,
                                              Vector3<T>&          pb,
                                              int&                 nbIter)
@@ -458,14 +458,14 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
 #define X(T)                                                             \
     template __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,    \
                                               Convex<T> const&     b,    \
-                                              Transform3<T> const& a2w,  \
-                                              Transform3<T> const& b2w); \
+                                              const Transform3<T>& a2w,  \
+                                              const Transform3<T>& b2w); \
                                                                          \
     template __HOSTDEVICE__ T computeClosestPoints_GJK_JH(               \
         Convex<T> const&     a,                                          \
         Convex<T> const&     b,                                          \
-        Transform3<T> const& a2w,                                        \
-        Transform3<T> const& b2w,                                        \
+        const Transform3<T>& a2w,                                        \
+        const Transform3<T>& b2w,                                        \
         Vector3<T>&          pa,                                         \
         Vector3<T>&          pb,                                         \
         int&                 nbIter);

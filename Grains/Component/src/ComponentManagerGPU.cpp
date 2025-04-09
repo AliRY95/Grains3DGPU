@@ -377,7 +377,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForces(
 // Adds external forces such as gravity
 template <typename T>
 void ComponentManagerGPU<T>::addExternalForces(
-    RigidBody<T, T> const* const* particleRB, Vector3<T> const& g)
+    RigidBody<T, T> const* const* particleRB, const Vector3<T>& g)
 {
     // Launch parameters
     unsigned int numThreads = 256;

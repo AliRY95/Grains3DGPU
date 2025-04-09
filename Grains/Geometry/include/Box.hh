@@ -33,7 +33,7 @@ public:
     /** @brief Constructor with a vector containing the edge half-lengths
         @param extent_ vector of half-lengths */
     __HOSTDEVICE__
-    Box(Vector3<T> const& extent_);
+    Box(const Vector3<T>& extent_);
 
     /** @brief Constructor with an input stream
         @param fileIn input stream */
@@ -104,7 +104,7 @@ public:
         point on the surface of the box that satisfies max(P.v)
         @param v direction */
     __HOSTDEVICE__
-    Vector3<T> support(Vector3<T> const& v) const final;
+    Vector3<T> support(const Vector3<T>& v) const final;
     //@}
 
     /** @name I/O methods */
@@ -135,7 +135,7 @@ public:
         @param translation additional center of mass translation */
     __HOST__
     std::list<Vector3<T>>
-        writePoints_PARAVIEW(Transform3<T> const& transform,
+        writePoints_PARAVIEW(const Transform3<T>& transform,
                              Vector3<T> const*    translation) const final;
 
     /** @brief Writes the connectivity of the box in a Paraview format

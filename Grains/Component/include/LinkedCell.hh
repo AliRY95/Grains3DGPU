@@ -40,7 +40,7 @@ public:
         @param max max point of the linked cell 
         @param extent size of cells */
     __HOSTDEVICE__
-    LinkedCell(Vector3<T> const& min, Vector3<T> const& max, T extent);
+    LinkedCell(const Vector3<T>& min, const Vector3<T>& max, T extent);
 
     /** @brief Destructor */
     __HOSTDEVICE__
@@ -64,12 +64,12 @@ public:
     /** @brief Returns the 3d Id of the cell which the point belongs to
         @param p point */
     __HOSTDEVICE__
-    int3 computeCellId(Vector3<T> const& p) const;
+    int3 computeCellId(const Vector3<T>& p) const;
 
     /** @brief Returns the linear cell hash value of a given point
         @param p point */
     __HOSTDEVICE__
-    int computeLinearCellHash(Vector3<T> const& p) const;
+    int computeLinearCellHash(const Vector3<T>& p) const;
 
     /** @brief Returns the linear cell hash value from the 3d Id of the cell
         @param cellId 3d cell Id */

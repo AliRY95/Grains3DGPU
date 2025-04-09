@@ -166,7 +166,7 @@ __HOSTDEVICE__ Vector3<T> Superquadric<T>::computeBoundingBox() const
 // Superquadric support function, returns the support point P, i.e. the point on
 // the surface of the Superquadric that satisfies max(P.v)
 template <typename T>
-__HOSTDEVICE__ Vector3<T> Superquadric<T>::support(Vector3<T> const& v) const
+__HOSTDEVICE__ Vector3<T> Superquadric<T>::support(const Vector3<T>& v) const
 {
     T const abvx  = fabs(v[X]);
     T const abvy  = fabs(v[Y]);
@@ -244,7 +244,7 @@ __HOST__ int Superquadric<T>::numberOfCells_PARAVIEW() const
 // Returns a list of points describing the superquadric in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>>
-         Superquadric<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
+         Superquadric<T>::writePoints_PARAVIEW(const Transform3<T>& transform,
                                           Vector3<T> const* translation) const
 {
     T const               eps1 = T(2) / m_n1;

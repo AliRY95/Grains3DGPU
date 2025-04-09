@@ -24,8 +24,8 @@
 template <typename T, typename U>
 __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
                                          RigidBody<T, U> const& rbB,
-                                         Transform3<T> const&   a2w,
-                                         Transform3<T> const&   b2w);
+                                         const Transform3<T>&   a2w,
+                                         const Transform3<T>&   b2w);
 
 /** @brief Returns whether 2 rigid bodies intersect - relative transformation
  @param rbA first rigid body
@@ -35,7 +35,7 @@ __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
 template <typename T, typename U>
 __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
                                          RigidBody<T, U> const& rbB,
-                                         Transform3<T> const&   b2a);
+                                         const Transform3<T>&   b2a);
 
 /** @brief Returns the contact information (if any) for 2 rigid bodies
  @param rbA first rigid body
@@ -48,8 +48,8 @@ template <typename T, typename U>
 __HOSTDEVICE__ ContactInfo<T>
                closestPointsRigidBodies(RigidBody<T, U> const& rbA,
                                         RigidBody<T, U> const& rbB,
-                                        Transform3<T> const&   a2w,
-                                        Transform3<T> const&   b2w);
+                                        const Transform3<T>&   a2w,
+                                        const Transform3<T>&   b2w);
 
 // TODO: LATER
 // /** @brief Returns the contact information (if any) for 2 rigid bodies -
@@ -73,8 +73,8 @@ __HOSTDEVICE__ ContactInfo<T>
 template <typename T, typename U>
 __HOSTDEVICE__ T distanceRigidBodies(RigidBody<T, U> const& rbA,
                                      RigidBody<T, U> const& rbB,
-                                     Transform3<T> const&   a2w,
-                                     Transform3<T> const&   b2w,
+                                     const Transform3<T>&   a2w,
+                                     const Transform3<T>&   b2w,
                                      int const              method);
 //@}
 

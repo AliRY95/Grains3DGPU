@@ -31,8 +31,8 @@
 template <typename T>
 __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
                                                  BoundingBox<T> const& bbB,
-                                                 Transform3<T> const&  trA2W,
-                                                 Transform3<T> const&  trB2W)
+                                                 const Transform3<T>&  trA2W,
+                                                 const Transform3<T>&  trB2W)
 {
     Vector3<T> const a = bbA.getExtent();
     Vector3<T> const b = bbB.getExtent();
@@ -99,7 +99,7 @@ __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
 template <typename T>
 __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
                                                  BoundingBox<T> const& bbB,
-                                                 Transform3<T> const&  trB2A)
+                                                 const Transform3<T>&  trB2A)
 {
     Vector3<T> const a   = bbA.getExtent();
     Vector3<T> const b   = bbB.getExtent();
@@ -159,8 +159,8 @@ __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
 template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
                                                     BoundingBox<T> const& bbB,
-                                                    Transform3<T> const&  trA2W,
-                                                    Transform3<T> const&  trB2W)
+                                                    const Transform3<T>&  trA2W,
+                                                    const Transform3<T>&  trB2W)
 {
     // TODO: lenA and lenB should be modified according to trA2W and trB2W
     // TODO: should we do len = bbA.getExtent() + bbB.getExtent()?
@@ -184,7 +184,7 @@ __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
 template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
                                                     BoundingBox<T> const& bbB,
-                                                    Transform3<T> const&  trB2A)
+                                                    const Transform3<T>&  trB2A)
 {
     // TODO: lenA and lenB should be modified according to trA2W and trB2W
     // TODO: should we do len = bbA.getExtent() + bbB.getExtent()?
@@ -213,8 +213,8 @@ __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
     template __HOSTDEVICE__ bool intersectOrientedBoundingBox( \
         BoundingBox<T> const& bbA,                             \
         BoundingBox<T> const& bbB,                             \
-        Transform3<T> const&  trA2W,                           \
-        Transform3<T> const&  trB2W);
+        const Transform3<T>&  trA2W,                           \
+        const Transform3<T>&  trB2W);
 X(float)
 X(double)
 #undef X

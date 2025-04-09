@@ -30,7 +30,7 @@ __HOSTDEVICE__ Vector3<T>::Vector3(T x, T y, T z)
 // -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
-__HOSTDEVICE__ Vector3<T>::Vector3(Vector3<T> const& vec)
+__HOSTDEVICE__ Vector3<T>::Vector3(const Vector3<T>& vec)
 {
     m_comp[X] = vec.m_comp[X];
     m_comp[Y] = vec.m_comp[Y];
@@ -136,7 +136,7 @@ __HOSTDEVICE__ void Vector3<T>::reset()
 // -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
-__HOSTDEVICE__ Vector3<T>& Vector3<T>::operator+=(Vector3<T> const& vec)
+__HOSTDEVICE__ Vector3<T>& Vector3<T>::operator+=(const Vector3<T>& vec)
 {
     m_comp[X] += vec.m_comp[X];
     m_comp[Y] += vec.m_comp[Y];
@@ -147,7 +147,7 @@ __HOSTDEVICE__ Vector3<T>& Vector3<T>::operator+=(Vector3<T> const& vec)
 // -----------------------------------------------------------------------------
 // Operator -=
 template <typename T>
-__HOSTDEVICE__ Vector3<T>& Vector3<T>::operator-=(Vector3<T> const& vec)
+__HOSTDEVICE__ Vector3<T>& Vector3<T>::operator-=(const Vector3<T>& vec)
 {
     m_comp[X] -= vec.m_comp[X];
     m_comp[Y] -= vec.m_comp[Y];
@@ -196,7 +196,7 @@ __HOSTDEVICE__ T& Vector3<T>::operator[](size_t i)
 // -----------------------------------------------------------------------------
 // Equal operator to another Vector3 object
 template <typename T>
-__HOSTDEVICE__ Vector3<T>& Vector3<T>::operator=(Vector3<T> const& vec)
+__HOSTDEVICE__ Vector3<T>& Vector3<T>::operator=(const Vector3<T>& vec)
 {
     if(&vec != this)
     {
@@ -216,7 +216,7 @@ __HOSTDEVICE__ Vector3<T> Vector3<T>::operator-() const
 // -----------------------------------------------------------------------------
 // Comparison operator
 template <typename T>
-__HOSTDEVICE__ bool Vector3<T>::operator==(Vector3<T> const& vec) const
+__HOSTDEVICE__ bool Vector3<T>::operator==(const Vector3<T>& vec) const
 {
     return (m_comp[X] == vec[X] && m_comp[Y] == vec[Y] && m_comp[Z] == vec[Z]);
 }
@@ -224,7 +224,7 @@ __HOSTDEVICE__ bool Vector3<T>::operator==(Vector3<T> const& vec) const
 // -----------------------------------------------------------------------------
 // Difference operator
 template <typename T>
-__HOSTDEVICE__ bool Vector3<T>::operator!=(Vector3<T> const& vec) const
+__HOSTDEVICE__ bool Vector3<T>::operator!=(const Vector3<T>& vec) const
 {
     return (m_comp[X] != vec[X] || m_comp[Y] != vec[Y] || m_comp[Z] != vec[Z]);
 }
@@ -241,7 +241,7 @@ __HOSTDEVICE__ Vector3<double>::operator Vector3<float>() const
 // -----------------------------------------------------------------------------
 // Output operator
 template <typename T>
-__HOST__ std::ostream& operator<<(std::ostream& fileOut, Vector3<T> const& v)
+__HOST__ std::ostream& operator<<(std::ostream& fileOut, const Vector3<T>& v)
 {
     fileOut << v[X] << " " << v[Y] << " " << v[Z];
     return (fileOut);
@@ -263,7 +263,7 @@ template class Vector3<double>;
 
 #define X(T)                                                      \
     template std::ostream& operator<< <T>(std::ostream & fileOut, \
-                                          Vector3<T> const& v);   \
+                                          const Vector3<T>& v);   \
                                                                   \
     template std::istream& operator>> <T>(std::istream & fileIn,  \
                                           Vector3<T> & v);

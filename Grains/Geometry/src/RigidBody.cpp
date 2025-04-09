@@ -239,7 +239,7 @@ __HOSTDEVICE__ U RigidBody<T, U>::getCircumscribedRadius() const
 // system, the moment of inertia tensor is assumed to be diagonal.
 template <typename T, typename U>
 __HOSTDEVICE__ Kinematics<T>
-               RigidBody<T, U>::computeMomentum(Vector3<T> const& omega,
+               RigidBody<T, U>::computeMomentum(const Vector3<T>& omega,
                                      Torce<T> const&   t) const
 {
     // Translational momentum
@@ -265,7 +265,7 @@ __HOSTDEVICE__ Kinematics<T>
 // torce in the space-fixed coordinate system
 template <typename T, typename U>
 __HOSTDEVICE__ Kinematics<T> RigidBody<T, U>::computeMomentum(
-    Vector3<T> const& omega, Torce<T> const& t, Quaternion<T> const& q) const
+    const Vector3<T>& omega, Torce<T> const& t, const Quaternion<T>& q) const
 {
     // Translational momentum
     Vector3<T> transMomentum(t.getForce() / m_mass);

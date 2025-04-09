@@ -108,7 +108,7 @@ __HOSTDEVICE__ Vector3<T> Sphere<T>::computeBoundingBox() const
 // Sphere support function, returns the support point P, i.e. the point on the
 // surface of the Sphere that satisfies max(P.v)
 template <typename T>
-__HOSTDEVICE__ Vector3<T> Sphere<T>::support(Vector3<T> const& v) const
+__HOSTDEVICE__ Vector3<T> Sphere<T>::support(const Vector3<T>& v) const
 {
     return (m_radius * v.normalized());
 }
@@ -150,7 +150,7 @@ __HOST__ int Sphere<T>::numberOfCells_PARAVIEW() const
 // Returns a list of points describing the sphere in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>>
-         Sphere<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
+         Sphere<T>::writePoints_PARAVIEW(const Transform3<T>& transform,
                                     Vector3<T> const*    translation) const
 {
     std::list<Vector3<T>> ParaviewPoints;

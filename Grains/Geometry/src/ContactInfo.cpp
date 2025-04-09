@@ -10,8 +10,8 @@ __HOSTDEVICE__ ContactInfo<T>::ContactInfo()
 // -----------------------------------------------------------------------------
 // Constructor with min and max points along with extent of each cell
 template <typename T>
-__HOSTDEVICE__ ContactInfo<T>::ContactInfo(Vector3<T> const& pt,
-                                           Vector3<T> const& vec,
+__HOSTDEVICE__ ContactInfo<T>::ContactInfo(const Vector3<T>& pt,
+                                           const Vector3<T>& vec,
                                            T                 overlap)
     : m_contactPoint(pt)
     , m_contactVector(vec)
@@ -53,7 +53,7 @@ __HOSTDEVICE__ T ContactInfo<T>::getOverlapDistance() const
 // -----------------------------------------------------------------------------
 // Sets the contact point
 template <typename T>
-__HOSTDEVICE__ void ContactInfo<T>::setContactPoint(Vector3<T> const& p)
+__HOSTDEVICE__ void ContactInfo<T>::setContactPoint(const Vector3<T>& p)
 {
     m_contactPoint = p;
 }
@@ -61,7 +61,7 @@ __HOSTDEVICE__ void ContactInfo<T>::setContactPoint(Vector3<T> const& p)
 // -----------------------------------------------------------------------------
 // Sets the contact vector
 template <typename T>
-__HOSTDEVICE__ void ContactInfo<T>::setContactVector(Vector3<T> const& v)
+__HOSTDEVICE__ void ContactInfo<T>::setContactVector(const Vector3<T>& v)
 {
     m_contactVector = v;
 }

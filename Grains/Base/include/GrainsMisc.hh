@@ -43,7 +43,7 @@ public:
     /** @brief Writes a vector3 object in a string
         @param vec the vector3 object */
     __HOST__
-    static std::string Vector3ToString(Vector3<T> const& vec);
+    static std::string Vector3ToString(const Vector3<T>& vec);
 
     /** @brief Writes a message to stdout
         @param message the output message

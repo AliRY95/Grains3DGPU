@@ -318,7 +318,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
     {
         // Parameters of the particle
         RigidBody<T, T> const& rbA   = *(particleRB[m_rigidBodyId[pId]]);
-        Transform3<T> const&   trA   = m_transform[pId];
+        const Transform3<T>&   trA   = m_transform[pId];
         T                      massA = rbA.getMass();
         unsigned int           matA  = rbA.getMaterial();
 
@@ -327,7 +327,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
         {
             RigidBody<T, T> const& rbB
                 = *(obstacleRB[m_obstacleRigidBodyId[oId]]);
-            Transform3<T> const& trB = m_obstacleTransform[oId];
+            const Transform3<T>& trB = m_obstacleTransform[oId];
             ContactInfo<T> ci = closestPointsRigidBodies(rbA, rbB, trA, trB);
             if(ci.getOverlapDistance() < T(0))
             {
@@ -377,7 +377,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
         unsigned int const     particleId = m_particleId[pId];
         unsigned int const     cellHash   = m_particleCellHash[pId];
         RigidBody<T, T> const& rbA   = *(particleRB[m_rigidBodyId[particleId]]);
-        Transform3<T> const&   trA   = m_transform[particleId];
+        const Transform3<T>&   trA   = m_transform[particleId];
         T                      massA = rbA.getMass();
         unsigned int           matA  = rbA.getMaterial();
 
@@ -401,7 +401,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                             continue;
                         RigidBody<T, T> const& rbB
                             = *(particleRB[m_rigidBodyId[secondaryId]]);
-                        Transform3<T> const& trB = m_transform[secondaryId];
+                        const Transform3<T>& trB = m_transform[secondaryId];
                         ;
                         ContactInfo<T> ci
                             = closestPointsRigidBodies(rbA, rbB, trA, trB);
@@ -464,7 +464,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
 // Adds external forces such as gravity
 template <typename T>
 void ComponentManagerCPU<T>::addExternalForces(
-    RigidBody<T, T> const* const* particleRB, Vector3<T> const& g)
+    RigidBody<T, T> const* const* particleRB, const Vector3<T>& g)
 {
     // #pragma omp parallel for
     // m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );

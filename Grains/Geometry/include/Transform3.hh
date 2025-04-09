@@ -52,7 +52,7 @@ public:
         @param t1 primary transformation
         @param t2 secondary transformation */
     __HOSTDEVICE__
-    Transform3(Transform3<T> const& t1, Transform3<T> const& t2);
+    Transform3(const Transform3<T>& t1, const Transform3<T>& t2);
 
     /** @brief Constructor with an XML node
         @param root the xml node */
@@ -62,7 +62,7 @@ public:
     /** @brief Copy constructor
         @param t the transformation to be copied */
     __HOSTDEVICE__
-    Transform3(Transform3<T> const& t);
+    Transform3(const Transform3<T>& t);
 
     /** @brief Destructor */
     __HOSTDEVICE__
@@ -93,7 +93,7 @@ public:
     /** @brief Sets the matrix part of the transformation
         @param m matrix part of the transformation */
     __HOSTDEVICE__
-    void setBasis(Matrix3<T> const& m);
+    void setBasis(const Matrix3<T>& m);
 
     /** @brief Sets the matrix part of the transformation with specified
         rotations around each principal axis
@@ -106,7 +106,7 @@ public:
     /** @brief Sets the origin of the transformation
         @param v origin of the transformation */
     __HOSTDEVICE__
-    void setOrigin(Vector3<T> const& v);
+    void setOrigin(const Vector3<T>& v);
 
     /** @brief Sets the transformation to the identity */
     __HOSTDEVICE__
@@ -118,15 +118,15 @@ public:
         @param isRotation if the other transformation is rotation. Default is
         false */
     __HOSTDEVICE__
-    void setToInverseTransform(Transform3<T> const& t, bool isRotation = false);
+    void setToInverseTransform(const Transform3<T>& t, bool isRotation = false);
 
     /** @brief Sets the transformation composition of affine transformations
         this = t2 o t1 (t1 first followed by t2)
         @param t1 1st affine transformation
         @param t2 2nd affine transformation */
     __HOSTDEVICE__
-    void setToTransformsComposition(Transform3<T> const& t1,
-                                    Transform3<T> const& t2);
+    void setToTransformsComposition(const Transform3<T>& t1,
+                                    const Transform3<T>& t2);
     //@}
 
     /**@name Methods */
@@ -135,7 +135,7 @@ public:
         this = this o scaling
         @param v diagonal entries of the scaling matrix */
     __HOSTDEVICE__
-    void composeWithScaling(Vector3<T> const& v);
+    void composeWithScaling(const Vector3<T>& v);
 
     /** @brief Composition on the left by a rotation described by a 
         transform:
@@ -144,46 +144,46 @@ public:
         is indeed a rotation
         @param t the other transformation describing a rotation */
     __HOSTDEVICE__
-    void composeLeftByRotation(Transform3<T> const& t);
+    void composeLeftByRotation(const Transform3<T>& t);
 
     /** @brief Composition on the left by a rotation described by a 
         quaternion: this = rot( quaternion ) o this ( this first followed by 
         rot( quaternion ) )
         @param q quaternion describing the rotation */
     __HOSTDEVICE__
-    void composeLeftByRotation(Quaternion<T> const& q);
+    void composeLeftByRotation(const Quaternion<T>& q);
 
     /** @brief Composition on the left by a translation:
         this = trans(vector) o this (this first followed by trans(vector))
         @param v translation vector */
     __HOSTDEVICE__
-    void composeLeftByTranslation(Vector3<T> const& v);
+    void composeLeftByTranslation(const Vector3<T>& v);
 
     /** @brief Composition on the left by another affine transformation: 
         this = t o this (this first followed by t)
         @param t the other affine transformation */
     __HOSTDEVICE__
-    void composeLeftByTransform(Transform3<T> const& t);
+    void composeLeftByTransform(const Transform3<T>& t);
 
     /** @brief Composition on the right by another affine transformation: 
         this = this o t (t first followed by this)
         @param t the other affine transformation */
     __HOSTDEVICE__
-    void composeRightByTransform(Transform3<T> const& t);
+    void composeRightByTransform(const Transform3<T>& t);
 
     /** @brief Composition in a way that it is now the relative
         transformation with respect to t
         @param t the other affine transformation */
     __HOSTDEVICE__
-    void relativeToTransform(Transform3<T> const& t);
+    void relativeToTransform(const Transform3<T>& t);
 
     /** @brief Updates the transformation with a given displacement (vector)
         and a given rotation (quaternion)
         @param transMotion displacement vector
         @param rotMotion rotation quaternion */
     __HOSTDEVICE__
-    void updateTransform(Vector3<T> const&    transMotion,
-                         Quaternion<T> const& rotMotion);
+    void updateTransform(const Vector3<T>&    transMotion,
+                         const Quaternion<T>& rotMotion);
     //@}
 
     /**@name Operators */
@@ -192,12 +192,12 @@ public:
         vector
         @param v input vector */
     __HOSTDEVICE__
-    Vector3<T> operator()(Vector3<T> const& v) const;
+    Vector3<T> operator()(const Vector3<T>& v) const;
 
     /** @brief Equal operator to another Transform3 object
         @param t the other Transform object */
     __HOSTDEVICE__
-    Transform3<T>& operator=(Transform3<T> const& t);
+    Transform3<T>& operator=(const Transform3<T>& t);
 
     /** @brief Conversion operator float */
     __HOSTDEVICE__
@@ -218,7 +218,7 @@ __HOST__ std::istream& operator>>(std::istream& fileIn, Transform3<T>& t);
 @param v vector */
 template <typename T>
 __HOST__ std::ostream& operator<<(std::ostream&        fileOut,
-                                  Transform3<T> const& t);
+                                  const Transform3<T>& t);
 //@}
 
 typedef Transform3<float>  Tr3F;

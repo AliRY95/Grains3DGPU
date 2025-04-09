@@ -18,7 +18,7 @@ __HOSTDEVICE__ BoundingBox<T>::BoundingBox(T x, T y, T z)
 // -----------------------------------------------------------------------------
 // Constructor with a vector containing the edge half-lengths
 template <typename T>
-__HOSTDEVICE__ BoundingBox<T>::BoundingBox(Vector3<T> const& extent_)
+__HOSTDEVICE__ BoundingBox<T>::BoundingBox(const Vector3<T>& extent_)
     : m_extent(extent_)
 {
 }

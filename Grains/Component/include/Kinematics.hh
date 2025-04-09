@@ -31,7 +31,7 @@ public:
         @param translational translational components
         @param angular angular component */
     __HOSTDEVICE__
-    Kinematics(Vector3<T> const& translational, Vector3<T> const& angular);
+    Kinematics(const Vector3<T>& translational, const Vector3<T>& angular);
 
     /** @brief Destructor */
     __HOSTDEVICE__
@@ -54,12 +54,12 @@ public:
     /** @brief Sets the translational component of the kinematics
         @param translational translational component */
     __HOSTDEVICE__
-    void setTranslationalComponent(Vector3<T> const& translational);
+    void setTranslationalComponent(const Vector3<T>& translational);
 
     /** @brief Sets the angular component of the kinematics
         @param angular angular component */
     __HOSTDEVICE__
-    void setAngularComponent(Vector3<T> const& angular);
+    void setAngularComponent(const Vector3<T>& angular);
     //@}
 
     /** @name Methods */
@@ -67,17 +67,17 @@ public:
     /** @brief Adds a vector to the translational component
         @param translational vector to add to the translational component */
     __HOSTDEVICE__
-    void addToTranslationalComponent(Vector3<T> const& translational);
+    void addToTranslationalComponent(const Vector3<T>& translational);
 
     /** @brief Adds a angular velocity to the angular velocity
         @param angular vector to add to the angular component */
     __HOSTDEVICE__
-    void addToAngularComponent(Vector3<T> const& angular);
+    void addToAngularComponent(const Vector3<T>& angular);
 
     /** @brief Returns the total velocity U + om x R given R 
         @param R arm vector */
     __HOSTDEVICE__
-    Vector3<T> kinematicsAtPoint(Vector3<T> const& R) const;
+    Vector3<T> kinematicsAtPoint(const Vector3<T>& R) const;
     //@}
 };
 

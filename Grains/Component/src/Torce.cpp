@@ -14,7 +14,7 @@ __HOSTDEVICE__ Torce<T>::Torce()
 // -----------------------------------------------------------------------------
 // Constructor with a torque and a force as input parameters
 template <typename T>
-__HOSTDEVICE__ Torce<T>::Torce(Vector3<T> const& t, Vector3<T> const& f)
+__HOSTDEVICE__ Torce<T>::Torce(const Vector3<T>& t, const Vector3<T>& f)
     : m_torque(t)
     , m_force(f)
 {
@@ -46,7 +46,7 @@ __HOSTDEVICE__ Vector3<T> Torce<T>::getForce() const
 // -----------------------------------------------------------------------------
 // Sets the total torque of the torce
 template <typename T>
-__HOSTDEVICE__ void Torce<T>::setTorque(Vector3<T> const& t)
+__HOSTDEVICE__ void Torce<T>::setTorque(const Vector3<T>& t)
 {
     m_torque = t;
 }
@@ -54,7 +54,7 @@ __HOSTDEVICE__ void Torce<T>::setTorque(Vector3<T> const& t)
 // -----------------------------------------------------------------------------
 // Sets the total force of the torce
 template <typename T>
-__HOSTDEVICE__ void Torce<T>::setForce(Vector3<T> const& f)
+__HOSTDEVICE__ void Torce<T>::setForce(const Vector3<T>& f)
 {
     m_force = f;
 }
@@ -71,7 +71,7 @@ __HOSTDEVICE__ void Torce<T>::reset()
 // -----------------------------------------------------------------------------
 // Adds a force to the torce
 template <typename T>
-__HOSTDEVICE__ void Torce<T>::addTorque(Vector3<T> const& t)
+__HOSTDEVICE__ void Torce<T>::addTorque(const Vector3<T>& t)
 {
     m_torque += t;
 }
@@ -79,7 +79,7 @@ __HOSTDEVICE__ void Torce<T>::addTorque(Vector3<T> const& t)
 // -----------------------------------------------------------------------------
 // Adds a force to the torce
 template <typename T>
-__HOSTDEVICE__ void Torce<T>::addForce(Vector3<T> const& f)
+__HOSTDEVICE__ void Torce<T>::addForce(const Vector3<T>& f)
 {
     m_force += f;
 }
@@ -87,7 +87,7 @@ __HOSTDEVICE__ void Torce<T>::addForce(Vector3<T> const& f)
 // -----------------------------------------------------------------------------
 // Adds a force to the torce with accounting for the additional torque
 template <typename T>
-__HOSTDEVICE__ void Torce<T>::addForce(Vector3<T> const& f, Vector3<T> const& p)
+__HOSTDEVICE__ void Torce<T>::addForce(const Vector3<T>& f, const Vector3<T>& p)
 {
     m_force += f;
     m_torque += (p ^ f);

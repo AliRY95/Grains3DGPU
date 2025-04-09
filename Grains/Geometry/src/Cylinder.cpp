@@ -115,7 +115,7 @@ __HOSTDEVICE__ Vector3<T> Cylinder<T>::computeBoundingBox() const
 // Cylinder support function, returns the support point P, i.e. the point on
 // the surface of the Cylinder that satisfies max(P.v)
 template <typename T>
-__HOSTDEVICE__ Vector3<T> Cylinder<T>::support(Vector3<T> const& v) const
+__HOSTDEVICE__ Vector3<T> Cylinder<T>::support(const Vector3<T>& v) const
 {
     T s = sqrt(v[X] * v[X] + v[Z] * v[Z]);
     if(s > EPS<T>)
@@ -169,7 +169,7 @@ __HOST__ int Cylinder<T>::numberOfCells_PARAVIEW() const
 // Returns a list of points describing the cylinder in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>>
-         Cylinder<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
+         Cylinder<T>::writePoints_PARAVIEW(const Transform3<T>& transform,
                                       Vector3<T> const*    translation) const
 {
     list<Vector3<T>> ParaviewPoints;

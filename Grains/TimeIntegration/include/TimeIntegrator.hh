@@ -67,7 +67,7 @@ public:
 		average for the angular velocity over the time step
 		@param v average of the angular velocity over the time step */
     __HOSTDEVICE__
-    Quaternion<T> computeQuaternionChange(Vector3<T> const& v) const;
+    Quaternion<T> computeQuaternionChange(const Vector3<T>& v) const;
 
     /** @brief Computes the new velocity and transformation change over dt
 		@param momentum acceleration

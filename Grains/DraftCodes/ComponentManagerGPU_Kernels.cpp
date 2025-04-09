@@ -86,7 +86,7 @@ __GLOBAL__ void collisionDetectionN2(RigidBody<T, U> const* const* a,
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     RigidBody<T, U> const& AA  = **a;
-    Transform3<T> const&   trA = tr3d[tid];
+    const Transform3<T>&   trA = tr3d[tid];
     ContactInfo<T>         ci;
     for(int j = 0; j < numComponents; j++)
     {
@@ -108,7 +108,7 @@ __GLOBAL__ void collisionDetectionRelativeN2(RigidBody<T, U> const* const* a,
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     RigidBody<T, U> const& AA  = **a;
-    Transform3<T> const&   trA = tr3d[tid];
+    const Transform3<T>&   trA = tr3d[tid];
     Transform3<T>          trB2A;
     for(int j = 0; j < numComponents; j++)
     {
@@ -144,7 +144,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(
     unsigned int const     compId   = m_compId[tid];
     unsigned int const     cellHash = m_componentCellHash[tid];
     RigidBody<T, U> const& rbA      = *(RB[m_rigidBodyId[compId]]);
-    Transform3<T> const&   trA      = tr3d[compId];
+    const Transform3<T>&   trA      = tr3d[compId];
     T                      massA    = rbA.getMass();
     unsigned int           matA     = rbA.getMaterial();
 
@@ -169,7 +169,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(
                         continue;
                     RigidBody<T, U> const& rbB
                         = *(RB[m_rigidBodyId[secondaryId]]);
-                    Transform3<T> const& trB = tr3d[secondaryId];
+                    const Transform3<T>& trB = tr3d[secondaryId];
                     // result[compId] += intersectRigidBodies( rigidBodyA,
                     //                                      rigidBodyA,
                     //                                      transformA,

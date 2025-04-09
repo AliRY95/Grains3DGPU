@@ -48,7 +48,7 @@ __HOST__ static constexpr INLINE std::string realToString(
 @param vec the vector3 object */
 template <typename T>
 __HOST__ static constexpr INLINE std::string
-                                 Vector3ToString(Vector3<T> const& vec)
+                                 Vector3ToString(const Vector3<T>& vec)
 {
     std::ostringstream oss;
     oss << vec;

@@ -30,8 +30,8 @@ B
 template <typename T>
 __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,
                                              Convex<T> const&     b,
-                                             Transform3<T> const& a2w,
-                                             Transform3<T> const& b2w,
+                                             const Transform3<T>& a2w,
+                                             const Transform3<T>& b2w,
                                              Vector3<T>&          pa,
                                              Vector3<T>&          pb,
                                              int&                 nbIter);

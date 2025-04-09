@@ -30,7 +30,7 @@ __HOST__ Box<T>::Box(DOMNode* root)
 // -----------------------------------------------------------------------------
 // Constructor with a vector containing the edge half-lengths
 template <typename T>
-__HOSTDEVICE__ Box<T>::Box(Vector3<T> const& extent_)
+__HOSTDEVICE__ Box<T>::Box(const Vector3<T>& extent_)
     : m_extent(extent_)
 {
 }
@@ -126,7 +126,7 @@ __HOSTDEVICE__ Vector3<T> Box<T>::computeBoundingBox() const
 // Box support function, returns the support point P, i.e. the point on the
 // surface of the box that satisfies max(P.v)
 template <typename T>
-__HOSTDEVICE__ Vector3<T> Box<T>::support(Vector3<T> const& v) const
+__HOSTDEVICE__ Vector3<T> Box<T>::support(const Vector3<T>& v) const
 {
     return (Vector3<T>(v[X] < T(0) ? -m_extent[X] : m_extent[X],
                        v[Y] < T(0) ? -m_extent[Y] : m_extent[Y],
@@ -170,7 +170,7 @@ __HOST__ int Box<T>::numberOfCells_PARAVIEW() const
 // Returns a list of points describing the box in a Paraview format
 template <typename T>
 __HOST__ std::list<Vector3<T>>
-         Box<T>::writePoints_PARAVIEW(Transform3<T> const& transform,
+         Box<T>::writePoints_PARAVIEW(const Transform3<T>& transform,
                                  Vector3<T> const*    translation) const
 {
     std::list<Vector3<T>> ParaviewPoints;

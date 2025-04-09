@@ -40,7 +40,7 @@ public:
     /** @brief Constructor with a vector containing the edge half-lengths
         @param extent_ vector of half-lengths */
     __HOSTDEVICE__
-    BoundingBox(Vector3<T> const& extent_);
+    BoundingBox(const Vector3<T>& extent_);
 
     /** @brief Destructor */
     __HOSTDEVICE__

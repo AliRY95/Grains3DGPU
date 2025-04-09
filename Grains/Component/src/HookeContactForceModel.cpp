@@ -90,8 +90,8 @@ __HOSTDEVICE__ void HookeContactForceModel<T>::getContactForceModelParameters(
 template <typename T>
 __HOSTDEVICE__ void HookeContactForceModel<T>::performForcesCalculus(
     ContactInfo<T> const& contactInfos,
-    Vector3<T> const&     relVelocityAtContact,
-    Vector3<T> const&     relAngVelocity,
+    const Vector3<T>&     relVelocityAtContact,
+    const Vector3<T>&     relAngVelocity,
     T                     m1,
     T                     m2,
     Vector3<T>&           delFN,
@@ -161,11 +161,11 @@ __HOSTDEVICE__ void HookeContactForceModel<T>::performForcesCalculus(
 template <typename T>
 __HOSTDEVICE__ void HookeContactForceModel<T>::computeForces(
     ContactInfo<T> const& contactInfos,
-    Vector3<T> const&     relVelocityAtContact,
-    Vector3<T> const&     relAngVelocity,
+    const Vector3<T>&     relVelocityAtContact,
+    const Vector3<T>&     relAngVelocity,
     T                     m1,
     T                     m2,
-    Vector3<T> const&     trOrigin,
+    const Vector3<T>&     trOrigin,
     Torce<T>&             torce) const
 {
     // Compute contact force and torque

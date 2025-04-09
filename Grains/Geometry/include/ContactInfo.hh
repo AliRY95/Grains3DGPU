@@ -36,7 +36,7 @@ public:
         @param vec contact vector
         @param distance_ overlap distance */
     __HOSTDEVICE__
-    ContactInfo(Vector3<T> const& pt, Vector3<T> const& vec, T overlap);
+    ContactInfo(const Vector3<T>& pt, const Vector3<T>& vec, T overlap);
 
     /** @brief Destructor */
     __HOSTDEVICE__
@@ -63,12 +63,12 @@ public:
     /** @brief Sets the contact point
         @param p contact point */
     __HOSTDEVICE__
-    void setContactPoint(Vector3<T> const& p);
+    void setContactPoint(const Vector3<T>& p);
 
     /** @brief Sets the contact vector
         @param v overlap vector */
     __HOSTDEVICE__
-    void setContactVector(Vector3<T> const& v);
+    void setContactVector(const Vector3<T>& v);
 
     /** @brief Sets the overlap distance
         @param d overlap distance  */

@@ -182,7 +182,7 @@ public:
         @param particleRB array of rigid bodies for particles
         @param g gravity field */
     virtual void addExternalForces(RigidBody<T, T> const* const* particleRB,
-                                   Vector3<T> const&             g)
+                                   const Vector3<T>&             g)
         = 0;
 
     /** @brief Updates the position and velocities of particles

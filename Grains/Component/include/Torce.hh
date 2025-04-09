@@ -32,7 +32,7 @@ public:
         @param t torque
         @param f force */
     __HOSTDEVICE__
-    Torce(Vector3<T> const& t, Vector3<T> const& f);
+    Torce(const Vector3<T>& t, const Vector3<T>& f);
 
     /** @brief Destructor */
     __HOSTDEVICE__
@@ -55,12 +55,12 @@ public:
     /** @brief Sets the torque of the torce
         @param t torque */
     __HOSTDEVICE__
-    void setTorque(Vector3<T> const& t);
+    void setTorque(const Vector3<T>& t);
 
     /** @brief Sets the force of the torce
         @param f force */
     __HOSTDEVICE__
-    void setForce(Vector3<T> const& f);
+    void setForce(const Vector3<T>& f);
     //@}
 
     /**@name Methods */
@@ -72,19 +72,19 @@ public:
     /** @brief Adds a torque to the torce
         @param t added torque */
     __HOSTDEVICE__
-    void addTorque(Vector3<T> const& t);
+    void addTorque(const Vector3<T>& t);
 
     /** @brief Adds a force to the torce
         @param f added force */
     __HOSTDEVICE__
-    void addForce(Vector3<T> const& f);
+    void addForce(const Vector3<T>& f);
 
     /** @brief Adds a force to the torce with accounting for the additional 
         torque
         @param f added force
         @param p point of application */
     __HOSTDEVICE__
-    void addForce(Vector3<T> const& f, Vector3<T> const& p);
+    void addForce(const Vector3<T>& f, const Vector3<T>& p);
     //@}
 };
 

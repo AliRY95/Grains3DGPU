@@ -13,7 +13,7 @@
 template <typename T, typename U>
 __HOSTDEVICE__ static INLINE bool intersectSpheres(RigidBody<T, U> const& rbA,
                                                    RigidBody<T, U> const& rbB,
-                                                   Vector3<T> const&      b2a)
+                                                   const Vector3<T>&      b2a)
 {
     T radiiSum = rbA.getCircumscribedRadius() + rbB.getCircumscribedRadius();
     T dist2    = norm2(b2a);
@@ -27,8 +27,8 @@ template <typename T, typename U>
 __HOSTDEVICE__ static INLINE ContactInfo<T>
                              closestPointsSpheres(RigidBody<T, U> const& rbA,
                                                   RigidBody<T, U> const& rbB,
-                                                  Transform3<T> const&   a2w,
-                                                  Transform3<T> const&   b2w)
+                                                  const Transform3<T>&   a2w,
+                                                  const Transform3<T>&   b2w)
 {
     T          rA    = rbA.getCircumscribedRadius();
     T          rB    = rbB.getCircumscribedRadius();
@@ -54,8 +54,8 @@ template <typename T, typename U>
 __HOSTDEVICE__ static INLINE ContactInfo<T>
                              closestPointsRectangle(RigidBody<T, U> const& rbA,
                                                     RigidBody<T, U> const& rbB,
-                                                    Transform3<T> const&   a2w,
-                                                    Transform3<T> const&   b2w)
+                                                    const Transform3<T>&   a2w,
+                                                    const Transform3<T>&   b2w)
 {
     Convex<T> const* convexA = rbA.getConvex();
     Convex<T> const* convexB = rbB.getConvex();
@@ -96,8 +96,8 @@ __HOSTDEVICE__ static INLINE ContactInfo<T>
 template <typename T, typename U>
 __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
                                          RigidBody<T, U> const& rbB,
-                                         Transform3<T> const&   a2w,
-                                         Transform3<T> const&   b2w)
+                                         const Transform3<T>&   a2w,
+                                         const Transform3<T>&   b2w)
 {
     Convex<T> const* convexA = rbA.getConvex();
     Convex<T> const* convexB = rbB.getConvex();
@@ -141,7 +141,7 @@ __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
 template <typename T, typename U>
 __HOSTDEVICE__ bool intersectRigidBodies(RigidBody<T, U> const& rbA,
                                          RigidBody<T, U> const& rbB,
-                                         Transform3<T> const&   b2a)
+                                         const Transform3<T>&   b2a)
 {
     Convex<T> const* convexA = rbA.getConvex();
     Convex<T> const* convexB = rbB.getConvex();
@@ -182,8 +182,8 @@ template <typename T, typename U>
 __HOSTDEVICE__ ContactInfo<T>
                closestPointsRigidBodies(RigidBody<T, U> const& rbA,
                                         RigidBody<T, U> const& rbB,
-                                        Transform3<T> const&   a2w,
-                                        Transform3<T> const&   b2w)
+                                        const Transform3<T>&   a2w,
+                                        const Transform3<T>&   b2w)
 {
     // Comment on the direction of the overlap vector
     // Assuming A and B are the centers of the 2 convex bodies
@@ -288,8 +288,8 @@ __HOSTDEVICE__ ContactInfo<T>
 template <typename T, typename U>
 __HOSTDEVICE__ T distanceRigidBodies(RigidBody<T, U> const& rbA,
                                      RigidBody<T, U> const& rbB,
-                                     Transform3<T> const&   a2w,
-                                     Transform3<T> const&   b2w,
+                                     const Transform3<T>&   a2w,
+                                     const Transform3<T>&   b2w,
                                      int const              method)
 {
     Convex<T> const* convexA = rbA.getConvex();
@@ -337,17 +337,17 @@ __HOSTDEVICE__ T distanceRigidBodies(RigidBody<T, U> const& rbA,
     template __HOSTDEVICE__ bool intersectRigidBodies(                        \
         RigidBody<T, U> const& rbA,                                           \
         RigidBody<T, U> const& rbB,                                           \
-        Transform3<T> const&   a2w,                                           \
-        Transform3<T> const&   b2w);                                            \
+        const Transform3<T>&   a2w,                                           \
+        const Transform3<T>&   b2w);                                            \
     template __HOSTDEVICE__ ContactInfo<T> closestPointsRigidBodies(          \
         RigidBody<T, U> const& rbA,                                           \
         RigidBody<T, U> const& rbB,                                           \
-        Transform3<T> const&   a2w,                                           \
-        Transform3<T> const&   b2w);                                            \
+        const Transform3<T>&   a2w,                                           \
+        const Transform3<T>&   b2w);                                            \
     template __HOSTDEVICE__ T distanceRigidBodies(RigidBody<T, U> const& rbA, \
                                                   RigidBody<T, U> const& rbB, \
-                                                  Transform3<T> const&   a2w, \
-                                                  Transform3<T> const&   b2w, \
+                                                  const Transform3<T>&   a2w, \
+                                                  const Transform3<T>&   b2w, \
                                                   int const method);
 X(float, float)
 X(double, float)

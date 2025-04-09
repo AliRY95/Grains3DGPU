@@ -14,8 +14,8 @@ __HOSTDEVICE__ Kinematics<T>::Kinematics()
 // -----------------------------------------------------------------------------
 // Constructor with two vectors as input parameters
 template <typename T>
-__HOSTDEVICE__ Kinematics<T>::Kinematics(Vector3<T> const& translational,
-                                         Vector3<T> const& angular)
+__HOSTDEVICE__ Kinematics<T>::Kinematics(const Vector3<T>& translational,
+                                         const Vector3<T>& angular)
     : m_translational(translational)
     , m_angular(angular)
 {
@@ -48,7 +48,7 @@ __HOSTDEVICE__ Vector3<T> Kinematics<T>::getAngularComponent() const
 // Sets the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void
-    Kinematics<T>::setTranslationalComponent(Vector3<T> const& translational)
+    Kinematics<T>::setTranslationalComponent(const Vector3<T>& translational)
 {
     m_translational = translational;
 }
@@ -57,7 +57,7 @@ __HOSTDEVICE__ void
 // Sets the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void
-    Kinematics<T>::setAngularComponent(Vector3<T> const& angular)
+    Kinematics<T>::setAngularComponent(const Vector3<T>& angular)
 {
     m_angular = angular;
 }
@@ -66,7 +66,7 @@ __HOSTDEVICE__ void
 // Adds a vector to the translational component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void
-    Kinematics<T>::addToTranslationalComponent(Vector3<T> const& translational)
+    Kinematics<T>::addToTranslationalComponent(const Vector3<T>& translational)
 {
     m_translational += translational;
 }
@@ -75,7 +75,7 @@ __HOSTDEVICE__ void
 // Adds a vector to the angular component of the kinematics
 template <typename T>
 __HOSTDEVICE__ void
-    Kinematics<T>::addToAngularComponent(Vector3<T> const& omega)
+    Kinematics<T>::addToAngularComponent(const Vector3<T>& omega)
 {
     m_angular += omega;
 }
@@ -84,7 +84,7 @@ __HOSTDEVICE__ void
 // Returns the total velocity U + om x R given R
 template <typename T>
 __HOSTDEVICE__ Vector3<T>
-               Kinematics<T>::kinematicsAtPoint(Vector3<T> const& R) const
+               Kinematics<T>::kinematicsAtPoint(const Vector3<T>& R) const
 {
     return (m_translational + (m_angular ^ R));
     // return ( m_translational );

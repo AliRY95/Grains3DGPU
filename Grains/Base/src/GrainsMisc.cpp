@@ -42,7 +42,7 @@ __HOST__ std::string GrainsMisc<T>::realToString(std::ios_base::fmtflags format,
 // -----------------------------------------------------------------------------
 // Writes a Vector3 object in a string
 template <typename T>
-__HOST__ std::string GrainsMisc<T>::Vector3ToString(Vector3<T> const& vec)
+__HOST__ std::string GrainsMisc<T>::Vector3ToString(const Vector3<T>& vec)
 {
     std::ostringstream oss;
     oss << vec;

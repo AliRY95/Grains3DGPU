@@ -97,7 +97,7 @@ public:
         i.e. point on the surface of the Superquadric that satisfies max(P.v)
         @param v direction */
     __HOSTDEVICE__
-    Vector3<T> support(Vector3<T> const& v) const final;
+    Vector3<T> support(const Vector3<T>& v) const final;
     //@}
 
     /** @name I/O methods */
@@ -128,7 +128,7 @@ public:
         @param translation additional center of mass translation */
     __HOST__
     std::list<Vector3<T>>
-        writePoints_PARAVIEW(Transform3<T> const& transform,
+        writePoints_PARAVIEW(const Transform3<T>& transform,
                              Vector3<T> const*    translation) const final;
 
     /** @brief Writes the connectivity of the superquadric in a Paraview 

@@ -24,8 +24,8 @@
 template <typename T>
 __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
                                                  BoundingBox<T> const& bbB,
-                                                 Transform3<T> const&  trA2W,
-                                                 Transform3<T> const&  trB2W);
+                                                 const Transform3<T>&  trA2W,
+                                                 const Transform3<T>&  trB2W);
 
 /** @brief Returns whether the bounding boxes are in contact using OBB test - 
 relative transformation
@@ -36,7 +36,7 @@ box */
 template <typename T>
 __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
                                                  BoundingBox<T> const& bbB,
-                                                 Transform3<T> const&  trB2A);
+                                                 const Transform3<T>&  trB2A);
 
 /** @brief Returns whether the bounding boxes are in contact using AABB test
 @param bbA first bounding box
@@ -46,8 +46,8 @@ __HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
 template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
                                                     BoundingBox<T> const& bbB,
-                                                    Transform3<T> const&  trA2W,
-                                                    Transform3<T> const& trB2W);
+                                                    const Transform3<T>&  trA2W,
+                                                    const Transform3<T>& trB2W);
 
 /** @brief Returns whether the bounding boxes are in contact using AABB test - 
 relative transformation
@@ -58,7 +58,7 @@ box */
 template <typename T>
 __HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
                                                     BoundingBox<T> const& bbB,
-                                                    Transform3<T> const& trB2A);
+                                                    const Transform3<T>& trB2A);
 //@}
 
 #endif

@@ -26,7 +26,7 @@ __HOSTDEVICE__ TimeIntegrator<T>::~TimeIntegrator()
 // Computes the quaternion change over the time step
 template <typename T>
 __HOSTDEVICE__ Quaternion<T> TimeIntegrator<T>::computeQuaternionChange(
-    Vector3<T> const& avgAngVel) const
+    const Vector3<T>& avgAngVel) const
 {
     // Quaternion change over dt
     Quaternion<T> qRotChange;

@@ -13,8 +13,8 @@ __HOSTDEVICE__ LinkedCell<T>::LinkedCell()
 // -----------------------------------------------------------------------------
 // Constructor with min and max points along with extent of each cell
 template <typename T>
-__HOSTDEVICE__ LinkedCell<T>::LinkedCell(Vector3<T> const& min,
-                                         Vector3<T> const& max,
+__HOSTDEVICE__ LinkedCell<T>::LinkedCell(const Vector3<T>& min,
+                                         const Vector3<T>& max,
                                          T                 extent)
     : m_minCorner(min)
     , m_maxCorner(max)
@@ -64,7 +64,7 @@ __HOSTDEVICE__ void LinkedCell<T>::checkBound(int3 const& id) const
 // -----------------------------------------------------------------------------
 // Returns the 3d Id of the cell which the point belongs to
 template <typename T>
-__HOSTDEVICE__ int3 LinkedCell<T>::computeCellId(Vector3<T> const& p) const
+__HOSTDEVICE__ int3 LinkedCell<T>::computeCellId(const Vector3<T>& p) const
 {
     int3 cellId;
     // static_cast is faster than floor, though it comes with a cost ...
@@ -83,7 +83,7 @@ __HOSTDEVICE__ int3 LinkedCell<T>::computeCellId(Vector3<T> const& p) const
 // Returns the linear cell hash value of a given point
 template <typename T>
 __HOSTDEVICE__ int
-    LinkedCell<T>::computeLinearCellHash(Vector3<T> const& p) const
+    LinkedCell<T>::computeLinearCellHash(const Vector3<T>& p) const
 {
     return (computeLinearCellHash(computeCellId(p)));
 }

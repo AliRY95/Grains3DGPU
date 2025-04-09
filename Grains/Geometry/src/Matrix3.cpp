@@ -29,7 +29,7 @@ __HOSTDEVICE__
 // -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
-__HOSTDEVICE__ Matrix3<T>::Matrix3(Matrix3<T> const& mat)
+__HOSTDEVICE__ Matrix3<T>::Matrix3(const Matrix3<T>& mat)
 {
     setValue(mat.getBuffer());
 }
@@ -152,7 +152,7 @@ __HOSTDEVICE__ Matrix3<T> Matrix3<T>::transpose() const
 // -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
-__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator+=(Matrix3<T> const& m)
+__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator+=(const Matrix3<T>& m)
 {
     T const* b = m.getBuffer();
     setValue(m_comp[XX] + b[XX],
@@ -170,7 +170,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator+=(Matrix3<T> const& m)
 // -----------------------------------------------------------------------------
 // Operator -=
 template <typename T>
-__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator-=(Matrix3<T> const& m)
+__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator-=(const Matrix3<T>& m)
 {
     T const* b = m.getBuffer();
     setValue(m_comp[XX] - b[XX],
@@ -205,7 +205,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(T d)
 // -----------------------------------------------------------------------------
 // Operator *= by a matrix
 template <typename T>
-__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(Matrix3<T> const& m)
+__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(const Matrix3<T>& m)
 {
     T const* b = m.getBuffer();
     setValue(m_comp[XX] * b[XX] + m_comp[XY] * b[YX] + m_comp[XZ] * b[ZX],
@@ -231,7 +231,7 @@ __HOSTDEVICE__ Vector3<T>& Matrix3<T>::operator[](unsigned int i) const
 // -----------------------------------------------------------------------------
 // Assign operator to another matrix
 template <typename T>
-__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator=(Matrix3<T> const& m)
+__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator=(const Matrix3<T>& m)
 {
     if(&m != this)
         setValue(m.getBuffer());
@@ -258,7 +258,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator-()
 // -----------------------------------------------------------------------------
 // Output operator
 template <typename T>
-__HOST__ std::ostream& operator<<(std::ostream& fileOut, Matrix3<T> const& m)
+__HOST__ std::ostream& operator<<(std::ostream& fileOut, const Matrix3<T>& m)
 {
     fileOut << m[X] << std::endl << m[Y] << std::endl << m[Z];
     return (fileOut);
@@ -280,7 +280,7 @@ template class Matrix3<double>;
 
 #define X(T)                                                      \
     template std::ostream& operator<< <T>(std::ostream & fileOut, \
-                                          Matrix3<T> const& m);   \
+                                          const Matrix3<T>& m);   \
                                                                   \
     template std::istream& operator>> <T>(std::istream & fileIn,  \
                                           Matrix3<T> & m);
