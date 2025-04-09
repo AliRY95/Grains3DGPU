@@ -1,5 +1,6 @@
 #include "Insertion.hh"
 #include "GrainsMisc.hh"
+#include "GrainsUtils.hh"
 #include <ctime>
 
 /* ========================================================================== */
@@ -21,17 +22,15 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
             rgs = RGS_UDEF;
         else
         {
-            GrainsMisc<T>::cout("Seed value is not provided. Aborting Grains!");
+            Gout("Seed value is not provided. Aborting Grains!");
             exit(1);
         }
-        GrainsMisc<T>::cout("Random initialization with " + std::to_string(val)
-                                + " seed.",
-                            12);
+        GoutWI(12, "Random initialization with", std::to_string(val), "seed.");
     }
     else if(seedString == "Random")
     {
         rgs = RGS_RANDOM;
-        GrainsMisc<T>::cout("Random initialization with random seed.", 12);
+        GoutWI(12, "Random initialization with random seed.");
     }
     // if ( seedString == "Default" )
     else
@@ -69,12 +68,11 @@ __HOST__ static INLINE InsertionInfo<T> readDataFile(DOMNode* root)
     // Check whether the file exists
     if(file.good())
     {
-        GrainsMisc<T>::cout("File initialization with path " + fileName + ".",
-                            12);
+        GoutWI(12, "File initialization with path" + fileName + ".");
     }
     else
     {
-        GrainsMisc<T>::cout("File does not exist. Aborting Grains!", 12);
+        Gout(12, "File does not exist. Aborting Grains!");
         exit(1);
     }
 

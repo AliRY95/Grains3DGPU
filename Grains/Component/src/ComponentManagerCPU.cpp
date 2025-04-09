@@ -248,8 +248,8 @@ void ComponentManagerCPU<T>::initializeParticles(
     //         numEachUniqueParticles.size() == initTr.size() );
 
     // Assigning
-    unsigned int rb_counter = 0;
-    for(int i = 0; i < m_nParticles; i++)
+    uint rb_counter = 0;
+    for(uint i = 0; i < m_nParticles; i++)
     {
         // m_rigidBodyId
         if(i == numEachUniqueParticles[rb_counter])
