@@ -25,7 +25,7 @@ __HOSTDEVICE__ Quaternion<T>::Quaternion(T q, T d)
 // Constructor with a Vector3 vector vec and a scalar d. Quaternion is
 // initialized as [ d, vec ]
 template <typename T>
-__HOSTDEVICE__ Quaternion<T>::Quaternion(Vector3<T> const& vec, T d)
+__HOSTDEVICE__ Quaternion<T>::Quaternion(const Vector3<T>& vec, T d)
     : m_w(d)
     , m_vqt(vec)
 {
@@ -44,7 +44,7 @@ __HOSTDEVICE__ Quaternion<T>::Quaternion(T x, T y, T z, T d)
 // -----------------------------------------------------------------------------
 // Constructor with a rotation matrix
 template <typename T>
-__HOSTDEVICE__ Quaternion<T>::Quaternion(Matrix3<T> const& rot)
+__HOSTDEVICE__ Quaternion<T>::Quaternion(const Matrix3<T>& rot)
 {
     this->setQuaternion(rot);
 }
@@ -52,7 +52,7 @@ __HOSTDEVICE__ Quaternion<T>::Quaternion(Matrix3<T> const& rot)
 // -----------------------------------------------------------------------------
 // Copy constructor
 template <typename T>
-__HOSTDEVICE__ Quaternion<T>::Quaternion(Quaternion<T> const& q)
+__HOSTDEVICE__ Quaternion<T>::Quaternion(const Quaternion<T>& q)
     : m_w(q.m_w)
     , m_vqt(q.m_vqt)
 {
@@ -68,7 +68,7 @@ __HOSTDEVICE__ Quaternion<T>::~Quaternion()
 // -----------------------------------------------------------------------------
 // Returns the vectorial part of the quaternion
 template <typename T>
-__HOSTDEVICE__ Vector3<T> Quaternion<T>::getVector() const
+__HOSTDEVICE__ const Vector3<T>& Quaternion<T>::getVector() const
 {
     return (m_vqt);
 }
@@ -76,7 +76,7 @@ __HOSTDEVICE__ Vector3<T> Quaternion<T>::getVector() const
 // -----------------------------------------------------------------------------
 // Returns the value of the scalar part of the quaternion
 template <typename T>
-__HOSTDEVICE__ T Quaternion<T>::getScalar() const
+__HOSTDEVICE__ const T Quaternion<T>::getScalar() const
 {
     return (m_w);
 }
@@ -84,7 +84,7 @@ __HOSTDEVICE__ T Quaternion<T>::getScalar() const
 // -----------------------------------------------------------------------------
 // Sets the vectorial part of the quaternion
 template <typename T>
-__HOSTDEVICE__ void Quaternion<T>::setVector(Vector3<T> const& vec)
+__HOSTDEVICE__ void Quaternion<T>::setVector(const Vector3<T>& vec)
 {
     m_vqt = vec;
 }
@@ -101,7 +101,7 @@ __HOSTDEVICE__ void Quaternion<T>::setScalar(T d)
 // Sets the quaternion with a Vector3 vector vec and a scalar d.
 // Quaternion is set to [ d, vec ]
 template <typename T>
-__HOSTDEVICE__ void Quaternion<T>::setQuaternion(Vector3<T> const& vec, T d)
+__HOSTDEVICE__ void Quaternion<T>::setQuaternion(const Vector3<T>& vec, T d)
 {
     m_w   = d;
     m_vqt = vec;
@@ -122,7 +122,7 @@ __HOSTDEVICE__ void Quaternion<T>::setQuaternion(T x, T y, T z, T d)
 // -----------------------------------------------------------------------------
 // Sets the quaternion with a rotation matrix
 template <typename T>
-__HOSTDEVICE__ void Quaternion<T>::setQuaternion(Matrix3<T> const& rot)
+__HOSTDEVICE__ void Quaternion<T>::setQuaternion(const Matrix3<T>& rot)
 {
     T den = T(0);
 
@@ -177,8 +177,8 @@ __HOSTDEVICE__ void Quaternion<T>::setQuaternion(Matrix3<T> const& rot)
 // TODO: if the input vectors aren't normalized, normalize them and warn the
 // user.
 template <typename T>
-__HOSTDEVICE__ void Quaternion<T>::setRotFromTwoVectors(Vector3<T> const& u,
-                                                        Vector3<T> const& v)
+__HOSTDEVICE__ void Quaternion<T>::setRotFromTwoVectors(const Vector3<T>& u,
+                                                        const Vector3<T>& v)
 {
     T          norm_u_norm_v = sqrt((u * u) * (v * v));
     T          real_part     = norm_u_norm_v + u * v;
@@ -242,7 +242,7 @@ __HOSTDEVICE__ Quaternion<T> Quaternion<T>::inverse() const
 // [ 0, lhs ] x this and return the product that is a quaternion
 template <typename T>
 __HOSTDEVICE__ Quaternion<T>
-               Quaternion<T>::multLeftVec(Vector3<T> const& lhs) const
+               Quaternion<T>::multLeftVec(const Vector3<T>& lhs) const
 {
     T          tmp  = -lhs * m_vqt;
     Vector3<T> vtmp = (lhs ^ m_vqt) + (m_w * lhs);
@@ -254,7 +254,7 @@ __HOSTDEVICE__ Quaternion<T>
 // i.e., perform this x rhs, and return the vectorial part of this x rhs
 template <typename T>
 __HOSTDEVICE__ Vector3<T>
-               Quaternion<T>::multToVector3(Quaternion<T> const& q) const
+               Quaternion<T>::multToVector3(const Quaternion<T>& q) const
 {
     Vector3<T> vtmp((m_vqt ^ q.m_vqt) + (m_w * q.m_vqt) + (q.m_w * m_vqt));
     return (vtmp);
@@ -266,7 +266,7 @@ __HOSTDEVICE__ Vector3<T>
 // this x rhs^t
 template <typename T>
 __HOSTDEVICE__ Vector3<T>
-    Quaternion<T>::multConjugateToVector3(Quaternion<T> const& q) const
+    Quaternion<T>::multConjugateToVector3(const Quaternion<T>& q) const
 {
     Vector3<T> vtmp(-(m_vqt ^ q.m_vqt) - (m_w * q.m_vqt) + (q.m_w * m_vqt));
     return (vtmp);
@@ -275,7 +275,7 @@ __HOSTDEVICE__ Vector3<T>
 // -----------------------------------------------------------------------------
 // Rotates a vector using the quaternion *this
 template <typename T>
-__HOSTDEVICE__ Vector3<T> Quaternion<T>::rotateVector(Vector3<T> const& v) const
+__HOSTDEVICE__ Vector3<T> Quaternion<T>::rotateVector(const Vector3<T>& v) const
 {
     Vector3<T> v_rotated = (m_w * m_w - m_vqt.norm2()) * v
                            + T(2) * (v * m_vqt) * m_vqt
@@ -286,7 +286,7 @@ __HOSTDEVICE__ Vector3<T> Quaternion<T>::rotateVector(Vector3<T> const& v) const
 // -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
-__HOSTDEVICE__ Quaternion<T>& Quaternion<T>::operator+=(Quaternion<T> const& q)
+__HOSTDEVICE__ Quaternion<T>& Quaternion<T>::operator+=(const Quaternion<T>& q)
 {
     m_w += q.m_w;
     m_vqt += q.m_vqt;
@@ -296,7 +296,7 @@ __HOSTDEVICE__ Quaternion<T>& Quaternion<T>::operator+=(Quaternion<T> const& q)
 // -----------------------------------------------------------------------------
 // Operator -=
 template <typename T>
-__HOSTDEVICE__ Quaternion<T>& Quaternion<T>::operator-=(Quaternion<T> const& q)
+__HOSTDEVICE__ Quaternion<T>& Quaternion<T>::operator-=(const Quaternion<T>& q)
 {
     m_w -= q.m_w;
     m_vqt -= q.m_vqt;
@@ -333,7 +333,7 @@ __HOSTDEVICE__ T& Quaternion<T>::operator[](size_t i)
 // -----------------------------------------------------------------------------
 // Equal operator to another quaternion
 template <typename T>
-__HOSTDEVICE__ Quaternion<T>& Quaternion<T>::operator=(Quaternion<T> const& q)
+__HOSTDEVICE__ Quaternion<T>& Quaternion<T>::operator=(const Quaternion<T>& q)
 {
     m_w   = q.m_w;
     m_vqt = q.m_vqt;
@@ -351,7 +351,7 @@ __HOSTDEVICE__ Quaternion<T> Quaternion<T>::operator-()
 // -----------------------------------------------------------------------------
 // Comparison operator
 template <typename T>
-__HOSTDEVICE__ bool Quaternion<T>::operator==(Quaternion<T> const& q)
+__HOSTDEVICE__ bool Quaternion<T>::operator==(const Quaternion<T>& q)
 {
     return (m_w == q.m_w && m_vqt[0] == q.m_vqt[0] && m_vqt[1] == q.m_vqt[1]
             && m_vqt[2] == q.m_vqt[2]);
@@ -360,7 +360,7 @@ __HOSTDEVICE__ bool Quaternion<T>::operator==(Quaternion<T> const& q)
 // -----------------------------------------------------------------------------
 // Difference operator
 template <typename T>
-__HOSTDEVICE__ bool Quaternion<T>::operator!=(Quaternion<T> const& q)
+__HOSTDEVICE__ bool Quaternion<T>::operator!=(const Quaternion<T>& q)
 {
     return (!(*this == q));
 }
@@ -368,7 +368,7 @@ __HOSTDEVICE__ bool Quaternion<T>::operator!=(Quaternion<T> const& q)
 // -----------------------------------------------------------------------------
 // Output operator
 template <typename T>
-std::ostream& operator<<(std::ostream& fileOut, Quaternion<T> const& q)
+std::ostream& operator<<(std::ostream& fileOut, const Quaternion<T>& q)
 {
     fileOut << q.getScalar() << "\t" << q.getVector();
     return (fileOut);
@@ -394,7 +394,7 @@ template class Quaternion<double>;
 
 #define X(T)                                                       \
     template std::ostream& operator<< <T>(std::ostream & fileOut,  \
-                                          Quaternion<T> const& q); \
+                                          const Quaternion<T>& q); \
                                                                    \
     template std::istream& operator>> <T>(std::istream & fileIn,   \
                                           Quaternion<T> & q);

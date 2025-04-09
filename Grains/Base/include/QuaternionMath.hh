@@ -18,25 +18,26 @@
 /** @brief Returns the norm of the quaternion
 @param q the quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE T norm(Quaternion<T> const& q)
+__HOSTDEVICE__ static INLINE T norm(const Quaternion<T>& q) noexcept
 {
-    return (sqrt(norm2(q.getVector) + q.getScalar() * q.getScalar()));
+    return (sqrt(norm2(q.getVector()) + q.getScalar() * q.getScalar()));
 }
 
 // -----------------------------------------------------------------------------
 /** @brief Returns the norm squared of the quaternion
 @param q the quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE T norm2(Quaternion<T> const& q)
+__HOSTDEVICE__ static INLINE T norm2(const Quaternion<T>& q) noexcept
 {
-    return (norm2(q.getVector) + q.getScalar() * q.getScalar());
+    return (norm2(q.getVector()) + q.getScalar() * q.getScalar());
 }
 
 // -----------------------------------------------------------------------------
 /** @brief Returns the conjugate of the quaternion
 @param q the quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> conjugate(Quaternion<T> const& q)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+                             conjugate(const Quaternion<T>& q) noexcept
 {
     return (Quaternion<T>(-q.getVector(), q.getScalar));
 }
@@ -45,7 +46,8 @@ __HOSTDEVICE__ static INLINE Quaternion<T> conjugate(Quaternion<T> const& q)
 /** @brief Returns the inverse of the quaternion
 @param q the quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> inverse(Quaternion<T> const& q)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+                             inverse(const Quaternion<T>& q) noexcept
 {
     return ((T(1) / norm(q)) * conjugate(q));
 }
@@ -55,8 +57,8 @@ __HOSTDEVICE__ static INLINE Quaternion<T> inverse(Quaternion<T> const& q)
 @param q1 1st quaternion 
 @param q2 2nd quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> operator+(Quaternion<T> const& q1,
-                                                     Quaternion<T> const& q2)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+    operator+(const Quaternion<T>& q1, const Quaternion<T>& q2) noexcept
 {
     return (Quaternion<T>(q1[0] + q2[0],
                           q1[1] + q2[1],
@@ -69,8 +71,8 @@ __HOSTDEVICE__ static INLINE Quaternion<T> operator+(Quaternion<T> const& q1,
 @param q1 1st quaternion
 @param q2 2nd quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> operator-(Quaternion<T> const& q1,
-                                                     Quaternion<T> const& q2)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+    operator-(const Quaternion<T>& q1, const Quaternion<T>& q2) noexcept
 {
     return (Quaternion<T>(q1[0] - q2[0],
                           q1[1] - q2[1],
@@ -83,8 +85,8 @@ __HOSTDEVICE__ static INLINE Quaternion<T> operator-(Quaternion<T> const& q1,
 @param d the multiplication factor
 @param q the quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> operator*(T                    d,
-                                                     Quaternion<T> const& q)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+                             operator*(T d, const Quaternion<T>& q) noexcept
 {
     return (Quaternion<T>(d * q[0], d * q[1], d * q[2], d * q[3]));
 }
@@ -94,8 +96,8 @@ __HOSTDEVICE__ static INLINE Quaternion<T> operator*(T                    d,
 @param q1 1st quaternion
 @param q2 2nd quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> operator*(Quaternion<T> const& q1,
-                                                     Quaternion<T> const& q2)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+    operator*(const Quaternion<T>& q1, const Quaternion<T>& q2) noexcept
 {
     T          w1  = q1.getScalar();
     Vector3<T> v1  = q1.getVector();
@@ -112,8 +114,8 @@ i.e., q x [ 0, v ]
 @param v the vector
 @param q the quaternion */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> operator*(Quaternion<T> const& q,
-                                                     Vector3<T> const&    v)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+    operator*(const Quaternion<T>& q, const Vector3<T>& v) noexcept
 {
     T          tmp = -q.getVector() * v;
     Vector3<T> vtmp((q.getVector() ^ v) + (q.getScalar() * v));
@@ -126,8 +128,8 @@ i.e., [ 0, v ] x q
 @param q the quaternion
 @param v the vector */
 template <typename T>
-__HOSTDEVICE__ static INLINE Quaternion<T> operator*(Vector3<T> const&    v,
-                                                     Quaternion<T> const& q)
+__HOSTDEVICE__ static INLINE Quaternion<T>
+    operator*(const Vector3<T>& v, const Quaternion<T>& q) noexcept
 {
     T          tmp = -v * q.getVector();
     Vector3<T> vtmp((v ^ q.getVector()) + (q.getScalar() * v));

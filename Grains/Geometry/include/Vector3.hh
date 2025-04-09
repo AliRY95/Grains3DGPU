@@ -30,7 +30,7 @@ public:
     /** @brief Constructor with the buffer
         @param buffer buffer */
     __HOSTDEVICE__
-    Vector3(T const* buffer);
+    Vector3(const T* buffer);
 
     /** @brief Constructor with 3 components as inputs
         @param x 1st component
@@ -42,7 +42,7 @@ public:
     /** @brief Copy constructor
         @param vec copied Vector3 object */
     __HOSTDEVICE__
-    Vector3(Vector3<T> const& vec);
+    Vector3(const Vector3<T>& vec);
 
     /** @brief Destructor */
     __HOSTDEVICE__
@@ -53,7 +53,7 @@ public:
     //@{
     /** @brief Gets the pointer to the buffer */
     __HOSTDEVICE__
-    T const* getBuffer() const;
+    const T* getBuffer() const;
     //@}
 
     /** @name Set methods */
@@ -61,7 +61,7 @@ public:
     /** @brief Sets the vector to a 1D array of 3 values as input
         @param buffer the 1D array of values ordered as: 0=Vx, 1=Vy, 2=Vz */
     __HOSTDEVICE__
-    void setValue(T const* buffer);
+    void setValue(const T* buffer);
 
     /** @brief Sets the components
         @param x the x component
@@ -109,12 +109,12 @@ public:
     /** @brief Operator +=
         @param vec 2nd Vector3 object */
     __HOSTDEVICE__
-    Vector3<T>& operator+=(Vector3<T> const& vec);
+    Vector3<T>& operator+=(const Vector3<T>& vec);
 
     /** @brief Operator -=
         @param vec 2nd Vector3 object */
     __HOSTDEVICE__
-    Vector3<T>& operator-=(Vector3<T> const& vec);
+    Vector3<T>& operator-=(const Vector3<T>& vec);
 
     /** @brief Unitary operator *= by a scalar
         @param d multiplication factor */
@@ -139,7 +139,7 @@ public:
     /** @brief Assign operator to another Vector3 object
         @param vec rhs Vector3 object */
     __HOSTDEVICE__
-    Vector3<T>& operator=(Vector3<T> const& vec);
+    Vector3<T>& operator=(const Vector3<T>& vec);
 
     /** @brief Unitary operator -. Returns an object with negative 
         components */
@@ -149,12 +149,12 @@ public:
     /** @brief Comparaison operator
         @param vec 2nd Vector3 object */
     __HOSTDEVICE__
-    bool operator==(Vector3<T> const& vec) const;
+    bool operator==(const Vector3<T>& vec) const;
 
     /** @brief Difference operator
         @param vec 2nd Vector3 object */
     __HOSTDEVICE__
-    bool operator!=(Vector3<T> const& vec) const;
+    bool operator!=(const Vector3<T>& vec) const;
 
     /** @brief Conversion operator float */
     __HOSTDEVICE__
@@ -174,7 +174,7 @@ __HOST__ std::istream& operator>>(std::istream& fileIn, Vector3<T>& v);
 @param fileOut output stream
 @param v vector */
 template <typename T>
-__HOST__ std::ostream& operator<<(std::ostream& fileOut, Vector3<T> const& v);
+__HOST__ std::ostream& operator<<(std::ostream& fileOut, const Vector3<T>& v);
 //@}
 
 typedef Vector3<float>  Vec3F;
