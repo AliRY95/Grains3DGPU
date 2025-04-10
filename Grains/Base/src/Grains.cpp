@@ -243,7 +243,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
         LC_coeff = T(ReaderXML::getNodeAttr_Double(nLC, "CellSizeFactor"));
     if(LC_coeff < T(1))
         LC_coeff = T(1);
-    GrainsMisc<T>::cout("Cell size factor = " + std::to_string(LC_coeff), 9);
+    GoutWI(9, "Cell size factor =", std::to_string(LC_coeff));
 
     // Creating linked cell
     GrainsParameters<T>::m_sizeLC = LC_coeff * T(2) * LCSize;

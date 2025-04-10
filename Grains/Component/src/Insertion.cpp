@@ -1,5 +1,4 @@
 #include "Insertion.hh"
-#include "GrainsMisc.hh"
 #include "GrainsUtils.hh"
 #include <ctime>
 
@@ -36,7 +35,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
     else
     {
         rgs = RGS_DEFAULT;
-        GrainsMisc<T>::cout("Random initialization with default seed.", 12);
+        GoutWI(12, "Random initialization with default seed.");
     }
     // srand
     // srand( static_cast<unsigned>( time( NULL ) ) );
@@ -88,9 +87,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataCons(DOMNode* root)
     T          yVal = T(ReaderXML::getNodeAttr_Double(root, "Y"));
     T          zVal = T(ReaderXML::getNodeAttr_Double(root, "Z"));
     Vector3<T> vec(xVal, yVal, zVal);
-    GrainsMisc<T>::cout("Constant initialization with "
-                            + GrainsMisc<T>::Vector3ToString(vec) + ".",
-                        12);
+    GoutWI(12, "Constant initialization with", Vector3ToString(vec), ".");
 
     return (vec);
 }
@@ -101,7 +98,7 @@ template <typename T>
 __HOST__ static INLINE InsertionInfo<T> readDataZero(DOMNode* root)
 {
     Vector3<T> vec(T(0), T(0), T(0));
-    GrainsMisc<T>::cout("Zero initialization.", 12);
+    GoutWI(12, "Zero initialization.");
 
     return (vec);
 }
@@ -153,25 +150,24 @@ __HOST__ Insertion<T>::Insertion(DOMNode* dn)
         }
         else
         {
-            GrainsMisc<T>::cout(
-                "Unknown Type in ParticleInsertion! Aborting Grains!");
+            Gout("Unknown Type in ParticleInsertion! Aborting Grains!");
             exit(1);
         }
     };
 
     DOMNode* nIP = ReaderXML::getNode(dn, "InitialPosition");
-    GrainsMisc<T>::cout("Reading PositionInsertion Policy ...", 9);
+    GoutWI(9, "Reading PositionInsertion Policy ...");
     read(nIP, m_positionType, m_positionInsertionInfo);
 
-    GrainsMisc<T>::cout("Reading OrientationInsertion Policy ...", 9);
+    GoutWI(9, "Reading OrientationInsertion Policy ...");
     DOMNode* nIO = ReaderXML::getNode(dn, "InitialOrientation");
     read(nIO, m_orientationType, m_orientationInsertionInfo);
 
-    GrainsMisc<T>::cout("Reading VeclocityInsertion Policy ...", 9);
+    GoutWI(9, "Reading VeclocityInsertion Policy ...");
     DOMNode* nIV = ReaderXML::getNode(dn, "InitialVelocity");
     read(nIV, m_translationalVelType, m_translationalVelInsertionInfo);
 
-    GrainsMisc<T>::cout("Reading AngularVeclocityInsertion Policy ...", 9);
+    GoutWI(9, "Reading AngularVeclocityInsertion Policy ...");
     DOMNode* nIA = ReaderXML::getNode(dn, "InitialAngularVelocity");
     read(nIA, m_angularVelType, m_angularVelInsertionInfo);
 }

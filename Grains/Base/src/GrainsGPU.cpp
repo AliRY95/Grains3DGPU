@@ -1,6 +1,5 @@
 #include "GrainsGPU.hh"
 #include "Grains.hh"
-#include "GrainsMisc.hh"
 #include "GrainsParameters.hh"
 #include "LinkedCellGPUWrapper.hh"
 #include "RigidBodyGPUWrapper.hh"
@@ -186,7 +185,7 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     unsigned int numUniqueParticles = allParticles->getLength();
     // It is a GPU simulation, and we have already read rigid bodies on the host
     // We allocate memory on device and copy the rigid bodies over.
-    GrainsMisc<T>::cout("Copying particle types to device ...", 6);
+    GoutWI(6, "Copying particle types to device ...");
     if(numUniqueParticles > 0)
     {
         cudaErrCheck(cudaMalloc((void**)&m_d_particleRigidBodyList,
@@ -196,7 +195,7 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
                                   numUniqueParticles);
         cudaDeviceSynchronize();
     }
-    GrainsMisc<T>::cout("Copying particle types to device completed!", 6, 1);
+    GoutWI(6, "Copying particle types to device completed!");
 
     // -------------------------------------------------------------------------
     // Obstacles
@@ -206,7 +205,7 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     unsigned int numUniqueObstacles = allObstacles->getLength();
     // It is a GPU simulation, and we have already read obstacles on the host
     // We allocate memory on device and copy the rigid bodies over.
-    GrainsMisc<T>::cout("Copying obstacle types to device ...", 6);
+    GoutWI(6, "Copying obstacle types to device ...");
     if(numUniqueObstacles > 0)
     {
         cudaErrCheck(cudaMalloc((void**)&m_d_obstacleRigidBodyList,
@@ -216,11 +215,11 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
                                   numUniqueObstacles);
         cudaDeviceSynchronize();
     }
-    GrainsMisc<T>::cout("Copying obstacle types to device completed!", 6, 1);
+    GoutWI(6, "Copying obstacle types to device completed!");
 
     // -------------------------------------------------------------------------
     // LinkedCell
-    GrainsMisc<T>::cout("Constructing linked cell on device ...", 6);
+    GoutWI(6, "Constructing linked cell on device ...");
     cudaErrCheck(cudaMalloc((void**)&m_d_linkedCell, sizeof(LinkedCell<T>*)));
     int d_numCells
         = createLinkedCellOnDevice(GrainsParameters<T>::m_origin,
@@ -228,11 +227,11 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
                                    GrainsParameters<T>::m_sizeLC,
                                    m_d_linkedCell);
     GrainsParameters<T>::m_numCells = d_numCells;
-    GrainsMisc<T>::cout("LinkedCell with "
-                            + std::to_string(GrainsParameters<T>::m_numCells)
-                            + " cells is created on device.",
-                        9);
-    GrainsMisc<T>::cout("Constructing linked cell on device completed!", 6, 1);
+    GoutWI(9,
+           "LinkedCell with",
+           GrainsParameters<T>::m_numCells,
+           "cells are created on device.");
+    GoutWI(6, "Constructing linked cell on device completed!");
 
     // -------------------------------------------------------------------------
     // Setting up the component managers
@@ -246,16 +245,14 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     // Contact force models
     // It is a GPU simulation, and we have already read contact force models
     // on the host. We allocate memory on device and copy the models over.
-    GrainsMisc<T>::cout("Copying contact force models to device ...", 6);
+    GoutWI(6, "Copying contact force models to device ...");
     cudaErrCheck(cudaMalloc((void**)&m_d_contactForce,
                             GrainsParameters<T>::m_numContactPairs
                                 * sizeof(ContactForceModel<T>*)));
     ContactForceModelBuilderFactory<T>::ContactForceModelCopyHostToDevice(
         Grains<T>::m_contactForce,
         m_d_contactForce);
-    GrainsMisc<T>::cout("Copying contact force models to device completed!",
-                        6,
-                        1);
+    GoutWI(6, "Copying contact force models to device completed!");
 
     // -------------------------------------------------------------------------
     // Temporal setting and time integration
@@ -263,14 +260,13 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     DOMNode* nTI         = ReaderXML::getNode(tempSetting, "TimeIntegration");
     // It is a GPU simulation, and we have already read time integration on the
     // host. We allocate memory on device and copy the scheme over.
-    GrainsMisc<T>::cout("Copying time integration scheme to device ...", 6);
+    GoutWI(6, "Copying time integration scheme to device ...");
     cudaErrCheck(
         cudaMalloc((void**)&m_d_timeIntegrator, sizeof(TimeIntegrator<T>*)));
     TimeIntegratorBuilderFactory<T>::createOnDevice(nTI,
                                                     GrainsParameters<T>::m_dt,
                                                     m_d_timeIntegrator);
-    GrainsMisc<T>::cout("Copying time integration scheme to device completed!",
-                        6);
+    GoutWI(6, "Copying time integration scheme to device completed!");
 }
 
 // -----------------------------------------------------------------------------

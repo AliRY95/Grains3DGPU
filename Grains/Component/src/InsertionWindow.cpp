@@ -1,5 +1,5 @@
 #include "InsertionWindow.hh"
-#include "GrainsMisc.hh"
+#include "GrainsUtils.hh"
 #include "VectorMath.hh"
 #include <ctime>
 
@@ -16,7 +16,7 @@ template <typename T>
 __HOST__ InsertionWindow<T>::InsertionWindow(DOMNode*            dn,
                                              RandomGeneratorSeed seed)
 {
-    GrainsMisc<T>::cout("Reading insertion window ...", 12);
+    GoutWI(12, "Reading insertion window ...");
 
     // Setting up the random generator engine with the given seed
     if(seed == RGS_DEFAULT)
@@ -38,11 +38,12 @@ __HOST__ InsertionWindow<T>::InsertionWindow(DOMNode*            dn,
         T          yVal2 = T(ReaderXML::getNodeAttr_Double(nP2, "Y"));
         T          zVal2 = T(ReaderXML::getNodeAttr_Double(nP2, "Z"));
         Vector3<T> m_v2(xVal2, yVal2, zVal2);
-        GrainsMisc<T>::cout("Box insertion window with min and max points "
-                                + GrainsMisc<T>::Vector3ToString(m_v1) + " and "
-                                + GrainsMisc<T>::Vector3ToString(m_v2) + ".",
-                            15);
-        GrainsMisc<T>::cout("Reading insertion window completed!", 12);
+        GoutWI(15,
+               "Box insertion window with min and max points",
+               Vector3ToString(m_v1),
+               "and",
+               Vector3ToString(m_v2) + ".");
+        GoutWI(12, "Reading insertion window completed!");
     }
     else if(nType == "Annulus")
     {
@@ -60,18 +61,21 @@ __HOST__ InsertionWindow<T>::InsertionWindow(DOMNode*            dn,
         DOMNode*   nR = ReaderXML::getNode(dn, "Radius");
         m_iRad        = T(ReaderXML::getNodeAttr_Double(nR, "Inner"));
         m_oRad        = T(ReaderXML::getNodeAttr_Double(nR, "Outter"));
-        GrainsMisc<T>::cout(
-            "Annulus insertion window with bottom point "
-                + GrainsMisc<T>::Vector3ToString(m_v1) + ", direction "
-                + GrainsMisc<T>::Vector3ToString(m_v2) + ", outter radius "
-                + std::to_string(m_oRad) + ", and inner radius "
-                + std::to_string(m_iRad) + ".",
-            15);
-        GrainsMisc<T>::cout("Reading insertion window completed!", 12);
+        GoutWI(15,
+               "Annulus insertion window with bottom point",
+               Vector3ToString(m_v1),
+               ", direction",
+               Vector3ToString(m_v2),
+               ", outter radius",
+               m_oRad,
+               ", and inner radius",
+               m_iRad,
+               ".");
+        GoutWI(12, "Reading insertion window completed!");
     }
     else
     {
-        GrainsMisc<T>::cout("Insertion window type is not supported");
+        Gout("Insertion window type is not supported");
         exit(1);
     }
 }

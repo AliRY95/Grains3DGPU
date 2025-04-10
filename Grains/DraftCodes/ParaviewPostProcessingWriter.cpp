@@ -1,4 +1,5 @@
 #include "ParaviewPostProcessingWriter.hh"
+#include "GrainsUtils.hh"
 
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
@@ -275,12 +276,10 @@ __HOST__
     m_ParaviewFilename     = ReaderXML::getNodeAttr_String(dn, "RootName");
     m_ParaviewFilename_dir = ReaderXML::getNodeAttr_String(dn, "Directory");
 
-    GrainsMisc<T>::cout("Type = Paraview", 9);
-    GrainsMisc<T>::cout("Output file root name = " + m_ParaviewFilename, 12);
-    GrainsMisc<T>::cout("Output file directory name = "
-                            + m_ParaviewFilename_dir,
-                        12);
-    GrainsMisc<T>::cout("Writing mode = " + (m_binary ? "Binary" : "Text"), 12);
+    GoutWI(9, "Type = Paraview");
+    GoutWI(12, "Output file root name =", m_ParaviewFilename);
+    GoutWI(12, "Output file directory name =", m_ParaviewFilename_dir);
+    GoutWI(12, "Writing mode =", (m_binary ? "Binary" : "Text"));
 }
 
 // -----------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 #include "RawDataPostProcessingWriter.hh"
+#include "GrainsUtils.hh"
 
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
@@ -31,8 +32,8 @@ __HOST__
     : m_ndigits(6)
 {
     m_filerootname = ReaderXML::getNodeAttr_String(dn, "Name");
-    GrainsMisc<T>::cout("Type = RawData", 9);
-    GrainsMisc<T>::cout("Output file name = " + m_filerootname, 12);
+    GoutWI(9, "Type = RawData");
+    GoutWI(12, "Output file name =", m_filerootname);
 }
 
 // -----------------------------------------------------------------------------
@@ -92,8 +93,7 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
                           ios::out);
 
     // Writing current time at the beginning of each line
-    std::string stime
-        = GrainsMisc<T>::realToString(ios::scientific, 6, currentTime);
+    std::string stime = realToString(ios::scientific, 6, currentTime);
     m_gc_coordinates_x << stime;
     m_gc_coordinates_y << stime;
     m_gc_coordinates_z << stime;
@@ -110,41 +110,35 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
         // Center of mass position
         centre = tParticle[i].getOrigin();
         m_gc_coordinates_x << " "
-                           << GrainsMisc<T>::realToString(ios::scientific,
-                                                          m_ndigits,
-                                                          centre[X]);
+                           << realToString(ios::scientific,
+                                           m_ndigits,
+                                           centre[X]);
         m_gc_coordinates_y << " "
-                           << GrainsMisc<T>::realToString(ios::scientific,
-                                                          m_ndigits,
-                                                          centre[Y]);
+                           << realToString(ios::scientific,
+                                           m_ndigits,
+                                           centre[Y]);
         m_gc_coordinates_z << " "
-                           << GrainsMisc<T>::realToString(ios::scientific,
-                                                          m_ndigits,
-                                                          centre[Z]);
+                           << realToString(ios::scientific,
+                                           m_ndigits,
+                                           centre[Z]);
 
         // Translational velocity
         velT = kParticle[i].getTranslationalComponent();
         m_translational_velocity_x
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[X]);
+            << " " << realToString(ios::scientific, m_ndigits, velT[X]);
         m_translational_velocity_y
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Y]);
+            << " " << realToString(ios::scientific, m_ndigits, velT[Y]);
         m_translational_velocity_z
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Z]);
+            << " " << realToString(ios::scientific, m_ndigits, velT[Z]);
 
         // Angular velocity
         velR = kParticle[i].getAngularComponent();
         m_angular_velocity_x
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[X]);
+            << " " << realToString(ios::scientific, m_ndigits, velR[X]);
         m_angular_velocity_y
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Y]);
+            << " " << realToString(ios::scientific, m_ndigits, velR[Y]);
         m_angular_velocity_z
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Z]);
+            << " " << realToString(ios::scientific, m_ndigits, velR[Z]);
 
         // // Number of contacts
         // m_coordination_number << " " << pp->getCoordinationNumber();
@@ -160,41 +154,35 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
         // Center of mass position
         centre = tObstacle[i].getOrigin();
         m_gc_coordinates_x << " "
-                           << GrainsMisc<T>::realToString(ios::scientific,
-                                                          m_ndigits,
-                                                          centre[X]);
+                           << realToString(ios::scientific,
+                                           m_ndigits,
+                                           centre[X]);
         m_gc_coordinates_y << " "
-                           << GrainsMisc<T>::realToString(ios::scientific,
-                                                          m_ndigits,
-                                                          centre[Y]);
+                           << realToString(ios::scientific,
+                                           m_ndigits,
+                                           centre[Y]);
         m_gc_coordinates_z << " "
-                           << GrainsMisc<T>::realToString(ios::scientific,
-                                                          m_ndigits,
-                                                          centre[Z]);
+                           << realToString(ios::scientific,
+                                           m_ndigits,
+                                           centre[Z]);
 
         // Translational velocity
         velT = kObstacle[i].getTranslationalComponent();
         m_translational_velocity_x
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[X]);
+            << " " << realToString(ios::scientific, m_ndigits, velT[X]);
         m_translational_velocity_y
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Y]);
+            << " " << realToString(ios::scientific, m_ndigits, velT[Y]);
         m_translational_velocity_z
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velT[Z]);
+            << " " << realToString(ios::scientific, m_ndigits, velT[Z]);
 
         // Angular velocity
         velR = kObstacle[i].getAngularComponent();
         m_angular_velocity_x
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[X]);
+            << " " << realToString(ios::scientific, m_ndigits, velR[X]);
         m_angular_velocity_y
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Y]);
+            << " " << realToString(ios::scientific, m_ndigits, velR[Y]);
         m_angular_velocity_z
-            << " "
-            << GrainsMisc<T>::realToString(ios::scientific, m_ndigits, velR[Z]);
+            << " " << realToString(ios::scientific, m_ndigits, velR[Z]);
 
         // // Number of contacts
         // m_coordination_number << " " << pp->getCoordinationNumber();
