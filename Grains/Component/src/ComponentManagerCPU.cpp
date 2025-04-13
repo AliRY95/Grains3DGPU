@@ -286,8 +286,8 @@ template <typename T>
 void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
 {
     // Reset
-    for(int i = 0; i < m_nCells + 1; i++)
-        m_cell[i].clear();
+    // for(int i = 0; i < m_nCells + 1; i++)
+    //     m_cell[i].clear();
 
     // Updating m_particleCellHash according to the linkedCell. That is,
     // assigning a hash value to each particle based on the cell it belongs to.

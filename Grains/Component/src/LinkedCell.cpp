@@ -74,7 +74,6 @@ __HOSTDEVICE__ uint3 LinkedCell<T>::computeCellId(const Vector3<T>& p) const
     cellId.x = floor((p[X] - m_minCorner[X]) / m_cellExtent);
     cellId.y = floor((p[Y] - m_minCorner[Y]) / m_cellExtent);
     cellId.z = floor((p[Z] - m_minCorner[Z]) / m_cellExtent);
-    // printf( "%d, %d, %d", cellId.x, cellId.y, cellId.z);
     checkBound(cellId);
     return (cellId);
 }

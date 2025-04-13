@@ -118,7 +118,7 @@ grains : MESS CPINC BASE COLL COMP CONT GEOM PP TIME XML
 
 MESS   :
 	@echo '***********************************************************'
-	@echo 'GRAINS compiling with'\
+	@echo 'GRAINS compiling with' \
 	$(GRAINS_CPP_COMPILER_DIST)-$(GRAINS_CPP_COMPILER_VERSION)\
 	', and' \
 	$(GRAINS_GPU_COMPILER_DIST)-$(GRAINS_GPU_COMPILER_VERSION)
