@@ -391,7 +391,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                                                                   i,
                                                                   j,
                                                                   k);
-                    cout << neighboringCellHash;
+                    cout << "Cell: " << neighboringCellHash << endl;
                     for(auto ppp : m_cell[neighboringCellHash])
                         cout << " " << ppp << endl;
                     for(auto id : m_cell[neighboringCellHash])
@@ -403,8 +403,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                         const RigidBody<T, T>& rbB
                             = *(particleRB[m_rigidBodyId[secondaryId]]);
                         const Transform3<T>& trB = m_transform[secondaryId];
-                        ;
-                        ContactInfo<T> ci
+                        ContactInfo<T>       ci
                             = closestPointsRigidBodies(rbA, rbB, trA, trB);
                         if(ci.getOverlapDistance() < T(0))
                         {
