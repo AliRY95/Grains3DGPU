@@ -33,7 +33,7 @@ protected:
     /** \brief Particles cell hash */
     std::vector<unsigned int> m_particleCellHash;
     /** \brief Cells and particle Ids each cell contains */
-    std::vector<std::vector<unsigned int>> m_cell;
+    std::vector<std::vector<uint>> m_cell;
     /** \brief Number of particles in manager */
     unsigned int m_nParticles;
     /** \brief Number of obstacles in manager */

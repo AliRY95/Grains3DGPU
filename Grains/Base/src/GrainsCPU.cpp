@@ -48,11 +48,12 @@ void GrainsCPU<T>::simulate()
         GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt)
     {
         // Output time
-        ostringstream oss;
-        oss.width(10);
-        oss << left << GrainsParameters<T>::m_time;
-        std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd
-                  << std::flush;
+        // ostringstream oss;
+        // oss.width(10);
+        // oss << left << GrainsParameters<T>::m_time;
+        // std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd
+        //           << std::flush;
+        cout << GrainsParameters<T>::m_time << endl;
 
         Grains<T>::m_components->detectCollisionAndComputeContactForces(
             Grains<T>::m_particleRigidBodyList,

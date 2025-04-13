@@ -47,18 +47,17 @@ __HOSTDEVICE__ int LinkedCell<T>::getNumCells() const
 // -----------------------------------------------------------------------------
 // Checks if a cell Id is in range
 template <typename T>
-__HOSTDEVICE__ void LinkedCell<T>::checkBound(int3 const& id) const
+__HOSTDEVICE__ void LinkedCell<T>::checkBound(const int3& id) const
 {
-    assert(id.x > 0 && id.x < m_numCellsPerDir.x && id.y > 0
-           && id.y < m_numCellsPerDir.y && id.z > 0
-           && id.z < m_numCellsPerDir.z);
-    // if ( id.x < 0 || id.x >= m_numCellsPerDir.x ||
-    //      id.y < 0 || id.y >= m_numCellsPerDir.y ||
-    //      id.z < 0 || id.z >= m_numCellsPerDir.z )
-    // {
-    //     printf( "Linked cell range exceeded!" );
-    //     assert( 1 );
-    // }
+    // assert(id.x < 0 || id.x > m_numCellsPerDir.x ||
+    //        id.y < 0 || id.y > m_numCellsPerDir.y ||
+    //        id.z < 0 || id.z > m_numCellsPerDir.z);
+    if(id.x < 0 || id.x >= m_numCellsPerDir.x || id.y < 0
+       || id.y >= m_numCellsPerDir.y || id.z < 0 || id.z >= m_numCellsPerDir.z)
+    {
+        printf("Linked cell range exceeded!");
+        // assert( 1 );
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -75,6 +74,7 @@ __HOSTDEVICE__ int3 LinkedCell<T>::computeCellId(const Vector3<T>& p) const
     cellId.x = floor((p[X] - m_minCorner[X]) / m_cellExtent);
     cellId.y = floor((p[Y] - m_minCorner[Y]) / m_cellExtent);
     cellId.z = floor((p[Z] - m_minCorner[Z]) / m_cellExtent);
+    // printf( "%d, %d, %d", cellId.x, cellId.y, cellId.z);
     checkBound(cellId);
     return (cellId);
 }
@@ -92,7 +92,7 @@ __HOSTDEVICE__ int
 // Returns the linear cell hash value from the 3d Id of the cell
 template <typename T>
 __HOSTDEVICE__ int
-    LinkedCell<T>::computeLinearCellHash(int3 const& cellId) const
+    LinkedCell<T>::computeLinearCellHash(const int3& cellId) const
 {
     return ((cellId.z * m_numCellsPerDir.y + cellId.y) * m_numCellsPerDir.x
             + cellId.x + 1);
@@ -129,9 +129,9 @@ __HOSTDEVICE__ int LinkedCell<T>::computeNeighboringCellLinearHash(int cellHash,
 // components using CPU
 template <typename T>
 void LinkedCell<T>::computeLinearLinkedCellHashCPU(
-    std::vector<Transform3<T>> const& tr,
-    unsigned int                      numComponents,
-    std::vector<unsigned int>&        componentCellHash) const
+    const std::vector<Transform3<T>>& tr,
+    uint                              numComponents,
+    std::vector<uint>&                componentCellHash) const
 {
     for(int i = 0; i < numComponents; i++)
         componentCellHash[i] = computeLinearCellHash(tr[i].getOrigin());

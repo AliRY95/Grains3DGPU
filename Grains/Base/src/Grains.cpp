@@ -165,12 +165,15 @@ void Grains<T>::Construction(DOMElement* rootElement)
                 // Create the Rigid Body
                 m_particleRigidBodyList[startId + j]
                     = new RigidBody<T, T>(nParticle);
+                // m_particleRigidBodyList[startId + j]
+                //     = std::make_unique<RigidBody<T, T>>(nParticle);
                 // Initial transformation of the rigid body
-                // One draw back is we might end up with the same rigid body shape,
+                // One draw back is we might end up with the same rigid body,
                 // but with different initial transformation.
-                particlesInitialTransform.push_back(Transform3<T>(nParticle));
-                // Increment the starting position
+                particlesInitialTransform[startId + j]
+                    = Transform3<T>(nParticle);
             }
+            // Increment the starting position
             startId += numEachUniqueParticle[i];
         }
         GoutWI(6, "Reading particle types completed!");

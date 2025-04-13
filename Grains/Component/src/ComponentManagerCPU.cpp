@@ -19,9 +19,9 @@ ComponentManagerCPU<T>::ComponentManagerCPU()
 // Constructor with the number of particles, number of obstacles, and number of
 // cells with all other data members initialized as default.
 template <typename T>
-ComponentManagerCPU<T>::ComponentManagerCPU(unsigned int nParticles,
-                                            unsigned int nObstacles,
-                                            unsigned int nCells)
+ComponentManagerCPU<T>::ComponentManagerCPU(uint nParticles,
+                                            uint nObstacles,
+                                            uint nCells)
     : m_nParticles(nParticles)
     , m_nObstacles(nObstacles)
     , m_nCells(nCells)
@@ -57,7 +57,7 @@ ComponentManagerCPU<T>::ComponentManagerCPU(unsigned int nParticles,
     // Initializing the vectors for cells
     // The size of these vectors is one bigger that nCells because we reserve
     // cellID = 0.
-    std::vector<unsigned int> zeroVec(1, 0);
+    std::vector<uint> zeroVec(1, 0);
     for(int i = 0; i < m_nCells + 1; i++)
     {
         m_cell.push_back(zeroVec);
@@ -300,8 +300,15 @@ void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
     // Update cells
     for(int i = 0; i < m_nParticles; i++)
     {
-        unsigned int cellId = m_particleCellHash[i];
+        uint cellId = m_particleCellHash[i];
         m_cell[cellId].push_back(i);
+    }
+
+    for(int i = 0; i < m_nCells + 1; i++)
+    {
+        cout << "Cell " << i << endl;
+        for(auto j : m_cell[i])
+            cout << j << endl;
     }
 }
 
@@ -374,12 +381,12 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
     for(int pId = 0; pId < m_nParticles; pId++)
     {
         // Parameters of the primary particle
-        unsigned int const     particleId = m_particleId[pId];
-        unsigned int const     cellHash   = m_particleCellHash[pId];
-        RigidBody<T, T> const& rbA   = *(particleRB[m_rigidBodyId[particleId]]);
+        const uint             particleId = m_particleId[pId];
+        const uint             cellHash   = m_particleCellHash[pId];
+        const RigidBody<T, T>& rbA   = *(particleRB[m_rigidBodyId[particleId]]);
         const Transform3<T>&   trA   = m_transform[particleId];
         T                      massA = rbA.getMass();
-        unsigned int           matA  = rbA.getMaterial();
+        uint                   matA  = rbA.getMaterial();
 
         // Loop over all neighboring particles
         for(int k = -1; k < 2; k++)
@@ -393,13 +400,18 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                                                                   i,
                                                                   j,
                                                                   k);
+                    cout << "\n"
+                         << i << " " << j << " " << k << " "
+                         << neighboringCellHash << " Done!";
                     for(auto id : m_cell[neighboringCellHash])
                     {
-                        unsigned int const secondaryId = id;
+                        cout << "\n"
+                             << id << " " << neighboringCellHash << " DODO!";
+                        const uint secondaryId = id;
                         // To skip self-collision
                         if(secondaryId == particleId)
                             continue;
-                        RigidBody<T, T> const& rbB
+                        const RigidBody<T, T>& rbB
                             = *(particleRB[m_rigidBodyId[secondaryId]]);
                         const Transform3<T>& trB = m_transform[secondaryId];
                         ;
