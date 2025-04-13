@@ -32,11 +32,11 @@ T GrainsParameters<T>::m_time;
 
 /* Numbers */
 template <typename T>
-unsigned int GrainsParameters<T>::m_numParticles = 0;
+uint GrainsParameters<T>::m_numParticles = 0;
 template <typename T>
-unsigned int GrainsParameters<T>::m_numObstacles = 0;
+uint GrainsParameters<T>::m_numObstacles = 0;
 template <typename T>
-unsigned int GrainsParameters<T>::m_numCells = 0;
+uint GrainsParameters<T>::m_numCells = 0;
 template <typename T>
 T GrainsParameters<T>::m_sizeLC = T(0);
 
@@ -46,10 +46,9 @@ Vector3<T> GrainsParameters<T>::m_gravity = zeroVector3T;
 
 /* Material */
 template <typename T>
-std::unordered_map<std::string, unsigned int>
-    GrainsParameters<T>::m_materialMap;
+std::unordered_map<std::string, uint> GrainsParameters<T>::m_materialMap;
 template <typename T>
-unsigned int GrainsParameters<T>::m_numContactPairs = 0;
+uint GrainsParameters<T>::m_numContactPairs = 0;
 
 /* Post-Processing */
 template <typename T>

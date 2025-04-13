@@ -28,8 +28,8 @@ void GrainsCPU<T>::simulate()
     Gout(std::string(80, '='));
     Gout("Starting the simulation on CPU");
     Gout(std::string(80, '='));
-    unsigned int N           = GrainsParameters<T>::m_numParticles;
-    int*         h_collision = new int[N];
+    uint N           = GrainsParameters<T>::m_numParticles;
+    int* h_collision = new int[N];
     // Zeroing out
     for(int i = 0; i < N; i++)
         h_collision[i] = 0;

@@ -5,21 +5,21 @@
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
 template <typename T>
-__HOSTDEVICE__ static INLINE unsigned int compareSigns(T a, T b)
+__HOSTDEVICE__ static INLINE uint compareSigns(T a, T b)
 {
     // Maybe there's a faster way to deal with this set of operations?
-    return static_cast<unsigned int>(!((a > 0) ^ (b > 0)));
+    return static_cast<uint>(!((a > 0) ^ (b > 0)));
 }
 
 // -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void
-    s1d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
+    s1d(Vector3<T> const y[4], uint& bits, T (&lambdas)[4])
 {
     // Identify the appropriate indices
-    bool         s1_set = false;
-    unsigned int i1 = 0xffffffff, i2 = 0xffffffff;
-    for(unsigned int i = 0; i < 4; ++i)
+    bool s1_set = false;
+    uint i1 = 0xffffffff, i2 = 0xffffffff;
+    for(uint i = 0; i < 4; ++i)
     {
         if(bits & (1 << i))
         {
@@ -37,9 +37,9 @@ __HOSTDEVICE__ static INLINE void
     }
 
     // Calculate the signed volume of the simplex.
-    Vector3<T>   t      = y[i2] - y[i1];
-    unsigned int I      = 0;
-    T            neg_tI = -t[0];
+    Vector3<T> t      = y[i2] - y[i1];
+    uint       I      = 0;
+    T          neg_tI = -t[0];
 
     if(fabs(t[1]) > fabs(neg_tI))
     {
@@ -57,8 +57,8 @@ __HOSTDEVICE__ static INLINE void
 
     // Identify the signed volume resulting from replacing each point by the
     // origin.
-    T            C[2] = {-y[i2][I] + pI, y[i1][I] - pI};
-    unsigned int sign_comparisons[2]
+    T    C[2] = {-y[i2][I] + pI, y[i1][I] - pI};
+    uint sign_comparisons[2]
         = {compareSigns(neg_tI, C[0]), compareSigns(neg_tI, C[1])};
 
     // If all signed volumes are identical, the origin lies inside the simplex.
@@ -87,10 +87,10 @@ __HOSTDEVICE__ static INLINE void
 // -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void
-    s2d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
+    s2d(Vector3<T> const y[4], uint& bits, T (&lambdas)[4])
 {
-    unsigned int counter = 0, point0_idx = 0, point1_idx = 0, point2_idx = 0;
-    for(unsigned int i = 0; i < 4; ++i)
+    uint counter = 0, point0_idx = 0, point1_idx = 0, point2_idx = 0;
+    for(uint i = 0; i < 4; ++i)
     {
         if(bits & (1 << i))
         {
@@ -112,9 +112,9 @@ __HOSTDEVICE__ static INLINE void
     // Make sure to store the *signed* area of the plane.
     // This loop is unrolled to save a few extra ops (assigning
     // an initial area of zero, an extra abs, etc)
-    unsigned int idx_x  = 1;
-    unsigned int idx_y  = 2;
-    T            mu_max = (y[point1_idx][1] * y[point2_idx][2]
+    uint idx_x  = 1;
+    uint idx_y  = 2;
+    T    mu_max = (y[point1_idx][1] * y[point2_idx][2]
                 + y[point0_idx][1] * y[point1_idx][2]
                 + y[point2_idx][1] * y[point0_idx][2]
                 - y[point1_idx][1] * y[point0_idx][2]
@@ -181,14 +181,14 @@ __HOSTDEVICE__ static INLINE void
     }
     else
     {
-        T            d = T(100000);
-        Vector3<T>   new_point;
-        unsigned int new_bits = 0;
-        for(unsigned int j = 0; j < 3; ++j)
+        T          d = T(100000);
+        Vector3<T> new_point;
+        uint       new_bits = 0;
+        for(uint j = 0; j < 3; ++j)
         {
             if(!sign_comparisons[j])
             {
-                unsigned int new_used = bits;
+                uint new_used = bits;
                 // Test removal of the current point.
                 if(j == 0)
                     new_used &= ~(1 << point0_idx);
@@ -204,7 +204,7 @@ __HOSTDEVICE__ static INLINE void
                 new_point[0] = 0;
                 new_point[1] = 0;
                 new_point[2] = 0;
-                for(unsigned int i = 0; i < 4; ++i)
+                for(uint i = 0; i < 4; ++i)
                 {
                     if(new_used & (1 << i))
                         new_point += new_lambdas[i] * y[i];
@@ -214,7 +214,7 @@ __HOSTDEVICE__ static INLINE void
                 {
                     new_bits = new_used;
                     d        = d_star;
-                    for(unsigned int i = 0; i < 4; ++i)
+                    for(uint i = 0; i < 4; ++i)
                         lambdas[i] = new_lambdas[i];
                 }
             }
@@ -226,7 +226,7 @@ __HOSTDEVICE__ static INLINE void
 // -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void
-    s3d(Vector3<T> const y[4], unsigned int& bits, T (&lambdas)[4])
+    s3d(Vector3<T> const y[4], uint& bits, T (&lambdas)[4])
 {
     T C[4] = {0.};
 
@@ -251,37 +251,37 @@ __HOSTDEVICE__ static INLINE void
            - y[1][0] * y[0][1] * y[2][2] - y[0][0] * y[2][1] * y[1][2];
     T dM = C[0] + C[1] + C[2] + C[3];
 
-    unsigned int sign_comparisons[4] = {0};
-    sign_comparisons[0]              = compareSigns(dM, C[0]);
-    sign_comparisons[1]              = compareSigns(dM, C[1]);
-    sign_comparisons[2]              = compareSigns(dM, C[2]);
-    sign_comparisons[3]              = compareSigns(dM, C[3]);
+    uint sign_comparisons[4] = {0};
+    sign_comparisons[0]      = compareSigns(dM, C[0]);
+    sign_comparisons[1]      = compareSigns(dM, C[1]);
+    sign_comparisons[2]      = compareSigns(dM, C[2]);
+    sign_comparisons[3]      = compareSigns(dM, C[3]);
 
     if((sign_comparisons[0] + sign_comparisons[1] + sign_comparisons[2]
         + sign_comparisons[3])
        == 4)
     {
-        for(unsigned int i = 0; i < 4; ++i)
+        for(uint i = 0; i < 4; ++i)
             lambdas[i] = C[i] / dM;
     }
     else
     {
-        T            d = T(100000), d_star = T(0);
-        Vector3<T>   new_point;
-        unsigned int new_bits = 0;
-        for(unsigned int j = 0; j < 4; ++j)
+        T          d = T(100000), d_star = T(0);
+        Vector3<T> new_point;
+        uint       new_bits = 0;
+        for(uint j = 0; j < 4; ++j)
         {
             if(!sign_comparisons[j])
             {
                 // Test removal of the current point.
-                unsigned int new_used = bits;
+                uint new_used = bits;
                 new_used &= ~(1 << j);
                 T new_lambdas[4] = {T(0)};
 
                 s2d(y, new_used, new_lambdas);
 
                 new_point = Vector3<T>();
-                for(unsigned int i = 0; i < 4; ++i)
+                for(uint i = 0; i < 4; ++i)
                 {
                     if(new_used & (1 << i))
                         new_point += new_lambdas[i] * y[i];
@@ -291,7 +291,7 @@ __HOSTDEVICE__ static INLINE void
                 {
                     new_bits = new_used;
                     d        = d_star;
-                    for(unsigned int i = 0; i < 4; ++i)
+                    for(uint i = 0; i < 4; ++i)
                         lambdas[i] = new_lambdas[i];
                 }
             }
@@ -302,13 +302,13 @@ __HOSTDEVICE__ static INLINE void
 
 // -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits,
-                                                Vector3<T> const   y[4],
-                                                T const            lambdas[4],
-                                                Vector3<T>&        v)
+__HOSTDEVICE__ static INLINE void computeVector(uint const       bits,
+                                                Vector3<T> const y[4],
+                                                T const          lambdas[4],
+                                                Vector3<T>&      v)
 {
     v.setValue(T(0), T(0), T(0));
-    for(unsigned int i = 0; i < 4; ++i)
+    for(uint i = 0; i < 4; ++i)
     {
         if(bits & (1 << i))
             v += lambdas[i] * y[i];
@@ -317,16 +317,16 @@ __HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits,
 
 // -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits,
-                                                Vector3<T> const   p[4],
-                                                Vector3<T> const   q[4],
-                                                T const            lambdas[4],
-                                                Vector3<T>&        p1,
-                                                Vector3<T>&        p2)
+__HOSTDEVICE__ static INLINE void computePoints(uint const       bits,
+                                                Vector3<T> const p[4],
+                                                Vector3<T> const q[4],
+                                                T const          lambdas[4],
+                                                Vector3<T>&      p1,
+                                                Vector3<T>&      p2)
 {
     p1.setValue(T(0), T(0), T(0));
     p2.setValue(T(0), T(0), T(0));
-    for(unsigned int i = 0; i < 4; ++i)
+    for(uint i = 0; i < 4; ++i)
     {
         if(bits & (1 << i))
         {
@@ -339,7 +339,7 @@ __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits,
 // -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE void sv_subalgorithm(Vector3<T> const y[4],
-                                                  unsigned int&    bits,
+                                                  uint&            bits,
                                                   T (&lambdas)[4],
                                                   Vector3<T>& v)
 {
@@ -347,14 +347,14 @@ __HOSTDEVICE__ static INLINE void sv_subalgorithm(Vector3<T> const y[4],
     // modified if necessary, and the lambdas will be updated.  All the other
     // functions (if they need to make deeper calls e.g. s3d->s2d) will have to
     // make copies of bits to avoid overwriting that data incorrectly.
-    unsigned int num_used = 0;
-    for(unsigned int i = 0; i < 4; ++i)
+    uint num_used = 0;
+    for(uint i = 0; i < 4; ++i)
         num_used += (bits >> i) & 1;
 
     // Start with the most common cases.
     if(num_used == 1)
     {
-        for(unsigned int i = 0; i < 4; ++i)
+        for(uint i = 0; i < 4; ++i)
         {
             if(bits & (1 << i))
                 lambdas[i] = T(1);
@@ -374,11 +374,10 @@ __HOSTDEVICE__ static INLINE void sv_subalgorithm(Vector3<T> const y[4],
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
 template <typename T>
-__HOSTDEVICE__ static INLINE bool degenerate(unsigned int const bits,
-                                             Vector3<T> const   y[4],
-                                             const Vector3<T>&  w)
+__HOSTDEVICE__ static INLINE bool
+    degenerate(uint const bits, Vector3<T> const y[4], const Vector3<T>& w)
 {
-    for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+    for(uint i = 0, bit = 1; i < 4; ++i, bit <<= 1)
     {
         if((bits & bit) && y[i] == w)
             return (true);
@@ -399,14 +398,14 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,
                                              int&                 nbIter)
 {
     // GJK variables
-    unsigned int bits = 0; // identifies current simplex
-    unsigned int last = 0; // identifies last found support point
-    Vector3<T>   p[4]; // support points of A in local
-    Vector3<T>   q[4]; // support points of B in local
-    Vector3<T>   y[4]; // support points of A-B in world
-    T            mu            = 0.; // optimality gap
-    int          numIterations = 0; // No. iterations
-    T            lambdas[4]    = {T(0)}; // Weights
+    uint       bits = 0; // identifies current simplex
+    uint       last = 0; // identifies last found support point
+    Vector3<T> p[4]; // support points of A in local
+    Vector3<T> q[4]; // support points of B in local
+    Vector3<T> y[4]; // support points of A-B in world
+    T          mu            = 0.; // optimality gap
+    int        numIterations = 0; // No. iterations
+    T          lambdas[4]    = {T(0)}; // Weights
 
     // Misc variables, e.g. tolerance, ...
     // T relError = GrainsExec::m_colDetTolerance;             // rel error for opt gap
@@ -430,7 +429,7 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,
     while(bits < 15 && dist > HIGHEPS<T> && numIterations < 1000)
     {
         // Updating the bits, ...
-        for(unsigned int new_index = 0; new_index < 4; ++new_index)
+        for(uint new_index = 0; new_index < 4; ++new_index)
         {
             // At least one of these must be empty, otherwise we have an overlap.
             if(!(bits & (1 << new_index)))

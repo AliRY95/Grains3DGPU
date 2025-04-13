@@ -22,18 +22,17 @@
 @param array array to be zero-ed out
 @param numElements number of elements in the array */
 __GLOBAL__
-void zeroOutArray_kernel(unsigned int* array, unsigned int numElements);
+void zeroOutArray_kernel(uint* array, uint numElements);
 
 /** @brief Returns the start Id for each hash value in cellStart
 @param componentCellHash sorted array of cell hash values
 @param numComponents number of components
 @param cellStartAndEnd start and end indices as s1, e1, s2, e2, ... */
 __GLOBAL__
-void sortComponentsAndFindCellStart_kernel(
-    unsigned int const* componentCellHash,
-    unsigned int        numComponents,
-    unsigned int*       cellStart,
-    unsigned int*       cellEnd);
+void sortComponentsAndFindCellStart_kernel(uint const* componentCellHash,
+                                           uint        numComponents,
+                                           uint*       cellStart,
+                                           uint*       cellEnd);
 
 /** @brief Detects collision between particles and obstacles and computes forces
 @param particleRB array of rigid bodies for particles
@@ -51,11 +50,11 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesObstacles_kernel(
     RigidBody<T, U> const* const*      particleRB,
     RigidBody<T, U> const* const*      obstacleRB,
     ContactForceModel<T> const* const* CF,
-    unsigned int*                      rigidBodyId,
+    uint*                              rigidBodyId,
     Transform3<T> const*               transform,
     Kinematics<T> const*               velocity,
     Torce<T>*                          torce,
-    unsigned int*                      obstacleRigidBodyId,
+    uint*                              obstacleRigidBodyId,
     Transform3<T> const*               obstacleTransform,
     int                                nParticles,
     int                                nObstacles);
@@ -78,14 +77,14 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
     RigidBody<T, U> const* const*      particleRB,
     LinkedCell<T> const* const*        LC,
     ContactForceModel<T> const* const* CF,
-    unsigned int*                      rigidBodyId,
+    uint*                              rigidBodyId,
     Transform3<T> const*               transform,
     Kinematics<T> const*               velocity,
     Torce<T>*                          torce,
-    unsigned int*                      particleId,
-    unsigned int*                      particleCellHash,
-    unsigned int*                      cellHashStart,
-    unsigned int*                      cellHashEnd,
+    uint*                              particleId,
+    uint*                              particleCellHash,
+    uint*                              cellHashStart,
+    uint*                              cellHashEnd,
     int                                nParticles,
     int*                               result);
 
@@ -98,7 +97,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
 template <typename T, typename U>
 __GLOBAL__ void
     addExternalForces_kernel(RigidBody<T, U> const* const* particleRB,
-                             unsigned int*                 rigidBodyId,
+                             uint*                         rigidBodyId,
                              Torce<T>*                     torce,
                              T                             gX,
                              T                             gY,
@@ -116,7 +115,7 @@ __GLOBAL__ void
 template <typename T, typename U>
 __GLOBAL__ void moveParticles_kernel(RigidBody<T, U> const* const*   particleRB,
                                      TimeIntegrator<T> const* const* TI,
-                                     unsigned int*  rigidBodyId,
+                                     uint*          rigidBodyId,
                                      Transform3<T>* transform,
                                      Kinematics<T>* velocity,
                                      Torce<T>*      torce,

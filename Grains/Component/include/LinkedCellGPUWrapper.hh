@@ -35,8 +35,8 @@ template <typename T>
 __GLOBAL__ void
     computeLinearLinkedCellHashGPU_kernel(LinkedCell<T> const* const* LC,
                                           Transform3<T> const*        tr,
-                                          unsigned int  numComponents,
-                                          unsigned int* componentCellHash);
+                                          uint  numComponents,
+                                          uint* componentCellHash);
 //@}
 
 #endif

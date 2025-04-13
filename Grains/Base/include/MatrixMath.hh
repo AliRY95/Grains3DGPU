@@ -84,7 +84,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator+(const Matrix3<T>& m1,
     T const* __RESTRICT__ b1 = m1.getBuffer();
     T const* __RESTRICT__ b2 = m2.getBuffer();
     T __RESTRICT__        out[9];
-    for(unsigned int i = 0; i < 9; ++i)
+    for(uint i = 0; i < 9; ++i)
         out[i] = b1[i] + b2[i];
     return (Matrix3<T>(out));
 }
@@ -100,7 +100,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator-(const Matrix3<T>& m1,
     T const* __RESTRICT__ b1 = m1.getBuffer();
     T const* __RESTRICT__ b2 = m2.getBuffer();
     T __RESTRICT__        out[9];
-    for(unsigned int i = 0; i < 9; ++i)
+    for(uint i = 0; i < 9; ++i)
         out[i] = b1[i] - b2[i];
     return (Matrix3<T>(out));
 }
@@ -115,7 +115,7 @@ __HOSTDEVICE__ static INLINE Matrix3<T> operator*(T                 c,
 {
     T const* __RESTRICT__ buffer = m.getBuffer();
     T __RESTRICT__        out[9];
-    for(unsigned int i = 0; i < 9; ++i)
+    for(uint i = 0; i < 9; ++i)
         out[i] = c * buffer[i];
     return (Matrix3<T>(out));
 }
@@ -131,7 +131,7 @@ __HOSTDEVICE__ static INLINE Vector3<T> operator*(const Matrix3<T>& m,
     T const* __RESTRICT__ bufferM = m.getBuffer();
     T const* __RESTRICT__ bufferV = v.getBuffer();
     T __RESTRICT__        out[3];
-    for(unsigned int i = 0; i < 3; ++i)
+    for(uint i = 0; i < 3; ++i)
         out[i] = bufferM[3 * i] * bufferV[0] + bufferM[3 * i + 1] * bufferV[1]
                  + bufferM[3 * i + 2] * bufferV[2];
     return (Vector3<T>(out));
@@ -148,7 +148,7 @@ __HOSTDEVICE__ static INLINE Vector3<T> operator*(const Vector3<T>& v,
     T const* __RESTRICT__ bufferV = v.getBuffer();
     T const* __RESTRICT__ bufferM = m.getBuffer();
     T __RESTRICT__        out[3];
-    for(unsigned int i = 0; i < 3; ++i)
+    for(uint i = 0; i < 3; ++i)
         out[i] = bufferM[i] * bufferV[0] + bufferM[i + 3] * bufferV[1]
                  + bufferM[i + 6] * bufferV[2];
     return (Vector3<T>(out));

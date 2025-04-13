@@ -763,11 +763,11 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_SV(Convex<T> const&     a,
 {
     /* GJK parameters */
     // iteration counter
-    unsigned int numIterations = 0;
+    uint numIterations = 0;
     // maximum number of GJK iterations
-    constexpr unsigned int maxNumIterations = 50;
+    constexpr uint maxNumIterations = 50;
     // counter for number of vertices
-    unsigned int i = 0;
+    uint i = 0;
     // relative tolerance
     constexpr T relError = LOWEPS<T>;
     // absolute tolerance

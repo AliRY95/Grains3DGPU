@@ -28,7 +28,7 @@ protected:
     Convex<T>*      m_convex; /**< Convex shape */
     T               m_crustThickness; /**< Rigid body's crust thickness */
     Vector3<T>      m_scaling; /**< Scaling vector related to crust thickness */
-    unsigned int    m_material; /**< Rigid body's material ID */
+    uint            m_material; /**< Rigid body's material ID */
     T               m_volume; /**< Rigid body's volume */
     T               m_mass; /**< Rigid body's mass */
     T               m_inertia[6]; /**< Rigid body's inertia */
@@ -51,7 +51,7 @@ public:
         @param material material ID
         @param density density */
     __HOSTDEVICE__
-    RigidBody(Convex<T>* convex, T ct, unsigned int material, T density);
+    RigidBody(Convex<T>* convex, T ct, uint material, T density);
 
     /** @brief Constructor with an XML input
         @param root XML input */
@@ -84,7 +84,7 @@ public:
 
     /** @brief Gets the rigid body's material ID */
     __HOSTDEVICE__
-    unsigned int getMaterial() const;
+    uint getMaterial() const;
 
     /** @brief Gets the rigid body's volume */
     __HOSTDEVICE__

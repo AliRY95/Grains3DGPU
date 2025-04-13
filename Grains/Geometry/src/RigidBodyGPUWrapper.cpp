@@ -18,14 +18,14 @@
 // It helps to NOT explicitly instantiate it.
 template <typename T, typename U, typename... Arguments>
 __GLOBAL__ void createRigidBodyKernel(RigidBody<T, U>** rb,
-                                      unsigned int      index,
+                                      uint              index,
                                       T                 crustThickness,
-                                      unsigned int      material,
+                                      uint              material,
                                       T                 density,
                                       ConvexType        convexType,
                                       Arguments... args)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid > 0)
         return;
 
@@ -77,10 +77,10 @@ __HOST__ void RigidBodyCopyHostToDevice(RigidBody<T, U>** h_rb,
     for(int index = 0; index < numRigidBodies; index++)
     {
         // Extracting info from the host side object
-        Convex<T>*   convex   = h_rb[index]->getConvex();
-        ConvexType   cvxType  = convex->getConvexType();
-        T            ct       = h_rb[index]->getCrustThickness();
-        unsigned int material = h_rb[index]->getMaterial();
+        Convex<T>* convex   = h_rb[index]->getConvex();
+        ConvexType cvxType  = convex->getConvexType();
+        T          ct       = h_rb[index]->getCrustThickness();
+        uint       material = h_rb[index]->getMaterial();
         // We also need the density to calculate the mass of the rigid body.
         // However, it is not available here. So, we manually compute it:
         T density = h_rb[index]->getMass() / h_rb[index]->getVolume();

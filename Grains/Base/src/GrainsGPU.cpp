@@ -55,8 +55,8 @@ void GrainsGPU<T>::simulate()
     Gout(std::string(80, '='));
     Gout("Starting the simulation on GPU");
     Gout(std::string(80, '='));
-    unsigned int N           = GrainsParameters<T>::m_numParticles;
-    int*         h_collision = new int[N];
+    uint N           = GrainsParameters<T>::m_numParticles;
+    int* h_collision = new int[N];
     // Zeroing out
     for(int i = 0; i < N; i++)
         h_collision[i] = 0;
@@ -182,7 +182,7 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     DOMNode*     particles    = ReaderXML::getNode(root, "Particles");
     DOMNodeList* allParticles = ReaderXML::getNodes(rootElement, "Particle");
     // Number of unique shapes (rigid bodies) in the simulation
-    unsigned int numUniqueParticles = allParticles->getLength();
+    uint numUniqueParticles = allParticles->getLength();
     // It is a GPU simulation, and we have already read rigid bodies on the host
     // We allocate memory on device and copy the rigid bodies over.
     GoutWI(6, "Copying particle types to device ...");
@@ -202,7 +202,7 @@ void GrainsGPU<T>::Construction(DOMElement* rootElement)
     DOMNode*     obstacles    = ReaderXML::getNode(root, "Obstacles");
     DOMNodeList* allObstacles = ReaderXML::getNodes(rootElement, "Obstacle");
     // Number of unique shapes (rigid bodies) in the simulation
-    unsigned int numUniqueObstacles = allObstacles->getLength();
+    uint numUniqueObstacles = allObstacles->getLength();
     // It is a GPU simulation, and we have already read obstacles on the host
     // We allocate memory on device and copy the rigid bodies over.
     GoutWI(6, "Copying obstacle types to device ...");

@@ -14,18 +14,18 @@
 // cells. We only allocate memory in the constructor. Filling out the data
 // members must be done separately.
 template <typename T>
-ComponentManagerGPU<T>::ComponentManagerGPU(unsigned int nParticles,
-                                            unsigned int nObstacles,
-                                            unsigned int nCells)
+ComponentManagerGPU<T>::ComponentManagerGPU(uint nParticles,
+                                            uint nObstacles,
+                                            uint nCells)
     : m_nParticles(nParticles)
     , m_nObstacles(nObstacles)
     , m_nCells(nCells)
 {
     // Allocating memory on host
-    cudaErrCheck(cudaMalloc((void**)&m_rigidBodyId,
-                            m_nParticles * sizeof(unsigned int)));
+    cudaErrCheck(
+        cudaMalloc((void**)&m_rigidBodyId, m_nParticles * sizeof(uint)));
     cudaErrCheck(cudaMalloc((void**)&m_obstacleRigidBodyId,
-                            m_nObstacles * sizeof(unsigned int)));
+                            m_nObstacles * sizeof(uint)));
     cudaErrCheck(
         cudaMalloc((void**)&m_transform, m_nParticles * sizeof(Transform3<T>)));
     cudaErrCheck(cudaMalloc((void**)&m_obstacleTransform,
@@ -34,13 +34,13 @@ ComponentManagerGPU<T>::ComponentManagerGPU(unsigned int nParticles,
         cudaMalloc((void**)&m_velocity, m_nParticles * sizeof(Kinematics<T>)));
     cudaErrCheck(cudaMalloc((void**)&m_torce, m_nParticles * sizeof(Torce<T>)));
     cudaErrCheck(
-        cudaMalloc((void**)&m_particleId, m_nParticles * sizeof(unsigned int)));
-    cudaErrCheck(cudaMalloc((void**)&m_particleCellHash,
-                            m_nParticles * sizeof(unsigned int)));
-    cudaErrCheck(cudaMalloc((void**)&m_cellHashStart,
-                            (m_nCells + 1) * sizeof(unsigned int)));
-    cudaErrCheck(cudaMalloc((void**)&m_cellHashEnd,
-                            (m_nCells + 1) * sizeof(unsigned int)));
+        cudaMalloc((void**)&m_particleId, m_nParticles * sizeof(uint)));
+    cudaErrCheck(
+        cudaMalloc((void**)&m_particleCellHash, m_nParticles * sizeof(uint)));
+    cudaErrCheck(
+        cudaMalloc((void**)&m_cellHashStart, (m_nCells + 1) * sizeof(uint)));
+    cudaErrCheck(
+        cudaMalloc((void**)&m_cellHashEnd, (m_nCells + 1) * sizeof(uint)));
 }
 
 // -----------------------------------------------------------------------------
@@ -65,12 +65,12 @@ ComponentManagerGPU<T>::~ComponentManagerGPU()
 // -----------------------------------------------------------------------------
 // Gets the array of particles rigid body Ids
 template <typename T>
-std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyId() const
+std::vector<uint> ComponentManagerGPU<T>::getRigidBodyId() const
 {
-    std::vector<unsigned int> h_rigidBodyId(m_nParticles);
+    std::vector<uint> h_rigidBodyId(m_nParticles);
     cudaErrCheck(cudaMemcpy(h_rigidBodyId.data(),
                             m_rigidBodyId,
-                            m_nParticles * sizeof(unsigned int),
+                            m_nParticles * sizeof(uint),
                             cudaMemcpyDeviceToHost));
     return (h_rigidBodyId);
 }
@@ -78,13 +78,12 @@ std::vector<unsigned int> ComponentManagerGPU<T>::getRigidBodyId() const
 // -----------------------------------------------------------------------------
 // Gets the array of obstacles rigid body Ids
 template <typename T>
-std::vector<unsigned int>
-    ComponentManagerGPU<T>::getRigidBodyIdObstacles() const
+std::vector<uint> ComponentManagerGPU<T>::getRigidBodyIdObstacles() const
 {
-    std::vector<unsigned int> h_obstaclesRigidBodyId(m_nObstacles);
+    std::vector<uint> h_obstaclesRigidBodyId(m_nObstacles);
     cudaErrCheck(cudaMemcpy(h_obstaclesRigidBodyId.data(),
                             m_obstacleRigidBodyId,
-                            m_nObstacles * sizeof(unsigned int),
+                            m_nObstacles * sizeof(uint),
                             cudaMemcpyDeviceToHost));
     return (h_obstaclesRigidBodyId);
 }
@@ -144,12 +143,12 @@ std::vector<Torce<T>> ComponentManagerGPU<T>::getTorce() const
 // -----------------------------------------------------------------------------
 // Gets the array of particles Ids
 template <typename T>
-std::vector<unsigned int> ComponentManagerGPU<T>::getParticleId() const
+std::vector<uint> ComponentManagerGPU<T>::getParticleId() const
 {
-    std::vector<unsigned int> h_particleId(m_nParticles);
+    std::vector<uint> h_particleId(m_nParticles);
     cudaErrCheck(cudaMemcpy(h_particleId.data(),
                             m_particleId,
-                            m_nParticles * sizeof(unsigned int),
+                            m_nParticles * sizeof(uint),
                             cudaMemcpyDeviceToHost));
     return (h_particleId);
 }
@@ -157,7 +156,7 @@ std::vector<unsigned int> ComponentManagerGPU<T>::getParticleId() const
 // -----------------------------------------------------------------------------
 // Gets the number of particles in manager
 template <typename T>
-unsigned int ComponentManagerGPU<T>::getNumberOfParticles() const
+uint ComponentManagerGPU<T>::getNumberOfParticles() const
 {
     return (m_nParticles);
 }
@@ -165,7 +164,7 @@ unsigned int ComponentManagerGPU<T>::getNumberOfParticles() const
 // -----------------------------------------------------------------------------
 // Gets the number of obstacles in manager
 template <typename T>
-unsigned int ComponentManagerGPU<T>::getNumberOfObstacles() const
+uint ComponentManagerGPU<T>::getNumberOfObstacles() const
 {
     return (m_nObstacles);
 }
@@ -173,7 +172,7 @@ unsigned int ComponentManagerGPU<T>::getNumberOfObstacles() const
 // -----------------------------------------------------------------------------
 // Gets the number of cells in manager
 template <typename T>
-unsigned int ComponentManagerGPU<T>::getNumberOfCells() const
+uint ComponentManagerGPU<T>::getNumberOfCells() const
 {
     return (m_nCells);
 }
@@ -181,11 +180,11 @@ unsigned int ComponentManagerGPU<T>::getNumberOfCells() const
 // -----------------------------------------------------------------------------
 // Sets the array of particles rigid body Ids
 template <typename T>
-void ComponentManagerGPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
+void ComponentManagerGPU<T>::setRigidBodyId(std::vector<uint> const& id)
 {
     cudaErrCheck(cudaMemcpy(m_rigidBodyId,
                             id.data(),
-                            m_nParticles * sizeof(unsigned int),
+                            m_nParticles * sizeof(uint),
                             cudaMemcpyHostToDevice));
 }
 
@@ -193,11 +192,11 @@ void ComponentManagerGPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
 // Sets the array of obstacles rigid body Ids
 template <typename T>
 void ComponentManagerGPU<T>::setRigidBodyIdObstacles(
-    std::vector<unsigned int> const& id)
+    std::vector<uint> const& id)
 {
     cudaErrCheck(cudaMemcpy(m_obstacleRigidBodyId,
                             id.data(),
-                            m_nObstacles * sizeof(unsigned int),
+                            m_nObstacles * sizeof(uint),
                             cudaMemcpyHostToDevice));
 }
 
@@ -249,11 +248,11 @@ void ComponentManagerGPU<T>::setTorce(std::vector<Torce<T>> const& t)
 // -----------------------------------------------------------------------------
 // Sets the array of particles Ids
 template <typename T>
-void ComponentManagerGPU<T>::setParticleId(std::vector<unsigned int> const& id)
+void ComponentManagerGPU<T>::setParticleId(std::vector<uint> const& id)
 {
     cudaErrCheck(cudaMemcpy(m_particleId,
                             id.data(),
-                            m_nParticles * sizeof(unsigned int),
+                            m_nParticles * sizeof(uint),
                             cudaMemcpyHostToDevice));
 }
 
@@ -263,9 +262,9 @@ template <typename T>
 void ComponentManagerGPU<T>::updateLinks(LinkedCell<T> const* const* LC)
 {
     // Kernel launch parameters
-    unsigned int numThreads = 256;
-    unsigned int numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
-    unsigned int sMemSize   = sizeof(unsigned int) * (numThreads + 1);
+    uint numThreads = 256;
+    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    uint sMemSize   = sizeof(uint) * (numThreads + 1);
 
     // Zeroing out the arrays
     zeroOutArray_kernel<<<numBlocks, numThreads>>>(m_cellHashStart,
@@ -281,9 +280,9 @@ void ComponentManagerGPU<T>::updateLinks(LinkedCell<T> const* const* LC)
 
     // Second - sorting the particle ids according to the cell hash
     thrust::sort_by_key(
-        thrust::device_ptr<unsigned int>(m_particleCellHash),
-        thrust::device_ptr<unsigned int>(m_particleCellHash + m_nParticles),
-        thrust::device_ptr<unsigned int>(m_particleId));
+        thrust::device_ptr<uint>(m_particleCellHash),
+        thrust::device_ptr<uint>(m_particleCellHash + m_nParticles),
+        thrust::device_ptr<uint>(m_particleId));
 
     // Third - reseting the cellStart array and finding the start location of
     // each hash
@@ -303,8 +302,8 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesObstacles(
     ContactForceModel<T> const* const* CF)
 {
     // Launch parameters
-    unsigned int numThreads = 256;
-    unsigned int numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    uint numThreads = 256;
+    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
 
     // Invoke the kernel
     detectCollisionAndComputeContactForcesObstacles_kernel<<<numBlocks,
@@ -332,8 +331,8 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesParticles(
     int*                               result)
 {
     // Launch parameters
-    unsigned int numThreads = 256;
-    unsigned int numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    uint numThreads = 256;
+    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
 
     // Invoke the kernel
     detectCollisionAndComputeContactForcesParticles_kernel<<<numBlocks,
@@ -380,8 +379,8 @@ void ComponentManagerGPU<T>::addExternalForces(
     RigidBody<T, T> const* const* particleRB, const Vector3<T>& g)
 {
     // Launch parameters
-    unsigned int numThreads = 256;
-    unsigned int numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    uint numThreads = 256;
+    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
 
     // since g is a host-side vector, we need to break it into three components
     // to be able to pass it to the kernel
@@ -404,8 +403,8 @@ void ComponentManagerGPU<T>::moveParticles(RigidBody<T, T> const* const*   RB,
                                            TimeIntegrator<T> const* const* TI)
 {
     // Launch parameters
-    unsigned int numThreads = 256;
-    unsigned int numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    uint numThreads = 256;
+    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
 
     // Invoke the kernel
     moveParticles_kernel<<<numBlocks, numThreads>>>(RB,

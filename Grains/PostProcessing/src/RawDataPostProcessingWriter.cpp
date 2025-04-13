@@ -74,21 +74,21 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
     T                             currentTime)
 {
     // Particles
-    unsigned int               numParticles = cm->getNumberOfParticles();
-    std::vector<unsigned int>  rbParticle   = cm->getRigidBodyId();
+    uint                       numParticles = cm->getNumberOfParticles();
+    std::vector<uint>          rbParticle   = cm->getRigidBodyId();
     std::vector<Transform3<T>> tParticle    = cm->getTransform();
     std::vector<Kinematics<T>> kParticle    = cm->getVelocity();
     // Obstacles
-    unsigned int               numObstacles = cm->getNumberOfObstacles();
-    std::vector<unsigned int>  rbObstacle   = cm->getRigidBodyIdObstacles();
+    uint                       numObstacles = cm->getNumberOfObstacles();
+    std::vector<uint>          rbObstacle   = cm->getRigidBodyIdObstacles();
     std::vector<Transform3<T>> tObstacle    = cm->getTransformObstacles();
     // TODO:
     std::vector<Kinematics<T>> kObstacle(numObstacles);
     // Aux. variables
-    Vector3<T>   centre;
-    Vector3<T>   velT;
-    Vector3<T>   velR;
-    unsigned int type;
+    Vector3<T> centre;
+    Vector3<T> velT;
+    Vector3<T> velR;
+    uint       type;
     m_particle_class.open((m_filerootname + "_particleType.dat").c_str(),
                           ios::out);
 

@@ -23,8 +23,8 @@ protected:
     Vector3<T> m_minCorner; /**< min corner point of the linked cell */
     Vector3<T> m_maxCorner; /**< max corner point of the linked cell */
     T          m_cellExtent; /**< extent of each cell */
-    int3       m_numCellsPerDir; /**< number of cells per each direction */
-    int        m_numCells; /**< total number of cells */
+    uint3      m_numCellsPerDir; /**< number of cells per each direction */
+    uint       m_numCells; /**< total number of cells */
     //@}
 
 public:
@@ -51,7 +51,7 @@ public:
     //@{
     /** @brief Gets the number of cells */
     __HOSTDEVICE__
-    int getNumCells() const;
+    uint getNumCells() const;
     //@}
 
     /** @name Methods */
@@ -59,29 +59,29 @@ public:
     /** @brief Checks if a cell Id is in range
         @param id 3D Id */
     __HOSTDEVICE__
-    void checkBound(int3 const& id) const;
+    void checkBound(const uint3& id) const;
 
     /** @brief Returns the 3d Id of the cell which the point belongs to
         @param p point */
     __HOSTDEVICE__
-    int3 computeCellId(const Vector3<T>& p) const;
+    uint3 computeCellId(const Vector3<T>& p) const;
 
     /** @brief Returns the linear cell hash value of a given point
         @param p point */
     __HOSTDEVICE__
-    int computeLinearCellHash(const Vector3<T>& p) const;
+    uint computeLinearCellHash(const Vector3<T>& p) const;
 
     /** @brief Returns the linear cell hash value from the 3d Id of the cell
         @param cellId 3d cell Id */
     __HOSTDEVICE__
-    int computeLinearCellHash(int3 const& cellId) const;
+    uint computeLinearCellHash(const uint3& cellId) const;
 
     /** @brief Returns the linear cell hash value from the 3d Id of the cell
         @param i position of the cell in the x-direction
         @param j position of the cell in the y-direction
         @param k position of the cell in the z-direction */
     __HOSTDEVICE__
-    int computeLinearCellHash(int i, int j, int k) const;
+    uint computeLinearCellHash(uint i, uint j, uint k) const;
 
     /** @brief Returns the linear cell hash value for a neighboring cell in
         the direction given by (i, j, k)
@@ -89,10 +89,10 @@ public:
         @param j relative position of the neighboring cell in the y-direction
         @param k relative position of the neighboring cell in the z-direction */
     __HOSTDEVICE__
-    int computeNeighboringCellLinearHash(int cellHash,
-                                         int i,
-                                         int j,
-                                         int k) const;
+    uint computeNeighboringCellLinearHash(uint cellHash,
+                                          uint i,
+                                          uint j,
+                                          uint k) const;
 
     /** @brief Computes and stores the linear cell hash values in 
         componentCellHash for all components using CPU
@@ -100,23 +100,23 @@ public:
         @param numComponents number of components
         @param componentCellHash hash values for particles */
     void computeLinearLinkedCellHashCPU(
-        std::vector<Transform3<T>> const& tr,
-        unsigned int                      numComponents,
-        std::vector<unsigned int>&        componentCellHash) const;
+        const std::vector<Transform3<T>>& tr,
+        uint                              numComponents,
+        std::vector<uint>&                componentCellHash) const;
 
     /** @brief Computes and stores the linear cell hash values in 
         componentCellHash for all components using GPU - Wrapper
         @param pos position of components
         @param numComponents number of components
         @param componentCellHash hash values for particles */
-    void computeLinearLinkedCellHashGPU(Transform3<T> const* pos,
-                                        unsigned int         numComponents,
-                                        unsigned int* componentCellHash) const;
+    void computeLinearLinkedCellHashGPU(const Transform3<T>* pos,
+                                        uint                 numComponents,
+                                        uint* componentCellHash) const;
 
     /** @brief Returns the Morton cell hash value from the 3d Id of the cell
         // @param cellId 3d cell Id */
     // __HOSTDEVICE__
-    // unsigned int computeMortonCellHash( int i,
+    // uint computeMortonCellHash( int i,
     //                                     int j,
     //                                     int k ) const;
     //@}

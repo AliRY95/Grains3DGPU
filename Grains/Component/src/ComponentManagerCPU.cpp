@@ -74,7 +74,7 @@ ComponentManagerCPU<T>::~ComponentManagerCPU()
 // -----------------------------------------------------------------------------
 // Gets particles rigid body Ids
 template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
+std::vector<uint> ComponentManagerCPU<T>::getRigidBodyId() const
 {
     return (m_rigidBodyId);
 }
@@ -82,8 +82,7 @@ std::vector<unsigned int> ComponentManagerCPU<T>::getRigidBodyId() const
 // -----------------------------------------------------------------------------
 // Gets obstacles rigid body Ids
 template <typename T>
-std::vector<unsigned int>
-    ComponentManagerCPU<T>::getRigidBodyIdObstacles() const
+std::vector<uint> ComponentManagerCPU<T>::getRigidBodyIdObstacles() const
 {
     return (m_obstacleRigidBodyId);
 }
@@ -123,7 +122,7 @@ std::vector<Torce<T>> ComponentManagerCPU<T>::getTorce() const
 // -----------------------------------------------------------------------------
 // Gets the array of particle Ids
 template <typename T>
-std::vector<unsigned int> ComponentManagerCPU<T>::getParticleId() const
+std::vector<uint> ComponentManagerCPU<T>::getParticleId() const
 {
     return (m_particleId);
 }
@@ -131,7 +130,7 @@ std::vector<unsigned int> ComponentManagerCPU<T>::getParticleId() const
 // -----------------------------------------------------------------------------
 // Gets the number of particles in manager
 template <typename T>
-unsigned int ComponentManagerCPU<T>::getNumberOfParticles() const
+uint ComponentManagerCPU<T>::getNumberOfParticles() const
 {
     return (m_nParticles);
 }
@@ -139,7 +138,7 @@ unsigned int ComponentManagerCPU<T>::getNumberOfParticles() const
 // -----------------------------------------------------------------------------
 // Gets the number of obstacles in manager
 template <typename T>
-unsigned int ComponentManagerCPU<T>::getNumberOfObstacles() const
+uint ComponentManagerCPU<T>::getNumberOfObstacles() const
 {
     return (m_nObstacles);
 }
@@ -147,7 +146,7 @@ unsigned int ComponentManagerCPU<T>::getNumberOfObstacles() const
 // -----------------------------------------------------------------------------
 // Gets the number of cells in manager
 template <typename T>
-unsigned int ComponentManagerCPU<T>::getNumberOfCells() const
+uint ComponentManagerCPU<T>::getNumberOfCells() const
 {
     return (m_nCells);
 }
@@ -155,7 +154,7 @@ unsigned int ComponentManagerCPU<T>::getNumberOfCells() const
 // -----------------------------------------------------------------------------
 // Sets the array of particles rigid body Ids
 template <typename T>
-void ComponentManagerCPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
+void ComponentManagerCPU<T>::setRigidBodyId(std::vector<uint> const& id)
 {
     m_rigidBodyId = id;
 }
@@ -164,7 +163,7 @@ void ComponentManagerCPU<T>::setRigidBodyId(std::vector<unsigned int> const& id)
 // Sets the array of obstacles rigid body Ids
 template <typename T>
 void ComponentManagerCPU<T>::setRigidBodyIdObstacles(
-    std::vector<unsigned int> const& id)
+    std::vector<uint> const& id)
 {
     m_obstacleRigidBodyId = id;
 }
@@ -205,7 +204,7 @@ void ComponentManagerCPU<T>::setTorce(std::vector<Torce<T>> const& t)
 // -----------------------------------------------------------------------------
 // Sets the array of particle Ids
 template <typename T>
-void ComponentManagerCPU<T>::setParticleId(std::vector<unsigned int> const& id)
+void ComponentManagerCPU<T>::setParticleId(std::vector<uint> const& id)
 {
     m_particleId = id;
 }
@@ -214,8 +213,7 @@ void ComponentManagerCPU<T>::setParticleId(std::vector<unsigned int> const& id)
 // Initializes the RigidBody IDs and transformations of the obstacles
 template <typename T>
 void ComponentManagerCPU<T>::initializeObstacles(
-    std::vector<unsigned int>  numEachUniqueObstacles,
-    std::vector<Transform3<T>> initTr)
+    std::vector<uint> numEachUniqueObstacles, std::vector<Transform3<T>> initTr)
 {
     // Making sure that we have data for all obstacles and the number of initial
     // TR matches the number of RBs
@@ -223,7 +221,7 @@ void ComponentManagerCPU<T>::initializeObstacles(
            && numEachUniqueObstacles.size() == initTr.size());
 
     // Assigning
-    unsigned int rb_counter = 0;
+    uint rb_counter = 0;
     for(int i = 0; i < m_nObstacles; i++)
     {
         // m_rigidBodyId
@@ -303,13 +301,6 @@ void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
         uint cellId = m_particleCellHash[i];
         m_cell[cellId].push_back(i);
     }
-
-    for(int i = 0; i < m_nCells + 1; i++)
-    {
-        cout << "Cell " << i << endl;
-        for(auto j : m_cell[i])
-            cout << j << endl;
-    }
 }
 
 // -----------------------------------------------------------------------------
@@ -327,7 +318,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
         RigidBody<T, T> const& rbA   = *(particleRB[m_rigidBodyId[pId]]);
         const Transform3<T>&   trA   = m_transform[pId];
         T                      massA = rbA.getMass();
-        unsigned int           matA  = rbA.getMaterial();
+        uint                   matA  = rbA.getMaterial();
 
         // Loop over all obstacles
         for(int oId = 0; oId < m_nObstacles; oId++)
@@ -339,7 +330,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
             if(ci.getOverlapDistance() < T(0))
             {
                 // CF ID given materialIDs
-                unsigned int contactForceID
+                uint contactForceID
                     = ContactForceModelBuilderFactory<T>::computeHash(
                         matA,
                         rbB.getMaterial());
@@ -400,13 +391,11 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                                                                   i,
                                                                   j,
                                                                   k);
-                    cout << "\n"
-                         << i << " " << j << " " << k << " "
-                         << neighboringCellHash << " Done!";
+                    cout << neighboringCellHash;
+                    for(auto ppp : m_cell[neighboringCellHash])
+                        cout << " " << ppp << endl;
                     for(auto id : m_cell[neighboringCellHash])
                     {
-                        cout << "\n"
-                             << id << " " << neighboringCellHash << " DODO!";
                         const uint secondaryId = id;
                         // To skip self-collision
                         if(secondaryId == particleId)
@@ -420,7 +409,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                         if(ci.getOverlapDistance() < T(0))
                         {
                             // CF ID given materialIDs
-                            unsigned int contactForceID
+                            uint contactForceID
                                 = ContactForceModelBuilderFactory<
                                     T>::computeHash(matA, rbB.getMaterial());
                             // velocities of the particles

@@ -16,10 +16,10 @@ __HOSTDEVICE__ RigidBody<T, U>::RigidBody()
 // -----------------------------------------------------------------------------
 // Constructor with a convex and the crust thickness
 template <typename T, typename U>
-__HOSTDEVICE__ RigidBody<T, U>::RigidBody(Convex<T>*   convex,
-                                          T            ct,
-                                          unsigned int material,
-                                          T            density)
+__HOSTDEVICE__ RigidBody<T, U>::RigidBody(Convex<T>* convex,
+                                          T          ct,
+                                          uint       material,
+                                          T          density)
     : m_convex(convex)
     , m_crustThickness(ct)
     , m_material(material)
@@ -85,7 +85,7 @@ __HOST__ RigidBody<T, U>::RigidBody(DOMNode* root)
     {
         // Getting the ID of the last material added to the map.
         // This is basically the same as the size of the map.
-        unsigned int id = GrainsParameters<T>::m_materialMap.size();
+        uint id = GrainsParameters<T>::m_materialMap.size();
         GrainsParameters<T>::m_materialMap.emplace(material, id);
     }
     // Volume and mass
@@ -178,7 +178,7 @@ __HOSTDEVICE__ Vector3<T> RigidBody<T, U>::getScalingVector() const
 // -----------------------------------------------------------------------------
 // Gets the rigid body's material ID
 template <typename T, typename U>
-__HOSTDEVICE__ unsigned int RigidBody<T, U>::getMaterial() const
+__HOSTDEVICE__ uint RigidBody<T, U>::getMaterial() const
 {
     return (m_material);
 }

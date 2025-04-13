@@ -223,7 +223,7 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(const Matrix3<T>& m)
 // -----------------------------------------------------------------------------
 // i-th row accessor
 template <typename T>
-__HOSTDEVICE__ Vector3<T>& Matrix3<T>::operator[](unsigned int i) const
+__HOSTDEVICE__ Vector3<T>& Matrix3<T>::operator[](uint i) const
 {
     return (*(Vector3<T>*)(m_comp + 3 * i));
 }

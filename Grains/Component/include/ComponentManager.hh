@@ -37,10 +37,10 @@ public:
     /** @name Get methods */
     //@{
     /** @brief Gets particles rigid body Ids */
-    virtual std::vector<unsigned int> getRigidBodyId() const = 0;
+    virtual std::vector<uint> getRigidBodyId() const = 0;
 
     /** @brief Gets obstacles rigid body Id */
-    virtual std::vector<unsigned int> getRigidBodyIdObstacles() const = 0;
+    virtual std::vector<uint> getRigidBodyIdObstacles() const = 0;
 
     /** @brief Gets particles transformations */
     virtual std::vector<Transform3<T>> getTransform() const = 0;
@@ -55,32 +55,31 @@ public:
     virtual std::vector<Torce<T>> getTorce() const = 0;
 
     /** @brief Gets the array of particles Ids */
-    virtual std::vector<unsigned int> getParticleId() const = 0;
+    virtual std::vector<uint> getParticleId() const = 0;
 
     /** @brief Gets the number of particles in manager */
-    virtual unsigned int getNumberOfParticles() const = 0;
+    virtual uint getNumberOfParticles() const = 0;
 
     /** @brief Gets the number of obstacles in manager */
-    virtual unsigned int getNumberOfObstacles() const = 0;
+    virtual uint getNumberOfObstacles() const = 0;
 
     /** @brief Gets the number of cells in manager */
-    virtual unsigned int getNumberOfCells() const = 0;
+    virtual uint getNumberOfCells() const = 0;
 
     // /** @brief Gets the array of components neighbor Id */
-    // std::vector<unsigned int> getNeighborsId() const;
+    // std::vector<uint> getNeighborsId() const;
 
     // /** @brief Gets the array of components neighbor count */
-    // std::vector<unsigned int> getNeighborsCount() const;
+    // std::vector<uint> getNeighborsCount() const;
     //@}
 
     /** @name Set methods */
     //@{
     /** @brief Sets the array of particles rigid body Ids */
-    virtual void setRigidBodyId(std::vector<unsigned int> const& id) = 0;
+    virtual void setRigidBodyId(std::vector<uint> const& id) = 0;
 
     /** @brief Sets the array of obstacles rigid body Ids */
-    virtual void setRigidBodyIdObstacles(std::vector<unsigned int> const& id)
-        = 0;
+    virtual void setRigidBodyIdObstacles(std::vector<uint> const& id) = 0;
 
     /** @brief Sets particles transformations */
     virtual void setTransform(std::vector<Transform3<T>> const& t) = 0;
@@ -95,13 +94,13 @@ public:
     virtual void setTorce(std::vector<Torce<T>> const& t) = 0;
 
     /** @brief Sets the array of particles Ids */
-    virtual void setParticleId(std::vector<unsigned int> const& id) = 0;
+    virtual void setParticleId(std::vector<uint> const& id) = 0;
 
     // /** @brief Sets the array of components neighbor Id */
-    // void setNeighborsId( std::vector<unsigned int> const& id );
+    // void setNeighborsId( std::vector<uint> const& id );
 
     // /** @brief Sets the array of components neighbor count */
-    // void setNeighborsCount( std::vector<unsigned int> const& count );
+    // void setNeighborsCount( std::vector<uint> const& count );
     //@}
 
     /** @name Methods */
@@ -115,18 +114,16 @@ public:
         @param numEachUniqueObstacles accumulating vector for number of 
         different RB 
         @param initTr initial transformation of obstacles */
-    virtual void
-        initializeObstacles(std::vector<unsigned int>  numEachUniqueObstacles,
-                            std::vector<Transform3<T>> initTr);
+    virtual void initializeObstacles(std::vector<uint> numEachUniqueObstacles,
+                                     std::vector<Transform3<T>> initTr);
 
     /** @brief Initializes the RigidBody IDs and transformations for 
         // particles in the simulation
         @param numEachUniqueParticles accumulating vector for number of 
         different RB 
         @param initTr initial transformation of particles */
-    virtual void
-        initializeParticles(std::vector<unsigned int>  numEachUniqueParticles,
-                            std::vector<Transform3<T>> initTr);
+    virtual void initializeParticles(std::vector<uint> numEachUniqueParticles,
+                                     std::vector<Transform3<T>> initTr);
 
     /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */

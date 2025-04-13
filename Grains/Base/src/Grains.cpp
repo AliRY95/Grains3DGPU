@@ -189,7 +189,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
     // accumulative. Vector [2, 5] means we have 2 id0 rigid bodies and then
     // 5 - 2 = 3 id1 rigid bodies. it also indicates that there are 5 different
     // rigid bodies in the simulation in total.
-    std::vector<unsigned int> numEachUniqueObstacle(numUniqueObstacles, 0);
+    std::vector<uint> numEachUniqueObstacle(numUniqueObstacles, 0);
     // We also store the initial transformations of the rigid bodies to pass to
     // the ComponentManager to create particles with the initial transformation
     // required.
@@ -286,7 +286,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
     // Calculating the proper array size for the contact force array
     // We might need to redute it by removing the obstacle-obstacle pairs,
     // but it should be fine by now
-    unsigned int numMaterials = GrainsParameters<T>::m_materialMap.size();
+    uint numMaterials = GrainsParameters<T>::m_materialMap.size();
     GrainsParameters<T>::m_numContactPairs
         = numMaterials * (numMaterials + 1) / 2;
     DOMNode* contacts = ReaderXML::getNode(root, "ContactForceModels");

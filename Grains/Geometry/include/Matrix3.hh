@@ -130,7 +130,7 @@ public:
     /** @brief i-th row accessor
         @param i row number */
     __HOSTDEVICE__
-    Vector3<T>& operator[](unsigned int i) const;
+    Vector3<T>& operator[](uint i) const;
 
     /** @brief Assign operator to another matrix
         @param mat rhs Matrix3 object */

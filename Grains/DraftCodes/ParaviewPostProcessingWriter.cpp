@@ -6,14 +6,13 @@
 /* ========================================================================== */
 // Writes particles data
 template <typename T>
-__HOST__ void
-    writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
-                            std::vector<unsigned int> const*    rigidBodyID,
-                            std::vector<Transform3<T>> const*   t,
-                            std::vector<Kinematics<T>> const*   k)
+__HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
+                                      std::vector<uint> const* rigidBodyID,
+                                      std::vector<Transform3<T>> const* t,
+                                      std::vector<Kinematics<T>> const* k)
 {
     list<Particle*>::const_iterator particle;
-    unsigned int                    numParticles = rigidBodyID->size();
+    uint                            numParticles = rigidBodyID->size();
 
     std::ofstream f((m_ParaviewFilename_dir + "/" + partFilename).c_str(),
                     ios::out);
@@ -26,7 +25,7 @@ __HOST__ void
     f << "<UnstructuredGrid>" << endl;
     int nbpts = 0, nbcells = 0, i;
 
-    for(unsigned int i = 0; i < numParticles; i++)
+    for(uint i = 0; i < numParticles; i++)
     {
         nbpts += rb[i].getConvex()->numberOfPoints_PARAVIEW();
         nbcells += rb[i].getConvex()->numberOfCells_PARAVIEW();
@@ -38,7 +37,7 @@ __HOST__ void
     f << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" ";
     f << "offset=\"" << OFFSET << "\" format=\"appended\">";
     start_output_binary(sizeof_Float32, 3 * nbpts);
-    for(unsigned int i = 0; i < numParticles; i++)
+    for(uint i = 0; i < numParticles; i++)
     {
         ppp = (*particle)->get_polygonsPts_PARAVIEW(PPTranslation);
         for(ilpp = ppp.begin(); ilpp != ppp.end(); ilpp++)
@@ -221,7 +220,7 @@ __HOST__ void
 // Writes data at one physical time
 template <typename T>
 __HOST__ void one_output(std::vector<RigidBody<T, T>> const* rb,
-                         std::vector<unsigned int>           rigidBodyID,
+                         std::vector<uint>                   rigidBodyID,
                          std::vector<Transform3<T>> const*   t,
                          std::vector<Kinematics<T>> const*   k)
 {
@@ -340,7 +339,7 @@ __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing_start(
 template <typename T>
 __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing(
     std::vector<RigidBody<T, T>> const* rb,
-    std::vector<unsigned int>           rigidBodyID,
+    std::vector<uint>                   rigidBodyID,
     std::vector<Transform3<T>> const*   t,
     std::vector<Kinematics<T>> const*   k)
 {

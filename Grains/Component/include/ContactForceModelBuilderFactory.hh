@@ -110,7 +110,7 @@ public:
 		@param x 1st material ID
 		@param y 2nd material ID */
     __HOSTDEVICE__
-    static unsigned int computeHash(unsigned int x, unsigned int y);
+    static uint computeHash(uint x, uint y);
 
     /** @brief ContactForceModel objects must be instantiated on device, if 
 		we want to use them on device. Copying from host is not supported due to 

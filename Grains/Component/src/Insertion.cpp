@@ -16,7 +16,7 @@ __HOST__ static INLINE InsertionInfo<T> readDataRand(DOMNode* root)
     std::string seedString = ReaderXML::getNodeAttr_String(root, "Seed");
     if(seedString == "UserDefined")
     {
-        unsigned int val = ReaderXML::getNodeAttr_Int(root, "Value");
+        uint val = ReaderXML::getNodeAttr_Int(root, "Value");
         if(val)
             rgs = RGS_UDEF;
         else

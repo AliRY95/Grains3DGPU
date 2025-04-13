@@ -17,7 +17,7 @@ __GLOBAL__ void createLinkedCellOnDeviceKernel(T               minX,
                                                LinkedCell<T>** LC,
                                                int*            numCells)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid > 0)
         return;
 
@@ -64,10 +64,10 @@ template <typename T>
 __GLOBAL__ void
     computeLinearLinkedCellHashGPU_kernel(LinkedCell<T> const* const* LC,
                                           Transform3<T> const*        tr,
-                                          unsigned int  numComponents,
-                                          unsigned int* componentCellHash)
+                                          uint  numComponents,
+                                          uint* componentCellHash)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid >= numComponents)
         return;
 
@@ -87,8 +87,8 @@ __GLOBAL__ void
     template __GLOBAL__ void computeLinearLinkedCellHashGPU_kernel(      \
         LinkedCell<T> const* const* LC,                                  \
         Transform3<T> const*        tr,                                  \
-        unsigned int                numComponents,                       \
-        unsigned int*               componentCellHash);
+        uint                        numComponents,                       \
+        uint*                       componentCellHash);
 X(float)
 X(double)
 #undef X

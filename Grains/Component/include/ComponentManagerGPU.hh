@@ -18,9 +18,9 @@ protected:
     /** @name Parameters */
     //@{
     /** \brief Particles rigid body Id */
-    unsigned int* m_rigidBodyId;
+    uint* m_rigidBodyId;
     /** \brief Obstacles rigid body Id */
-    unsigned int* m_obstacleRigidBodyId;
+    uint* m_obstacleRigidBodyId;
     /** \brief Particles transformation */
     Transform3<T>* m_transform;
     /** \brief Obstacles transformation */
@@ -30,19 +30,19 @@ protected:
     /** \brief Particles torce */
     Torce<T>* m_torce;
     /** \brief Particles Id */
-    unsigned int* m_particleId;
+    uint* m_particleId;
     /** \brief Particles cell hash */
-    unsigned int* m_particleCellHash;
+    uint* m_particleCellHash;
     /** \brief cells hash start */
-    unsigned int* m_cellHashStart;
+    uint* m_cellHashStart;
     /** \brief cells hash end */
-    unsigned int* m_cellHashEnd;
+    uint* m_cellHashEnd;
     /** \brief number of particles in manager (HOST VARIABLE) */
-    unsigned int m_nParticles;
+    uint m_nParticles;
     /** \brief number of obstacles in manager (HOST VARIABLE) */
-    unsigned int m_nObstacles;
+    uint m_nObstacles;
     /** \brief number of cells in manager (HOST VARIABLE) */
-    unsigned int m_nCells;
+    uint m_nCells;
 
     // bool* isActive; /**< array of components activity in the simulation */
     // bool* isObstacle; /**< array of components flag for being obstacle */
@@ -53,9 +53,7 @@ public:
     //@{
     /** @brief Constructor with the number of particles, obstacles, and
         cells. All other data members are set to default. */
-    ComponentManagerGPU(unsigned int nParticles,
-                        unsigned int nObstacles,
-                        unsigned int nCells);
+    ComponentManagerGPU(uint nParticles, uint nObstacles, uint nCells);
 
     /** @brief Destructor */
     ~ComponentManagerGPU();
@@ -64,10 +62,10 @@ public:
     /** @name Get methods */
     //@{
     /** @brief Gets particles rigid body Id */
-    std::vector<unsigned int> getRigidBodyId() const final;
+    std::vector<uint> getRigidBodyId() const final;
 
     /** @brief Gets obstacles rigid body Id */
-    std::vector<unsigned int> getRigidBodyIdObstacles() const final;
+    std::vector<uint> getRigidBodyIdObstacles() const final;
 
     /** @brief Gets particles transformation */
     std::vector<Transform3<T>> getTransform() const final;
@@ -82,31 +80,31 @@ public:
     std::vector<Torce<T>> getTorce() const final;
 
     /** @brief Gets the array of particles Ids */
-    std::vector<unsigned int> getParticleId() const final;
+    std::vector<uint> getParticleId() const final;
 
     /** @brief Gets the number of particles in manager */
-    unsigned int getNumberOfParticles() const final;
+    uint getNumberOfParticles() const final;
 
     /** @brief Gets the number of obstacles in manager */
-    unsigned int getNumberOfObstacles() const final;
+    uint getNumberOfObstacles() const final;
 
     /** @brief Gets the number of cells in manager */
-    unsigned int getNumberOfCells() const final;
+    uint getNumberOfCells() const final;
 
     // /** @brief Gets the array of components neighbor Id */
-    // std::vector<unsigned int> getNeighborsId() const;
+    // std::vector<uint> getNeighborsId() const;
 
     // /** @brief Gets the array of components neighbor count */
-    // std::vector<unsigned int> getNeighborsCount() const;
+    // std::vector<uint> getNeighborsCount() const;
     //@}
 
     /** @name Set methods */
     //@{
     /** @brief Sets the array of particles rigid body Ids */
-    void setRigidBodyId(std::vector<unsigned int> const& id) final;
+    void setRigidBodyId(std::vector<uint> const& id) final;
 
     /** @brief Sets the array of obstacles rigid body Ids */
-    void setRigidBodyIdObstacles(std::vector<unsigned int> const& id) final;
+    void setRigidBodyIdObstacles(std::vector<uint> const& id) final;
 
     /** @brief Sets particles transformations */
     void setTransform(std::vector<Transform3<T>> const& t) final;
@@ -121,13 +119,13 @@ public:
     void setTorce(std::vector<Torce<T>> const& t) final;
 
     /** @brief Sets the array of particles Ids */
-    void setParticleId(std::vector<unsigned int> const& id) final;
+    void setParticleId(std::vector<uint> const& id) final;
 
     // /** @brief Sets the array of components neighbor Id */
-    // void setNeighborsId( std::vector<unsigned int> const& id );
+    // void setNeighborsId( std::vector<uint> const& id );
 
     // /** @brief Sets the array of components neighbor count */
-    // void setNeighborsCount( std::vector<unsigned int> const& count );
+    // void setNeighborsCount( std::vector<uint> const& count );
     //@}
 
     /** @name Methods */

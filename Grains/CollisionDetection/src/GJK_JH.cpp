@@ -6,28 +6,28 @@
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
 template <typename T>
-__HOSTDEVICE__ static INLINE void computeDet(unsigned int const bits,
-                                             unsigned int const last,
-                                             unsigned int const last_bit,
-                                             unsigned int const all_bits,
-                                             Vector3<T> const   y[4],
-                                             T                  dp[4][4],
-                                             T                  det[16][4])
+__HOSTDEVICE__ static INLINE void computeDet(uint const       bits,
+                                             uint const       last,
+                                             uint const       last_bit,
+                                             uint const       all_bits,
+                                             Vector3<T> const y[4],
+                                             T                dp[4][4],
+                                             T                det[16][4])
 {
-    for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+    for(uint i = 0, bit = 1; i < 4; ++i, bit <<= 1)
         if(bits & bit)
             dp[i][last] = dp[last][i] = y[i] * y[last];
     dp[last][last] = y[last] * y[last];
 
     det[last_bit][last] = T(1);
-    for(unsigned int j = 0, sj = 1; j < 4; ++j, sj <<= 1)
+    for(uint j = 0, sj = 1; j < 4; ++j, sj <<= 1)
     {
         if(bits & sj)
         {
-            unsigned int s2 = sj | last_bit;
-            det[s2][j]      = dp[last][last] - dp[last][j];
-            det[s2][last]   = dp[j][j] - dp[j][last];
-            for(unsigned int k = 0, sk = 1; k < j; ++k, sk <<= 1)
+            uint s2       = sj | last_bit;
+            det[s2][j]    = dp[last][last] - dp[last][j];
+            det[s2][last] = dp[j][j] - dp[j][last];
+            for(uint k = 0, sk = 1; k < j; ++k, sk <<= 1)
             {
                 if(bits & sk)
                 {
@@ -65,9 +65,9 @@ __HOSTDEVICE__ static INLINE void computeDet(unsigned int const bits,
 // -----------------------------------------------------------------------------
 template <typename T>
 __HOSTDEVICE__ static INLINE bool
-    valid(unsigned int const s, unsigned int const all_bits, T const det[16][4])
+    valid(uint const s, uint const all_bits, T const det[16][4])
 {
-    for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+    for(uint i = 0, bit = 1; i < 4; ++i, bit <<= 1)
     {
         if(all_bits & bit)
         {
@@ -85,14 +85,14 @@ __HOSTDEVICE__ static INLINE bool
 
 // -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits_,
-                                                Vector3<T> const   y[4],
-                                                T const            det[16][4],
-                                                Vector3<T>&        v)
+__HOSTDEVICE__ static INLINE void computeVector(uint const       bits_,
+                                                Vector3<T> const y[4],
+                                                T const          det[16][4],
+                                                Vector3<T>&      v)
 {
     T sum = T(0);
     v.setValue(T(0), T(0), T(0));
-    for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+    for(uint i = 0, bit = 1; i < 4; ++i, bit <<= 1)
     {
         if(bits_ & bit)
         {
@@ -105,17 +105,17 @@ __HOSTDEVICE__ static INLINE void computeVector(unsigned int const bits_,
 
 // -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits_,
-                                                T const            det[16][4],
-                                                Vector3<T> const   p[4],
-                                                Vector3<T> const   q[4],
-                                                Vector3<T>&        p1,
-                                                Vector3<T>&        p2)
+__HOSTDEVICE__ static INLINE void computePoints(uint const       bits_,
+                                                T const          det[16][4],
+                                                Vector3<T> const p[4],
+                                                Vector3<T> const q[4],
+                                                Vector3<T>&      p1,
+                                                Vector3<T>&      p2)
 {
     T sum = T(0);
     p1.setValue(T(0), T(0), T(0));
     p2.setValue(T(0), T(0), T(0));
-    for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+    for(uint i = 0, bit = 1; i < 4; ++i, bit <<= 1)
     {
         if(bits_ & bit)
         {
@@ -131,10 +131,9 @@ __HOSTDEVICE__ static INLINE void computePoints(unsigned int const bits_,
 
 // -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE bool proper(unsigned int const s,
-                                         T const            det[16][4])
+__HOSTDEVICE__ static INLINE bool proper(uint const s, T const det[16][4])
 {
-    for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+    for(uint i = 0, bit = 1; i < 4; ++i, bit <<= 1)
         if((s & bit) && det[s][i] <= EPS<T>)
             return (false);
     return (true);
@@ -142,16 +141,16 @@ __HOSTDEVICE__ static INLINE bool proper(unsigned int const s,
 
 // -----------------------------------------------------------------------------
 template <typename T>
-__HOSTDEVICE__ static INLINE bool closest(unsigned int&      bits,
-                                          unsigned int const last,
-                                          unsigned int const last_bit,
-                                          unsigned int const all_bits,
-                                          Vector3<T> const   y[4],
-                                          T                  dp[4][4],
-                                          T                  det[16][4],
-                                          Vector3<T>&        v)
+__HOSTDEVICE__ static INLINE bool closest(uint&            bits,
+                                          uint const       last,
+                                          uint const       last_bit,
+                                          uint const       all_bits,
+                                          Vector3<T> const y[4],
+                                          T                dp[4][4],
+                                          T                det[16][4],
+                                          Vector3<T>&      v)
 {
-    unsigned int s;
+    uint s;
     computeDet(bits, last, last_bit, all_bits, y, dp, det);
     for(s = bits; s; --s)
     {
@@ -198,11 +197,10 @@ __HOSTDEVICE__ static INLINE bool closest(unsigned int&      bits,
 // The next function is used for detecting degenerate cases that cause
 // termination problems due to rounding errors.
 template <typename T>
-__HOSTDEVICE__ static INLINE bool degenerate(unsigned int const all_bits,
-                                             Vector3<T> const   y[4],
-                                             const Vector3<T>&  w)
+__HOSTDEVICE__ static INLINE bool
+    degenerate(uint const all_bits, Vector3<T> const y[4], const Vector3<T>& w)
 {
-    for(unsigned int i = 0, bit = 1; i < 4; ++i, bit <<= 1)
+    for(uint i = 0, bit = 1; i < 4; ++i, bit <<= 1)
         if((all_bits & bit) && y[i] == w)
             return (true);
     return (false);
@@ -226,13 +224,13 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
                                  const Transform3<T>& a2w,
                                  const Transform3<T>& b2w)
 {
-    unsigned int bits     = 0; // identifies current simplex
-    unsigned int last     = 0; // identifies last found support point
-    unsigned int last_bit = 0; // last_bit = 1<<last
-    unsigned int all_bits = 0; // all_bits = bits|last_bit
-    Vector3<T>   y[4]; // support points of A-B in world
-    T            det[16][4] = {T(0)}; // cached sub-determinants
-    T            dp[4][4]   = {T(0)};
+    uint       bits     = 0; // identifies current simplex
+    uint       last     = 0; // identifies last found support point
+    uint       last_bit = 0; // last_bit = 1<<last
+    uint       all_bits = 0; // all_bits = bits|last_bit
+    Vector3<T> y[4]; // support points of A-B in world
+    T          det[16][4] = {T(0)}; // cached sub-determinants
+    T          dp[4][4]   = {T(0)};
 
     Vector3<T> v(b2w.getOrigin() - a2w.getOrigin());
     Vector3<T> w;
@@ -270,13 +268,13 @@ __HOSTDEVICE__ bool intersectGJK(Convex<T> const&     a,
                                  Convex<T> const&     b,
                                  const Transform3<T>& b2a)
 {
-    unsigned int bits     = 0; // identifies current simplex
-    unsigned int last     = 0; // identifies last found support point
-    unsigned int last_bit = 0; // last_bit = 1<<last
-    unsigned int all_bits = 0; // all_bits = bits|last_bit
-    Vector3<T>   y[4]; // support points of A-B in world
-    T            det[16][4] = {T(0)}; // cached sub-determinants
-    T            dp[4][4]   = {T(0)};
+    uint       bits     = 0; // identifies current simplex
+    uint       last     = 0; // identifies last found support point
+    uint       last_bit = 0; // last_bit = 1<<last
+    uint       all_bits = 0; // all_bits = bits|last_bit
+    Vector3<T> y[4]; // support points of A-B in world
+    T          det[16][4] = {T(0)}; // cached sub-determinants
+    T          dp[4][4]   = {T(0)};
 
     Vector3<T> v(b2a.getOrigin());
     Vector3<T> w;
@@ -318,17 +316,17 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
                                              int&                 nbIter)
 {
     // GJK variables
-    unsigned int bits     = 0; // identifies current simplex
-    unsigned int last     = 0; // identifies last found support point
-    unsigned int last_bit = 0; // last_bit = 1<<last
-    unsigned int all_bits = 0; // all_bits = bits|last_bit
-    Vector3<T>   p[4]; // support points of A in local
-    Vector3<T>   q[4]; // support points of B in local
-    Vector3<T>   y[4]; // support points of A-B in world
-    T            mu            = 0.; // optimality gap
-    int          numIterations = 0; // No. iterations
-    T            det[16][4]    = {T(0)}; // cached sub-determinants
-    T            dp[4][4]      = {T(0)};
+    uint       bits     = 0; // identifies current simplex
+    uint       last     = 0; // identifies last found support point
+    uint       last_bit = 0; // last_bit = 1<<last
+    uint       all_bits = 0; // all_bits = bits|last_bit
+    Vector3<T> p[4]; // support points of A in local
+    Vector3<T> q[4]; // support points of B in local
+    Vector3<T> y[4]; // support points of A-B in world
+    T          mu            = 0.; // optimality gap
+    int        numIterations = 0; // No. iterations
+    T          det[16][4]    = {T(0)}; // cached sub-determinants
+    T          dp[4][4]      = {T(0)};
 
     // Misc variables, e.g. tolerance, ...
     // T relError = GrainsExec::m_colDetTolerance;             // rel error for opt gap
@@ -404,10 +402,10 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
 //                          Vec3& pb,
 //                          int& nbIter )
 // {
-//     unsigned int bits = 0;           // identifies current simplex
-//     unsigned int last = 0;           // identifies last found support point
-//     unsigned int last_bit = 0;       // last_bit = 1<<last
-//     unsigned int all_bits = 0;       // all_bits = bits|last_bit
+//     uint bits = 0;           // identifies current simplex
+//     uint last = 0;           // identifies last found support point
+//     uint last_bit = 0;       // last_bit = 1<<last
+//     uint all_bits = 0;       // all_bits = bits|last_bit
 //     Vec3 p[4];                      // support points of A in local
 //     Vec3 q[4];                      // support points of B in local
 //     Vec3 y[4];                      // support points of A-B in world
@@ -419,7 +417,7 @@ __HOSTDEVICE__ T computeClosestPoints_GJK_JH(Convex<T> const&     a,
 //     Vec3 w;
 //     double dist = v.norm();
 //     double mu = 0;
-//     unsigned int num_iterations = 0;
+//     uint num_iterations = 0;
 
 //     while ( bits < 15 && dist > abs_error && num_iterations < 1000 )
 //     {

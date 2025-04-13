@@ -15,11 +15,11 @@
 template <typename T, typename... Arguments>
 __GLOBAL__ void
     createContactForceModelKernel(ContactForceModel<T>** CF,
-                                  unsigned int           index,
+                                  uint                   index,
                                   ContactForceModelType  contactForceModelType,
                                   Arguments... args)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid > 0)
         return;
 
@@ -38,9 +38,9 @@ template <typename T>
 __HOST__ ContactForceModel<T>**
          ContactForceModelBuilderFactory<T>::create(DOMElement* root)
 {
-    unsigned int numContactPairs = GrainsParameters<T>::m_numContactPairs;
-    ContactForceModel<T>** CF    = new ContactForceModel<T>*[numContactPairs];
-    DOMNodeList* allContacts = ReaderXML::getNodes(root, "ContactForceModel");
+    uint numContactPairs      = GrainsParameters<T>::m_numContactPairs;
+    ContactForceModel<T>** CF = new ContactForceModel<T>*[numContactPairs];
+    DOMNodeList* allContacts  = ReaderXML::getNodes(root, "ContactForceModel");
     for(XMLSize_t i = 0; i < allContacts->getLength(); i++)
     {
         DOMNode*    contact = allContacts->item(i);
@@ -50,9 +50,9 @@ __HOST__ ContactForceModel<T>**
         DOMNode*    material = ReaderXML::getNode(contact, "Material");
         std::string matA = ReaderXML::getNodeAttr_String(material, "materialA");
         std::string matB = ReaderXML::getNodeAttr_String(material, "materialB");
-        unsigned int matA_id = GrainsParameters<T>::m_materialMap[matA];
-        unsigned int matB_id = GrainsParameters<T>::m_materialMap[matB];
-        unsigned int index   = computeHash(matA_id, matB_id);
+        uint        matA_id = GrainsParameters<T>::m_materialMap[matA];
+        uint        matB_id = GrainsParameters<T>::m_materialMap[matB];
+        uint        index   = computeHash(matA_id, matB_id);
         // Contact Parameters
         DOMNode* parameters = ReaderXML::getNode(contact, "Parameters");
         if(contactType == "Hooke")
@@ -74,17 +74,16 @@ __HOST__ ContactForceModel<T>**
 // inputs would persumably crash the code by accessing memory accesses that are
 // not valid.
 template <typename T>
-__HOSTDEVICE__ unsigned int
-    ContactForceModelBuilderFactory<T>::computeHash(unsigned int x,
-                                                    unsigned int y)
+__HOSTDEVICE__ uint ContactForceModelBuilderFactory<T>::computeHash(uint x,
+                                                                    uint y)
 {
-    unsigned int s = min(x, y); // smaller one
-    unsigned int l = max(x, y); // larger one
+    uint s = min(x, y); // smaller one
+    uint l = max(x, y); // larger one
     return (l * (l + 1) / 2 + s);
 
-    // unsigned int numPM = numParticleMaterials<T>;
-    // unsigned int s = min( x, y ); // smaller one
-    // unsigned int l = max( x, y ); // larger one
+    // uint numPM = numParticleMaterials<T>;
+    // uint s = min( x, y ); // smaller one
+    // uint l = max( x, y ); // larger one
     // if ( l < numPM )
     // 	return ( l * ( l + 1 ) / 2 + s );
     // // offset if contact between a part and obst

@@ -34,11 +34,11 @@ public:
 
     /* Numbers */
     /** @brief Number of particles in simulation */
-    static unsigned int m_numParticles;
+    static uint m_numParticles;
     /** @brief Number of obstacles in simulation */
-    static unsigned int m_numObstacles;
+    static uint m_numObstacles;
     /** @brief Number of cells in simulation */
-    static unsigned int m_numCells;
+    static uint m_numCells;
     /** @brief Size of cells in LinkedCell */
     static T m_sizeLC;
 
@@ -47,10 +47,10 @@ public:
     static Vector3<T> m_gravity;
 
     /* Material */
-    /** \brief Map from material name to an unsigned int ID */
-    static std::unordered_map<std::string, unsigned int> m_materialMap;
+    /** \brief Map from material name to an uint ID */
+    static std::unordered_map<std::string, uint> m_materialMap;
     /** \brief Number of different possible contact pairs (incl. obs-obs) */
-    static unsigned int m_numContactPairs;
+    static uint m_numContactPairs;
 
     /* Post-Processing */
     /** \brief Queue of simulation time to write PP */

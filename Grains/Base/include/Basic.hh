@@ -141,6 +141,6 @@ constexpr float LOWEPS<float> = float(1.e-03);
 #define noContact ContactInfo<T>(zeroVector3T, zeroVector3T, T(0))
 //@}
 
-using uint = unsigned int;
+using uint = uint;
 
 #endif

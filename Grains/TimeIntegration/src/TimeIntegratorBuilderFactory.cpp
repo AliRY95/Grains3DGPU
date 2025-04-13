@@ -15,7 +15,7 @@ __GLOBAL__ void createTimeIntegratorKernel(TimeIntegratorType  tiType,
                                            T                   dt,
                                            TimeIntegrator<T>** TI)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid > 0)
         return;
 

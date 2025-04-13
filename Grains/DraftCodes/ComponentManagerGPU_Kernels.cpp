@@ -11,9 +11,9 @@
 // -----------------------------------------------------------------------------
 // Zeros out the array
 __GLOBAL__
-void zeroOutArray(unsigned int* array, unsigned int numElements)
+void zeroOutArray(uint* array, uint numElements)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     if(tid >= numElements)
         return;
@@ -24,19 +24,18 @@ void zeroOutArray(unsigned int* array, unsigned int numElements)
 // -----------------------------------------------------------------------------
 // Returns the start Id for each hash value in cellStart
 __GLOBAL__
-void sortComponentsAndFindCellStart_kernel(
-    unsigned int const* componentCellHash,
-    unsigned int        numComponents,
-    unsigned int*       cellStart,
-    unsigned int*       cellEnd)
+void sortComponentsAndFindCellStart_kernel(uint const* componentCellHash,
+                                           uint        numComponents,
+                                           uint*       cellStart,
+                                           uint*       cellEnd)
 {
     // Handle to thread block group
     cooperative_groups::thread_block cta
         = cooperative_groups::this_thread_block();
-    extern __shared__ unsigned int sharedHash[]; // blockSize + 1 elements
-    unsigned int                   tid = blockIdx.x * blockDim.x + threadIdx.x;
+    extern __shared__ uint sharedHash[]; // blockSize + 1 elements
+    uint                   tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-    unsigned int hash;
+    uint hash;
     if(tid < numComponents)
     {
         hash = componentCellHash[tid];
@@ -83,7 +82,7 @@ __GLOBAL__ void collisionDetectionN2(RigidBody<T, U> const* const* a,
                                      int  numComponents,
                                      int* result)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     RigidBody<T, U> const& AA  = **a;
     const Transform3<T>&   trA = tr3d[tid];
@@ -105,7 +104,7 @@ __GLOBAL__ void collisionDetectionRelativeN2(RigidBody<T, U> const* const* a,
                                              int  numComponents,
                                              int* result)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     RigidBody<T, U> const& AA  = **a;
     const Transform3<T>&   trA = tr3d[tid];
@@ -126,27 +125,27 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(
     LinkedCell<T> const* const*        LC,
     RigidBody<T, U> const* const*      RB,
     ContactForceModel<T> const* const* CF,
-    unsigned int*                      m_rigidBodyId,
+    uint*                              m_rigidBodyId,
     Transform3<T> const*               tr3d,
     Torce<T>*                          m_torce,
     int*                               m_compId,
-    unsigned int*                      m_componentCellHash,
-    unsigned int*                      m_cellHashStart,
-    unsigned int*                      m_cellHashEnd,
+    uint*                              m_componentCellHash,
+    uint*                              m_cellHashStart,
+    uint*                              m_cellHashEnd,
     int                                numComponents,
     int*                               result)
 {
-    unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     if(tid >= numComponents)
         return;
 
-    unsigned int const     compId   = m_compId[tid];
-    unsigned int const     cellHash = m_componentCellHash[tid];
+    uint const             compId   = m_compId[tid];
+    uint const             cellHash = m_componentCellHash[tid];
     RigidBody<T, U> const& rbA      = *(RB[m_rigidBodyId[compId]]);
     const Transform3<T>&   trA      = tr3d[compId];
     T                      massA    = rbA.getMass();
-    unsigned int           matA     = rbA.getMaterial();
+    uint                   matA     = rbA.getMaterial();
 
     for(int k = -1; k < 2; k++)
     {
@@ -178,7 +177,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(
                         = closestPointsRigidBodies(rbA, rbB, trA, trB);
                     if(ci.getOverlapDistance() < T(0))
                     {
-                        unsigned int contactForceID = 0;
+                        uint contactForceID = 0;
                         // ContactForceModelBuilderFactory<T>::computeHash( matA,
                         //                                         rbB.getMaterial(),
                         //                                         GrainsParameters<T>::m_materialMap.size() );
@@ -215,13 +214,13 @@ __GLOBAL__ void detectCollisionAndComputeContactForces_kernel(
         LinkedCell<T> const* const*        LC,                               \
         RigidBody<T, U> const* const*      RB,                               \
         ContactForceModel<T> const* const* CF,                               \
-        unsigned int*                      m_rigidBodyId,                    \
+        uint*                              m_rigidBodyId,                    \
         Transform3<T> const*               tr3d,                             \
         Torce<T>*                          m_torce,                          \
         int*                               m_compId,                         \
-        unsigned int*                      m_componentCellHash,              \
-        unsigned int*                      m_cellHashStart,                  \
-        unsigned int*                      m_cellHashEnd,                    \
+        uint*                              m_componentCellHash,              \
+        uint*                              m_cellHashStart,                  \
+        uint*                              m_cellHashEnd,                    \
         int                                numComponents,                    \
         int*                               result);
 X(float, float)
