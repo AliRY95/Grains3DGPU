@@ -238,7 +238,7 @@ __HOSTDEVICE__ void Transform3<T>::composeLeftByRotation(const Transform3<T>& t)
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::composeLeftByRotation(const Quaternion<T>& q)
 {
-    T const* b  = m_basis.getBuffer();
+    const T* b  = m_basis.getBuffer();
     T        qx = q[X], qy = q[Y], qz = q[Z], qw = q[W];
     T        px, py, pz, pw;
 

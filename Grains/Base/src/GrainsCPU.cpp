@@ -48,12 +48,11 @@ void GrainsCPU<T>::simulate()
         GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt)
     {
         // Output time
-        // ostringstream oss;
-        // oss.width(10);
-        // oss << left << GrainsParameters<T>::m_time;
-        // std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd
-        //           << std::flush;
-        cout << GrainsParameters<T>::m_time << endl;
+        ostringstream oss;
+        oss.width(10);
+        oss << left << GrainsParameters<T>::m_time;
+        std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd
+                  << std::flush;
 
         Grains<T>::m_components->detectCollisionAndComputeContactForces(
             Grains<T>::m_particleRigidBodyList,
@@ -64,9 +63,9 @@ void GrainsCPU<T>::simulate()
         Grains<T>::m_components->addExternalForces(
             Grains<T>::m_particleRigidBodyList,
             GrainsParameters<T>::m_gravity);
-        Grains<T>::m_components->moveParticles(
-            Grains<T>::m_particleRigidBodyList,
-            Grains<T>::m_timeIntegrator);
+        // Grains<T>::m_components->moveParticles(
+        //     Grains<T>::m_particleRigidBodyList,
+        //     Grains<T>::m_timeIntegrator);
 
         // Post-Processing
         Grains<T>::postProcess(Grains<T>::m_components);

@@ -27,6 +27,49 @@ __HOSTDEVICE__ LinkedCell<T>::LinkedCell(const Vector3<T>& min,
     m_numCellsPerDir.y = uint(numCellsPerDir[Y]);
     m_numCellsPerDir.z = uint(numCellsPerDir[Z]);
     m_numCells = m_numCellsPerDir.x * m_numCellsPerDir.y * m_numCellsPerDir.z;
+
+    // Allocate memory for the flat array
+    uint offset;
+    m_neighborsList = new uint[27 * m_numCells];
+    // Precompute neighbors for each cell
+    for(uint cellHash = 0; cellHash < m_numCells; ++cellHash)
+    {
+        offset       = cellHash * 27;
+        uint3 cellId = {cellHash % m_numCellsPerDir.x,
+                        (cellHash / m_numCellsPerDir.x) % m_numCellsPerDir.y,
+                        cellHash / (m_numCellsPerDir.x * m_numCellsPerDir.y)};
+        for(int k = -1; k < 2; ++k)
+        {
+            for(int j = -1; j < 2; ++j)
+            {
+                for(int i = -1; i < 2; ++i)
+                {
+                    int nx = cellId.x + i;
+                    int ny = cellId.y + j;
+                    int nz = cellId.z + k;
+
+                    // Check if the neighbor is within bounds
+                    // clang-format off
+                    if(nx >= 0 && nx < m_numCellsPerDir.x && 
+                       ny >= 0 && ny < m_numCellsPerDir.y && 
+                       nz >= 0 && nz < m_numCellsPerDir.z)
+                    {
+                        uint neighborHash = 
+                            nx + 
+                            ny * m_numCellsPerDir.x +
+                            nz * m_numCellsPerDir.x * m_numCellsPerDir.y;
+                        m_neighborsList[offset++] = neighborHash;
+                    }
+                    // clang-format on
+                    else
+                    {
+                        // Invalid neighbor
+                        m_neighborsList[offset++] = UINT_MAX;
+                    }
+                }
+            }
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -34,6 +77,17 @@ __HOSTDEVICE__ LinkedCell<T>::LinkedCell(const Vector3<T>& min,
 template <typename T>
 __HOSTDEVICE__ LinkedCell<T>::~LinkedCell()
 {
+    delete[] m_neighborsList;
+}
+
+// -----------------------------------------------------------------------------
+// Gets the neighbors of the cell with the given hash value
+template <typename T>
+__HOSTDEVICE__ const uint*
+    LinkedCell<T>::getNeighbors(const uint cellHash) const
+{
+    const uint offset = cellHash * 27;
+    return (&m_neighborsList[offset]);
 }
 
 // -----------------------------------------------------------------------------
@@ -49,9 +103,6 @@ __HOSTDEVICE__ uint LinkedCell<T>::getNumCells() const
 template <typename T>
 __HOSTDEVICE__ void LinkedCell<T>::checkBound(const uint3& id) const
 {
-    // assert(id.x < 0 || id.x > m_numCellsPerDir.x ||
-    //        id.y < 0 || id.y > m_numCellsPerDir.y ||
-    //        id.z < 0 || id.z > m_numCellsPerDir.z);
     if(id.x >= m_numCellsPerDir.x || id.y >= m_numCellsPerDir.y
        || id.z >= m_numCellsPerDir.z)
     {
@@ -94,17 +145,17 @@ __HOSTDEVICE__ uint
     LinkedCell<T>::computeLinearCellHash(const uint3& cellId) const
 {
     return ((cellId.z * m_numCellsPerDir.y + cellId.y) * m_numCellsPerDir.x
-            + cellId.x + 1);
+            + cellId.x);
 }
 
 // -----------------------------------------------------------------------------
 // Returns the linear cell hash value from the Id along each axis
 template <typename T>
-__HOSTDEVICE__ uint LinkedCell<T>::computeLinearCellHash(uint i,
-                                                         uint j,
-                                                         uint k) const
+__HOSTDEVICE__ uint LinkedCell<T>::computeLinearCellHash(const uint i,
+                                                         const uint j,
+                                                         const uint k) const
 {
-    return ((k * m_numCellsPerDir.y + j) * m_numCellsPerDir.x + i + 1);
+    return ((k * m_numCellsPerDir.y + j) * m_numCellsPerDir.x + i);
 }
 
 // -----------------------------------------------------------------------------
@@ -113,9 +164,8 @@ __HOSTDEVICE__ uint LinkedCell<T>::computeLinearCellHash(uint i,
 // TODO: performance check!
 template <typename T>
 __HOSTDEVICE__ uint LinkedCell<T>::computeNeighboringCellLinearHash(
-    uint cellHash, uint i, uint j, uint k) const
+    const uint cellHash, const uint i, const uint j, const uint k) const
 {
-    cellHash--;
     uint z = cellHash / (m_numCellsPerDir.x * m_numCellsPerDir.y);
     uint y = (cellHash / m_numCellsPerDir.x) % m_numCellsPerDir.y;
     uint x = cellHash % m_numCellsPerDir.x;

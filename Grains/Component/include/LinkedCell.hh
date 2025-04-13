@@ -20,11 +20,19 @@ class LinkedCell
 protected:
     /** @name Parameters */
     //@{
-    Vector3<T> m_minCorner; /**< min corner point of the linked cell */
-    Vector3<T> m_maxCorner; /**< max corner point of the linked cell */
-    T          m_cellExtent; /**< extent of each cell */
-    uint3      m_numCellsPerDir; /**< number of cells per each direction */
-    uint       m_numCells; /**< total number of cells */
+    /** \brief Neighboring cell hash values as a flat array. Each cell has 27
+     * neighbors. */
+    uint* m_neighborsList;
+    /** \brief Min corner point of the linked cell */
+    Vector3<T> m_minCorner;
+    /** \brief Max corner point of the linked cell */
+    Vector3<T> m_maxCorner;
+    /** \brief Extent of each cell */
+    T m_cellExtent;
+    /** \brief Number of cells per each direction */
+    uint3 m_numCellsPerDir;
+    /** \brief Total number of cells */
+    uint m_numCells;
     //@}
 
 public:
@@ -49,6 +57,11 @@ public:
 
     /** @name Get methods */
     //@{
+    /** @brief Gets the neighbors of the cell with the given hash value
+        @param cellHash hash value of the cell */
+    __HOSTDEVICE__
+    const uint* getNeighbors(const uint cellHash) const;
+
     /** @brief Gets the number of cells */
     __HOSTDEVICE__
     uint getNumCells() const;

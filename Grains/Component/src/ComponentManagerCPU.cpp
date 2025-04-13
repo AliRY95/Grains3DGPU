@@ -34,7 +34,7 @@ ComponentManagerCPU<T>::ComponentManagerCPU(uint nParticles,
     m_torce.reserve(m_nParticles);
     m_particleId.reserve(m_nParticles);
     m_particleCellHash.reserve(m_nParticles);
-    m_cell.reserve(m_nCells + 1);
+    m_cell.reserve(m_nCells);
 
     // Initializing the vectors for particles
     for(int i = 0; i < m_nParticles; i++)
@@ -57,8 +57,8 @@ ComponentManagerCPU<T>::ComponentManagerCPU(uint nParticles,
     // Initializing the vectors for cells
     // The size of these vectors is one bigger that nCells because we reserve
     // cellID = 0.
-    std::vector<uint> zeroVec(1, 0);
-    for(int i = 0; i < m_nCells + 1; i++)
+    std::vector<uint> zeroVec(1, UINT_MAX);
+    for(int i = 0; i < m_nCells; i++)
     {
         m_cell.push_back(zeroVec);
     }
@@ -286,9 +286,10 @@ template <typename T>
 void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
 {
     // Reset
-    // for(int i = 0; i < m_nCells + 1; i++)
-    //     m_cell[i].clear();
-
+    for(int i = 0; i < m_nCells + 1; i++)
+        m_cell[i].clear();
+    for(int i = 0; i < m_nParticles; i++)
+        std::cout << m_transform[i].getOrigin() << std::endl;
     // Updating m_particleCellHash according to the linkedCell. That is,
     // assigning a hash value to each particle based on the cell it belongs to.
     (*LC)->computeLinearLinkedCellHashCPU(m_transform,
@@ -299,6 +300,13 @@ void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
     for(int i = 0; i < m_nParticles; i++)
     {
         uint cellId = m_particleCellHash[i];
+        if(cellId > m_nCells)
+        {
+            std::cerr << "Error: Particle " << i
+                      << " is outside the linked cell domain." << std::endl;
+            std::cerr << m_transform[i].getOrigin();
+            std::cerr << "CellId: " << cellId << std::endl;
+        }
         m_cell[cellId].push_back(i);
     }
 }
@@ -378,63 +386,53 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
         const Transform3<T>&   trA   = m_transform[particleId];
         T                      massA = rbA.getMass();
         uint                   matA  = rbA.getMaterial();
-
+        const uint*            neighborsList = (*LC)->getNeighbors(cellHash);
         // Loop over all neighboring particles
-        for(int k = -1; k < 2; k++)
+        for(int i = 0; i < 27; ++i)
         {
-            for(int j = -1; j < 2; j++)
+            // Get the neighboring cell hash
+            uint neighborCellHash = neighborsList[i];
+            // Check if the neighboring cell is valid
+            if(neighborCellHash == UINT_MAX)
+                continue;
+            for(auto id : m_cell[neighborCellHash])
             {
-                for(int i = -1; i < 2; i++)
+                const uint secondaryId = id;
+                // To skip self-collision
+                if(secondaryId == particleId)
+                    continue;
+                const RigidBody<T, T>& rbB
+                    = *(particleRB[m_rigidBodyId[secondaryId]]);
+                const Transform3<T>& trB = m_transform[secondaryId];
+                ContactInfo<T>       ci
+                    = closestPointsRigidBodies(rbA, rbB, trA, trB);
+                if(ci.getOverlapDistance() < T(0))
                 {
-                    int neighboringCellHash
-                        = (*LC)->computeNeighboringCellLinearHash(cellHash,
-                                                                  i,
-                                                                  j,
-                                                                  k);
-                    cout << "Cell: " << neighboringCellHash << endl;
-                    for(auto ppp : m_cell[neighboringCellHash])
-                        cout << " " << ppp << endl;
-                    for(auto id : m_cell[neighboringCellHash])
-                    {
-                        const uint secondaryId = id;
-                        // To skip self-collision
-                        if(secondaryId == particleId)
-                            continue;
-                        const RigidBody<T, T>& rbB
-                            = *(particleRB[m_rigidBodyId[secondaryId]]);
-                        const Transform3<T>& trB = m_transform[secondaryId];
-                        ContactInfo<T>       ci
-                            = closestPointsRigidBodies(rbA, rbB, trA, trB);
-                        if(ci.getOverlapDistance() < T(0))
-                        {
-                            // CF ID given materialIDs
-                            uint contactForceID
-                                = ContactForceModelBuilderFactory<
-                                    T>::computeHash(matA, rbB.getMaterial());
-                            // velocities of the particles
-                            Kinematics<T> v1(m_velocity[particleId]);
-                            Kinematics<T> v2(m_velocity[secondaryId]);
-                            // geometric point of contact
-                            Vector3<T> contactPt(ci.getContactPoint());
-                            // relative velocity at contact point
-                            Vector3<T> relVel(
-                                v1.kinematicsAtPoint(contactPt)
-                                - v2.kinematicsAtPoint(contactPt));
-                            // relative angular velocity
-                            Vector3<T> relAngVel(v1.getAngularComponent()
-                                                 - v2.getAngularComponent());
-                            CF[contactForceID]->computeForces(
-                                ci,
-                                relVel,
-                                relAngVel,
-                                massA,
-                                rbB.getMass(),
-                                trA.getOrigin(),
-                                m_torce[particleId]);
-                        }
-                        result[particleId] += (ci.getOverlapDistance() < T(0));
-                    }
+                    // CF ID given materialIDs
+                    uint contactForceID
+                        = ContactForceModelBuilderFactory<T>::computeHash(
+                            matA,
+                            rbB.getMaterial());
+                    // velocities of the particles
+                    Kinematics<T> v1(m_velocity[particleId]);
+                    Kinematics<T> v2(m_velocity[secondaryId]);
+                    // geometric point of contact
+                    Vector3<T> contactPt(ci.getContactPoint());
+                    // relative velocity at contact point
+                    Vector3<T> relVel(v1.kinematicsAtPoint(contactPt)
+                                      - v2.kinematicsAtPoint(contactPt));
+                    // relative angular velocity
+                    Vector3<T> relAngVel(v1.getAngularComponent()
+                                         - v2.getAngularComponent());
+                    CF[contactForceID]->computeForces(ci,
+                                                      relVel,
+                                                      relAngVel,
+                                                      massA,
+                                                      rbB.getMass(),
+                                                      trA.getOrigin(),
+                                                      m_torce[particleId]);
                 }
+                result[particleId] += (ci.getOverlapDistance() < T(0));
             }
         }
     }
@@ -467,7 +465,6 @@ void ComponentManagerCPU<T>::addExternalForces(
     RigidBody<T, T> const* const* particleRB, const Vector3<T>& g)
 {
     // #pragma omp parallel for
-    // m_torce[ 0 ].setTorque( Vector3<T>( 0, 0.5, 0 ) );
     for(int pId = 0; pId < m_nParticles; pId++)
     {
         // Parameters of the primary particle
@@ -486,7 +483,6 @@ void ComponentManagerCPU<T>::moveParticles(
     TimeIntegrator<T> const* const* TI)
 {
     // #pragma omp parallel for
-    m_torce[0].setTorque(Vector3<T>(0, 0.5, 0));
     for(int pId = 0; pId < m_nParticles; pId++)
     {
         // Rigid body
@@ -506,13 +502,11 @@ void ComponentManagerCPU<T>::moveParticles(
         Quaternion<T> rotMotion;
         (*TI)->Move(momentum, m_velocity[pId], transMotion, rotMotion);
 
-        // // Quaternion and rotation quaternion conjugate
-        // Vector3<T> om = m_velocity[ pId ].getAngularComponent();
-        // Quaternion<T> qRotCon( qRot.conjugate() );
-        // // Write torque in body-fixed coordinates system
-        // Vector3<T> angAcc( qRot.multToVector3( om * qRotCon ) );
-        // std::cout << "angAcc: " << angAcc << std::endl;
-        // std::cout << "qRot: " << qRot << std::endl;
+        // Quaternion and rotation quaternion conjugate
+        Vector3<T>    om = m_velocity[pId].getAngularComponent();
+        Quaternion<T> qRotCon(qRot.conjugate());
+        // Write torque in body-fixed coordinates system
+        Vector3<T> angAcc(qRot.multToVector3(om * qRotCon));
         // and update the transformation of the component
         m_transform[pId].updateTransform(transMotion, rotMotion);
         // TODO
