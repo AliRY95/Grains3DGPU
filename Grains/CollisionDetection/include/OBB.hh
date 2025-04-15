@@ -1,10 +1,8 @@
 #ifndef _OBB_HH_
 #define _OBB_HH_
 
-
-#include "Transform3.hh"
 #include "BoundingBox.hh"
-
+#include "Transform3.hh"
 
 // =============================================================================
 /** @brief The header for the axis-aligned and oriented bounding boxes collision
@@ -24,12 +22,11 @@
 @param trA2W transformation of first bounding box
 @param trB2W transformation of second bounding box */
 template <typename T>
-__HOSTDEVICE__
-bool intersectOrientedBoundingBox( BoundingBox<T> const& bbA, 
-                                   BoundingBox<T> const& bbB,
-                                   Transform3<T> const& trA2W,
-                                   Transform3<T> const& trB2W );
-                                        
+__HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
+                                                 BoundingBox<T> const& bbB,
+                                                 const Transform3<T>&  trA2W,
+                                                 const Transform3<T>&  trB2W);
+
 /** @brief Returns whether the bounding boxes are in contact using OBB test - 
 relative transformation
 @param bbA first bounding box
@@ -37,10 +34,9 @@ relative transformation
 @param trB2A transformation of the second bounding box wrt the first bounding
 box */
 template <typename T>
-__HOSTDEVICE__
-bool intersectOrientedBoundingBox( BoundingBox<T> const& bbA, 
-                                   BoundingBox<T> const& bbB,
-                                   Transform3<T> const& trB2A );
+__HOSTDEVICE__ bool intersectOrientedBoundingBox(BoundingBox<T> const& bbA,
+                                                 BoundingBox<T> const& bbB,
+                                                 const Transform3<T>&  trB2A);
 
 /** @brief Returns whether the bounding boxes are in contact using AABB test
 @param bbA first bounding box
@@ -48,12 +44,11 @@ bool intersectOrientedBoundingBox( BoundingBox<T> const& bbA,
 @param trA2W transformation of first bounding box
 @param trB2W transformation of second bounding box */
 template <typename T>
-__HOSTDEVICE__
-bool intersectAxisAlignedBoundingBox( BoundingBox<T> const& bbA, 
-                                      BoundingBox<T> const& bbB,
-                                      Transform3<T> const& trA2W,
-                                      Transform3<T> const& trB2W );
-                                        
+__HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
+                                                    BoundingBox<T> const& bbB,
+                                                    const Transform3<T>&  trA2W,
+                                                    const Transform3<T>& trB2W);
+
 /** @brief Returns whether the bounding boxes are in contact using AABB test - 
 relative transformation
 @param bbA first bounding box
@@ -61,11 +56,9 @@ relative transformation
 @param trB2A transformation of the second bounding box wrt the first bounding
 box */
 template <typename T>
-__HOSTDEVICE__
-bool intersectAxisAlignedBoundingBox( BoundingBox<T> const& bbA, 
-                                      BoundingBox<T> const& bbB,
-                                      Transform3<T> const& trB2A );
+__HOSTDEVICE__ bool intersectAxisAlignedBoundingBox(BoundingBox<T> const& bbA,
+                                                    BoundingBox<T> const& bbB,
+                                                    const Transform3<T>& trB2A);
 //@}
-
 
 #endif

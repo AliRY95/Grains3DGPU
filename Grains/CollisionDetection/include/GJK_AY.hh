@@ -1,9 +1,8 @@
 #ifndef _GJK_AY_HH_
 #define _GJK_AY_HH_
 
-#include "Transform3.hh"
 #include "Convex.hh"
-
+#include "Transform3.hh"
 
 // =============================================================================
 /** @brief The header for the GJK distance query algorithm with signed volume.
@@ -13,16 +12,7 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-/** @name GJK_SV : Data structure for simplex */
-//@{
-template <typename T>
-struct Simplex {
-	int nvrtx;                /**< Number of points defining the simplex */
-	Vector3<T> vrtx[4];       /**< Coordinates of the points of the simplex */
-};
-//@}
-
-/** @name GJK_SV : External methods */
+/** @name GJK_AY : External methods */
 //@{
 /** @brief Returns the minimal distance between 2 convex shapes and a point per
 convex shape that represents the tips of the minimal distance segment using the
@@ -38,15 +28,13 @@ frame
 B
 @param nbIter number of iterations of GJK for convergence */
 template <typename T>
-__HOSTDEVICE__
-T computeClosestPoints_GJK_AY( Convex<T> const& a, 
-                               Convex<T> const& b, 
-                               Transform3<T> const& a2w,
-                               Transform3<T> const& b2w, 
-                               Vector3<T>& pa,
-                               Vector3<T>& pb,
-                               int& nbIter );
+__HOSTDEVICE__ T computeClosestPoints_GJK_AY(Convex<T> const&     a,
+                                             Convex<T> const&     b,
+                                             const Transform3<T>& a2w,
+                                             const Transform3<T>& b2w,
+                                             Vector3<T>&          pa,
+                                             Vector3<T>&          pb,
+                                             int&                 nbIter);
 //@}
-
 
 #endif

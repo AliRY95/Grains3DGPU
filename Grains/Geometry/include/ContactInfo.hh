@@ -1,9 +1,7 @@
 #ifndef _CONTACTINFO_HH_
 #define _CONTACTINFO_HH_
 
-
 #include "Vector3.hh"
-
 
 // =============================================================================
 /** @brief The class ContactInfo.
@@ -15,86 +13,80 @@
 template <typename T>
 class ContactInfo
 {
-    protected:
-        /** @name Parameters */
-        //@{
-        Vector3<T> m_contactPoint; /**< contact point */
-        Vector3<T> m_contactVector; /**< contact vector */
-        T m_overlapDistance; /**< overlap distance */
-        // int m_nbIterGJK; /**< number of iterations of GJK for convergence */
-        //@}
+protected:
+    /** @name Parameters */
+    //@{
+    Vector3<T> m_contactPoint; /**< contact point */
+    Vector3<T> m_contactVector; /**< contact vector */
+    T          m_overlapDistance; /**< overlap distance */
+    // int m_nbIterGJK; /**< number of iterations of GJK for convergence */
+    //@}
 
-    public:
-        /** @name Constructors */
-        //@{
-        /** @brief Default constructor */
-        __HOSTDEVICE__
-        ContactInfo();
+public:
+    /** @name Constructors */
+    //@{
+    /** @brief Default constructor */
+    __HOSTDEVICE__
+    ContactInfo();
 
-        /** @brief Constructor with contact point location in the world reference
+    /** @brief Constructor with contact point location in the world reference
         frame, overlap vector, overlap distance and number of iterations of GJK as 
         input parameters
         @param pt contact point
         @param vec contact vector
         @param distance_ overlap distance */
-        __HOSTDEVICE__
-        ContactInfo( Vector3<T> const& pt, 
-                     Vector3<T> const& vec, 
-                     T overlap );
+    __HOSTDEVICE__
+    ContactInfo(const Vector3<T>& pt, const Vector3<T>& vec, T overlap);
 
-        /** @brief Destructor */
-        __HOSTDEVICE__
-        ~ContactInfo();
-        //@}
+    /** @brief Destructor */
+    __HOSTDEVICE__
+    ~ContactInfo();
+    //@}
 
+    /** @name Get methods */
+    //@{
+    /** @brief Gets the contact point */
+    __HOSTDEVICE__
+    Vector3<T> getContactPoint() const;
 
-        /** @name Get methods */
-        //@{
-        /** @brief Gets the contact point */
-        __HOSTDEVICE__
-        Vector3<T> getContactPoint() const;
-    
-        /** @brief Gets the contact vector */
-        __HOSTDEVICE__
-        Vector3<T> getContactVector() const;
+    /** @brief Gets the contact vector */
+    __HOSTDEVICE__
+    Vector3<T> getContactVector() const;
 
-        /** @brief Gets the overlap distance */
-        __HOSTDEVICE__
-        T getOverlapDistance() const;
-        //@}
+    /** @brief Gets the overlap distance */
+    __HOSTDEVICE__
+    T getOverlapDistance() const;
+    //@}
 
-
-        /** @name Set methods */
-        //@{
-        /** @brief Sets the contact point
+    /** @name Set methods */
+    //@{
+    /** @brief Sets the contact point
         @param p contact point */
-        __HOSTDEVICE__
-        void setContactPoint( Vector3<T> const& p );
-    
-        /** @brief Sets the contact vector
-        @param v overlap vector */
-        __HOSTDEVICE__
-        void setContactVector( Vector3<T> const& v );
+    __HOSTDEVICE__
+    void setContactPoint(const Vector3<T>& p);
 
-        /** @brief Sets the overlap distance
+    /** @brief Sets the contact vector
+        @param v overlap vector */
+    __HOSTDEVICE__
+    void setContactVector(const Vector3<T>& v);
+
+    /** @brief Sets the overlap distance
         @param d overlap distance  */
-        __HOSTDEVICE__
-        void setOverlapDistance( T d );
-        //@}
+    __HOSTDEVICE__
+    void setOverlapDistance(T d);
+    //@}
 };
 
-
 typedef ContactInfo<double> ContactInfoD;
-typedef ContactInfo<float> ContactInfoF;
-
+typedef ContactInfo<float>  ContactInfoF;
 
 // __HOSTDEVICE__
-// static ContactInfoD noContact( Vec3d( 0., 0., 0. ), 
+// static ContactInfoD noContact( Vec3d( 0., 0., 0. ),
 //                               Vec3d( 0., 0., 0. ),
 //                               1.e20 );
 // __HOSTDEVICE__
-// static ContactInfoF noContactF( Vec3f( 0., 0., 0. ), 
+// static ContactInfoF noContactF( Vec3f( 0., 0., 0. ),
 //                                 Vec3f( 0., 0., 0. ),
-//                                 1.e20 );	
+//                                 1.e20 );
 
 #endif

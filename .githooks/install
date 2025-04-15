@@ -1,0 +1,15 @@
+#!/bin/bash
+
+HOOKS_DIR=".githooks"
+GIT_HOOKS_DIR=".git/hooks"
+
+echo "Installing Git hooks..."
+
+for hook in "$HOOKS_DIR"/*; do
+    hook_name=$(basename "$hook")
+    echo "Installing $hook_name"
+    cp "$hook" "$GIT_HOOKS_DIR/$hook_name"
+    chmod +x "$GIT_HOOKS_DIR/$hook_name"
+done
+
+echo "Hooks installed."

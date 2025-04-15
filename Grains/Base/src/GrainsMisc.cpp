@@ -1,55 +1,65 @@
+#include "GrainsMisc.hh"
 #include <sys/types.h>
 #include <unistd.h>
-#include "GrainsMisc.hh"
-
 
 // -----------------------------------------------------------------------------
 // Static variables
-template <typename T> 
+template <typename T>
 std::string GrainsMisc<T>::m_grainsHome = ".";
 template <typename T>
 int GrainsMisc<T>::m_returnSysCmd = 0;
 
-
-
-
 // -----------------------------------------------------------------------------
 // Writes a real number with a given number of digits
 template <typename T>
-__HOST__
-std::string GrainsMisc<T>::realToString( T const& figure, 
-                                   		 int const& size )
+__HOST__ std::string GrainsMisc<T>::realToString(T const&   figure,
+                                                 int const& size)
 {
-	std::ostringstream oss;
-	oss.width( size );
-	oss << std::left << figure;
-	return ( oss.str() );
+    std::ostringstream oss;
+    oss.width(size);
+    oss << std::left << figure;
+    return (oss.str());
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 // Writes a float number with a prescribed format and a prescribed
 // number of digits after the decimal point
 template <typename T>
-__HOST__
-std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format, 
-										 int digits,
-      									 T const& number )
+__HOST__ std::string GrainsMisc<T>::realToString(std::ios_base::fmtflags format,
+                                                 int                     digits,
+                                                 T const&                number)
 {
-	std::ostringstream oss;
-	if ( number != T( 0 ) )
-	{
-		oss.setf( format, std::ios::floatfield );
-		oss.precision( digits );
-	}
-	oss << number;
-	return ( oss.str() );
+    std::ostringstream oss;
+    if(number != T(0))
+    {
+        oss.setf(format, std::ios::floatfield);
+        oss.precision(digits);
+    }
+    oss << number;
+    return (oss.str());
 }
 
+// -----------------------------------------------------------------------------
+// Writes a Vector3 object in a string
+template <typename T>
+__HOST__ std::string GrainsMisc<T>::Vector3ToString(const Vector3<T>& vec)
+{
+    std::ostringstream oss;
+    oss << vec;
 
+    return ("[" + oss.str() + "]");
+}
 
+// -----------------------------------------------------------------------------
+// Writes
+template <typename T>
+__HOST__ void
+    GrainsMisc<T>::cout(std::string message, int numShift, bool nextLine)
+{
+    auto shift = [](int n) { return std::string(n, ' '); };
+    auto nLine = [](bool b) { return b ? '\n' : '\0'; };
+    std::cout << shift(numShift) << message << nLine(nextLine) << std::endl;
+}
 
 // // -----------------------------------------------------------------------------
 // // Writes an integer in a string
@@ -60,9 +70,6 @@ std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format,
 
 //   return ( oss.str() );
 // }
-
-
-
 
 // // ----------------------------------------------------------------------------
 // // Returns memory used by this process
@@ -100,9 +107,6 @@ std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format,
 //   return ( result ) ;
 // }
 
-
-
-
 // // ----------------------------------------------------------------------------
 // // Writes memory used by this process in a stream
 // void GrainsExec::display_memory( ostream& os, size_t memory )
@@ -116,9 +120,6 @@ std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format,
 //     os << ( (double) memory )/mo << " Mo" << std::flush ;
 //   else os << memory << " octets" << std::flush ;
 // }
-
-
-
 
 // // ----------------------------------------------------------------------------
 // // Returns a random rotation matrix
@@ -150,9 +151,6 @@ std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format,
 //   return ( rotation );
 // }
 
-
-
-
 // // ----------------------------------------------------------------------------
 // // Returns a random unit vector
 // Vector3 GrainsExec::RandomUnitVector( size_t dim )
@@ -170,9 +168,6 @@ std::string GrainsMisc<T>::realToString( std::ios_base::fmtflags format,
 
 //   return( vec );
 // }
-
-
-
 
 // -----------------------------------------------------------------------------
 // Explicit instantiation

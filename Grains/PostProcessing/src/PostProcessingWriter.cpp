@@ -1,25 +1,18 @@
 #include "PostProcessingWriter.hh"
 
-
 // ----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
-__HOST__
-PostProcessingWriter<T>::PostProcessingWriter()
-{}
-
-
-
+__HOST__ PostProcessingWriter<T>::PostProcessingWriter()
+{
+}
 
 // ----------------------------------------------------------------------------
 // Destructor
 template <typename T>
-__HOST__
-PostProcessingWriter<T>::~PostProcessingWriter()
-{}
-
-
-
+__HOST__ PostProcessingWriter<T>::~PostProcessingWriter()
+{
+}
 
 // -----------------------------------------------------------------------------
 // Explicit instantiation

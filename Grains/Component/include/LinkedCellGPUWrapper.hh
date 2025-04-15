@@ -1,11 +1,9 @@
 #ifndef _LINKEDCELLGPUWRAPPER_HH_
 #define _LINKEDCELLGPUWRAPPER_HH_
 
-
 #include "LinkedCell.hh"
 #include "Transform3.hh"
 #include "Vector3.hh"
-
 
 // =============================================================================
 /** @brief Header for LinkedCellGPUWrapper.
@@ -24,23 +22,21 @@ after the construction
 @param LC device pointer to the linked cell object to be created
 @param numCells number of cells after constructing the linked cell */
 template <typename T>
-__HOST__
-int createLinkedCellOnDevice( Vector3<T> min,
-                              Vector3<T> max,
-                              T size,
-                              LinkedCell<T>** LC );
+__HOST__ int createLinkedCellOnDevice(Vector3<T>      min,
+                                      Vector3<T>      max,
+                                      T               size,
+                                      LinkedCell<T>** LC);
 
 /** @brief Computes the linear linked cell hash values for all components
 @param LC linked cell
 @param tr list of all transformations
 @param numComponents number of all components in the simulation */
 template <typename T>
-__GLOBAL__ 
-void computeLinearLinkedCellHashGPU_kernel( LinkedCell<T> const* const* LC,
-                                            Transform3<T> const* tr,
-                                            unsigned int numComponents,
-                                            unsigned int* componentCellHash );
+__GLOBAL__ void
+    computeLinearLinkedCellHashGPU_kernel(LinkedCell<T> const* const* LC,
+                                          Transform3<T> const*        tr,
+                                          uint  numComponents,
+                                          uint* componentCellHash);
 //@}
-
 
 #endif

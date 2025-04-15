@@ -1,9 +1,7 @@
 #ifndef _FIRSTORDEREXPLICIT_HH_
 #define _FIRSTORDEREXPLICIT_HH_
 
-
 #include "TimeIntegrator.hh"
-
 
 // =============================================================================
 /** @brief The class FirstOrderExplicit.
@@ -16,48 +14,46 @@
 template <typename T>
 class FirstOrderExplicit : public TimeIntegrator<T>
 {
-    public:
-        /**@name Contructors & Destructor */
-        //@{
-        /** @brief Default constructor */
-        __HOSTDEVICE__
-        FirstOrderExplicit();
+public:
+    /**@name Contructors & Destructor */
+    //@{
+    /** @brief Default constructor */
+    __HOSTDEVICE__
+    FirstOrderExplicit();
 
-        /** @brief Constructor with the time step */
-        __HOSTDEVICE__
-        FirstOrderExplicit( T dt );
+    /** @brief Constructor with the time step */
+    __HOSTDEVICE__
+    FirstOrderExplicit(T dt);
 
-        /** @brief Destructor */
-        __HOSTDEVICE__
-        ~FirstOrderExplicit();
-        //@}
+    /** @brief Destructor */
+    __HOSTDEVICE__
+    ~FirstOrderExplicit();
+    //@}
 
+    /** @name Get methods */
+    //@{
+    /** @brief Returns the time integrator type */
+    __HOSTDEVICE__
+    TimeIntegratorType getTimeIntegratorType() const final;
+    //@}
 
-        /** @name Get methods */
-        //@{
-        /** @brief Returns the time integrator type */
-        __HOSTDEVICE__
-        TimeIntegratorType getTimeIntegratorType() const final;
-        //@}
+    /** @name Methods */
+    //@{
+    /** @brief Creates and returns a clone of the time integrator */
+    __HOSTDEVICE__
+    TimeIntegrator<T>* clone() const final;
 
-
-        /** @name Methods */
-        //@{
-        /** @brief Creates and returns a clone of the time integrator */
-		__HOSTDEVICE__
-		TimeIntegrator<T>* clone() const final;
-
-        /** @brief Computes the new velocity and transformation change over dt
+    /** @brief Computes the new velocity and transformation change over dt
 		@param momentum acceleration
 		@param velocity velocity 
 		@param transMotion translational motion over dt
 		@param rotMotion rotational motion over dt */
-        __HOSTDEVICE__
-        void Move( Kinematics<T> const& momentum,
-                   Kinematics<T>& velocity,
-                   Vector3<T>& transMotion,
-                   Quaternion<T>& rotMotion ) const final;
-        //@}
+    __HOSTDEVICE__
+    void Move(Kinematics<T> const& momentum,
+              Kinematics<T>&       velocity,
+              Vector3<T>&          transMotion,
+              Quaternion<T>&       rotMotion) const final;
+    //@}
 };
 
 #endif

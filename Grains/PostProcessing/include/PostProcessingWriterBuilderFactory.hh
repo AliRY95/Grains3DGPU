@@ -1,10 +1,9 @@
 #ifndef _POSTPROCESSINGWRITERBUILDERFACTORY_HH_
 #define _POSTPROCESSINGWRITERBUILDERFACTORY_HH_
 
-#include <string>
 #include "PostProcessingWriter.hh"
 #include "ReaderXML.hh"
-
+#include <string>
 
 // =============================================================================
 /** @brief The class PostProcessingWriterBuilderFactory.
@@ -18,26 +17,25 @@
 template <typename T>
 class PostProcessingWriterBuilderFactory
 {
-	private:
-		/**@name Constructors & Destructor */
-		//@{
-		/** @brief Default constructor (forbidden) */
-		__HOST__
-		PostProcessingWriterBuilderFactory();
+private:
+    /**@name Constructors & Destructor */
+    //@{
+    /** @brief Default constructor (forbidden) */
+    __HOST__
+    PostProcessingWriterBuilderFactory();
 
-		/** @brief Destructor (forbidden) */
-		__HOST__
-		~PostProcessingWriterBuilderFactory();
-		//@}
+    /** @brief Destructor (forbidden) */
+    __HOST__
+    ~PostProcessingWriterBuilderFactory();
+    //@}
 
-
-	public:
-		/** @name Methods */
-		//@{
-		/** @brief Creates a post-processing writer from an XML node
+public:
+    /** @name Methods */
+    //@{
+    /** @brief Creates a post-processing writer from an XML node
 		@param nPPW XMl node */
-		static PostProcessingWriter<T>* create( DOMNode* nPPW );
-		//@}
+    static PostProcessingWriter<T>* create(DOMNode* nPPW);
+    //@}
 };
 
 #endif

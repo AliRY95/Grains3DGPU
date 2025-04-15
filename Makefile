@@ -1,19 +1,29 @@
 # ----------------
 # Standard targets
 # ----------------
-update:
-	cd Main/src ; make ; cd ../..
+update: githook
+	cd Main/src; \
+	make; \
+	cd ../..;
 	@echo 'Grains is updated!'
 
 install: xerces createarch createdepend depend update dtd
 	@echo 'Full Grains platform built!'
 
+updatedev: clean cleandepend createdepend update 
+
 depend:
-	cd Grains ; make depend ; cd ..
-	cd Main/src ; make depend ; cd ../..
+	cd Grains; \
+	make depend; \
+	cd ..;
+	cd Main/src; \
+	make depend; \
+	cd ../..;
 	
 clean:
-	cd Main/src ; make clean ; cd ../..
+	cd Main/src; \
+	make clean; \
+	cd ../..;
 	@echo 'Grains platform cleaned'
 	
 cleanall: cleanxerces clean cleandepend deletearch cleandtd
@@ -23,47 +33,78 @@ cleanall: cleanxerces clean cleandepend deletearch cleandtd
 # -----------------
 # Low level targets
 # -----------------
+apply-clang-format:
+	@echo "Formatting all source files according to .clang-format ..."
+	find ./Grains/ -name "*.cpp" -o -name "*.hh" | \
+	xargs clang-format -i --style=file:./.clang-format --verbose; \
+	echo "Formatting complete.";
+
+# Rule to install the pre-commit hook
+install-githook:
+	@echo "Installing pre-commit hook..."
+	cp .githooks/pre-commit .git/hooks/pre-commit && \
+	chmod +x .git/hooks/pre-commit && \
+	echo "Pre-commit hook installed successfully."; \
+
+githook:
+	@echo '----------------------'
+	@echo "Running githooks..."
+	@echo '----------------------'
+	bash .git/hooks/pre-commit
+	@echo '----------------------'
+	@echo "Running githooks finished."
+	@echo '----------------------'
+
 xerces:
-	cd $(XERCES_DIR) ; $(INSTALL_XERCES) ; cd ..
+	cd $(XERCES_DIR); \
+	$(INSTALL_XERCES); \
+	cd ..;
 
 dtd:
-	cd Main/dtd ; $(INSTALL_DTD) ; cd ../..
+	cd Main/dtd; \
+	$(INSTALL_DTD); \
+	cd ../..;
 
 createarch:
 	./makeARCH create
 	
 createdepend:
-	cd Grains; $(TOUCH) Makedepend; cd ..
-	cd Main/src; $(TOUCH) Makedepend; cd ../..
+	cd Grains; \
+	$(TOUCH) Makedepend; \
+	cd ..;
+	cd Main/src; \
+	$(TOUCH) Makedepend; \
+	cd ../..;
 	
 
 # --------------------------
 # Low level cleaning targets
 # --------------------------
 cleanxerces:
-	cd $(XERCES_SOURCE) ; make clean ; cd ../../..
-	cd $(XERCES_DIR) ; $(RM) ${GRAINS_XERCES_LIBDIR} ; cd ..
+	cd $(XERCES_SOURCE); \
+	make clean; \
+	cd ../../..;
+	cd $(XERCES_DIR); \
+	$(RM) ${GRAINS_XERCES_LIBDIR}; \
+	cd ..;
 	@echo 'XERCES cleaned'
 
 cleandtd:
-	cd Main/dtd ; $(RM) Grains*.dtd ; cd ../..
+	cd Main/dtd; \
+	$(RM) Grains*.dtd; \
+	cd ../..
 	@echo 'dtd cleaned!'
 
 deletearch:
 	./makeARCH delete
 
 cleandepend:
-	cd Grains; $(RM) Makedepend; cd ..
-	cd Main/src; $(RM) Makedepend; cd ../..
-	
-		
-# -----------------	
-# Developer targets
-# -----------------		
-dev:
-	cd Main/src ; make ; cd ../..
-	
-updatedev: clean cleandepend createdepend update	
+	cd Grains; \
+	$(RM) Makedepend; \
+	cd ..
+	cd Main/src; \
+	$(RM) Makedepend; \
+	cd ../..
 	
 
 # ----	

@@ -1,9 +1,7 @@
 #ifndef _VECTORMATH_HH_
 #define _VECTORMATH_HH_
 
-
 #include "Vector3.hh"
-
 
 // =============================================================================
 /** @brief Miscellaneous Vector3 functions and operators as header-only.
@@ -19,140 +17,129 @@
 /** @brief Returns the norm of the vector
 @param v the vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE T norm( Vector3<T> const& v )
+__HOSTDEVICE__ static INLINE T norm(const Vector3<T>& v) noexcept
 {
-    return ( sqrt( v[X] * v[X] + 
-                   v[Y] * v[Y] + 
-                   v[Z] * v[Z] ) );
+    T const* __RESTRICT__ buffer = v.getBuffer();
+    return (sqrt(buffer[0] * buffer[0] + buffer[1] * buffer[1]
+                 + buffer[2] * buffer[2]));
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Returns the norm squared of the vector
 @param v the vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE T norm2( Vector3<T> const& v )
+__HOSTDEVICE__ static INLINE T norm2(const Vector3<T>& v) noexcept
 {
-    return ( v[X] * v[X] + 
-             v[Y] * v[Y] + 
-             v[Z] * v[Z] );
+    T const* __RESTRICT__ buffer = v.getBuffer();
+    return (buffer[0] * buffer[0] + buffer[1] * buffer[1]
+            + buffer[2] * buffer[2]);
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Determines if the vector is approximately zero or not
 @param v the vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE bool isApproxZero( Vector3<T> const& v, T tol = HIGHEPS<T> )
+__HOSTDEVICE__ static INLINE bool isApproxZero(const Vector3<T>& v,
+                                               T tol = HIGHEPS<T>) noexcept
 {
-    return ( fabs( v[X] ) < tol && 
-             fabs( v[Y] ) < tol &&
-             fabs( v[Z] ) < tol );
+    T const* __RESTRICT__ buffer = v.getBuffer();
+    return (fabs(buffer[0]) < tol && fabs(buffer[1]) < tol
+            && fabs(buffer[2]) < tol);
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Vectors addition
 @param v1 1st vector
 @param v2 2nd vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE Vector3<T> operator + ( Vector3<T> const& v1,
-                                      Vector3<T> const& v2 )
+__HOSTDEVICE__ static INLINE Vector3<T> operator+(const Vector3<T>& v1,
+                                                  const Vector3<T>& v2) noexcept
 {
-    return ( Vector3<T>( v1[X] + v2[X],
-                         v1[Y] + v2[Y], 
-                         v1[Z] + v2[Z] ) );
+    T const* __RESTRICT__ b1 = v1.getBuffer();
+    T const* __RESTRICT__ b2 = v2.getBuffer();
+    T __RESTRICT__        out[3];
+    for(uint i = 0; i < 3; ++i)
+        out[i] = b1[i] + b2[i];
+    return (Vector3<T>(out));
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Vectors subtraction
 @param v1 1st vector
 @param v2 2nd vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE Vector3<T> operator - ( Vector3<T> const& v1,
-                                      Vector3<T> const& v2 )
+__HOSTDEVICE__ static INLINE Vector3<T> operator-(const Vector3<T>& v1,
+                                                  const Vector3<T>& v2) noexcept
 {
-    return ( Vector3<T>( v1[X] - v2[X],
-                         v1[Y] - v2[Y], 
-                         v1[Z] - v2[Z] ) );
+    T const* __RESTRICT__ b1 = v1.getBuffer();
+    T const* __RESTRICT__ b2 = v2.getBuffer();
+    T __RESTRICT__        out[3];
+    for(uint i = 0; i < 3; ++i)
+        out[i] = b1[i] - b2[i];
+    return (Vector3<T>(out));
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Multiplication by a scalar
 @param d the multiplication factor
 @param v the vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE Vector3<T> operator * ( T d,
-                                      Vector3<T> const& v )
+__HOSTDEVICE__ static INLINE Vector3<T> operator*(T                 d,
+                                                  const Vector3<T>& v) noexcept
 {
-    return ( Vector3<T>( v[X] * d, v[Y] * d, v[Z] * d ) );
+    T const* __RESTRICT__ buffer = v.getBuffer();
+    T __RESTRICT__        out[3];
+    for(uint i = 0; i < 3; ++i)
+        out[i] = d * buffer[i];
+    return (Vector3<T>(out));
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Division by a scalar
 @param d division factor
 @param v the vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE Vector3<T> operator / ( Vector3<T> const& v,
-                                      T d )
+__HOSTDEVICE__ static INLINE Vector3<T> operator/(const Vector3<T>& v,
+                                                  T                 d) noexcept
 {
-    return ( Vector3<T>( v[X] / d, v[Y] / d, v[Z] / d ) );
+    T const* __RESTRICT__ buffer = v.getBuffer();
+    T __RESTRICT__        out[3];
+    for(uint i = 0; i < 3; ++i)
+        out[i] = buffer[i] / d;
+    return (Vector3<T>(out));
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Dot product
 @param v1 1st vector
 @param v2 2nd vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE T operator * ( Vector3<T> const& v1,
-                             Vector3<T> const& v2 )
+__HOSTDEVICE__ static INLINE T operator*(const Vector3<T>& v1,
+                                         const Vector3<T>& v2) noexcept
 {
-    return ( v1[X] * v2[X] + 
-             v1[Y] * v2[Y] +
-             v1[Z] * v2[Z] );
+    T const* __RESTRICT__ b1  = v1.getBuffer();
+    T const* __RESTRICT__ b2  = v2.getBuffer();
+    T                     out = T(0);
+    for(uint i = 0; i < 3; ++i)
+        out += b1[i] * b2[i];
+    return (out);
 }
-
-
-
 
 // -----------------------------------------------------------------------------
 /** @brief Cross product v1 x v2
 @param v1 1st vector
 @param v2 2nd vector */
 template <typename T>
-__HOSTDEVICE__
-static INLINE Vector3<T> operator ^ ( Vector3<T> const& v1,
-                                      Vector3<T> const& v2 )
+__HOSTDEVICE__ static INLINE Vector3<T> operator^(const Vector3<T>& v1,
+                                                  const Vector3<T>& v2) noexcept
 {
-    return ( Vector3<T>( v1[Y] * v2[Z] - v1[Z] * v2[Y],
-                       - v1[X] * v2[Z] + v1[Z] * v2[X],
-                         v1[X] * v2[Y] - v1[Y] * v2[X] ) );
+    T const* __RESTRICT__ b1 = v1.getBuffer();
+    T const* __RESTRICT__ b2 = v2.getBuffer();
+    T __RESTRICT__        out[3];
+    out[0] = b1[1] * b2[2] - b1[2] * b2[1];
+    out[1] = b1[2] * b2[0] - b1[0] * b2[2];
+    out[2] = b1[0] * b2[1] - b1[1] * b2[0];
+    return (Vector3<T>(out));
 }
 //@}
 

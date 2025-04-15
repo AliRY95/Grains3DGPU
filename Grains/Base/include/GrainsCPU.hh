@@ -1,11 +1,9 @@
 #ifndef _GRAINSCPU_HH_
 #define _GRAINSCPU_HH_
 
-
 #include "ComponentManagerCPU.hh"
-#include "ReaderXML.hh"
 #include "Grains.hh"
-
+#include "ReaderXML.hh"
 
 // =============================================================================
 /** @brief The class GrainsCPU.
@@ -17,38 +15,35 @@
 template <typename T>
 class GrainsCPU : public Grains<T>
 {
-    protected:
-        /** @name Parameters */
-        //@{
-        /** \brief linked cell for broad-phase */
-        // TimeIntegration<T>* m_timeIntegration;
-        //@}
-        
+protected:
+    /** @name Parameters */
+    //@{
+    /** \brief linked cell for broad-phase */
+    // TimeIntegration<T>* m_timeIntegration;
+    //@}
 
-    public:
-        /** @name Contructors & Destructor */
-        //@{
-        /** @brief Default constructor */
-        GrainsCPU();
+public:
+    /** @name Contructors & Destructor */
+    //@{
+    /** @brief Default constructor */
+    GrainsCPU();
 
-        /** @brief Destructor */
-        ~GrainsCPU();
-        //@}
+    /** @brief Destructor */
+    ~GrainsCPU();
+    //@}
 
+    /** @name High-level methods */
+    //@{
+    // /** @brief Tasks to perform before time-stepping
+    // @param rootElement XML root */
+    // void initialize( DOMElement* rootElement );
 
-        /** @name High-level methods */
-        //@{
-        // /** @brief Tasks to perform before time-stepping 
-        // @param rootElement XML root */
-        // void initialize( DOMElement* rootElement );
+    /** @brief Runs the simulation over the prescribed time interval */
+    void simulate() final;
 
-        /** @brief Runs the simulation over the prescribed time interval */
-        void simulate() final; 
-
-        // /** @brief Tasks to perform after time-stepping */
-        // virtual void finalize();
-        //@}
+    // /** @brief Tasks to perform after time-stepping */
+    // virtual void finalize();
+    //@}
 };
 
 #endif
-  

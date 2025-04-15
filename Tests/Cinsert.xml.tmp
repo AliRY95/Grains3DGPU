@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE Grains3D SYSTEM "/home/alireza/Desktop/Work/Codes/GrainsGPU/Main/dtd/Grains3D.dtd">
-<Grains3D Type="Standard" Precision="Double">
+<Grains3D Type="GPU" Precision="Single">
 
 <Construction>
 	<LinkedCell MX="0.5" MY="0.5" MZ="1.0" CellSizeFactor="1."/>
@@ -15,10 +15,10 @@
 			<HODC>
 				<stiff>5.e2</stiff>
 				<en>1.</en>
-				<ks>0</ks>
-				<mut>0</mut>
-				<muc>0</muc>
-				<kms>0</kms>
+				<!-- <ks>10</ks> -->
+				<mut>10</mut>
+				<muc>10</muc>
+				<kms>10</kms>
 			</HODC>
 		</ContactForceModel>
 	</ContactForceModels>
@@ -31,15 +31,7 @@
 
 
 	<Particles>
-		<Particle Number="1" Density="1163.66" Material="matP">
-				<!-- <Box LX="0.05" LY="0.05" LZ="0.1"/>
-				<Superquadric a="0.025" b="0.025" c="0.05" n1="8" n2="8"/> -->
-			<Convex CrustThickness="1.e-4">
-				<Sphere Radius="0.1"/>
-			</Convex>
-			<AngularPosition Type="Angular" aX="90" aY="0" aZ="0"/>
-		</Particle>
-		<Particle Number="1" Density="1163.66" Material="matP">
+		<Particle Number="2" Density="1163.66" Material="matP">
 				<!-- <Superquadric a="0.02" b="0.02" c="0.08" n1="8" n2="8"/> -->
 				<!-- <Superquadric a="0.025" b="0.025" c="0.05" n1="8" n2="8"/> -->
 			<Convex CrustThickness="1.e-4">
