@@ -32,8 +32,7 @@ void ComponentManager<T>::copy(ComponentManager<T> const* cm)
 // -----------------------------------------------------------------------------
 // Initializes the RigidBody IDs and transformations for obstacles
 template <typename T>
-void ComponentManager<T>::initializeObstacles(
-    std::vector<uint> numEachUniqueObstacles, std::vector<Transform3<T>> initTr)
+void ComponentManager<T>::initializeObstacles(std::vector<Transform3<T>> initTr)
 {
     std::cout << "Cannot initialize obstacles directly on the device. "
               << "Try initializing on host first, and copy to device. "
@@ -44,8 +43,7 @@ void ComponentManager<T>::initializeObstacles(
 // -----------------------------------------------------------------------------
 // Initializes the RigidBody IDs and transformations for particles
 template <typename T>
-void ComponentManager<T>::initializeParticles(
-    std::vector<uint> numEachUniqueParticles, std::vector<Transform3<T>> initTr)
+void ComponentManager<T>::initializeParticles(std::vector<Transform3<T>> initTr)
 {
     std::cout << "Cannot initialize particles directly on the device. "
               << "Try initializing on host first, and copy to device. "

@@ -213,24 +213,20 @@ void ComponentManagerCPU<T>::setParticleId(std::vector<uint> const& id)
 // Initializes the RigidBody IDs and transformations of the obstacles
 template <typename T>
 void ComponentManagerCPU<T>::initializeObstacles(
-    std::vector<uint> numEachUniqueObstacles, std::vector<Transform3<T>> initTr)
+    std::vector<Transform3<T>> initTr)
 {
     // Making sure that we have data for all obstacles and the number of initial
     // TR matches the number of RBs
-    assert(numEachUniqueObstacles.back() == m_nObstacles
-           && numEachUniqueObstacles.size() == initTr.size());
+    assert(initTr.size() == m_nObstacles);
 
     // Assigning
-    uint rb_counter = 0;
     for(int i = 0; i < m_nObstacles; i++)
     {
         // m_rigidBodyId
-        if(i == numEachUniqueObstacles[rb_counter])
-            ++rb_counter;
-        m_obstacleRigidBodyId[i] = rb_counter;
+        m_obstacleRigidBodyId[i] = i;
 
         // m_transform
-        m_obstacleTransform[i] = initTr[rb_counter];
+        m_obstacleTransform[i] = initTr[i];
     }
 }
 
@@ -238,24 +234,20 @@ void ComponentManagerCPU<T>::initializeObstacles(
 // Initializes the RigidBody IDs and transformations of the particles
 template <typename T>
 void ComponentManagerCPU<T>::initializeParticles(
-    std::vector<uint> numEachUniqueParticles, std::vector<Transform3<T>> initTr)
+    std::vector<Transform3<T>> initTr)
 {
     // Making sure that we have data for all particles and the number of initial
     // TR matches the number of RBs
-    // assert( numEachUniqueParticles.back() == m_nParticles &&
-    //         numEachUniqueParticles.size() == initTr.size() );
+    assert(initTr.size() == m_nParticles);
 
     // Assigning
-    uint rb_counter = 0;
     for(uint i = 0; i < m_nParticles; i++)
     {
         // m_rigidBodyId
-        if(i == numEachUniqueParticles[rb_counter])
-            ++rb_counter;
-        m_rigidBodyId[i] = rb_counter;
+        m_rigidBodyId[i] = i;
 
         // m_transform
-        m_transform[i] = initTr[rb_counter];
+        m_transform[i] = initTr[i];
     }
 }
 
@@ -288,8 +280,7 @@ void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
     // Reset
     for(int i = 0; i < m_nCells + 1; i++)
         m_cell[i].clear();
-    for(int i = 0; i < m_nParticles; i++)
-        std::cout << m_transform[i].getOrigin() << std::endl;
+
     // Updating m_particleCellHash according to the linkedCell. That is,
     // assigning a hash value to each particle based on the cell it belongs to.
     (*LC)->computeLinearLinkedCellHashCPU(m_transform,
@@ -300,13 +291,6 @@ void ComponentManagerCPU<T>::updateLinks(LinkedCell<T> const* const* LC)
     for(int i = 0; i < m_nParticles; i++)
     {
         uint cellId = m_particleCellHash[i];
-        if(cellId > m_nCells)
-        {
-            std::cerr << "Error: Particle " << i
-                      << " is outside the linked cell domain." << std::endl;
-            std::cerr << m_transform[i].getOrigin();
-            std::cerr << "CellId: " << cellId << std::endl;
-        }
         m_cell[cellId].push_back(i);
     }
 }

@@ -156,25 +156,21 @@ void Grains<T>::Construction(DOMElement* rootElement)
         GoutWI(6, "Reading new particle types ...");
         // Populating the array with different kind of rigid bodies in the XML
         // file
-        uint startId = 0;
+        uint offset = 0;
         for(uint i = 0; i < numUniqueParticles; i++)
         {
             DOMNode* nParticle = allParticles->item(i);
             for(uint j = 0; j < numEachUniqueParticle[i]; j++)
             {
                 // Create the Rigid Body
-                m_particleRigidBodyList[startId + j]
+                m_particleRigidBodyList[offset + j]
                     = new RigidBody<T, T>(nParticle);
-                // m_particleRigidBodyList[startId + j]
-                //     = std::make_unique<RigidBody<T, T>>(nParticle);
                 // Initial transformation of the rigid body
-                // One draw back is we might end up with the same rigid body,
-                // but with different initial transformation.
-                particlesInitialTransform[startId + j]
+                particlesInitialTransform[offset + j]
                     = Transform3<T>(nParticle);
             }
             // Increment the starting position
-            startId += numEachUniqueParticle[i];
+            offset += numEachUniqueParticle[i];
         }
         GoutWI(6, "Reading particle types completed!");
     }
@@ -183,48 +179,30 @@ void Grains<T>::Construction(DOMElement* rootElement)
     // Obstacles
     DOMNode*     obstacles    = ReaderXML::getNode(root, "Obstacles");
     DOMNodeList* allObstacles = ReaderXML::getNodes(rootElement, "Obstacle");
-    // Number of unique shapes (rigid bodies) in the simulation
-    uint numUniqueObstacles = allObstacles->getLength();
-    // Number of each unique shape in the simulation. For simplicity, we keep it
-    // accumulative. Vector [2, 5] means we have 2 id0 rigid bodies and then
-    // 5 - 2 = 3 id1 rigid bodies. it also indicates that there are 5 different
-    // rigid bodies in the simulation in total.
-    std::vector<uint> numEachUniqueObstacle(numUniqueObstacles, 0);
+    // Number of unique obstacles in the simulation
+    uint numObstacles = allObstacles->getLength();
     // We also store the initial transformations of the rigid bodies to pass to
     // the ComponentManager to create particles with the initial transformation
     // required.
-    std::vector<Transform3<T>> obstaclesInitialTransform;
-    obstaclesInitialTransform.reserve(numUniqueObstacles);
+    std::vector<Transform3<T>> obstaclesInitialTransform(numObstacles);
     // Memory allocation for m_rigidBodyList with respect to the number of
     // shapes in the simulation.
-    m_obstacleRigidBodyList = (RigidBody<T, T>**)malloc(
-        numUniqueObstacles * sizeof(RigidBody<T, T>*));
-    if(obstacles)
+    m_obstacleRigidBodyList
+        = (RigidBody<T, T>**)malloc(numObstacles * sizeof(RigidBody<T, T>*));
+    if(numObstacles)
     {
-        GoutWI(6, "Reading new obstacle types ...");
-
-        // Populating the array with different kind of rigid bodies in the XML
-        // file
-        for(int i = 0; i < numUniqueObstacles; i++)
+        GoutWI(6, "Reading obstacles types ...");
+        for(uint i = 0; i < numObstacles; i++)
         {
             DOMNode* nObstacle = allObstacles->item(i);
-            // We only add one because the obstacles are added one by one in the
-            // XML file
-            if(i == 0)
-                numEachUniqueObstacle[i] = 1;
-            else
-                numEachUniqueObstacle[i] = numEachUniqueObstacle[i - 1] + 1;
-
             // Create the Rigid Body
             m_obstacleRigidBodyList[i] = new RigidBody<T, T>(nObstacle);
-
             // Initial transformation of the rigid body
             // One draw back is we might end up with the same rigid body shape,
             // but with different initial transformation.
             obstaclesInitialTransform.push_back(Transform3<T>(nObstacle));
         }
-
-        GoutWI(6, "Reading obstacle types completed!");
+        GoutWI(6, "Reading obstacles types completed!");
     }
 
     // -------------------------------------------------------------------------
@@ -263,23 +241,15 @@ void Grains<T>::Construction(DOMElement* rootElement)
 
     // -------------------------------------------------------------------------
     // Setting up the component managers
-    GrainsParameters<T>::m_numParticles = 0;
-    GrainsParameters<T>::m_numObstacles = 0;
-    if(!numEachUniqueParticle.empty())
-        GrainsParameters<T>::m_numParticles = numParticles;
-    if(!numEachUniqueObstacle.empty())
-        GrainsParameters<T>::m_numObstacles = numEachUniqueObstacle.back();
+    GrainsParameters<T>::m_numParticles = numParticles;
+    GrainsParameters<T>::m_numObstacles = numObstacles;
     m_components
         = new ComponentManagerCPU<T>(GrainsParameters<T>::m_numParticles,
                                      GrainsParameters<T>::m_numObstacles,
                                      GrainsParameters<T>::m_numCells);
     // Initialize the particles and obstacles
-    if(!numEachUniqueParticle.empty())
-        m_components->initializeParticles(numEachUniqueParticle,
-                                          particlesInitialTransform);
-    if(!numEachUniqueObstacle.empty())
-        m_components->initializeObstacles(numEachUniqueObstacle,
-                                          obstaclesInitialTransform);
+    m_components->initializeParticles(particlesInitialTransform);
+    m_components->initializeObstacles(obstaclesInitialTransform);
 
     // -------------------------------------------------------------------------
     // Contact force models

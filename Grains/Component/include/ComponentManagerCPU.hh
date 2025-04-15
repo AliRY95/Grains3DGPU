@@ -134,21 +134,13 @@ public:
 
     /** @name Methods */
     //@{
-    /** @brief Initializes the RigidBody IDs and transformations for 
-        // obstacles in the simulation
-        @param numEachUniqueObstacles accumulating vector for number of 
-        different RB 
+    /** @brief Initializes transformations for obstacles in the simulation
         @param initTr initial transformation of obstacles */
-    void initializeObstacles(std::vector<uint>          numEachUniqueObstacles,
-                             std::vector<Transform3<T>> initTr) final;
+    void initializeObstacles(std::vector<Transform3<T>> initTr) final;
 
-    /** @brief Initializes the RigidBody IDs and transformations for 
-        // particles in the simulation
-        @param numEachUniqueParticles accumulating vector for number of 
-        different RB 
+    /** @brief Initializes the transformations for particles in the simulation
         @param initTr initial transformation of particles */
-    void initializeParticles(std::vector<uint>          numEachUniqueParticles,
-                             std::vector<Transform3<T>> initTr) final;
+    void initializeParticles(std::vector<Transform3<T>> initTr) final;
 
     /** @brief Inserts particles according to a given insertion policy
         @param ins insertion policy */
