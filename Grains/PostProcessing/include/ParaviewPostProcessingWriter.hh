@@ -18,16 +18,20 @@ class ParaviewPostProcessingWriter : public PostProcessingWriter<T>
 protected:
     /** @name Parameters */
     //@{
-    /** \brief output directory name */
+    /** \brief Output directory name */
     std::string m_ParaviewFilename_dir;
-    /** \brief output file name */
+    /** \brief Output file name */
     std::string m_ParaviewFilename;
-    /** \brief particles output stream */
+    /** \brief Particles output stream */
     vector<ostringstream*> m_Paraview_saveParticles_pvd;
-    /** \brief writing in binary */
+    /** \brief Obstacles output stream */
+    ostringstream m_Paraview_saveObstacles_pvd;
+    /** \brief Writing in binary */
     bool m_binary;
-    /** \brief writing separately for each type of particle */
+    /** \brief Writing separately for each type of particle */
     bool m_pertype;
+    /** \brief Cycle number */
+    uint m_ParaviewCycleNumber;
     //@}
 
 public:
@@ -60,10 +64,10 @@ public:
 
     /** @brief Writes data */
     __HOST__
-    void PostProcessing(std::vector<RigidBody<T, T>> const* rb,
-                        std::vector<unsigined int> const*   RigidBodyID,
-                        std::vector<Transform3<T>> const*   t,
-                        std::vector<Kinematics<T>> const*   k) final;
+    void PostProcessing(RigidBody<T, T> const* const* particleRB,
+                        RigidBody<T, T> const* const* obstacleRB,
+                        ComponentManager<T> const*    cm,
+                        T                             currentTime) final;
 
     /** @brief Finalizes writing data */
     void PostProcessing_end() final;
