@@ -200,7 +200,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
             // Initial transformation of the rigid body
             // One draw back is we might end up with the same rigid body shape,
             // but with different initial transformation.
-            obstaclesInitialTransform.push_back(Transform3<T>(nObstacle));
+            obstaclesInitialTransform[i] = Transform3<T>(nObstacle);
         }
         GoutWI(6, "Reading obstacles types completed!");
     }

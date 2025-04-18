@@ -12,7 +12,7 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-template <typedef T>
+template <typename T>
 class ParaviewPostProcessingWriter : public PostProcessingWriter<T>
 {
 protected:
@@ -53,7 +53,7 @@ public:
     /** @name Get methods */
     //@{
     __HOST__
-    PostProcessingWriterType getPostProcessingWriterType();
+    PostProcessingWriterType getPostProcessingWriterType() const;
     //@}
 
     /** @name Methods */
@@ -66,8 +66,8 @@ public:
     __HOST__
     void PostProcessing(RigidBody<T, T> const* const* particleRB,
                         RigidBody<T, T> const* const* obstacleRB,
-                        ComponentManager<T> const*    cm,
-                        T                             currentTime) final;
+                        const ComponentManager<T>*    cm,
+                        const T                       currentTime) final;
 
     /** @brief Finalizes writing data */
     void PostProcessing_end() final;

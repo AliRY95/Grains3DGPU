@@ -105,6 +105,15 @@ public:
     __HOST__
     virtual int numberOfCells_PARAVIEW() const = 0;
 
+    /** @brief Writes the list of points describing the convex to an stream
+      @param f output stream
+        @param transform geometric transformation
+        @param translation additional center of mass translation */
+    __HOST__
+    void writePoints_PARAVIEW(std::ostream&        f,
+                              const Transform3<T>& transform,
+                              const Vector3<T>*    translation = NULL) const;
+
     /** @brief Returns a list of points describing the convex in a Paraview
         format
         @param transform geometric transformation

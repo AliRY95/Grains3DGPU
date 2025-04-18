@@ -79,8 +79,8 @@ public:
     __HOST__
     void PostProcessing(RigidBody<T, T> const* const* particleRB,
                         RigidBody<T, T> const* const* obstacleRB,
-                        ComponentManager<T> const*    cm,
-                        T                             currentTime);
+                        const ComponentManager<T>*    cm,
+                        const T                       currentTime);
 
     /** @brief Finalizes writing data */
     __HOST__

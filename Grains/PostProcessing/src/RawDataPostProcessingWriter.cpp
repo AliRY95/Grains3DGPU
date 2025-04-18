@@ -70,8 +70,8 @@ template <typename T>
 __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
     RigidBody<T, T> const* const* particleRB,
     RigidBody<T, T> const* const* obstacleRB,
-    ComponentManager<T> const*    cm,
-    T                             currentTime)
+    const ComponentManager<T>*    cm,
+    const T                       currentTime)
 {
     // Particles
     uint                       numParticles = cm->getNumberOfParticles();

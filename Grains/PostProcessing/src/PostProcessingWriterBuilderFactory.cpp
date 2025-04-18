@@ -1,6 +1,6 @@
 #include "PostProcessingWriterBuilderFactory.hh"
+#include "ParaviewPostProcessingWriter.hh"
 #include "RawDataPostProcessingWriter.hh"
-// #include "ParaviewPostProcessingWriter.hh"
 
 // -----------------------------------------------------------------------------
 // Creates a post-processing writer from an XML node
@@ -13,8 +13,8 @@ __HOST__ PostProcessingWriter<T>*
 
     if(PPWName == "RawData")
         ppw = new RawDataPostProcessingWriter<T>(nPPW);
-    // else if ( PPWName == "Paraview" )
-    // 	ppw = new ParaviewPostProcessingWriter( nPPW, rank_, nbranks_ );
+    else if(PPWName == "Paraview")
+        ppw = new ParaviewPostProcessingWriter<T>(nPPW);
     // else
     //  	error
 
