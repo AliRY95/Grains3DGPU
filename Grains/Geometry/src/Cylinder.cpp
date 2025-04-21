@@ -223,11 +223,11 @@ __HOST__ std::list<Vector3<T>>
 // Writes the connectivity of the cylinder in a Paraview format
 template <typename T>
 __HOST__ void
-    Cylinder<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
-                                          std::list<int>& offsets,
-                                          std::list<int>& cellstype,
-                                          int& firstpoint_globalnumber,
-                                          int& last_offset) const
+    Cylinder<T>::writeConnection_PARAVIEW(std::list<uint>& connectivity,
+                                          std::list<uint>& offsets,
+                                          std::list<uint>& cellstype,
+                                          uint& firstpoint_globalnumber,
+                                          uint& last_offset) const
 {
     for(int i = 0; i < visuNodeNbOnPer - 1; ++i)
     {

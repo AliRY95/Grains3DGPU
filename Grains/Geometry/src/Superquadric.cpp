@@ -328,14 +328,14 @@ __HOST__ std::list<Vector3<T>>
 // Writes the connectivity of the superquadric in a Paraview format
 template <typename T>
 __HOST__ void
-    Superquadric<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
-                                              std::list<int>& offsets,
-                                              std::list<int>& cellstype,
-                                              int& firstpoint_globalnumber,
-                                              int& last_offset) const
+    Superquadric<T>::writeConnection_PARAVIEW(std::list<uint>& connectivity,
+                                              std::list<uint>& offsets,
+                                              std::list<uint>& cellstype,
+                                              uint& firstpoint_globalnumber,
+                                              uint& last_offset) const
 {
     // Top cells: tetrahedron
-    for(int j = 0; j < visuNodeNbOnPer - 1; j++)
+    for(uint j = 0; j < visuNodeNbOnPer - 1; ++j)
     {
         // Center
         connectivity.push_back(firstpoint_globalnumber);
@@ -360,11 +360,11 @@ __HOST__ void
     cellstype.push_back(10);
 
     // Regular cells: Pyramid
-    int pointact = 3; // Current point (we will browse the grid)
+    uint pointact = 3; // Current point (we will browse the grid)
 
-    for(int i = 1; i < visuNodeNbOnPer - 1; ++i)
+    for(uint i = 1; i < visuNodeNbOnPer - 1; ++i)
     {
-        for(int j = 0; j < visuNodeNbOnPer - 1; j++)
+        for(uint j = 0; j < visuNodeNbOnPer - 1; ++j)
         {
             // Center
             connectivity.push_back(firstpoint_globalnumber);
@@ -402,9 +402,9 @@ __HOST__ void
     }
 
     // Bottom cells: tetrahedron
-    const int Firstptlastlat = 3 + visuNodeNbOnPer * (visuNodeNbOnPer - 2);
+    const uint Firstptlastlat = 3 + visuNodeNbOnPer * (visuNodeNbOnPer - 2);
 
-    for(int j = 0; j < visuNodeNbOnPer - 1; j++)
+    for(uint j = 0; j < visuNodeNbOnPer - 1; ++j)
     {
         connectivity.push_back(firstpoint_globalnumber); // Center
         connectivity.push_back(firstpoint_globalnumber + 2); // Bottom point

@@ -133,11 +133,11 @@ public:
         @param firstpoint_globalnumber global number of the 1st point
         @param last_offset last offset used for the previous convex shape */
     __HOST__
-    void writeConnection_PARAVIEW(std::list<int>& connectivity,
-                                  std::list<int>& offsets,
-                                  std::list<int>& cellstype,
-                                  int&            firstpoint_globalnumber,
-                                  int&            last_offset) const final;
+    void writeConnection_PARAVIEW(std::list<uint>& connectivity,
+                                  std::list<uint>& offsets,
+                                  std::list<uint>& cellstype,
+                                  uint&            firstpoint_globalnumber,
+                                  uint&            last_offset) const final;
     //@}
 };
 

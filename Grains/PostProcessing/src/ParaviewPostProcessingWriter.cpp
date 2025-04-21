@@ -1,5 +1,6 @@
 #include "ParaviewPostProcessingWriter.hh"
 #include "GrainsUtils.hh"
+#include "VectorMath.hh"
 
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
@@ -20,11 +21,11 @@
 template <typename T>
 __HOST__ void writeObstacles_Paraview(RigidBody<T, T> const* const* obstacleRB,
                                       const ComponentManager<T>*    cm,
-                                      const uint         numObstacles,
-                                      const std::string& obsFileName)
+                                      const std::string&            obsFileName)
 {
     ofstream                         f((obsFileName).c_str(), ios::out);
-    const std::vector<Transform3<T>> tr = cm->getTransformObstacles();
+    const uint                       numObstacles = cm->getNumberOfObstacles();
+    const std::vector<Transform3<T>> tr           = cm->getTransformObstacles();
 
     f << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" "
       << "byte_order=\"LittleEndian\" ";
@@ -47,9 +48,9 @@ __HOST__ void writeObstacles_Paraview(RigidBody<T, T> const* const* obstacleRB,
     f << "</DataArray>" << endl;
     f << "</Points>" << endl;
 
-    list<int>           connectivity, offsets, cellstype;
-    list<int>::iterator ii;
-    int                 firstpoint_globalnumber = 0, last_offset = 0;
+    list<uint>           connectivity, offsets, cellstype;
+    list<uint>::iterator ii;
+    uint                 firstpoint_globalnumber = 0, last_offset = 0;
     for(uint i = 0; i < numObstacles; ++i)
         obstacleRB[i]->getConvex()->writeConnection_PARAVIEW(
             connectivity,
@@ -90,7 +91,7 @@ __HOST__ void writeObstacles_Paraview(RigidBody<T, T> const* const* obstacleRB,
         // double indic = obstacleRB[i]->getIndicator();
         double indic = 0;
         int    nc    = obstacleRB[i]->getConvex()->numberOfCells_PARAVIEW();
-        for(i = 0; i < nc; ++i)
+        for(uint j = 0; j < nc; ++j)
             f << indic << " ";
     }
     f << endl;
@@ -103,218 +104,125 @@ __HOST__ void writeObstacles_Paraview(RigidBody<T, T> const* const* obstacleRB,
     f.close();
 }
 
-// // -----------------------------------------------------------------------------
-// // Writes particles data
-// template <typename T>
-// __HOST__ void writeParticles_Paraview(std::vector<RigidBody<T, T>> const* rb,
-//                                       std::vector<uint> const* rigidBodyID,
-//                                       std::vector<Transform3<T>> const* t,
-//                                       std::vector<Kinematics<T>> const* k)
-// {
-//     list<Particle*>::const_iterator particle;
-//     uint                            numParticles = rigidBodyID->size();
+// -----------------------------------------------------------------------------
+// Writes particles data
+template <typename T>
+__HOST__ void writeParticles_Paraview(RigidBody<T, T> const* const* particleRB,
+                                      const ComponentManager<T>*    cm,
+                                      const std::string&            parFileName)
+{
+    ofstream                         f((parFileName).c_str(), ios::out);
+    const uint                       numParticles = cm->getNumberOfParticles();
+    const std::vector<Transform3<T>> tr           = cm->getTransform();
+    const std::vector<Kinematics<T>> kin          = cm->getVelocity();
 
-//     std::ofstream f((m_ParaviewFilename_dir + "/" + partFilename).c_str(),
-//                     ios::out);
+    f << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" "
+      << "byte_order=\"LittleEndian\" ";
+    f << ">" << endl;
+    f << "<UnstructuredGrid>" << endl;
+    uint nbpts = 0, nbcells = 0;
+    for(uint i = 0; i < numParticles; ++i)
+    {
+        nbpts += particleRB[i]->getConvex()->numberOfPoints_PARAVIEW();
+        nbcells += particleRB[i]->getConvex()->numberOfCells_PARAVIEW();
+    }
 
-//     f << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" "
-//       << "byte_order=\"LittleEndian\" ";
-//     if(m_binary)
-//         f << "compressor=\"vtkZLibDataCompressor\"";
-//     f << ">" << endl;
-//     f << "<UnstructuredGrid>" << endl;
-//     int nbpts = 0, nbcells = 0, i;
+    f << "<Piece NumberOfPoints=\"" << nbpts << "\"" << " NumberOfCells=\""
+      << nbcells << "\">" << endl;
 
-//     for(uint i = 0; i < numParticles; i++)
-//     {
-//         nbpts += rb[i].getConvex()->numberOfPoints_PARAVIEW();
-//         nbcells += rb[i].getConvex()->numberOfCells_PARAVIEW();
-//     }
-//     f << "<Piece NumberOfPoints=\"" << nbpts << "\"" << " NumberOfCells=\""
-//       << nbcells << "\">" << endl;
+    f << "<Points>" << endl;
+    f << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" ";
+    f << "format=\"ascii\">" << endl;
 
-//     f << "<Points>" << endl;
-//     f << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" ";
-//     f << "offset=\"" << OFFSET << "\" format=\"appended\">";
-//     start_output_binary(sizeof_Float32, 3 * nbpts);
-//     for(uint i = 0; i < numParticles; i++)
-//     {
-//         ppp = (*particle)->get_polygonsPts_PARAVIEW(PPTranslation);
-//         for(ilpp = ppp.begin(); ilpp != ppp.end(); ilpp++)
-//             for(int comp = 0; comp < 3; ++comp)
-//                 write_double_binary((*ilpp)[comp]);
-//     }
-//     flush_binary(f, "writeParticles_Paraview/Points");
-//     f << "</DataArray>" << endl;
-//     f << "</Points>" << endl;
+    for(uint i = 0; i < numParticles; ++i)
+    {
+        particleRB[i]->getConvex()->writePoints_PARAVIEW(f, tr[i]);
+    }
+    f << "</DataArray>" << endl;
+    f << "</Points>" << endl;
 
-//     list<int>           connectivity, offsets, cellstype;
-//     list<int>::iterator ii;
-//     int                 firstpoint_globalnumber = 0, last_offset = 0;
-//     for(particle = particles->begin(); particle != particles->end(); particle++)
-//         if((*particle)->getActivity() == COMPUTE
-//            && ((*particle)->getTag() != 2 || forceForAllTag))
-//             (*particle)->write_polygonsStr_PARAVIEW(connectivity,
-//                                                     offsets,
-//                                                     cellstype,
-//                                                     firstpoint_globalnumber,
-//                                                     last_offset);
-//     f << "<Cells>" << endl;
-//     f << "<DataArray type=\"Int32\" Name=\"connectivity\" ";
-//     if(m_binary)
-//         f << "offset=\"" << OFFSET << "\" format=\"appended\">";
-//     else
-//         f << "format=\"ascii\">" << endl;
-//     if(m_binary)
-//     {
-//         start_output_binary(sizeof_Int32, int(connectivity.size()));
-//         for(ii = connectivity.begin(); ii != connectivity.end(); ii++)
-//             write_int_binary(*ii);
-//         flush_binary(f, "writeParticles_Paraview/connectivity");
-//     }
-//     else
-//     {
-//         for(ii = connectivity.begin(); ii != connectivity.end(); ii++)
-//             f << *ii << " ";
-//         f << endl;
-//     }
-//     f << "</DataArray>" << endl;
-//     f << "<DataArray type=\"Int32\" Name=\"offsets\" ";
-//     if(m_binary)
-//         f << "offset=\"" << OFFSET << "\" format=\"appended\">";
-//     else
-//         f << "format=\"ascii\">" << endl;
-//     if(m_binary)
-//     {
-//         start_output_binary(sizeof_Int32, int(offsets.size()));
-//         for(ii = offsets.begin(); ii != offsets.end(); ii++)
-//             write_int_binary(*ii);
-//         flush_binary(f, "writeParticles_Paraview/offsets");
-//     }
-//     else
-//     {
-//         for(ii = offsets.begin(); ii != offsets.end(); ii++)
-//             f << *ii << " ";
-//         f << endl;
-//     }
-//     f << "</DataArray>" << endl;
-//     f << "<DataArray type=\"Int32\" Name=\"types\" ";
-//     if(m_binary)
-//         f << "offset=\"" << OFFSET << "\" format=\"appended\">";
-//     else
-//         f << "format=\"ascii\">" << endl;
-//     if(m_binary)
-//     {
-//         start_output_binary(sizeof_Int32, int(cellstype.size()));
-//         for(ii = cellstype.begin(); ii != cellstype.end(); ii++)
-//             write_int_binary(*ii);
-//         flush_binary(f, "writeParticles_Paraview/types");
-//     }
-//     else
-//     {
-//         for(ii = cellstype.begin(); ii != cellstype.end(); ii++)
-//             f << *ii << " ";
-//         f << endl;
-//     }
-//     f << "</DataArray>" << endl;
-//     f << "</Cells>" << endl;
+    list<uint>           connectivity, offsets, cellstype;
+    list<uint>::iterator ii;
+    uint                 firstpoint_globalnumber = 0, last_offset = 0;
+    for(uint i = 0; i < numParticles; ++i)
+        particleRB[i]->getConvex()->writeConnection_PARAVIEW(
+            connectivity,
+            offsets,
+            cellstype,
+            firstpoint_globalnumber,
+            last_offset);
+    f << "<Cells>" << endl;
+    f << "<DataArray type=\"Int32\" Name=\"connectivity\" ";
+    f << "format=\"ascii\">" << endl;
+    for(ii = connectivity.begin(); ii != connectivity.end(); ii++)
+        f << *ii << " ";
+    f << endl;
+    f << "</DataArray>" << endl;
+    f << "<DataArray type=\"Int32\" Name=\"offsets\" ";
+    f << "format=\"ascii\">" << endl;
 
-//     f << "<CellData Scalars=\"NormU,NormOm,CoordNumb\">" << endl;
+    for(ii = offsets.begin(); ii != offsets.end(); ii++)
+        f << *ii << " ";
+    f << endl;
 
-//     f << "<DataArray type=\"Float32\" Name=\"NormU\" ";
-//     if(m_binary)
-//         f << "offset=\"" << OFFSET << "\" format=\"appended\">";
-//     else
-//         f << "format=\"ascii\">" << endl;
-//     if(m_binary)
-//         start_output_binary(sizeof_Float32, int(cellstype.size()));
-//     for(particle = particles->begin(); particle != particles->end(); particle++)
-//         if((*particle)->getActivity() == COMPUTE
-//            && ((*particle)->getTag() != 2 || forceForAllTag))
-//         {
-//             double normU = Norm(*(*particle)->getTranslationalVelocity());
-//             int    nc    = (*particle)->numberOfCells_PARAVIEW();
-//             if(m_binary)
-//                 for(i = 0; i < nc; ++i)
-//                     write_double_binary(normU);
-//             else
-//                 for(i = 0; i < nc; ++i)
-//                     f << normU << " ";
-//         }
-//     if(m_binary)
-//         flush_binary(f, "writeParticles_Paraview/NormU");
-//     else
-//         f << endl;
-//     f << "</DataArray>" << endl;
+    f << "</DataArray>" << endl;
+    f << "<DataArray type=\"Int32\" Name=\"types\" ";
+    f << "format=\"ascii\">" << endl;
 
-//     f << "<DataArray type=\"Float32\" Name=\"NormOm\" ";
-//     if(m_binary)
-//         f << "offset=\"" << OFFSET << "\" format=\"appended\">";
-//     else
-//         f << "format=\"ascii\">" << endl;
-//     if(m_binary)
-//         start_output_binary(sizeof_Float32, int(cellstype.size()));
-//     for(particle = particles->begin(); particle != particles->end(); particle++)
-//         if((*particle)->getActivity() == COMPUTE
-//            && ((*particle)->getTag() != 2 || forceForAllTag))
-//         {
-//             double normOm = Norm(*(*particle)->getAngularVelocity());
-//             int    nc     = (*particle)->numberOfCells_PARAVIEW();
-//             if(m_binary)
-//                 for(i = 0; i < nc; ++i)
-//                     write_double_binary(normOm);
-//             else
-//                 for(i = 0; i < nc; ++i)
-//                     f << normOm << " ";
-//         }
-//     if(m_binary)
-//         flush_binary(f, "writeParticles_Paraview/NormOm");
-//     else
-//         f << endl;
-//     f << "</DataArray>" << endl;
+    for(ii = cellstype.begin(); ii != cellstype.end(); ii++)
+        f << *ii << " ";
+    f << endl;
 
-//     f << "<DataArray type=\"Float32\" Name=\"CoordNumb\" ";
-//     if(m_binary)
-//         f << "offset=\"" << OFFSET << "\" format=\"appended\">";
-//     else
-//         f << "format=\"ascii\">" << endl;
-//     if(m_binary)
-//         start_output_binary(sizeof_Float32, int(cellstype.size()));
-//     for(particle = particles->begin(); particle != particles->end(); particle++)
-//         if((*particle)->getActivity() == COMPUTE
-//            && ((*particle)->getTag() != 2 || forceForAllTag))
-//         {
-//             double coordNum = double((*particle)->getCoordinationNumber());
-//             int    nc       = (*particle)->numberOfCells_PARAVIEW();
-//             if(m_binary)
-//                 for(i = 0; i < nc; ++i)
-//                     write_double_binary(coordNum);
-//             else
-//                 for(i = 0; i < nc; ++i)
-//                     f << coordNum << " ";
-//         }
-//     if(m_binary)
-//         flush_binary(f, "writeParticles_Paraview/CoordNumb");
-//     else
-//         f << endl;
-//     f << "</DataArray>" << endl;
-//     f << "</CellData>" << endl;
-//     f << "</Piece>" << endl;
+    f << "</DataArray>" << endl;
+    f << "</Cells>" << endl;
 
-//     f << "</UnstructuredGrid>" << endl;
-//     if(m_binary)
-//     {
-//         f << "<AppendedData encoding=\"raw\">" << endl << "    _";
-//         f.write(BUFFER, OFFSET);
-//         delete[] BUFFER;
-//         BUFFER    = 0;
-//         ALLOCATED = 0;
-//         OFFSET    = 0;
-//         f << endl << "</AppendedData>" << endl;
-//     }
-//     f << "</VTKFile>" << endl;
-//     f.close();
-// }
+    f << "<CellData Scalars=\"NormU,NormOm,CoordNumb\">" << endl;
+
+    f << "<DataArray type=\"Float32\" Name=\"NormU\" ";
+    f << "format=\"ascii\">" << endl;
+
+    for(uint i = 0; i < numParticles; ++i)
+    {
+        T    normU = norm(kin[i].getTranslationalComponent());
+        uint nc    = particleRB[i]->getConvex()->numberOfCells_PARAVIEW();
+        for(uint j = 0; j < nc; ++j)
+            f << normU << " ";
+    }
+    f << endl;
+    f << "</DataArray>" << endl;
+
+    f << "<DataArray type=\"Float32\" Name=\"NormOm\" ";
+    f << "format=\"ascii\">" << endl;
+
+    for(uint i = 0; i < numParticles; ++i)
+    {
+        T    normOm = norm(kin[i].getAngularComponent());
+        uint nc     = particleRB[i]->getConvex()->numberOfCells_PARAVIEW();
+        for(uint j = 0; j < nc; ++j)
+            f << normOm << " ";
+    }
+    f << endl;
+    f << "</DataArray>" << endl;
+
+    f << "<DataArray type=\"Float32\" Name=\"CoordNumb\" ";
+    f << "format=\"ascii\">" << endl;
+
+    for(uint i = 0; i < numParticles; ++i)
+    {
+        T    coordNum = 0;
+        uint nc       = particleRB[i]->getConvex()->numberOfCells_PARAVIEW();
+        for(uint j = 0; j < nc; ++j)
+            f << coordNum << " ";
+    }
+    f << endl;
+    f << "</DataArray>" << endl;
+    f << "</CellData>" << endl;
+    f << "</Piece>" << endl;
+
+    f << "</UnstructuredGrid>" << endl;
+    f << "</VTKFile>" << endl;
+    f.close();
+}
 
 /* ========================================================================== */
 /*                            High-Level Methods                              */
@@ -391,12 +299,10 @@ __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing(
     const ComponentManager<T>*    cm,
     const T                       currentTime)
 {
-    const uint   numObstacles = cm->getNumberOfObstacles();
-    const uint   numParticles = cm->getNumberOfParticles();
-    list<string> Scalars;
-    Scalars.push_back("NormU");
-    Scalars.push_back("NormOm");
-    Scalars.push_back("CoordNumb");
+    // list<string> Scalars;
+    // Scalars.push_back("NormU");
+    // Scalars.push_back("NormOm");
+    // Scalars.push_back("CoordNumb");
     std::ostringstream ossCN;
     ossCN << m_ParaviewCycleNumber;
 
@@ -416,50 +322,26 @@ __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing(
     f << "</Collection>" << endl;
     f << "</VTKFile>" << endl;
     f.close();
-    writeObstacles_Paraview(obstacleRB, cm, numObstacles, obsFileNamePath);
+    writeObstacles_Paraview(obstacleRB, cm, obsFileNamePath);
 
     // Particles
-    // string partFilename = m_ParaviewFilename + "_Particles_T" + ossCN.str();
-    // *m_Paraview_saveParticles_pvd[0]
-    //     << "<DataSet timestep=\"" << time << "\" "
-    //     << "group=\"\" part=\"0\" file=\"" << partFilename
-    //     << (m_nprocs > 1 && !m_mpiio_singlefile ? ".pvtu\"/>" : ".vtu\"/>")
-    //     << endl;
+    std::string parFileName
+        = m_ParaviewFilename + "_Particles_T" + ossCN.str() + ".vtu";
+    std::string parFileNamePath = m_ParaviewFilename_dir + "/" + parFileName;
+    *m_Paraview_saveParticles_pvd[0] << "<DataSet timestep=\"" << currentTime
+                                     << "\" " << "group=\"\" part=\"0\" file=\""
+                                     << parFileName << "\"/>\n";
 
-    // ofstream g(
-    //     (m_ParaviewFilename_dir + "/" + m_ParaviewFilename + "_Particles.pvd")
-    //         .c_str(),
-    //     ios::out);
-    // g << m_Paraview_saveParticles_pvd[0]->str();
-    // g << "</Collection>" << endl;
-    // g << "</VTKFile>" << endl;
-    // g.close();
+    ofstream g(
+        (m_ParaviewFilename_dir + "/" + m_ParaviewFilename + "_Particles.pvd")
+            .c_str(),
+        ios::out);
+    g << m_Paraview_saveParticles_pvd[0]->str();
+    g << "</Collection>" << endl;
+    g << "</VTKFile>" << endl;
+    g.close();
 
-    // if(m_nprocs > 1 && !m_mpiio_singlefile)
-    // {
-    //     if(nbParticleTypes == 1
-    //        && (*referenceParticles)[0]->getRigidBody()->getConvex()->isSphere()
-    //        && !GrainsExec::m_SphereAsPolyParaview)
-    //     {
-    //         list<string> ptVec;
-    //         ptVec.push_back("Orientation");
-    //         writePVTU_Paraview(partFilename,
-    //                            &ptVec,
-    //                            &Scalars,
-    //                            &empty_string_list);
-    //     }
-    //     else
-    //         writePVTU_Paraview(partFilename,
-    //                            &empty_string_list,
-    //                            &empty_string_list,
-    //                            &Scalars);
-    // }
-
-    // writeParticles_Paraview(
-    //     particles,
-    //     partFilename + (m_nprocs > 1 ? "_" + ossRK.str() : "") + ".vtu",
-    //     false,
-    //     PostProcessingWriter::m_bPPWindow[m_rank]);
+    writeParticles_Paraview(particleRB, cm, parFileNamePath);
     m_ParaviewCycleNumber++;
 }
 

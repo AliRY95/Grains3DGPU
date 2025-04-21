@@ -205,16 +205,16 @@ __HOST__ std::list<Vector3<T>>
 // -----------------------------------------------------------------------------
 // Writes the connectivity of the sphere in a Paraview format
 template <typename T>
-__HOST__ void Sphere<T>::writeConnection_PARAVIEW(std::list<int>& connectivity,
-                                                  std::list<int>& offsets,
-                                                  std::list<int>& cellstype,
-                                                  int& firstpoint_globalnumber,
-                                                  int& last_offset) const
+__HOST__ void Sphere<T>::writeConnection_PARAVIEW(std::list<uint>& connectivity,
+                                                  std::list<uint>& offsets,
+                                                  std::list<uint>& cellstype,
+                                                  uint& firstpoint_globalnumber,
+                                                  uint& last_offset) const
 {
-    int i, k, ptsPerlevel = 4 * visuNodeNbPerQar,
-              Bottom_number = ptsPerlevel * (2 * visuNodeNbPerQar - 1),
-              Top_number    = ptsPerlevel * (2 * visuNodeNbPerQar - 1) + 1,
-              GC_number     = ptsPerlevel * (2 * visuNodeNbPerQar - 1) + 2;
+    uint i, k, ptsPerlevel = 4 * visuNodeNbPerQar,
+               Bottom_number = ptsPerlevel * (2 * visuNodeNbPerQar - 1),
+               Top_number    = ptsPerlevel * (2 * visuNodeNbPerQar - 1) + 1,
+               GC_number     = ptsPerlevel * (2 * visuNodeNbPerQar - 1) + 2;
 
     // Regular cells: Pyramid
     for(k = 0; k < 2 * visuNodeNbPerQar - 2; ++k)
