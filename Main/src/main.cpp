@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
             grains->simulate();
 
             // Tasks to perform after time-stepping
-            // grains->do_after_time_stepping();
+            grains->finalize();
 
             // Delete the Grains application
             delete grains;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
             grains->simulate();
 
             // Tasks to perform after time-stepping
-            // grains->do_after_time_stepping();
+            grains->finalize();
 
             // Delete the Grains application
             delete grains;

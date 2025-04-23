@@ -12,20 +12,20 @@
 
     @author A.Yazdani - 2024 - Construction */
 // =============================================================================
-template <typedef T>
+template <typename T>
 class ParaviewPostProcessingWriter : public PostProcessingWriter<T>
 {
 protected:
     /** @name Parameters */
     //@{
-    /** \brief Output directory name */
-    std::string m_ParaviewFilename_dir;
-    /** \brief Output file name */
-    std::string m_ParaviewFilename;
     /** \brief Particles output stream */
     vector<ostringstream*> m_Paraview_saveParticles_pvd;
     /** \brief Obstacles output stream */
     ostringstream m_Paraview_saveObstacles_pvd;
+    /** \brief Output directory name */
+    std::string m_directory;
+    /** \brief files root name */
+    std::string m_rootName;
     /** \brief Writing in binary */
     bool m_binary;
     /** \brief Writing separately for each type of particle */
@@ -53,21 +53,29 @@ public:
     /** @name Get methods */
     //@{
     __HOST__
-    PostProcessingWriterType getPostProcessingWriterType();
+    PostProcessingWriterType getPostProcessingWriterType() const;
     //@}
 
     /** @name Methods */
     //@{
+    /** @brief Removes post-processing files already in the directory */
+    __HOST__
+    void clearPostProcessingFiles() const;
+
     /** @brief Initializes the post-processing writer */
     __HOST__
     void PostProcessing_start() final;
 
-    /** @brief Writes data */
+    /** @brief Writes post-processing data
+     @param particleRB Arrays of particles rigid bodies
+     @param obstacleRB Arrays of obstacles rigid bodies
+     @param cm component manager
+     @param currentTime Current simulation time */
     __HOST__
     void PostProcessing(RigidBody<T, T> const* const* particleRB,
                         RigidBody<T, T> const* const* obstacleRB,
-                        ComponentManager<T> const*    cm,
-                        T                             currentTime) final;
+                        const ComponentManager<T>*    cm,
+                        const T                       currentTime) final;
 
     /** @brief Finalizes writing data */
     void PostProcessing_end() final;

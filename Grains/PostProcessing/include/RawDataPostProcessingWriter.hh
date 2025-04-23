@@ -41,7 +41,9 @@ private:
     /** \brief particle class output stream */
     std::ofstream m_particle_class;
     /** \brief files root name */
-    std::string m_filerootname;
+    std::string m_rootName;
+    /** \brief output directory */
+    std::string m_directory;
     /** \brief No. digits after the decimal in the scientific format */
     int m_ndigits;
     //@}
@@ -71,16 +73,24 @@ public:
 
     /** @name Methods */
     //@{
+    /** @brief Removes post-processing files already in the directory */
+    __HOST__
+    void clearPostProcessingFiles() const;
+
     /** @brief Initializes the post-processing writer */
     __HOST__
     void PostProcessing_start();
 
-    /** @brief Writes data TODO:PARAMS*/
+    /** @brief Writes post-processing data
+     @param particleRB Arrays of particles rigid bodies
+     @param obstacleRB Arrays of obstacles rigid bodies
+     @param cm component manager
+     @param currentTime Current simulation time */
     __HOST__
     void PostProcessing(RigidBody<T, T> const* const* particleRB,
                         RigidBody<T, T> const* const* obstacleRB,
-                        ComponentManager<T> const*    cm,
-                        T                             currentTime);
+                        const ComponentManager<T>*    cm,
+                        const T                       currentTime);
 
     /** @brief Finalizes writing data */
     __HOST__
@@ -89,7 +99,6 @@ public:
     /** @brief Creates output files and open streams */
     __HOST__
     void prepareResultFiles(ios_base::openmode mode);
-    //@}
     //@}
 };
 

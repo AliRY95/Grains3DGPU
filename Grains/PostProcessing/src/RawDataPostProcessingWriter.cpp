@@ -1,23 +1,7 @@
 #include "RawDataPostProcessingWriter.hh"
 #include "GrainsUtils.hh"
 
-/* ========================================================================== */
-/*                             Low-Level Methods                              */
-/* ========================================================================== */
-// Delete all raw result files
-__HOST__
-void clearResultFiles()
-{
-    // std::string cmd = "bash " +
-    // 		   		  GrainsExecParameters<T>::m_GRAINS_HOME +
-    // 				  "/Tools/ExecScripts/Text_clear.exec " +
-    // 				  m_filerootname;
-    // GrainsExec::m_return_syscmd = system( cmd.c_str() );
-}
-
-/* ========================================================================== */
-/*                             High-Level Methods                             */
-/* ========================================================================== */
+// -----------------------------------------------------------------------------
 // Default constructor
 template <typename T>
 __HOST__ RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter()
@@ -31,9 +15,11 @@ __HOST__
     RawDataPostProcessingWriter<T>::RawDataPostProcessingWriter(DOMNode* dn)
     : m_ndigits(6)
 {
-    m_filerootname = ReaderXML::getNodeAttr_String(dn, "Name");
+    m_directory = ReaderXML::getNodeAttr_String(dn, "Directory");
+    m_rootName  = ReaderXML::getNodeAttr_String(dn, "RootName");
     GoutWI(9, "Type = RawData");
-    GoutWI(12, "Output file name =", m_filerootname);
+    GoutWI(12, "Output file directory name =", m_directory);
+    GoutWI(12, "Output file root name =", m_rootName);
 }
 
 // -----------------------------------------------------------------------------
@@ -52,6 +38,24 @@ __HOST__ PostProcessingWriterType
     return (RAW);
 }
 
+// ----------------------------------------------------------------------------
+// Removes post-processing files already in the directory
+template <typename T>
+__HOST__ void RawDataPostProcessingWriter<T>::clearPostProcessingFiles() const
+{
+    std::string              directory = m_directory;
+    std::vector<std::string> patternsStr
+        = {"^" + m_rootName + R"(_position_.*\.dat$)",
+           "^" + m_rootName + R"(_translational_velocity_.*\.dat$)",
+           "^" + m_rootName + R"(_angular_velocity_.*\.dat$)",
+           "^" + m_rootName + R"(_coordinationNumber\.dat$)",
+           "^" + m_rootName + R"(_particleType\.dat$)"};
+    std::vector<std::regex> patternsReg;
+    for(const auto& pattern : patternsStr)
+        patternsReg.push_back(std::regex(pattern));
+    PostProcessingWriter<T>::clearPostProcessingFiles(directory, patternsReg);
+}
+
 // -----------------------------------------------------------------------------
 // Initializes the post-processing writer
 template <typename T>
@@ -60,7 +64,7 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing_start()
     // Open files
     ios_base::openmode mode = ios::app;
     mode                    = ios::out;
-    // clearResultFiles();
+    clearPostProcessingFiles();
     prepareResultFiles(mode);
 }
 
@@ -70,8 +74,8 @@ template <typename T>
 __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
     RigidBody<T, T> const* const* particleRB,
     RigidBody<T, T> const* const* obstacleRB,
-    ComponentManager<T> const*    cm,
-    T                             currentTime)
+    const ComponentManager<T>*    cm,
+    const T                       currentTime)
 {
     // Particles
     uint                       numParticles = cm->getNumberOfParticles();
@@ -85,12 +89,12 @@ __HOST__ void RawDataPostProcessingWriter<T>::PostProcessing(
     // TODO:
     std::vector<Kinematics<T>> kObstacle(numObstacles);
     // Aux. variables
-    Vector3<T> centre;
-    Vector3<T> velT;
-    Vector3<T> velR;
-    uint       type;
-    m_particle_class.open((m_filerootname + "_particleType.dat").c_str(),
-                          ios::out);
+    Vector3<T>  centre;
+    Vector3<T>  velT;
+    Vector3<T>  velR;
+    uint        type;
+    std::string fileName(m_directory + "/" + m_rootName);
+    m_particle_class.open((fileName + "_particleType.dat").c_str(), ios::out);
 
     // Writing current time at the beginning of each line
     std::string stime = realToString(ios::scientific, 6, currentTime);
@@ -231,29 +235,30 @@ template <typename T>
 __HOST__ void
     RawDataPostProcessingWriter<T>::prepareResultFiles(ios_base::openmode mode)
 {
-    string file;
-    file = m_filerootname + "_position_x.dat";
+    std::string fileName(m_directory + "/" + m_rootName);
+    string      file;
+    file = fileName + "_position_x.dat";
     m_gc_coordinates_x.open(file.c_str(), mode);
-    file = m_filerootname + "_position_y.dat";
+    file = fileName + "_position_y.dat";
     m_gc_coordinates_y.open(file.c_str(), mode);
-    file = m_filerootname + "_position_z.dat";
+    file = fileName + "_position_z.dat";
     m_gc_coordinates_z.open(file.c_str(), mode);
 
-    file = m_filerootname + "_translational_velocity_x.dat";
+    file = fileName + "_translational_velocity_x.dat";
     m_translational_velocity_x.open(file.c_str(), mode);
-    file = m_filerootname + "_translational_velocity_y.dat";
+    file = fileName + "_translational_velocity_y.dat";
     m_translational_velocity_y.open(file.c_str(), mode);
-    file = m_filerootname + "_translational_velocity_z.dat";
+    file = fileName + "_translational_velocity_z.dat";
     m_translational_velocity_z.open(file.c_str(), mode);
 
-    file = m_filerootname + "_angular_velocity_x.dat";
+    file = fileName + "_angular_velocity_x.dat";
     m_angular_velocity_x.open(file.c_str(), mode);
-    file = m_filerootname + "_angular_velocity_y.dat";
+    file = fileName + "_angular_velocity_y.dat";
     m_angular_velocity_y.open(file.c_str(), mode);
-    file = m_filerootname + "_angular_velocity_z.dat";
+    file = fileName + "_angular_velocity_z.dat";
     m_angular_velocity_z.open(file.c_str(), mode);
 
-    file = m_filerootname + "_coordinationNumber.dat";
+    file = fileName + "_coordinationNumber.dat";
     m_coordination_number.open(file.c_str(), mode);
 }
 

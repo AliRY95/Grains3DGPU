@@ -37,8 +37,6 @@ void GrainsCPU<T>::simulate()
     // Collision detection on host
     // first, inserting particles on host
     Grains<T>::m_components->insertParticles(Grains<T>::m_insertion);
-    // setting up the PP
-    Grains<T>::m_postProcessor->PostProcessing_start();
 
     cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
     auto h_start = chrono::high_resolution_clock::now();
@@ -71,7 +69,6 @@ void GrainsCPU<T>::simulate()
         Grains<T>::postProcess(Grains<T>::m_components);
     }
     auto h_end = chrono::high_resolution_clock::now();
-    Grains<T>::m_postProcessor->PostProcessing_end();
 
     // Time comparison
     chrono::duration<double> h_time = h_end - h_start;

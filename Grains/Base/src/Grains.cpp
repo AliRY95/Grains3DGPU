@@ -26,6 +26,8 @@ template <typename T>
 Grains<T>::~Grains()
 {
     // TODO
+    for(auto ptr : m_postProcessor)
+        delete ptr;
     delete m_insertion;
 }
 
@@ -47,6 +49,10 @@ void Grains<T>::initialize(DOMElement* rootElement)
     Gout(std::string(80, '='));
     Gout("Reading the input file completed!");
     Gout(std::string(80, '='));
+
+    // Post-processing start
+    for(auto pp : m_postProcessor)
+        pp->PostProcessing_start();
 }
 
 // -----------------------------------------------------------------------------
@@ -54,21 +60,29 @@ void Grains<T>::initialize(DOMElement* rootElement)
 template <typename T>
 void Grains<T>::postProcess(ComponentManager<T> const* cm) const
 {
-    if(GrainsParameters<T>::m_tSave.front() - GrainsParameters<T>::m_time
-       < 0.01 * GrainsParameters<T>::m_dt)
+    using GP = GrainsParameters<T>;
+
+    if(GP::m_tSave.front() - GP::m_time < 0.01 * GP::m_dt)
     {
-        GrainsParameters<T>::m_tSave.pop();
-        Grains<T>::m_postProcessor->PostProcessing(
-            Grains<T>::m_particleRigidBodyList,
-            Grains<T>::m_obstacleRigidBodyList,
-            cm,
-            GrainsParameters<T>::m_time);
+        GP::m_tSave.pop();
+        for(auto pp : m_postProcessor)
+            pp->PostProcessing(m_particleRigidBodyList,
+                               m_obstacleRigidBodyList,
+                               cm,
+                               GP::m_time);
     }
     // In case we get past the saveTime, we need to remove it from the queue
-    if(GrainsParameters<T>::m_time > GrainsParameters<T>::m_tSave.front())
-    {
-        GrainsParameters<T>::m_tSave.pop();
-    }
+    if(GP::m_time > GP::m_tSave.front())
+        GP::m_tSave.pop();
+}
+
+// -----------------------------------------------------------------------------
+// Performs tasks after time-stepping
+template <typename T>
+void Grains<T>::finalize()
+{
+    for(auto pp : m_postProcessor)
+        pp->PostProcessing_end();
 }
 
 /* ========================================================================== */
@@ -200,7 +214,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
             // Initial transformation of the rigid body
             // One draw back is we might end up with the same rigid body shape,
             // but with different initial transformation.
-            obstaclesInitialTransform.push_back(Transform3<T>(nObstacle));
+            obstaclesInitialTransform[i] = Transform3<T>(nObstacle);
         }
         GoutWI(6, "Reading obstacles types completed!");
     }
@@ -338,7 +352,7 @@ void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
     // Output message
     GoutWI(3, "Simulation");
     // -------------------------------------------------------------------------
-    // Checking if Construction node is available
+    // Checking if Simulation node is available
     assert(rootElement != NULL);
     DOMNode* root = ReaderXML::getNode(rootElement, "Simulation");
     if(!root)
@@ -382,18 +396,11 @@ void Grains<T>::AdditionalFeatures(DOMElement* rootElement)
         {
             GoutWI(6, "Reading the post processing writers ...");
             DOMNodeList* allPPW = ReaderXML::getNodes(nWriters);
-            for(XMLSize_t i = 0; i < allPPW->getLength(); i++)
+            for(uint i = 0; i < allPPW->getLength(); ++i)
             {
-                DOMNode*                 nPPW = allPPW->item(i);
-                PostProcessingWriter<T>* ppw  = m_postProcessor
-                    = PostProcessingWriterBuilderFactory<T>::create(nPPW);
-                if(!ppw)
-                {
-                    GoutWI(6,
-                           "Unknown postprocessing writer in "
-                           "node <Writers>");
-                    exit(1);
-                }
+                DOMNode* nPPW = allPPW->item(i);
+                m_postProcessor.push_back(
+                    PostProcessingWriterBuilderFactory<T>::create(nPPW));
             }
             GoutWI(6, "Reading the post processing writers completed!");
         }

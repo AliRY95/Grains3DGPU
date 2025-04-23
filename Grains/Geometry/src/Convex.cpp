@@ -14,6 +14,22 @@ __HOSTDEVICE__ Convex<T>::~Convex()
 {
 }
 
+// -----------------------------------------------------------------------------
+// Destructor
+template <typename T>
+__HOST__ void
+    Convex<T>::writePoints_PARAVIEW(std::ostream&        f,
+                                    const Transform3<T>& transform,
+                                    const Vector3<T>*    translation) const
+{
+    std::list<Vector3<T>> points = writePoints_PARAVIEW(transform, translation);
+
+    for(auto& point : points)
+    {
+        f << point[X] << " " << point[Y] << " " << point[Z] << std::endl;
+    }
+}
+
 // // ----------------------------------------------------------------------------
 // // Input operator
 // template <typename T>
