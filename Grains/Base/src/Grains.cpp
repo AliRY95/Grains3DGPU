@@ -60,19 +60,20 @@ void Grains<T>::initialize(DOMElement* rootElement)
 template <typename T>
 void Grains<T>::postProcess(ComponentManager<T> const* cm) const
 {
-    if(GrainsParameters<T>::m_tSave.front() - GrainsParameters<T>::m_time
-       < 0.01 * GrainsParameters<T>::m_dt)
+    using GP = GrainsParameters<T>;
+
+    if(GP::m_tSave.front() - GP::m_time < 0.01 * GP::m_dt)
     {
-        GrainsParameters<T>::m_tSave.pop();
+        GP::m_tSave.pop();
         for(auto pp : m_postProcessor)
             pp->PostProcessing(m_particleRigidBodyList,
                                m_obstacleRigidBodyList,
                                cm,
-                               GrainsParameters<T>::m_time);
+                               GP::m_time);
     }
     // In case we get past the saveTime, we need to remove it from the queue
-    if(GrainsParameters<T>::m_time > GrainsParameters<T>::m_tSave.front())
-        GrainsParameters<T>::m_tSave.pop();
+    if(GP::m_time > GP::m_tSave.front())
+        GP::m_tSave.pop();
 }
 
 // -----------------------------------------------------------------------------
