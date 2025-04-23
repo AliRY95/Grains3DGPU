@@ -5,18 +5,6 @@
 /* ========================================================================== */
 /*                             Low-Level Methods                              */
 /* ========================================================================== */
-// // Delete all result files
-// __HOST__
-// void clearResultFiles()
-// {
-// 	string cmd = "bash " + GrainsExec::m_GRAINS_HOME
-//      	+ "/Tools/ExecScripts/Paraview_clear.exec " + m_ParaviewFilename_dir +
-// 	" " + m_ParaviewFilename;
-//     GrainsExec::m_return_syscmd = system( cmd.c_str() );
-//   }
-// }
-
-// -----------------------------------------------------------------------------
 // Writes obstacles data
 template <typename T>
 __HOST__ void writeObstacles_Paraview(RigidBody<T, T> const* const* obstacleRB,
@@ -239,12 +227,12 @@ template <typename T>
 __HOST__
     ParaviewPostProcessingWriter<T>::ParaviewPostProcessingWriter(DOMNode* dn)
 {
-    m_ParaviewFilename     = ReaderXML::getNodeAttr_String(dn, "RootName");
-    m_ParaviewFilename_dir = ReaderXML::getNodeAttr_String(dn, "Directory");
+    m_rootName  = ReaderXML::getNodeAttr_String(dn, "RootName");
+    m_directory = ReaderXML::getNodeAttr_String(dn, "Directory");
 
     GoutWI(9, "Type = Paraview");
-    GoutWI(12, "Output file root name =", m_ParaviewFilename);
-    GoutWI(12, "Output file directory name =", m_ParaviewFilename_dir);
+    GoutWI(12, "Output file directory name =", m_directory);
+    GoutWI(12, "Output file root name =", m_rootName);
     // GoutWI(12, "Writing mode =", (m_binary ? "Binary" : "Text"));
 }
 
@@ -264,11 +252,28 @@ __HOST__ PostProcessingWriterType
     return (PARAVIEW);
 }
 
+// ----------------------------------------------------------------------------
+// Removes post-processing files already in the directory
+template <typename T>
+__HOST__ void ParaviewPostProcessingWriter<T>::clearPostProcessingFiles() const
+{
+    std::string              directory   = m_directory;
+    std::vector<std::string> patternsStr = {"^" + m_rootName + R"(_.*\.pvd$)",
+                                            "^" + m_rootName + R"(_.*\.vtu$)",
+                                            "^" + m_rootName + R"(_.*\.pvtu$)",
+                                            "^" + m_rootName + R"(_.*\.vtp$)",
+                                            "^" + m_rootName + R"(_.*\.pvtp$)"};
+    std::vector<std::regex>  patternsReg;
+    for(const auto& pattern : patternsStr)
+        patternsReg.push_back(std::regex(pattern));
+    PostProcessingWriter<T>::clearPostProcessingFiles(directory, patternsReg);
+}
+
 // -----------------------------------------------------------------------------
 template <typename T>
 __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing_start()
 {
-    // clearResultFiles();
+    clearPostProcessingFiles();
     // Obstacles
     m_Paraview_saveObstacles_pvd << "<?xml version=\"1.0\"?>" << endl;
     m_Paraview_saveObstacles_pvd
@@ -308,16 +313,14 @@ __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing(
 
     // Obstacles
     std::string obsFileName
-        = m_ParaviewFilename + "_Obstacles_T" + ossCN.str() + ".vtu";
-    std::string obsFileNamePath = m_ParaviewFilename_dir + "/" + obsFileName;
+        = m_rootName + "_Obstacles_T" + ossCN.str() + ".vtu";
+    std::string obsFileNamePath = m_directory + "/" + obsFileName;
     m_Paraview_saveObstacles_pvd << "<DataSet timestep=\"" << currentTime
                                  << "\" " << "group=\"\" part=\"0\" file=\""
                                  << obsFileName << "\"/>\n";
 
-    ofstream f(
-        (m_ParaviewFilename_dir + "/" + m_ParaviewFilename + "_Obstacles.pvd")
-            .c_str(),
-        ios::out);
+    ofstream f((m_directory + "/" + m_rootName + "_Obstacles.pvd").c_str(),
+               ios::out);
     f << m_Paraview_saveObstacles_pvd.str();
     f << "</Collection>" << endl;
     f << "</VTKFile>" << endl;
@@ -326,16 +329,14 @@ __HOST__ void ParaviewPostProcessingWriter<T>::PostProcessing(
 
     // Particles
     std::string parFileName
-        = m_ParaviewFilename + "_Particles_T" + ossCN.str() + ".vtu";
-    std::string parFileNamePath = m_ParaviewFilename_dir + "/" + parFileName;
+        = m_rootName + "_Particles_T" + ossCN.str() + ".vtu";
+    std::string parFileNamePath = m_directory + "/" + parFileName;
     *m_Paraview_saveParticles_pvd[0] << "<DataSet timestep=\"" << currentTime
                                      << "\" " << "group=\"\" part=\"0\" file=\""
                                      << parFileName << "\"/>\n";
 
-    ofstream g(
-        (m_ParaviewFilename_dir + "/" + m_ParaviewFilename + "_Particles.pvd")
-            .c_str(),
-        ios::out);
+    ofstream g((m_directory + "/" + m_rootName + "_Particles.pvd").c_str(),
+               ios::out);
     g << m_Paraview_saveParticles_pvd[0]->str();
     g << "</Collection>" << endl;
     g << "</VTKFile>" << endl;

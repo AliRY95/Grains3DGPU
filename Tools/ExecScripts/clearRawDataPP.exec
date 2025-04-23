@@ -4,13 +4,14 @@ textFiles_list=(
   position_x.dat
   position_y.dat
   position_z.dat
-  velocity_x.dat
-  velocity_y.dat
-  velocity_z.dat
-  rotation_x.dat
-  rotation_y.dat
-  rotation_z.dat
+  translational_velocity_x.dat
+  translational_velocity_y.dat
+  translational_velocity_z.dat
+  angular_velocity_x.dat
+  angular_velocity_y.dat
+  angular_velocity_z.dat
   coordinationNumber.dat
+  particleType.dat
   totalForce_x.dat
   totalForce_y.dat
   totalForce_z.dat

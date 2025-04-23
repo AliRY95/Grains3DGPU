@@ -40,7 +40,7 @@ for file in $1/$2*.pvtp
     fi
   done    
 
-for file in $1/ErreurContact*
+for file in $1/ContactError*
   do
     if [ -f $file ]
       then
@@ -48,7 +48,7 @@ for file in $1/ErreurContact*
     fi
   done
 
-for file in $1/ErreurImposedMotion*
+for file in $1/ImposedMotionError*
   do
     if [ -f $file ]
       then

@@ -25,7 +25,8 @@ private:
     /** @brief Constructor */
     ConvexBuilderFactory();
 
-    /** @brief Copy constructor */
+    /** @brief Copy constructor
+    @param cb the other ConvexBuilderFactory object */
     ConvexBuilderFactory(ConvexBuilderFactory<T> const& cb);
 
     /** @brief Equal operator to another ConvexBuilderFactory object

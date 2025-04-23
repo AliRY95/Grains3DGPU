@@ -68,47 +68,8 @@ void GrainsGPU<T>::simulate()
                             N * sizeof(int),
                             cudaMemcpyHostToDevice));
 
-    // Collision detection on host
     // first, inserting partilces
     Grains<T>::m_components->insertParticles(Grains<T>::m_insertion);
-    // setting up the PP
-    Grains<T>::m_postProcessor->PostProcessing_start();
-
-    // cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
-    auto h_start = chrono::high_resolution_clock::now();
-    // for ( GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
-    //       GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
-    //       GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt )
-    // {
-    //     // Output time
-    //     ostringstream oss;
-    //     oss.width( 10 );
-    //     oss << left << GrainsParameters<T>::m_time;
-    //     std::cout << '\r'
-    //               << oss.str()
-    //               << "  \t"
-    //               << GrainsParameters<T>::m_tEnd
-    //               << std::flush;
-
-    //     Grains<T>::m_components->detectCollisionAndComputeContactForces(
-    //                                         Grains<T>::m_particleRigidBodyList,
-    //                                         Grains<T>::m_obstacleRigidBodyList,
-    //                                         Grains<T>::m_linkedCell,
-    //                                         Grains<T>::m_contactForce,
-    //                                         h_collision );
-    //     Grains<T>::m_components->addExternalForces(
-    //                                         Grains<T>::m_particleRigidBodyList,
-    //                                         GrainsParameters<T>::m_gravity );
-    //     Grains<T>::m_components->moveParticles(
-    //                                         Grains<T>::m_particleRigidBodyList,
-    //                                         Grains<T>::m_timeIntegrator );
-
-    //     // Post-Processing
-    //     Grains<T>::postProcess( Grains<T>::m_components );
-    // }
-    auto h_end = chrono::high_resolution_clock::now();
-
-    // Collision detection on device
     // Copying to device
     cout << "Copying the inserted particles to the device ..." << endl;
     m_d_components->copy(Grains<T>::m_components);
@@ -142,27 +103,26 @@ void GrainsGPU<T>::simulate()
     }
     cudaDeviceSynchronize();
     auto d_end = chrono::high_resolution_clock::now();
-    Grains<T>::m_postProcessor->PostProcessing_end();
 
-    // Time comparison
-    chrono::duration<double> h_time = h_end - h_start;
-    chrono::duration<double> d_time = d_end - d_start;
-    std::cout << "\nCPU: " << h_time.count() << endl;
-    std::cout << "GPU: " << d_time.count() << endl;
-    int* h_d_collision = new int[N];
-    cudaErrCheck(cudaMemcpy(h_d_collision,
-                            d_collision,
-                            N * sizeof(int),
-                            cudaMemcpyDeviceToHost));
-    // accuracy
-    int hCount = 0, dCount = 0;
-    for(int i = 0; i < N; i++)
-    {
-        hCount += h_collision[i];
-        dCount += h_d_collision[i];
-    }
-    cout << N << " Particles, " << hCount << " collisions on CPU, and "
-         << dCount << " collisions on GPU. " << endl;
+    // // Time comparison
+    // chrono::duration<double> h_time = h_end - h_start;
+    // chrono::duration<double> d_time = d_end - d_start;
+    // std::cout << "\nCPU: " << h_time.count() << endl;
+    // std::cout << "GPU: " << d_time.count() << endl;
+    // int* h_d_collision = new int[N];
+    // cudaErrCheck(cudaMemcpy(h_d_collision,
+    //                         d_collision,
+    //                         N * sizeof(int),
+    //                         cudaMemcpyDeviceToHost));
+    // // accuracy
+    // int hCount = 0, dCount = 0;
+    // for(int i = 0; i < N; i++)
+    // {
+    //     hCount += h_collision[i];
+    //     dCount += h_d_collision[i];
+    // }
+    // cout << N << " Particles, " << hCount << " collisions on CPU, and "
+    //      << dCount << " collisions on GPU. " << endl;
 }
 
 /* ========================================================================== */

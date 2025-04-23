@@ -1,4 +1,5 @@
 #include "PostProcessingWriterBuilderFactory.hh"
+#include "GrainsUtils.hh"
 #include "ParaviewPostProcessingWriter.hh"
 #include "RawDataPostProcessingWriter.hh"
 
@@ -15,8 +16,11 @@ __HOST__ PostProcessingWriter<T>*
         ppw = new RawDataPostProcessingWriter<T>(nPPW);
     else if(PPWName == "Paraview")
         ppw = new ParaviewPostProcessingWriter<T>(nPPW);
-    // else
-    //  	error
+    else
+    {
+        GoutWI(6, "Unknown postprocessing writer in node <Writers>");
+        exit(1);
+    }
 
     return (ppw);
 }

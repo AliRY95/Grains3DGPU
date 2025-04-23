@@ -34,6 +34,7 @@ public:
     //@{
     /** @brief Creates a post-processing writer from an XML node
 		@param nPPW XMl node */
+    __HOST__
     static PostProcessingWriter<T>* create(DOMNode* nPPW);
     //@}
 };

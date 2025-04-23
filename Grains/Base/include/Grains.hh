@@ -55,7 +55,7 @@ protected:
     /** \brief Linked cell for broad-phase. We use a pointer because
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
-    PostProcessingWriter<T>* m_postProcessor;
+    std::list<PostProcessingWriter<T>*> m_postProcessor;
     /** \brief Linked cell for broad-phase. We use a pointer because
         the linkedCell is directly instantiated on device in the case that we
         run Grains on GPU. */
@@ -87,8 +87,8 @@ public:
         @param cm ComponentManager object, either host or device */
     virtual void postProcess(ComponentManager<T> const* cm) const;
 
-    // /** @brief Tasks to perform after time-stepping */
-    // virtual void finalize();
+    /** @brief Tasks to perform after time-stepping */
+    virtual void finalize();
     //@}
 
     /**@name Low-level methods */
