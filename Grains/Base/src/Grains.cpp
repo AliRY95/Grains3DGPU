@@ -36,9 +36,6 @@ Grains<T>::~Grains()
 template <typename T>
 void Grains<T>::initialize(DOMElement* rootElement)
 {
-    // Set the simulation type to default. It will be overridden later if needed
-    GrainsParameters<T>::m_isGPU = false;
-
     // Reading different blocks of the input XML
     Gout(std::string(80, '='));
     Gout("Reading the input file ...");
@@ -93,6 +90,8 @@ void Grains<T>::finalize()
 template <typename T>
 void Grains<T>::Construction(DOMElement* rootElement)
 {
+    using GP = GrainsParameters<T>;
+
     // Output message
     GoutWI(3, "Construction");
     // -------------------------------------------------------------------------
@@ -107,19 +106,18 @@ void Grains<T>::Construction(DOMElement* rootElement)
     // -------------------------------------------------------------------------
     // Domain size: origin, max coordinates and periodicity
     DOMNode* nDomain = ReaderXML::getNode(root, "LinkedCell");
-    GrainsParameters<T>::m_maxCoordinate.setValue(
+    GP::m_maxCoordinate.setValue(
         T(ReaderXML::getNodeAttr_Double(nDomain, "MX")),
         T(ReaderXML::getNodeAttr_Double(nDomain, "MY")),
         T(ReaderXML::getNodeAttr_Double(nDomain, "MZ")));
 
     DOMNode* nOrigin = ReaderXML::getNode(root, "Origin");
     if(nOrigin)
-        GrainsParameters<T>::m_origin.setValue(
-            T(ReaderXML::getNodeAttr_Double(nOrigin, "OX")),
-            T(ReaderXML::getNodeAttr_Double(nOrigin, "OY")),
-            T(ReaderXML::getNodeAttr_Double(nOrigin, "OZ")));
+        GP::m_origin.setValue(T(ReaderXML::getNodeAttr_Double(nOrigin, "OX")),
+                              T(ReaderXML::getNodeAttr_Double(nOrigin, "OY")),
+                              T(ReaderXML::getNodeAttr_Double(nOrigin, "OZ")));
     else
-        GrainsParameters<T>::m_origin.setValue(T(0), T(0), T(0));
+        GP::m_origin.setValue(T(0), T(0), T(0));
 
     // if the simulation is periodic
     DOMNode* nPeriodicity = ReaderXML::getNode(root, "Periodicity");
@@ -133,7 +131,7 @@ void Grains<T>::Construction(DOMElement* rootElement)
             Gout("Periodicity is not implemented!");
             exit(1);
         }
-        GrainsParameters<T>::m_isPeriodic = false;
+        GP::m_isPeriodic = false;
     }
 
     // -------------------------------------------------------------------------
@@ -241,26 +239,21 @@ void Grains<T>::Construction(DOMElement* rootElement)
     GoutWI(9, "Cell size factor =", std::to_string(LC_coeff));
 
     // Creating linked cell
-    GrainsParameters<T>::m_sizeLC = LC_coeff * T(2) * LCSize;
-    m_linkedCell  = (LinkedCell<T>**)malloc(sizeof(LinkedCell<T>*));
-    *m_linkedCell = new LinkedCell<T>(GrainsParameters<T>::m_origin,
-                                      GrainsParameters<T>::m_maxCoordinate,
-                                      GrainsParameters<T>::m_sizeLC);
-    GrainsParameters<T>::m_numCells = (*m_linkedCell)->getNumCells();
-    GoutWI(9,
-           "LinkedCell with",
-           GrainsParameters<T>::m_numCells,
-           "cells is created on host.");
+    GP::m_sizeLC = LC_coeff * T(2) * LCSize;
+    m_linkedCell = (LinkedCell<T>**)malloc(sizeof(LinkedCell<T>*));
+    *m_linkedCell
+        = new LinkedCell<T>(GP::m_origin, GP::m_maxCoordinate, GP::m_sizeLC);
+    GP::m_numCells = (*m_linkedCell)->getNumCells();
+    GoutWI(9, "LinkedCell with", GP::m_numCells, "cells is created on host.");
     GoutWI(6, "Constructing linked cell completed!");
 
     // -------------------------------------------------------------------------
     // Setting up the component managers
-    GrainsParameters<T>::m_numParticles = numParticles;
-    GrainsParameters<T>::m_numObstacles = numObstacles;
-    m_components
-        = new ComponentManagerCPU<T>(GrainsParameters<T>::m_numParticles,
-                                     GrainsParameters<T>::m_numObstacles,
-                                     GrainsParameters<T>::m_numCells);
+    GP::m_numParticles = numParticles;
+    GP::m_numObstacles = numObstacles;
+    m_components       = new ComponentManagerCPU<T>(GP::m_numParticles,
+                                              GP::m_numObstacles,
+                                              GP::m_numCells);
     // Initialize the particles and obstacles
     m_components->initializeParticles(particlesInitialTransform);
     m_components->initializeObstacles(obstaclesInitialTransform);
@@ -270,10 +263,9 @@ void Grains<T>::Construction(DOMElement* rootElement)
     // Calculating the proper array size for the contact force array
     // We might need to redute it by removing the obstacle-obstacle pairs,
     // but it should be fine by now
-    uint numMaterials = GrainsParameters<T>::m_materialMap.size();
-    GrainsParameters<T>::m_numContactPairs
-        = numMaterials * (numMaterials + 1) / 2;
-    DOMNode* contacts = ReaderXML::getNode(root, "ContactForceModels");
+    uint numMaterials     = GP::m_materialMap.size();
+    GP::m_numContactPairs = numMaterials * (numMaterials + 1) / 2;
+    DOMNode* contacts     = ReaderXML::getNode(root, "ContactForceModels");
     if(contacts)
     {
         GoutWI(6, "Reading the contact force model ...");
@@ -291,18 +283,17 @@ void Grains<T>::Construction(DOMElement* rootElement)
         T        tStart = ReaderXML::getNodeAttr_Double(nTime, "Start");
         T        tEnd   = ReaderXML::getNodeAttr_Double(nTime, "End");
         T        tStep  = ReaderXML::getNodeAttr_Double(nTime, "dt");
-        GrainsParameters<T>::m_tStart = tStart;
-        GrainsParameters<T>::m_tEnd   = tEnd + HIGHEPS<T>;
-        GrainsParameters<T>::m_dt     = tStep;
-        DOMNode* nTI = ReaderXML::getNode(tempSetting, "TimeIntegration");
+        GP::m_tStart    = tStart;
+        GP::m_tEnd      = tEnd + HIGHEPS<T>;
+        GP::m_dt        = tStep;
+        DOMNode* nTI    = ReaderXML::getNode(tempSetting, "TimeIntegration");
         if(nTI)
         {
             GoutWI(6, "Reading the time integration model ...");
             m_timeIntegrator
                 = (TimeIntegrator<T>**)malloc(sizeof(TimeIntegrator<T>*));
-            *m_timeIntegrator = TimeIntegratorBuilderFactory<T>::create(
-                nTI,
-                GrainsParameters<T>::m_dt);
+            *m_timeIntegrator
+                = TimeIntegratorBuilderFactory<T>::create(nTI, GP::m_dt);
             GoutWI(6, "Reading the time integration model completed!");
         }
     }

@@ -42,7 +42,7 @@ public:
     /** @brief Size of cells in LinkedCell */
     static T m_sizeLC;
 
-    /* Simulation */
+    /* Physical */
     /** \brief Gravity vector */
     static Vector3<T> m_gravity;
 
@@ -59,6 +59,10 @@ public:
     /* GPU */
     /** \brief is simulation on GPU? */
     static bool m_isGPU;
+    /** \brief number of threads per block */
+    static uint m_numThreadsPerBlock;
+    /** \brief number of blocks per grid */
+    static uint m_numBlocksPerGrid;
     //@}
 };
 

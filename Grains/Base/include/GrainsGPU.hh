@@ -53,6 +53,9 @@ public:
 
     /** @name High-level methods */
     //@{
+    /** @brief Sets up the GPU and its parameters */
+    void setupGPUDevice();
+
     /** @brief Tasks to perform before time-stepping 
         // @param rootElement XML root */
     void initialize(DOMElement* rootElement) final;
