@@ -7,7 +7,6 @@
 
 #include "Grains.hh"
 #include "GrainsBuilderFactory.hh"
-#include "GrainsMisc.hh"
 #include "ReaderXML.hh"
 
 using namespace std;
@@ -27,6 +26,7 @@ int main(int argc, char* argv[])
         cout << "ERROR: input file needs the .xml extension" << endl;
         error = true;
     }
+    uint returnSysCmd = 0;
 
     // Execute the Grains application
     if(!error)
@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
             ReaderXML::terminate();
 
             // Delete the temporary input file
-            std::string cmd                   = "/bin/rm " + filename_exe;
-            GrainsMisc<float>::m_returnSysCmd = system(cmd.c_str());
+            std::string cmd = "/bin/rm " + filename_exe;
+            returnSysCmd    = system(cmd.c_str());
 
             // Run the simulation
             grains->simulate();
@@ -85,8 +85,8 @@ int main(int argc, char* argv[])
             ReaderXML::terminate();
 
             // Delete the temporary input file
-            std::string cmd                    = "/bin/rm " + filename_exe;
-            GrainsMisc<double>::m_returnSysCmd = system(cmd.c_str());
+            std::string cmd = "/bin/rm " + filename_exe;
+            returnSysCmd    = system(cmd.c_str());
 
             // Run the simulation
             grains->simulate();
