@@ -165,7 +165,7 @@ public:
         @param q quaternion of rotation from space to body coordinate systems */
     __HOSTDEVICE__
     Kinematics<T> computeMomentum(const Vector3<T>&    omega,
-                                  Torce<T> const&      t,
+                                  const Torce<T>&      t,
                                   const Quaternion<T>& q) const;
     //@}
 };

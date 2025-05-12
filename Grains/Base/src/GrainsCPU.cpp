@@ -61,9 +61,9 @@ void GrainsCPU<T>::simulate()
         Grains<T>::m_components->addExternalForces(
             Grains<T>::m_particleRigidBodyList,
             GP::m_gravity);
-        // Grains<T>::m_components->moveParticles(
-        //     Grains<T>::m_particleRigidBodyList,
-        //     Grains<T>::m_timeIntegrator);
+        Grains<T>::m_components->moveParticles(
+            Grains<T>::m_particleRigidBodyList,
+            Grains<T>::m_timeIntegrator);
 
         // Post-Processing
         Grains<T>::postProcess(Grains<T>::m_components);
