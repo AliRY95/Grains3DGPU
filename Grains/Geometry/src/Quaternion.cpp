@@ -124,46 +124,43 @@ __HOSTDEVICE__ void Quaternion<T>::setQuaternion(T x, T y, T z, T d)
 template <typename T>
 __HOSTDEVICE__ void Quaternion<T>::setQuaternion(const Matrix3<T>& rot)
 {
-    T den = T(0);
+    const T* b   = rot.getBuffer(); // rotation matrix buffer
+    T        den = T(0);
 
     // Case rotYY > - rotZZ, rotXX > - rotYY and rotXX > - rotZZ
-    if(rot[Y][Y] > -rot[Z][Z] && rot[X][X] > -rot[Y][Y]
-       && rot[X][X] > -rot[Z][Z])
+    if(b[YY] > -b[ZZ] && b[XX] > -b[YY] && b[XX] > -b[ZZ])
     {
-        den      = pow(T(1) + rot[X][X] + rot[Y][Y] + rot[Z][Z], T(0.5));
+        den      = pow(T(1) + b[XX] + b[YY] + b[ZZ], T(0.5));
         m_w      = T(0.5) * den;
-        m_vqt[X] = T(0.5) * (rot[Z][Y] - rot[Y][Z]) / den;
-        m_vqt[Y] = T(0.5) * (rot[X][Z] - rot[Z][X]) / den;
-        m_vqt[Z] = T(0.5) * (rot[Y][X] - rot[X][Y]) / den;
+        m_vqt[X] = T(0.5) * (b[ZY] - b[YZ]) / den;
+        m_vqt[Y] = T(0.5) * (b[XZ] - b[ZX]) / den;
+        m_vqt[Z] = T(0.5) * (b[YX] - b[XY]) / den;
     }
     // Case rotYY < - rotZZ, rotXX > rotYY and rotXX > rotZZ
-    else if(rot[Y][Y] < -rot[Z][Z] && rot[X][X] > rot[Y][Y]
-            && rot[X][X] > rot[Z][Z])
+    else if(b[YY] < -b[ZZ] && b[XX] > b[YY] && b[XX] > b[ZZ])
     {
-        den      = pow(T(1) + rot[X][X] - rot[Y][Y] - rot[Z][Z], T(0.5));
-        m_w      = T(0.5) * (rot[Z][Y] - rot[Y][Z]) / den;
+        den      = pow(T(1) + b[XX] - b[YY] - b[ZZ], T(0.5));
+        m_w      = T(0.5) * (b[ZY] - b[YZ]) / den;
         m_vqt[X] = T(0.5) * den;
-        m_vqt[Y] = T(0.5) * (rot[X][Y] + rot[Y][X]) / den;
-        m_vqt[Z] = T(0.5) * (rot[Z][X] + rot[X][Z]) / den;
+        m_vqt[Y] = T(0.5) * (b[XY] + b[YX]) / den;
+        m_vqt[Z] = T(0.5) * (b[ZX] + b[XZ]) / den;
     }
     // Case rotYY > rotZZ, rotXX < rotYY and rotXX < - rotZZ
-    else if(rot[Y][Y] > rot[Z][Z] && rot[X][X] < rot[Y][Y]
-            && rot[X][X] < -rot[Z][Z])
+    else if(b[YY] > b[ZZ] && b[XX] < b[YY] && b[XX] < -b[ZZ])
     {
-        den      = pow(T(1) - rot[X][X] + rot[Y][Y] - rot[Z][Z], T(0.5));
-        m_w      = T(0.5) * (rot[X][Z] - rot[Z][X]) / den;
-        m_vqt[X] = T(0.5) * (rot[X][Y] + rot[Y][X]) / den;
+        den      = pow(T(1) - b[XX] + b[YY] - b[ZZ], T(0.5));
+        m_w      = T(0.5) * (b[XZ] - b[ZX]) / den;
+        m_vqt[X] = T(0.5) * (b[XY] + b[YX]) / den;
         m_vqt[Y] = T(0.5) * den;
-        m_vqt[Z] = T(0.5) * (rot[Y][Z] + rot[Z][Y]) / den;
+        m_vqt[Z] = T(0.5) * (b[YZ] + b[ZY]) / den;
     }
     // Case rotYY < rotZZ, rotXX < - rotYY and rotXX < rotZZ
-    else if(rot[Y][Y] < rot[Z][Z] && rot[X][X] < -rot[Y][Y]
-            && rot[X][X] < rot[Z][Z])
+    else if(b[YY] < b[ZZ] && b[XX] < -b[YY] && b[XX] < b[ZZ])
     {
-        den      = pow(T(1) - rot[X][X] - rot[Y][Y] + rot[Z][Z], T(0.5));
-        m_w      = T(0.5) * (rot[Y][X] - rot[X][Y]) / den;
-        m_vqt[X] = T(0.5) * (rot[Z][X] + rot[X][Z]) / den;
-        m_vqt[Y] = T(0.5) * (rot[Y][Z] + rot[Z][Y]) / den;
+        den      = pow(T(1) - b[XX] - b[YY] + b[ZZ], T(0.5));
+        m_w      = T(0.5) * (b[YX] - b[XY]) / den;
+        m_vqt[X] = T(0.5) * (b[ZX] + b[XZ]) / den;
+        m_vqt[Y] = T(0.5) * (b[YZ] + b[ZY]) / den;
         m_vqt[Z] = T(0.5) * den;
     }
     else

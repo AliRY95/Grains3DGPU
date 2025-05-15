@@ -69,14 +69,13 @@ __HOST__ Transform3<T>::Transform3(DOMNode* root)
         std::istringstream inValues(values.c_str());
         inValues >> mat;
         setBasis(mat);
-        // TODO:
         // Check that the matrix is a rotation matrix
-        // if ( !m_basis.isRotation() )
-        // {
-        //     cout << "A matrix in one of the AngularPosition XML nodes is"
-        //         << " not a rotation matrix !!!" << endl;
-        //     exit(1);
-        // }
+        if(!m_basis.isRotation())
+        {
+            cout << "A matrix in one of the AngularPosition XML nodes is"
+                 << " not a rotation matrix !!!" << endl;
+            exit(1);
+        }
     }
     else if(type == "Angles")
     {
@@ -209,16 +208,7 @@ __HOSTDEVICE__ void
 template <typename T>
 __HOSTDEVICE__ void Transform3<T>::composeWithScaling(const Vector3<T>& v)
 {
-    T const* b = v.getBuffer();
-    m_basis[XX] *= b[0];
-    m_basis[XY] *= b[1];
-    m_basis[XZ] *= b[2];
-    m_basis[YX] *= b[0];
-    m_basis[YY] *= b[1];
-    m_basis[YZ] *= b[2];
-    m_basis[ZX] *= b[0];
-    m_basis[ZY] *= b[1];
-    m_basis[ZZ] *= b[2];
+    m_basis.scale(v);
 }
 
 // -----------------------------------------------------------------------------
@@ -246,14 +236,28 @@ __HOSTDEVICE__ void Transform3<T>::composeLeftByRotation(const Quaternion<T>& q)
     // M_rot(q) is the rotation matrix corresponding to the quaternion q
     for(int i = 0; i < 3; ++i)
     {
-        px             = qy * b[6 + i] - qz * b[3 + i] + qw * b[i];
-        py             = qz * b[i] - qx * b[6 + i] + qw * b[3 + i];
-        pz             = qx * b[3 + i] - qy * b[i] + qw * b[6 + i];
-        pw             = -qx * b[i] - qy * b[3 + i] - qz * b[6 + i];
-        m_basis[i]     = qy * pz - qz * py - pw * qx + qw * px;
-        m_basis[3 + i] = qz * px - qx * pz - pw * qy + qw * py;
-        m_basis[6 + i] = qx * py - qy * px - pw * qz + qw * pz;
+        px            = qy * b[6 + i] - qz * b[3 + i] + qw * b[i];
+        py            = qz * b[i] - qx * b[6 + i] + qw * b[3 + i];
+        pz            = qx * b[3 + i] - qy * b[i] + qw * b[6 + i];
+        pw            = -qx * b[i] - qy * b[3 + i] - qz * b[6 + i];
+        m_basis[X][i] = qy * pz - qz * py - pw * qx + qw * px;
+        m_basis[Y][i] = qz * px - qx * pz - pw * qy + qw * py;
+        m_basis[Z][i] = qx * py - qy * px - pw * qz + qw * pz;
     }
+
+    // // We compute below the matrix product M_rot(q).basis where
+    // // M_rot(q) is the rotation matrix corresponding to the quaternion q
+    // for(int i = 0; i < 3; ++i)
+    // {
+    //     px             = qy * b[6 + i] - qz * b[3 + i] + qw * b[i];
+    //     py             = qz * b[i] - qx * b[6 + i] + qw * b[3 + i];
+    //     pz             = qx * b[3 + i] - qy * b[i] + qw * b[6 + i];
+    //     pw             = -qx * b[i] - qy * b[3 + i] - qz * b[6 + i];
+    //     m_basis[i]     = qy * pz - qz * py - pw * qx + qw * px;
+    //     m_basis[3 + i] = qz * px - qx * pz - pw * qy + qw * py;
+    //     m_basis[6 + i] = qx * py - qy * px - pw * qz + qw * pz;
+    // }
+
     // const Matrix3<T>& mm = m_basis;
     // T qx = q[X], qy = q[Y], qz = q[Z], qw = q[W];
     // T px, py, pz, pw;

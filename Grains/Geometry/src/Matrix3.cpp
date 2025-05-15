@@ -150,6 +150,22 @@ __HOSTDEVICE__ Matrix3<T> Matrix3<T>::transpose() const
 }
 
 // -----------------------------------------------------------------------------
+// Scales the matrix by a vector
+template <typename T>
+__HOSTDEVICE__ void Matrix3<T>::scale(const Vector3<T>& v) const
+{
+    T const* b = v.getBuffer();
+    m_comp[XY] *= b[1];
+    m_comp[XZ] *= b[2];
+    m_comp[YX] *= b[0];
+    m_comp[YY] *= b[1];
+    m_comp[YZ] *= b[2];
+    m_comp[ZX] *= b[0];
+    m_comp[ZY] *= b[1];
+    m_comp[ZZ] *= b[2];
+}
+
+// -----------------------------------------------------------------------------
 // Operator +=
 template <typename T>
 __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator+=(const Matrix3<T>& m)
@@ -199,6 +215,18 @@ __HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(T d)
              d * m_comp[ZX],
              d * m_comp[ZY],
              d * m_comp[ZZ]);
+    return (*this);
+}
+
+// -----------------------------------------------------------------------------
+// Operator *= by a vector
+template <typename T>
+__HOSTDEVICE__ Matrix3<T>& Matrix3<T>::operator*=(const Vector3<T>& v)
+{
+    T const* b = v.getBuffer();
+    setValue(m_comp[XX] * b[X] + m_comp[XY] * b[Y] + m_comp[XZ] * b[Z],
+             m_comp[YX] * b[X] + m_comp[YY] * b[Y] + m_comp[YZ] * b[Z],
+             m_comp[ZX] * b[X] + m_comp[ZY] * b[Y] + m_comp[ZZ] * b[Z]);
     return (*this);
 }
 

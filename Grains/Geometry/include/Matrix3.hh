@@ -103,6 +103,11 @@ public:
     /** @brief Returns the transposed matrix */
     __HOSTDEVICE__
     Matrix3<T> transpose() const;
+
+    /** @brief Scales the matrix by a vector
+        @param v Vector3 object */
+    __HOSTDEVICE__
+    void scale(const Vector3<T>& v) const;
     //@}
 
     /**@name Operators */
@@ -121,6 +126,11 @@ public:
         @param d multiplication factor */
     __HOSTDEVICE__
     Matrix3<T>& operator*=(T d);
+
+    /** @brief Operator *= by a vector
+        @param v 2nd Vector3 object */
+    __HOSTDEVICE__
+    Matrix3<T>& operator*=(const Vector3<T>& v);
 
     /** @brief Operator *= by a matrix
         @param mat 2nd Matrix3 object */
