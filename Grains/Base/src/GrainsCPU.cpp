@@ -25,10 +25,12 @@ GrainsCPU<T>::~GrainsCPU()
 template <typename T>
 void GrainsCPU<T>::simulate()
 {
+    using GP = GrainsParameters<T>;
+
     Gout(std::string(80, '='));
     Gout("Starting the simulation on CPU");
     Gout(std::string(80, '='));
-    uint N           = GrainsParameters<T>::m_numParticles;
+    uint N           = GP::m_numParticles;
     int* h_collision = new int[N];
     // Zeroing out
     for(int i = 0; i < N; i++)
@@ -41,16 +43,14 @@ void GrainsCPU<T>::simulate()
     cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
     auto h_start = chrono::high_resolution_clock::now();
     // time marching
-    for(GrainsParameters<T>::m_time = GrainsParameters<T>::m_tStart;
-        GrainsParameters<T>::m_time <= GrainsParameters<T>::m_tEnd;
-        GrainsParameters<T>::m_time += GrainsParameters<T>::m_dt)
+    for(GP::m_time = GP::m_tStart; GP::m_time <= GP::m_tEnd;
+        GP::m_time += GP::m_dt)
     {
         // Output time
         ostringstream oss;
         oss.width(10);
-        oss << left << GrainsParameters<T>::m_time;
-        std::cout << '\r' << oss.str() << "  \t" << GrainsParameters<T>::m_tEnd
-                  << std::flush;
+        oss << left << GP::m_time;
+        std::cout << '\r' << oss.str() << "  \t" << GP::m_tEnd << std::flush;
 
         Grains<T>::m_components->detectCollisionAndComputeContactForces(
             Grains<T>::m_particleRigidBodyList,
@@ -60,10 +60,10 @@ void GrainsCPU<T>::simulate()
             h_collision);
         Grains<T>::m_components->addExternalForces(
             Grains<T>::m_particleRigidBodyList,
-            GrainsParameters<T>::m_gravity);
-        // Grains<T>::m_components->moveParticles(
-        //     Grains<T>::m_particleRigidBodyList,
-        //     Grains<T>::m_timeIntegrator);
+            GP::m_gravity);
+        Grains<T>::m_components->moveParticles(
+            Grains<T>::m_particleRigidBodyList,
+            Grains<T>::m_timeIntegrator);
 
         // Post-Processing
         Grains<T>::postProcess(Grains<T>::m_components);

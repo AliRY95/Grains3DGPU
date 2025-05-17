@@ -7,7 +7,6 @@
 
 #include "Basic.hh"
 #include "ComponentManager.hh"
-#include "GrainsMisc.hh"
 #include "ReaderXML.hh"
 
 // PostProcessingWriter types

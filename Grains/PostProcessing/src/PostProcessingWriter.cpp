@@ -22,7 +22,6 @@ __HOST__ void PostProcessingWriter<T>::clearPostProcessingFiles(
     const std::filesystem::path&   directory,
     const std::vector<std::regex>& patterns) const
 {
-    Gout("Removing post-processing files in", directory);
     for(const auto& entry : std::filesystem::directory_iterator(directory))
     {
         if(entry.is_regular_file())

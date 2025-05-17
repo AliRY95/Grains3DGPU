@@ -265,11 +265,8 @@ __HOSTDEVICE__ Kinematics<T>
 // torce in the space-fixed coordinate system
 template <typename T, typename U>
 __HOSTDEVICE__ Kinematics<T> RigidBody<T, U>::computeMomentum(
-    const Vector3<T>& omega, Torce<T> const& t, const Quaternion<T>& q) const
+    const Vector3<T>& omega, const Torce<T>& t, const Quaternion<T>& q) const
 {
-    // Translational momentum
-    Vector3<T> transMomentum(t.getForce() / m_mass);
-
     // Angular momentum
     // Quaternion and rotation quaternion conjugate
     Quaternion<T> qCon(q.conjugate());
@@ -279,16 +276,13 @@ __HOSTDEVICE__ Kinematics<T> RigidBody<T, U>::computeMomentum(
     Vector3<T> angMomentum(qCon.multToVector3(t.getTorque() * q));
 
     // Compute I.w in the body-fixed coordinates system
-    Vector3<T> angMomentumTemp;
-    angMomentumTemp[0] = m_inertia[0] * angVelocity[0]
-                         + m_inertia[1] * angVelocity[1]
-                         + m_inertia[2] * angVelocity[2];
-    angMomentumTemp[1] = m_inertia[1] * angVelocity[0]
-                         + m_inertia[3] * angVelocity[1]
-                         + m_inertia[4] * angVelocity[2];
-    angMomentumTemp[2] = m_inertia[2] * angVelocity[0]
-                         + m_inertia[4] * angVelocity[1]
-                         + m_inertia[5] * angVelocity[2];
+    Vector3<T> angMomentumTemp(
+        m_inertia[0] * angVelocity[0] + m_inertia[1] * angVelocity[1]
+            + m_inertia[2] * angVelocity[2],
+        m_inertia[1] * angVelocity[0] + m_inertia[3] * angVelocity[1]
+            + m_inertia[4] * angVelocity[2],
+        m_inertia[2] * angVelocity[0] + m_inertia[4] * angVelocity[1]
+            + m_inertia[5] * angVelocity[2]);
 
     // Compute T + I.w ^ w in the body-fixed coordinates system
     angMomentum += angMomentumTemp ^ angVelocity;
@@ -305,6 +299,9 @@ __HOSTDEVICE__ Kinematics<T> RigidBody<T, U>::computeMomentum(
                          + m_inertia_1[5] * angMomentum[2];
     // Write I^-1.(T + I.w ^ w) in space-fixed coordinates system
     angMomentum = q.multToVector3(angMomentumTemp * qCon);
+
+    // Translational momentum
+    Vector3<T> transMomentum(t.getForce() / m_mass);
 
     return (Kinematics<T>(transMomentum, angMomentum));
 }

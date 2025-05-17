@@ -53,6 +53,7 @@ __HOST__ void RawDataPostProcessingWriter<T>::clearPostProcessingFiles() const
     std::vector<std::regex> patternsReg;
     for(const auto& pattern : patternsStr)
         patternsReg.push_back(std::regex(pattern));
+    Gout("Removing RawData post-processing files in", directory);
     PostProcessingWriter<T>::clearPostProcessingFiles(directory, patternsReg);
 }
 

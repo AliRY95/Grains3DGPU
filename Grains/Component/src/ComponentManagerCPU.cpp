@@ -307,7 +307,7 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesObstacles(
     for(int pId = 0; pId < m_nParticles; pId++)
     {
         // Parameters of the particle
-        RigidBody<T, T> const& rbA   = *(particleRB[m_rigidBodyId[pId]]);
+        const RigidBody<T, T>& rbA   = *(particleRB[m_rigidBodyId[pId]]);
         const Transform3<T>&   trA   = m_transform[pId];
         T                      massA = rbA.getMass();
         uint                   matA  = rbA.getMaterial();
@@ -452,7 +452,7 @@ void ComponentManagerCPU<T>::addExternalForces(
     for(int pId = 0; pId < m_nParticles; pId++)
     {
         // Parameters of the primary particle
-        RigidBody<T, T> const& rb   = *(particleRB[m_rigidBodyId[pId]]);
+        const RigidBody<T, T>& rb   = *(particleRB[m_rigidBodyId[pId]]);
         T                      mass = rb.getMass();
         // Adding the gravitational force to the torce
         m_torce[pId].addForce(mass * g);
@@ -470,12 +470,12 @@ void ComponentManagerCPU<T>::moveParticles(
     for(int pId = 0; pId < m_nParticles; pId++)
     {
         // Rigid body
-        RigidBody<T, T> const* rb = particleRB[m_rigidBodyId[pId]];
+        const RigidBody<T, T>* rb = particleRB[m_rigidBodyId[pId]];
 
         // First, we compute quaternion of orientation
         Quaternion<T> qRot(m_transform[pId].getBasis());
         // Computing momentums in the space-fixed coordinate
-        Kinematics<T> const& momentum
+        const Kinematics<T>& momentum
             = rb->computeMomentum(m_velocity[pId].getAngularComponent(),
                                   m_torce[pId],
                                   qRot);

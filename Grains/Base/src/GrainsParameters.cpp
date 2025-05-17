@@ -2,16 +2,6 @@
 
 // -----------------------------------------------------------------------------
 // Static variables
-/* GPU */
-template <typename T>
-bool GrainsParameters<T>::m_isGPU = false;
-// template <typename T> int GrainsParameters<T>::m_numBlockGPU;
-// template <typename T> int GrainsParameters<T>::m_numThreadGPU;
-
-/* MPI */
-// template <typename T> bool GrainsParameters<T>::m_isMPI = false;
-// template <typename T> int GrainsParameters<T>::m_nProcs;
-
 /* Spatial */
 template <typename T>
 Vector3<T> GrainsParameters<T>::m_origin = zeroVector3T;
@@ -53,6 +43,18 @@ uint GrainsParameters<T>::m_numContactPairs = 0;
 /* Post-Processing */
 template <typename T>
 std::queue<T> GrainsParameters<T>::m_tSave;
+
+/* GPU */
+template <typename T>
+bool GrainsParameters<T>::m_isGPU = false;
+template <typename T>
+uint GrainsParameters<T>::m_numThreadsPerBlock = 0;
+template <typename T>
+uint GrainsParameters<T>::m_numBlocksPerGrid = 0;
+
+/* MPI */
+// template <typename T> bool GrainsParameters<T>::m_isMPI = false;
+// template <typename T> int GrainsParameters<T>::m_nProcs;
 
 /* Booleans */
 // template <typename T> bool GrainsParameters<T>::m_isDouble = true;
