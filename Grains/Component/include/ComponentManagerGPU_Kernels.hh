@@ -85,24 +85,23 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
     uint*                              particleCellHash,
     uint*                              cellHashStart,
     uint*                              cellHashEnd,
-    int                                nParticles,
-    int*                               result);
+    int                                nParticles);
 
 /** @brief Adds external forces such as gravity
 @param particleRB array of rigid bodies for particles
 @param rigidBodyId array of rigid body IDs for particles
-@param torce array of particles torces
 @param g the gravity field
+@param torce array of particles torces
 @param nParticles number of particles */
 template <typename T, typename U>
 __GLOBAL__ void
     addExternalForces_kernel(RigidBody<T, U> const* const* particleRB,
-                             uint*                         rigidBodyId,
+                             const uint*                   rigidBodyId,
+                             const T                       gX,
+                             const T                       gY,
+                             const T                       gZ,
                              Torce<T>*                     torce,
-                             T                             gX,
-                             T                             gY,
-                             T                             gZ,
-                             int                           nParticles);
+                             const uint                    nParticles);
 
 /** @brief Updates the position and velocities of particles
 @param particleRB array of rigid bodies for particles

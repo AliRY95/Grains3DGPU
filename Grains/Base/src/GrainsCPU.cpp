@@ -30,18 +30,11 @@ void GrainsCPU<T>::simulate()
     Gout(std::string(80, '='));
     Gout("Starting the simulation on CPU");
     Gout(std::string(80, '='));
-    uint N           = GP::m_numParticles;
-    int* h_collision = new int[N];
-    // Zeroing out
-    for(int i = 0; i < N; i++)
-        h_collision[i] = 0;
 
-    // Collision detection on host
     // first, inserting particles on host
     Grains<T>::m_components->insertParticles(Grains<T>::m_insertion);
 
     cout << "Time \t TO \tend \tParticles \tIn \tOut" << endl;
-    auto h_start = chrono::high_resolution_clock::now();
     // time marching
     for(GP::m_time = GP::m_tStart; GP::m_time <= GP::m_tEnd;
         GP::m_time += GP::m_dt)
@@ -56,11 +49,9 @@ void GrainsCPU<T>::simulate()
             Grains<T>::m_particleRigidBodyList,
             Grains<T>::m_obstacleRigidBodyList,
             Grains<T>::m_linkedCell,
-            Grains<T>::m_contactForce,
-            h_collision);
+            Grains<T>::m_contactForce);
         Grains<T>::m_components->addExternalForces(
-            Grains<T>::m_particleRigidBodyList,
-            GP::m_gravity);
+            Grains<T>::m_particleRigidBodyList);
         Grains<T>::m_components->moveParticles(
             Grains<T>::m_particleRigidBodyList,
             Grains<T>::m_timeIntegrator);
@@ -68,20 +59,6 @@ void GrainsCPU<T>::simulate()
         // Post-Processing
         Grains<T>::postProcess(Grains<T>::m_components);
     }
-    auto h_end = chrono::high_resolution_clock::now();
-
-    // Time comparison
-    chrono::duration<double> h_time = h_end - h_start;
-    std::cout << "\nCPU: " << h_time.count() << endl;
-
-    // accuracy
-    int trueHostCount = 0, trueDeviceCount = 0;
-    for(int i = 0; i < N; i++)
-    {
-        trueHostCount += h_collision[i];
-    }
-    cout << N << " Particles, " << trueHostCount << " Collision on host. "
-         << endl;
 }
 
 // -----------------------------------------------------------------------------

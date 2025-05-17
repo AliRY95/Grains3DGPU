@@ -4,8 +4,8 @@
 #include <random>
 
 #include "ComponentManagerCPU.hh"
+#include "ComponentManagerCommon.hh"
 #include "Quaternion.hh"
-#include "QuaternionMath.hh"
 #include "VectorMath.hh"
 
 // -----------------------------------------------------------------------------
@@ -356,8 +356,7 @@ template <typename T>
 void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
     RigidBody<T, T> const* const*      particleRB,
     LinkedCell<T> const* const*        LC,
-    ContactForceModel<T> const* const* CF,
-    int*                               result)
+    ContactForceModel<T> const* const* CF)
 {
     // Loop over all particles
     // #pragma omp parallel for
@@ -416,7 +415,6 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForcesParticles(
                                                       trA.getOrigin(),
                                                       m_torce[particleId]);
                 }
-                result[particleId] += (ci.getOverlapDistance() < T(0));
             }
         }
     }
@@ -429,14 +427,13 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
     RigidBody<T, T> const* const*      particleRB,
     RigidBody<T, T> const* const*      obstacleRB,
     LinkedCell<T> const* const*        LC,
-    ContactForceModel<T> const* const* CF,
-    int*                               result)
+    ContactForceModel<T> const* const* CF)
 {
     // Updates links between components and linked cell
     updateLinks(LC);
 
     // Particle-particle interactions
-    detectCollisionAndComputeContactForcesParticles(particleRB, LC, CF, result);
+    detectCollisionAndComputeContactForcesParticles(particleRB, LC, CF);
 
     // Particle-obstacle interactions
     detectCollisionAndComputeContactForcesObstacles(particleRB, obstacleRB, CF);
@@ -446,16 +443,15 @@ void ComponentManagerCPU<T>::detectCollisionAndComputeContactForces(
 // Adds external forces such as gravity
 template <typename T>
 void ComponentManagerCPU<T>::addExternalForces(
-    RigidBody<T, T> const* const* particleRB, const Vector3<T>& g)
+    RigidBody<T, T> const* const* particleRB)
 {
     // #pragma omp parallel for
     for(int pId = 0; pId < m_nParticles; pId++)
     {
-        // Parameters of the primary particle
-        const RigidBody<T, T>& rb   = *(particleRB[m_rigidBodyId[pId]]);
-        T                      mass = rb.getMass();
-        // Adding the gravitational force to the torce
-        m_torce[pId].addForce(mass * g);
+        addGravity(particleRB,
+                   m_rigidBodyId[pId],
+                   GrainsParameters<T>::m_gravity,
+                   m_torce[pId]);
     }
 }
 
@@ -469,33 +465,13 @@ void ComponentManagerCPU<T>::moveParticles(
     // #pragma omp parallel for
     for(int pId = 0; pId < m_nParticles; pId++)
     {
-        // Rigid body
-        const RigidBody<T, T>* rb = particleRB[m_rigidBodyId[pId]];
-
-        // First, we compute quaternion of orientation
-        Quaternion<T> qRot(m_transform[pId].getBasis());
-        // Computing momentums in the space-fixed coordinate
-        const Kinematics<T>& momentum
-            = rb->computeMomentum(m_velocity[pId].getAngularComponent(),
-                                  m_torce[pId],
-                                  qRot);
-        // Reset torces
-        m_torce[pId].reset();
-        // Finally, we move particles using the given time integration
-        Vector3<T>    transMotion;
-        Quaternion<T> rotMotion;
-        (*TI)->Move(momentum, m_velocity[pId], transMotion, rotMotion);
-
-        // Quaternion and rotation quaternion conjugate
-        Vector3<T>    om = m_velocity[pId].getAngularComponent();
-        Quaternion<T> qRotCon(qRot.conjugate());
-        // Write torque in body-fixed coordinates system
-        Vector3<T> angAcc(qRot.multToVector3(om * qRotCon));
-        // and update the transformation of the component
-        m_transform[pId].updateTransform(transMotion, rotMotion);
-        // TODO
-        // qRot = qRotChange * qRot;
-        // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
+        moveParticle(particleRB,
+                     TI,
+                     m_transform[pId],
+                     m_velocity[pId],
+                     m_torce[pId],
+                     m_rigidBodyId[pId],
+                     pId);
     }
 }
 

@@ -70,12 +70,12 @@ __HOST__ Transform3<T>::Transform3(DOMNode* root)
         inValues >> mat;
         setBasis(mat);
         // Check that the matrix is a rotation matrix
-        if(!m_basis.isRotation())
-        {
-            cout << "A matrix in one of the AngularPosition XML nodes is"
-                 << " not a rotation matrix !!!" << endl;
-            exit(1);
-        }
+        // if(!m_basis.isRotation())
+        // {
+        //     cout << "A matrix in one of the AngularPosition XML nodes is"
+        //          << " not a rotation matrix !!!" << endl;
+        //     exit(1);
+        // }
     }
     else if(type == "Angles")
     {

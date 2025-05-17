@@ -2,6 +2,7 @@
 #include <cooperative_groups.h>
 
 #include "CollisionDetection.hh"
+#include "ComponentManagerCommon.hh"
 #include "ComponentManagerGPU_Kernels.hh"
 #include "ContactForceModelBuilderFactory.hh"
 #include "GrainsParameters.hh"
@@ -150,8 +151,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
     uint*                              particleCellHash,
     uint*                              cellHashStart,
     uint*                              cellHashEnd,
-    int                                nParticles,
-    int*                               result)
+    int                                nParticles)
 {
     uint pId = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -187,11 +187,7 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
                     RigidBody<T, U> const& rbB
                         = *(particleRB[rigidBodyId[secondaryId]]);
                     const Transform3<T>& trB = transform[secondaryId];
-                    // result[compId] += intersectRigidBodies( rigidBodyA,
-                    //                                      rigidBodyA,
-                    //                                      transformA,
-                    //                                      transformB );
-                    ContactInfo<T> ci
+                    ContactInfo<T>       ci
                         = closestPointsRigidBodies(rbA, rbB, trA, trB);
                     if(ci.getOverlapDistance() < T(0))
                     {
@@ -218,7 +214,6 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
                                                           trA.getOrigin(),
                                                           torce[primaryId]);
                     }
-                    result[primaryId] += (ci.getOverlapDistance() < T(0));
                 }
             }
         }
@@ -230,30 +225,26 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
 template <typename T, typename U>
 __GLOBAL__ void
     addExternalForces_kernel(RigidBody<T, U> const* const* particleRB,
-                             uint*                         rigidBodyId,
+                             const uint*                   rigidBodyId,
+                             const T                       gX,
+                             const T                       gY,
+                             const T                       gZ,
                              Torce<T>*                     torce,
-                             T                             gX,
-                             T                             gY,
-                             T                             gZ,
-                             int                           nParticles)
+                             const uint                    nParticles)
 {
     uint pId = blockIdx.x * blockDim.x + threadIdx.x;
 
     if(pId >= nParticles)
         return;
 
-    // // Rigid body
-    // RigidBody<T, U> const* rb = particleRB[ rigidBodyId[ pId ] ];
-    // T mass = rb->getMass();
-    // // T mass = particleRB[ rigidBodyId[ pId ] ]->getMass();
-
-    // // Add to torce
-    // torce[ pId ].addForce( mass * Vector3<T>( gX, gY, gZ ) );
+    addGravity(particleRB,
+               rigidBodyId[pId],
+               Vector3<T>(gX, gY, gZ),
+               torce[pId]);
 }
 
 // -----------------------------------------------------------------------------
 // Updates the position and velocities of particles
-// TODO: CLEAN -- A LOT OF THINGS
 template <typename T, typename U>
 __GLOBAL__ void moveParticles_kernel(RigidBody<T, U> const* const*   RB,
                                      TimeIntegrator<T> const* const* TI,
@@ -268,30 +259,13 @@ __GLOBAL__ void moveParticles_kernel(RigidBody<T, U> const* const*   RB,
     if(pId >= nParticles)
         return;
 
-    // Rigid body
-    RigidBody<T, U> const* rb = RB[rigidBodyId[pId]];
-
-    T mass = rb->getMass();
-    // Add to torce
-    torce[pId].addForce(mass * Vector3<T>(0, 0, -0.1));
-
-    // First, we compute quaternion of orientation
-    Quaternion<T> qRot(transform[pId].getBasis());
-    // Next, we compute accelerations and reset torces
-    Kinematics<T> const& momentum
-        = rb->computeMomentum(velocity[pId].getAngularComponent(),
-                              torce[pId],
-                              qRot);
-    torce[pId].reset();
-    // Finally, we move particles using the given time integration
-    Vector3<T>    transMotion;
-    Quaternion<T> rotMotion;
-    (*TI)->Move(momentum, velocity[pId], transMotion, rotMotion);
-    // and update the transformation of the component
-    transform[pId].updateTransform(transMotion, rotMotion);
-    // TODO
-    // qRot = qRotChange * qRot;
-    // qRotChange = T( 0.5 ) * ( m_velocity[ pId ].getAngularComponent() * qRot );
+    moveParticle(RB,
+                 TI,
+                 transform[pId],
+                 velocity[pId],
+                 torce[pId],
+                 rigidBodyId[pId],
+                 pId);
 }
 
 // -----------------------------------------------------------------------------
@@ -324,17 +298,16 @@ __GLOBAL__ void moveParticles_kernel(RigidBody<T, U> const* const*   RB,
             uint*                              particleCellHash,    \
             uint*                              cellHashStart,       \
             uint*                              cellHashEnd,         \
-            int                                nParticles,          \
-            int*                               result);                                           \
+            int                                nParticles);                                        \
                                                                     \
     template __GLOBAL__ void addExternalForces_kernel(              \
         RigidBody<T, U> const* const* particleRB,                   \
-        uint*                         rigidBodyId,                  \
+        const uint*                   rigidBodyId,                  \
+        const T                       gX,                           \
+        const T                       gY,                           \
+        const T                       gZ,                           \
         Torce<T>*                     torce,                        \
-        T                             gX,                           \
-        T                             gY,                           \
-        T                             gZ,                           \
-        int                           nParticles);                                            \
+        const uint                    nParticles);                                     \
                                                                     \
     template __GLOBAL__ void moveParticles_kernel(                  \
         RigidBody<T, U> const* const*   RB,                         \

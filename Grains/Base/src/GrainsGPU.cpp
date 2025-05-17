@@ -94,18 +94,6 @@ void GrainsGPU<T>::simulate()
     Gout(std::string(80, '='));
     Gout("Starting the simulation on GPU");
     Gout(std::string(80, '='));
-    uint N           = GP::m_numParticles;
-    int* h_collision = new int[N];
-    // Zeroing out
-    for(int i = 0; i < N; i++)
-        h_collision[i] = 0;
-
-    int* d_collision;
-    cudaErrCheck(cudaMalloc((void**)&d_collision, N * sizeof(int)));
-    cudaErrCheck(cudaMemcpy(d_collision,
-                            h_collision,
-                            N * sizeof(int),
-                            cudaMemcpyHostToDevice));
 
     // first, inserting partilces
     Grains<T>::m_components->insertParticles(Grains<T>::m_insertion);
@@ -114,7 +102,6 @@ void GrainsGPU<T>::simulate()
     m_d_components->copy(Grains<T>::m_components);
     cout << "Copying completed!" << endl;
     cout << "\nTime \t TO \tend \tParticles \tIn \tOut" << endl;
-    auto d_start = chrono::high_resolution_clock::now();
     for(GP::m_time = GP::m_tStart; GP::m_time <= GP::m_tEnd;
         GP::m_time += GP::m_dt)
     {
@@ -128,38 +115,15 @@ void GrainsGPU<T>::simulate()
             m_d_particleRigidBodyList,
             m_d_obstacleRigidBodyList,
             m_d_linkedCell,
-            m_d_contactForce,
-            d_collision);
-        m_d_components->addExternalForces(m_d_particleRigidBodyList,
-                                          GP::m_gravity);
-        // m_d_components->moveParticles(m_d_particleRigidBodyList,
-        //                               m_d_timeIntegrator);
+            m_d_contactForce);
+        m_d_components->addExternalForces(m_d_particleRigidBodyList);
+        m_d_components->moveParticles(m_d_particleRigidBodyList,
+                                      m_d_timeIntegrator);
 
         // Post-Processing
         Grains<T>::postProcess(m_d_components);
     }
     cudaDeviceSynchronize();
-    auto d_end = chrono::high_resolution_clock::now();
-
-    // // Time comparison
-    // chrono::duration<double> h_time = h_end - h_start;
-    // chrono::duration<double> d_time = d_end - d_start;
-    // std::cout << "\nCPU: " << h_time.count() << endl;
-    // std::cout << "GPU: " << d_time.count() << endl;
-    // int* h_d_collision = new int[N];
-    // cudaErrCheck(cudaMemcpy(h_d_collision,
-    //                         d_collision,
-    //                         N * sizeof(int),
-    //                         cudaMemcpyDeviceToHost));
-    // // accuracy
-    // int hCount = 0, dCount = 0;
-    // for(int i = 0; i < N; i++)
-    // {
-    //     hCount += h_collision[i];
-    //     dCount += h_d_collision[i];
-    // }
-    // cout << N << " Particles, " << hCount << " collisions on CPU, and "
-    //      << dCount << " collisions on GPU. " << endl;
 }
 
 /* ========================================================================== */

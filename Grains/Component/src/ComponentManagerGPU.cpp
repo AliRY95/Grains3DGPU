@@ -306,19 +306,19 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesObstacles(
     uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
 
     // Invoke the kernel
-    detectCollisionAndComputeContactForcesObstacles_kernel<<<numBlocks,
-                                                             numThreads>>>(
-        particleRB,
-        obstacleRB,
-        CF,
-        m_rigidBodyId,
-        m_transform,
-        m_velocity,
-        m_torce,
-        m_obstacleRigidBodyId,
-        m_obstacleTransform,
-        m_nParticles,
-        m_nObstacles);
+    // detectCollisionAndComputeContactForcesObstacles_kernel<<<numBlocks,
+    //                                                          numThreads>>>(
+    //     particleRB,
+    //     obstacleRB,
+    //     CF,
+    //     m_rigidBodyId,
+    //     m_transform,
+    //     m_velocity,
+    //     m_torce,
+    //     m_obstacleRigidBodyId,
+    //     m_obstacleTransform,
+    //     m_nParticles,
+    //     m_nObstacles);
 }
 
 // -----------------------------------------------------------------------------
@@ -327,8 +327,7 @@ template <typename T>
 void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesParticles(
     RigidBody<T, T> const* const*      particleRB,
     LinkedCell<T> const* const*        LC,
-    ContactForceModel<T> const* const* CF,
-    int*                               result)
+    ContactForceModel<T> const* const* CF)
 {
     // Launch parameters
     uint numThreads = 256;
@@ -348,8 +347,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesParticles(
         m_particleCellHash,
         m_cellHashStart,
         m_cellHashEnd,
-        m_nParticles,
-        result);
+        m_nParticles);
 }
 
 // -----------------------------------------------------------------------------
@@ -359,14 +357,13 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForces(
     RigidBody<T, T> const* const*      particleRB,
     RigidBody<T, T> const* const*      obstacleRB,
     LinkedCell<T> const* const*        LC,
-    ContactForceModel<T> const* const* CF,
-    int*                               result)
+    ContactForceModel<T> const* const* CF)
 {
     // Updates links between components and linked cell
     updateLinks(LC);
 
     // Particle-particle interactions
-    detectCollisionAndComputeContactForcesParticles(particleRB, LC, CF, result);
+    detectCollisionAndComputeContactForcesParticles(particleRB, LC, CF);
 
     // Particle-obstacle interactions
     detectCollisionAndComputeContactForcesObstacles(particleRB, obstacleRB, CF);
@@ -376,7 +373,7 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForces(
 // Adds external forces such as gravity
 template <typename T>
 void ComponentManagerGPU<T>::addExternalForces(
-    RigidBody<T, T> const* const* particleRB, const Vector3<T>& g)
+    RigidBody<T, T> const* const* particleRB)
 {
     // Launch parameters
     uint numThreads = 256;
@@ -384,15 +381,17 @@ void ComponentManagerGPU<T>::addExternalForces(
 
     // since g is a host-side vector, we need to break it into three components
     // to be able to pass it to the kernel
-    T const gX = g[X], gY = g[Y], gZ = g[Z];
+    const T gX = GrainsParameters<T>::m_gravity[X];
+    const T gY = GrainsParameters<T>::m_gravity[Y];
+    const T gZ = GrainsParameters<T>::m_gravity[Z];
 
     // Invoke the kernel
     addExternalForces_kernel<<<numBlocks, numThreads>>>(particleRB,
                                                         m_rigidBodyId,
-                                                        m_torce,
                                                         gX,
                                                         gY,
                                                         gZ,
+                                                        m_torce,
                                                         m_nParticles);
 }
 
