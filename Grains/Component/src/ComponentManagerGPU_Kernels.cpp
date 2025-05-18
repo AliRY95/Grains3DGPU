@@ -164,57 +164,50 @@ __GLOBAL__ void detectCollisionAndComputeContactForcesParticles_kernel(
     const Transform3<T>&   trA       = transform[primaryId];
     T                      massA     = rbA.getMass();
     uint                   matA      = rbA.getMaterial();
+    const uint*            neighborsList = (*LC)->getNeighbors(cellHash);
 
-    for(int k = -1; k < 2; k++)
+    for(int i = 0; i < 27; ++i)
     {
-        for(int j = -1; j < 2; j++)
+        // Get the neighboring cell hash
+        uint neighborCellHash = neighborsList[i];
+        // Check if the neighboring cell is valid
+        if(neighborCellHash == UINT_MAX)
+            continue;
+        int startId = cellHashStart[neighborCellHash];
+        int endId   = cellHashEnd[neighborCellHash];
+        for(int id = startId; id < endId; id++)
         {
-            for(int i = -1; i < 2; i++)
+            int secondaryId = particleId[id];
+            // To skip the self-collision
+            if(secondaryId == primaryId)
+                continue;
+            RigidBody<T, U> const& rbB
+                = *(particleRB[rigidBodyId[secondaryId]]);
+            const Transform3<T>& trB = transform[secondaryId];
+            ContactInfo<T> ci = closestPointsRigidBodies(rbA, rbB, trA, trB);
+            if(ci.getOverlapDistance() < T(0))
             {
-                int neighboringCellHash
-                    = (*LC)->computeNeighboringCellLinearHash(cellHash,
-                                                              i,
-                                                              j,
-                                                              k);
-                int startId = cellHashStart[neighboringCellHash];
-                int endId   = cellHashEnd[neighboringCellHash];
-                for(int id = startId; id < endId; id++)
-                {
-                    int secondaryId = particleId[id];
-                    // To skip the self-collision
-                    if(secondaryId == primaryId)
-                        continue;
-                    RigidBody<T, U> const& rbB
-                        = *(particleRB[rigidBodyId[secondaryId]]);
-                    const Transform3<T>& trB = transform[secondaryId];
-                    ContactInfo<T>       ci
-                        = closestPointsRigidBodies(rbA, rbB, trA, trB);
-                    if(ci.getOverlapDistance() < T(0))
-                    {
-                        // CF ID given materialIDs
-                        uint contactForceID
-                            = ContactForceModelBuilderFactory<T>::computeHash(
-                                matA,
-                                rbB.getMaterial());
-                        // velocities of the particles
-                        Kinematics<T> v1(velocity[primaryId]);
-                        Kinematics<T> v2(velocity[secondaryId]);
-                        // relative velocity at contact point
-                        Vector3<T> relVel(
-                            v1.kinematicsAtPoint(ci.getContactPoint())
-                            - v2.kinematicsAtPoint(ci.getContactPoint()));
-                        // relative angular velocity
-                        Vector3<T> relAngVel(v1.getAngularComponent()
-                                             - v2.getAngularComponent());
-                        CF[contactForceID]->computeForces(ci,
-                                                          relVel,
-                                                          relAngVel,
-                                                          massA,
-                                                          rbB.getMass(),
-                                                          trA.getOrigin(),
-                                                          torce[primaryId]);
-                    }
-                }
+                // CF ID given materialIDs
+                uint contactForceID
+                    = ContactForceModelBuilderFactory<T>::computeHash(
+                        matA,
+                        rbB.getMaterial());
+                // velocities of the particles
+                Kinematics<T> v1(velocity[primaryId]);
+                Kinematics<T> v2(velocity[secondaryId]);
+                // relative velocity at contact point
+                Vector3<T> relVel(v1.kinematicsAtPoint(ci.getContactPoint())
+                                  - v2.kinematicsAtPoint(ci.getContactPoint()));
+                // relative angular velocity
+                Vector3<T> relAngVel(v1.getAngularComponent()
+                                     - v2.getAngularComponent());
+                CF[contactForceID]->computeForces(ci,
+                                                  relVel,
+                                                  relAngVel,
+                                                  massA,
+                                                  rbB.getMass(),
+                                                  trA.getOrigin(),
+                                                  torce[primaryId]);
             }
         }
     }

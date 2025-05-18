@@ -59,6 +59,11 @@ void GrainsGPU<T>::setupGPUDevice()
     // Set the number of blocks
     GP::m_numBlocksPerGrid = (GP::m_numParticles + GP::m_numThreadsPerBlock - 1)
                              / GP::m_numThreadsPerBlock;
+
+    // Set the number of threads per block
+    GP::m_numThreadsPerBlock = 7;
+    // Set the number of blocks
+    GP::m_numBlocksPerGrid = prop.multiProcessorCount;
 }
 
 // -----------------------------------------------------------------------------

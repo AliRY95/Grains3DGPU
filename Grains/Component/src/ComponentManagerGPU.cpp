@@ -261,10 +261,11 @@ void ComponentManagerGPU<T>::setParticleId(std::vector<uint> const& id)
 template <typename T>
 void ComponentManagerGPU<T>::updateLinks(LinkedCell<T> const* const* LC)
 {
+    using GP = GrainsParameters<T>;
     // Kernel launch parameters
-    uint numThreads = 256;
-    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
-    uint sMemSize   = sizeof(uint) * (numThreads + 1);
+    const uint numThreads = GP::m_numThreadsPerBlock;
+    const uint numBlocks  = GP::m_numBlocksPerGrid;
+    uint       sMemSize   = sizeof(uint) * (numThreads + 1);
 
     // Zeroing out the arrays
     zeroOutArray_kernel<<<numBlocks, numThreads>>>(m_cellHashStart,
@@ -301,9 +302,10 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesObstacles(
     RigidBody<T, T> const* const*      obstacleRB,
     ContactForceModel<T> const* const* CF)
 {
-    // Launch parameters
-    uint numThreads = 256;
-    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    using GP = GrainsParameters<T>;
+    // Kernel launch parameters
+    const uint numThreads = GP::m_numThreadsPerBlock;
+    const uint numBlocks  = GP::m_numBlocksPerGrid;
 
     // Invoke the kernel
     // detectCollisionAndComputeContactForcesObstacles_kernel<<<numBlocks,
@@ -329,9 +331,10 @@ void ComponentManagerGPU<T>::detectCollisionAndComputeContactForcesParticles(
     LinkedCell<T> const* const*        LC,
     ContactForceModel<T> const* const* CF)
 {
-    // Launch parameters
-    uint numThreads = 256;
-    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    using GP = GrainsParameters<T>;
+    // Kernel launch parameters
+    const uint numThreads = GP::m_numThreadsPerBlock;
+    const uint numBlocks  = GP::m_numBlocksPerGrid;
 
     // Invoke the kernel
     detectCollisionAndComputeContactForcesParticles_kernel<<<numBlocks,
@@ -375,9 +378,10 @@ template <typename T>
 void ComponentManagerGPU<T>::addExternalForces(
     RigidBody<T, T> const* const* particleRB)
 {
-    // Launch parameters
-    uint numThreads = 256;
-    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    using GP = GrainsParameters<T>;
+    // Kernel launch parameters
+    const uint numThreads = GP::m_numThreadsPerBlock;
+    const uint numBlocks  = GP::m_numBlocksPerGrid;
 
     // since g is a host-side vector, we need to break it into three components
     // to be able to pass it to the kernel
@@ -401,9 +405,10 @@ template <typename T>
 void ComponentManagerGPU<T>::moveParticles(RigidBody<T, T> const* const*   RB,
                                            TimeIntegrator<T> const* const* TI)
 {
-    // Launch parameters
-    uint numThreads = 256;
-    uint numBlocks  = (m_nParticles + numThreads - 1) / numThreads;
+    using GP = GrainsParameters<T>;
+    // Kernel launch parameters
+    const uint numThreads = GP::m_numThreadsPerBlock;
+    const uint numBlocks  = GP::m_numBlocksPerGrid;
 
     // Invoke the kernel
     moveParticles_kernel<<<numBlocks, numThreads>>>(RB,
